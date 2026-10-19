@@ -1,7 +1,7 @@
 import {
   mcpNamespace,
   validateMcpServerConfig
-} from "./chunk-E7M6DDVC.js";
+} from "./chunk-RTGDH7DA.js";
 import {
   CONFIG_DIR_NAME,
   canonicalizePath,

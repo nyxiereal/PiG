@@ -6,11 +6,17 @@ import {
 } from "./chunk-SHUYVCID.js";
 
 // pi-dist/pi-coding-agent/utils/shell.js
-import { existsSync } from "node:fs";
-import { delimiter, join } from "node:path";
+import { accessSync, constants } from "node:fs";
+import { delimiter, join, win32 } from "node:path";
 import { spawn, spawnSync } from "child_process";
 function isLegacyWslBashPath(path) {
-  const normalized = path.replace(/\//g, "\\").toLowerCase();
+  const normalized = win32.normalize(path).toLowerCase();
+  const systemRoot = process.env.SystemRoot;
+  if (systemRoot) {
+    if (!/^[a-z]:[\\/]/i.test(systemRoot))
+      return false;
+    return ["System32", "Sysnative"].some((directory) => normalized === win32.join(systemRoot, directory, "bash.exe").toLowerCase());
+  }
   return /^[a-z]:\\windows\\(?:system32|sysnative)\\bash\.exe$/.test(normalized);
 }
 __name(isLegacyWslBashPath, "isLegacyWslBashPath");
@@ -18,6 +24,15 @@ function getBashShellConfig(shell) {
   return isLegacyWslBashPath(shell) ? { shell, args: ["-s"], commandTransport: "stdin" } : { shell, args: ["-c"] };
 }
 __name(getBashShellConfig, "getBashShellConfig");
+function shellPathExists(path) {
+  try {
+    accessSync(path, constants.F_OK);
+    return true;
+  } catch {
+    return false;
+  }
+}
+__name(shellPathExists, "shellPathExists");
 function findExecutableOnPath(executable) {
   if (process.platform === "win32") {
     try {
@@ -28,7 +43,7 @@ function findExecutableOnPath(executable) {
       });
       if (result.status === 0 && result.stdout) {
         const firstMatch = result.stdout.trim().split(/\r?\n/)[0];
-        if (firstMatch && existsSync(firstMatch)) {
+        if (firstMatch && shellPathExists(firstMatch)) {
           return firstMatch;
         }
       }
@@ -51,7 +66,7 @@ function findExecutableOnPath(executable) {
 __name(findExecutableOnPath, "findExecutableOnPath");
 function getShellConfig(customShellPath) {
   if (customShellPath) {
-    if (existsSync(customShellPath)) {
+    if (shellPathExists(customShellPath)) {
       return getBashShellConfig(customShellPath);
     }
     throw new Error(`Custom shell path not found: ${customShellPath}`);
@@ -67,7 +82,7 @@ function getShellConfig(customShellPath) {
       paths.push(`${programFilesX86}\\Git\\bin\\bash.exe`);
     }
     for (const path of paths) {
-      if (existsSync(path)) {
+      if (shellPathExists(path)) {
         return getBashShellConfig(path);
       }
     }
@@ -83,7 +98,7 @@ function getShellConfig(customShellPath) {
 Searched Git Bash in:
 ${paths.map((p) => `  ${p}`).join("\n")}`);
   }
-  if (existsSync("/bin/bash")) {
+  if (shellPathExists("/bin/bash")) {
     return getBashShellConfig("/bin/bash");
   }
   const bashOnPath = findExecutableOnPath("bash");
@@ -98,7 +113,20 @@ function getPowerShellConfig() {
   if (process.platform !== "win32") {
     throw new Error("The powershell tool is only available on Windows.");
   }
-  const shell = findExecutableOnPath("pwsh.exe") ?? findExecutableOnPath("powershell.exe");
+  let shell = findExecutableOnPath("pwsh.exe");
+  const programFiles = process.env.ProgramFiles;
+  if (!shell && programFiles) {
+    const pwsh7 = win32.join(programFiles, "PowerShell", "7", "pwsh.exe");
+    if (shellPathExists(pwsh7))
+      shell = pwsh7;
+  }
+  shell ??= findExecutableOnPath("powershell.exe");
+  const systemRoot = process.env.SystemRoot;
+  if (!shell && systemRoot) {
+    const windowsPowerShell = win32.join(systemRoot, "System32", "WindowsPowerShell", "v1.0", "powershell.exe");
+    if (shellPathExists(windowsPowerShell))
+      shell = windowsPowerShell;
+  }
   if (!shell) {
     throw new Error("No PowerShell executable found. Install PowerShell or add powershell.exe/pwsh.exe to PATH.");
   }
@@ -141,7 +169,7 @@ __name(killTrackedDetachedChildren, "killTrackedDetachedChildren");
 function killProcessTree(pid) {
   if (process.platform === "win32") {
     try {
-      const child = spawn(join(process.env.SystemRoot ?? "C:\\Windows", "System32", "taskkill.exe"), ["/F", "/T", "/PID", String(pid)], {
+      const child = spawn(join(process.env.SystemRoot || "C:\\Windows", "System32", "taskkill.exe"), ["/F", "/T", "/PID", String(pid)], {
         stdio: "ignore",
         detached: true,
         windowsHide: true

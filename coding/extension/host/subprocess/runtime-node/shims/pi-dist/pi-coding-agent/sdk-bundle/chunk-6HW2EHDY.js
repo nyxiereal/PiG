@@ -19,7 +19,7 @@ import {
   truncateLine,
   truncateTail,
   wrapToolDefinition
-} from "./chunk-4XCBZNRK.js";
+} from "./chunk-QJIK7HVQ.js";
 import {
   getLanguageFromPath,
   highlightCode,
@@ -34,7 +34,7 @@ import {
   killProcessTree,
   trackDetachedChildPid,
   untrackDetachedChildPid
-} from "./chunk-PCYDWUGN.js";
+} from "./chunk-RVJYK3FO.js";
 import {
   APP_NAME,
   formatPathRelativeToCwdOrAbsolute,
@@ -1742,7 +1742,7 @@ function extractTarGzArchive(archivePath, extractDir, assetName) {
 }
 __name(extractTarGzArchive, "extractTarGzArchive");
 function getWindowsTarCommand() {
-  const systemRoot = process.env.SystemRoot ?? process.env.WINDIR;
+  const systemRoot = process.env.SystemRoot;
   if (systemRoot) {
     const systemTar = join(systemRoot, "System32", "tar.exe");
     if (existsSync(systemTar)) {

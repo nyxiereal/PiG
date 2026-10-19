@@ -3,7 +3,7 @@ import {
   createLocalBashOperations,
   fetchWithRetry,
   processImage
-} from "./chunk-NF4F5DMY.js";
+} from "./chunk-6HW2EHDY.js";
 import {
   SETTINGS_DEFAULTS,
   addUsageToTotals,
@@ -18,7 +18,7 @@ import {
   stripAnsi,
   truncateTail,
   wrapToolDefinition
-} from "./chunk-4XCBZNRK.js";
+} from "./chunk-QJIK7HVQ.js";
 import {
   FS_WATCH_RETRY_DELAY_MS,
   closeWatcher,
@@ -44,10 +44,10 @@ import {
   resolveConfigValueOrThrow,
   resolveHeadersOrThrow,
   validateMcpServerConfig
-} from "./chunk-E7M6DDVC.js";
+} from "./chunk-RTGDH7DA.js";
 import {
   sanitizeBinaryOutput
-} from "./chunk-PCYDWUGN.js";
+} from "./chunk-RVJYK3FO.js";
 import {
   APP_NAME,
   CONFIG_DIR_NAME,

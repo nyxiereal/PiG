@@ -4093,8 +4093,13 @@
     },
     {
       "path": "packages/coding-agent/test/login-dialog-device-code.test.ts",
-      "disposition": "pending",
-      "upstreamTestHash": "sha256:b1705be4371dc4a040f7e65ce23cf134e54ba77aa4e3f0788285624eb21a213e"
+      "disposition": "ported",
+      "upstreamTestHash": "sha256:b1705be4371dc4a040f7e65ce23cf134e54ba77aa4e3f0788285624eb21a213e",
+      "evidence": [
+        "tui/login_dialog_device_code_test.go",
+        "tui/login_dialog_render_oracle_test.go#TestLoginDialogRenderMatchesPi"
+      ],
+      "rationale": "All 9 cases are ported with Pi's inputs and assertions: one open-and-copy after confirmation across a prompt, the three provider overrides of the it.each, the previous auth-URL copy action cleared by a device code, device actions cleared by browser authentication and by details, cancellation that opens and copies nothing, and manual login kept when the browser and clipboard fail. The Go dialog takes the launcher and the clipboard writer from SetOpenBrowser and SetCopyToClipboard in place of Pi's module mocks, and the copy runs off the input path as Pi's unawaited copyToClipboard does. TestDeviceCodeLoginOpensOnlyWebURLs adds the file-URL guard of the same code. TestLoginDialogRenderMatchesPi compares the offer row and the dialog's frames with the pinned Pi over 500 seeded flows, with the clipboard route pinned so the copy fails the same way in both."
     },
     {
       "path": "packages/coding-agent/test/management-http.test.ts",

@@ -456,6 +456,8 @@ Rust: `ext.register_oauth_provider("example-provider", json!({"name": "Example P
 
 Python: `ext.register_oauth_provider("example-provider", {"name": "Example Provider"}, OAuthProvider(login=..., ...))`.
 
+Device-code login offers browser opening and code copying on Enter (`tui.select.confirm`) by default. Confirmation is optional; users can complete login manually without opening a browser or changing the clipboard. Set `OpenBrowserOnConfirm` or `CopyCodeOnConfirm` to a pointer to `false` (Go; `openBrowserOnConfirm` or `copyCodeOnConfirm` set to `false` in Node, Rust and Python) in the `OnDeviceCode` payload to disable either action. Native `AuthEvent` device-code notifications support the same flags.
+
 Value-returning callbacks (`OnPrompt`/`OnSelect`/`OnManualCodeInput`) return the user's input or, on dismissal, an error with Pi's message `Login cancelled` (Go `ErrOAuthCancelled`, Rust `OAUTH_CANCELLED`, Python `OAuthCancelled`; Node `onPrompt`, `onSelect` and `onManualCodeInput` reject with it). A login that returns that error ends as cancelled, and `/login` returns to the menu it was started from, as in Pi. Any other host failure is returned as that error. `OnManualCodeInput` asks with Pi's message "Paste the authorization code".
 
 ## Validation

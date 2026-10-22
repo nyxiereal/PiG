@@ -12,6 +12,11 @@ const { LoginDialogComponent } = await load("dist/modes/interactive/components/l
 let input = "";
 process.stdin.setEncoding("utf8");
 for await (const chunk of process.stdin) input += chunk;
+// A confirmed device code opens a browser and copies the code. Pin the clipboard route and hide every launcher, so the run
+// neither writes OSC 52 to stdout nor starts a program: the copy fails as it does on a desktop without xclip or xsel.
+process.env.DISPLAY = "oracle:0";
+for (const name of ["WAYLAND_DISPLAY", "TERMUX_VERSION", "SSH_CONNECTION", "SSH_CLIENT", "MOSH_CONNECTION", "PI_CLIPBOARD_OSC52"]) delete process.env[name];
+process.env.PATH = "";
 const flush = () => new Promise((resolve) => setImmediate(resolve));
 const results = [];
 for (const probe of JSON.parse(input)) {

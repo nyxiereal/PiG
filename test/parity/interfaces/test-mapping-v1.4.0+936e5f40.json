@@ -3560,8 +3560,13 @@
     },
     {
       "path": "packages/coding-agent/test/export-html-system-messages.test.ts",
-      "disposition": "pending",
-      "upstreamTestHash": "sha256:3e3ff75b664e951785e5209dc5eb600a01d7ba215410d6b349934cd258f213a1"
+      "disposition": "ported",
+      "upstreamTestHash": "sha256:3e3ff75b664e951785e5209dc5eb600a01d7ba215410d6b349934cd258f213a1",
+      "evidence": [
+        "internal/codingagent/export/upstream_test.go#TestExportHTMLSystemMessages",
+        "internal/codingagent/export/upstream_test.go#TestExportHTMLPinnedAssets"
+      ],
+      "rationale": "All 4 cases run in testdata/system_messages.cjs against the shipped template.js, sliced and evaluated in a fresh vm context exactly as Pi's test does: the system text and update rendering (Pi compares them with pi-ai's getSystemMessageText and renderSystemMessageUpdate; the script holds the strings those return for the same messages, which the oracle run checked), the leading-entry and update description cases, the compaction snapshot as earlier system state, and the transcript markers. The template is Pi's file byte for byte, pinned by hash."
     },
     {
       "path": "packages/coding-agent/test/export-html-whitespace.test.ts",

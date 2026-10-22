@@ -100,8 +100,8 @@ func TestCustomToolResultHTMLTrimsSpacing(t *testing.T) {
 func TestExportHTMLPinnedAssets(t *testing.T) {
 	for name, want := range map[string]string{
 		"template.html":                     "47d208235b066c856dae69c60281a3b99d164b99be9b81153d880375c9327105",
-		"template.css":                      "8ee19851f8e583277ed396cbb76496687aa556707fdfc1f78d1118bff87c740a",
-		"template.js":                       "10bc6324f9cc3136a332d5670b25aa0a7280badd0565210beec7c1efb5036415",
+		"template.css":                      "c9d26cc314336192021d604c0f1a4a63115172b24d03500571379f9172c06fc9",
+		"template.js":                       "9e1de8a050081c49e5e4523ace23accb6fad308625e699c9d5f8b63fa28d76c7",
 		"vendor/marked.min.js":              "438eedfcf932a414d0d0bfeea32dc365c063563b8ca713b4687fc8f8b501e5e4",
 		"vendor/marked-cjk-friendly.min.js": "93d2c938754cb24eef5b9ffecc268a98ef6beeb75dad614b0e874176aeeba565",
 		"vendor/highlight.min.js":           "837a6fa5b0c736b52bbde2b2b6190f305da3fc9ed41681db5321507057b5c846",
@@ -155,6 +155,17 @@ func TestExportHTMLRendering(t *testing.T) {
 	cmd := exec.CommandContext(t.Context(), "node", "testdata/render.cjs", output)
 	if output, err := cmd.CombinedOutput(); err != nil {
 		t.Fatalf("export rendering: %v\n%s", err, output)
+	}
+}
+
+// Ports packages/coding-agent/test/export-html-system-messages.test.ts (Pi #11261): the template's system-message helpers.
+func TestExportHTMLSystemMessages(t *testing.T) {
+	template, err := filepath.Abs("assets/template.js")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if output, err := exec.CommandContext(t.Context(), "node", "testdata/system_messages.cjs", template).CombinedOutput(); err != nil {
+		t.Fatalf("system message helpers: %v\n%s", err, output)
 	}
 }
 

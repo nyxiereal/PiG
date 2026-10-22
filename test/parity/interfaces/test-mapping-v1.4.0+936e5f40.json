@@ -3514,8 +3514,14 @@
     },
     {
       "path": "packages/coding-agent/test/exec.test.ts",
-      "disposition": "pending",
-      "upstreamTestHash": "sha256:36840712b5b038c4d162d13c52a20bc098c2734e7bf07e3c6a0a5337b71f4157"
+      "disposition": "ported",
+      "upstreamTestHash": "sha256:36840712b5b038c4d162d13c52a20bc098c2734e7bf07e3c6a0a5337b71f4157",
+      "evidence": [
+        "coding/extension/exec_test.go#TestExecCommand_SpawnFailureResolvesWithCodeOne",
+        "coding/extension/exec_test.go#TestExecCommand_SilentExitKeepsStderrEmpty",
+        "coding/extension/exec_oracle_test.go#TestExecCommandMatchesPi"
+      ],
+      "rationale": "Both cases are ported: a command that cannot start resolves with code 1, killed false, empty stdout and the spawn error's message in stderr (Pi matches /ENOENT/; the Go test asserts Node's whole message, `spawn <program> ENOENT`, for a missing program and a missing working directory), and a command that exits silently with code 1 keeps stderr empty. TestExecCommandMatchesPi compares about 150 real commands with the pinned Pi, including every program that cannot start."
     },
     {
       "path": "packages/coding-agent/test/experimental.test.ts",

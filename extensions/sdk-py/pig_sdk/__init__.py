@@ -4802,7 +4802,8 @@ class Extension:
         assistant Markdown in the interactive transcript, after its own
         transformers; a later registration replaces an earlier one. It receives
         the Markdown and Pi's MarkdownTransformContext (messageType,
-        isStreaming, availableWidth); anything but a str return, or a raise,
+        isStreaming, availableWidth, and messageId and timestamp when rendering a
+        persisted session entry); anything but a str return, or a raise,
         keeps the input."""
         self._markdown_transformer = transformer
 

@@ -3245,9 +3245,9 @@ rationale = ""
 [[files]]
 path = "packages/coding-agent/src/modes/interactive/interactive-mode.ts"
 change = "added"
-disposition = "pending"
-evidence = []
-rationale = ""
+disposition = "ported"
+evidence = ["test:internal/codingagent/ext_ui_dialog_stack_test.go#TestExtensionDialogsShowTheEarlierConfirmAgainAfterTheLaterIsAnswered", "test:internal/codingagent/ext_ui_dialog_stack_test.go#TestExtensionDialogsRemoveAHiddenDialogWhenItsSignalAborts", "test:test/extension-conformance/ui_concurrent_dialogs_test.go#TestConformance_ConcurrentDialogsAgreeAcrossSDKs", "test:internal/codingagent/markdown_message_meta_test.go#TestMarkdownTransformContextCarriesPersistedEntryIdentity"]
+rationale = "Pi 38847563 (#11166, #9909): select, confirm, input, editor and inline custom dialogs form a stack (pushExtensionDialog, removeExtensionDialog, showTopExtensionDialog) instead of replacing each other, the visible one is the last, closing it shows the previous one, a hidden dialog's abort removes only itself, and resetExtensionUI disposes every dialog; internal/codingagent/ext_ui_dialog_stack.go owns the stack for in-process, remote and custom dialogs, session replacement and /reload reset it, and a conformance row covers every SDK realization. Pi 64627838 (#11270) gives addMessageToChat and renderSessionItems a messageMeta (entry id and timestamp per message) that reaches the user and assistant components and then every Markdown transformer as the context's messageId and timestamp. Ported as the messageMeta value of newUserMessageBlock and newAssistantMessageBlock, filled from the entry in the transcript rebuild and empty for live messages and the no-session fallback; the transformer context (markdowntransform, the extension SDKs) carries MessageID and Timestamp."
 
 [[files]]
 path = "packages/coding-agent/src/modes/interactive/model-catalog-refresh.ts"

@@ -3913,8 +3913,13 @@
     },
     {
       "path": "packages/coding-agent/test/interactive-mode-compaction.test.ts",
-      "disposition": "pending",
-      "upstreamTestHash": "sha256:21bdd795cb20e836985614f7225695a7dabec8d7154554dc3fbdf54040975fb0"
+      "disposition": "ported",
+      "upstreamTestHash": "sha256:21bdd795cb20e836985614f7225695a7dabec8d7154554dc3fbdf54040975fb0",
+      "evidence": [
+        "internal/codingagent/interactive_compaction_upstream_test.go#TestInteractiveCompactionUpstream",
+        "internal/codingagent/markdown_message_meta_test.go#TestMarkdownTransformContextCarriesPersistedEntryIdentity"
+      ],
+      "rationale": "All 6 cases are subtests of TestInteractiveCompactionUpstream (titles drop only an article). The only 1.1.0 change adds a programStatus.handleEvent stub to the two mode fixtures, which the Go fixture does not need; program status belongs to the status-events lane. Pi #11270 changes two assertions: renderSessionItems now receives a messageMeta map (message to entry id and timestamp), and the test reads the ids and timestamps of the compaction summary and retained entries from it. PiG has no renderSessionItems: the transcript rebuild hands each message's entry id and timestamp straight to the user and assistant blocks (messageMeta in interactive_transcript.go), so the Go test renders persisted entries and checks the Markdown transformer context for each, and checks that live messages carry none."
     },
     {
       "path": "packages/coding-agent/test/interactive-mode-extension-dialogs.test.ts",
@@ -6680,8 +6685,17 @@
     },
     {
       "path": "packages/coding-agent/test/user-message.test.ts",
-      "disposition": "pending",
-      "upstreamTestHash": "sha256:41d082bde7b8e9da8ad11925dc65613751bc168f4c840251c967e2fa18d2e34f"
+      "disposition": "ported",
+      "upstreamTestHash": "sha256:41d082bde7b8e9da8ad11925dc65613751bc168f4c840251c967e2fa18d2e34f",
+      "evidence": [
+        "tui/user_message_upstream_test.go#TestUpstreamUserMessageOSCMarkers",
+        "tui/user_message_upstream_test.go#TestUpstreamUserMessageInvalidation",
+        "tui/user_message_upstream_test.go#TestUpstreamUserMessageTransformerChain",
+        "internal/codingagent/mermaid_interactive_test.go#TestInteractiveUserMessageRunsBuiltinMarkdownTransform",
+        "test/parity/scenarios/tui-components/16-markdown-user-components.toml",
+        "tui/user_message_upstream_test.go#TestUpstreamUserMessagePersistedEntryIdentity"
+      ],
+      "rationale": "All three upstream cases preserve exact text, dimensions, OSC marker assertions, transform order/context and invalidation behavior. Marker placement and stale transformed content are red-proven. Constructor transforms map to the generic Go component setter and the production createMarkdownTransform adapter; the interactive factory also passes its built-in transform. Compiling mutations and the exact real-Pi component scenario verify the guards. This closes the component contract, not the separately unported subprocess transformer-registration API. Pi #11270 adds the case 'passes persisted entry identity in transformer context; live leaves it undefined': a component built with an entry id and ISO timestamp hands both to the Markdown transformers, and one built without them hands none. The Go test uses the same ids and timestamp; the optional constructor arguments are the trailing messageID and timestamp strings, empty for Pi's undefined."
     },
     {
       "path": "packages/coding-agent/test/version-check.test.ts",

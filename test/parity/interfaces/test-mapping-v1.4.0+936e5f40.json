@@ -3546,8 +3546,13 @@
     },
     {
       "path": "packages/coding-agent/test/export-html-deep-tree.test.ts",
-      "disposition": "pending",
-      "upstreamTestHash": "sha256:2572f25526bb595af772f056d75afbcb02252e00ce557d07e0f5046a73d30f44"
+      "disposition": "ported",
+      "upstreamTestHash": "sha256:2572f25526bb595af772f056d75afbcb02252e00ce557d07e0f5046a73d30f44",
+      "evidence": [
+        "internal/codingagent/export/upstream_test.go#TestExportHTMLDeepSessionTree",
+        "internal/codingagent/export/upstream_test.go#TestExportHTMLPinnedAssets"
+      ],
+      "rationale": "The single case builds the 20,000-entry single-child chain Pi builds (ids e0..e19999, one second apart, user messages with content x), exports it with ExportFromFile and runs buildTree, buildActivePathIds, flattenTree, findNewestLeaf and getPath from the exported viewer script in a vm context (testdata/deep_tree.cjs, Pi's loadTreeApi and assertions). The template is Pi's file byte for byte, pinned by hash."
     },
     {
       "path": "packages/coding-agent/test/export-html-skill-block.test.ts",

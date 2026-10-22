@@ -3,7 +3,7 @@ import {
   mcpNamespace,
   resolveConfigValueOrThrow,
   resolveHeadersOrThrow
-} from "./chunk-RTGDH7DA.js";
+} from "./chunk-XNXPQFJN.js";
 import {
   APP_NAME,
   VERSION,

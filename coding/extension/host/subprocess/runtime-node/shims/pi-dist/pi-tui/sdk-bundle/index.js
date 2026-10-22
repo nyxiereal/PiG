@@ -11,50 +11,63 @@ import { homedir } from "os";
 import { basename, dirname, join } from "path";
 
 // pi-dist/pi-tui/fuzzy.js
+function scorePositions(textLower, positions) {
+  let score = 0;
+  let lastMatchIndex = -1;
+  let consecutiveMatches = 0;
+  for (const i of positions) {
+    if (lastMatchIndex === i - 1) {
+      consecutiveMatches++;
+      score -= consecutiveMatches * 5;
+    } else {
+      consecutiveMatches = 0;
+      if (lastMatchIndex >= 0) {
+        score += (i - lastMatchIndex - 1) * 2;
+      }
+    }
+    if (i === 0 || /[\s\-_./:]/.test(textLower[i - 1])) {
+      score -= 10;
+    }
+    score += i * 0.1;
+    lastMatchIndex = i;
+  }
+  return score;
+}
+__name(scorePositions, "scorePositions");
+function matchQuery(normalizedQuery, textLower) {
+  if (normalizedQuery.length === 0) {
+    return { matches: true, score: 0 };
+  }
+  if (normalizedQuery.length > textLower.length) {
+    return { matches: false, score: 0 };
+  }
+  const positions = [];
+  let lastMatchIndex = -1;
+  for (let queryIndex = 0; queryIndex < normalizedQuery.length; queryIndex++) {
+    const i = textLower.indexOf(normalizedQuery[queryIndex], lastMatchIndex + 1);
+    if (i === -1) {
+      return { matches: false, score: 0 };
+    }
+    positions.push(i);
+    lastMatchIndex = i;
+  }
+  let score = scorePositions(textLower, positions);
+  for (let start = textLower.indexOf(normalizedQuery); start !== -1; start = textLower.indexOf(normalizedQuery, start + 1)) {
+    for (let k = 0; k < positions.length; k++) {
+      positions[k] = start + k;
+    }
+    score = Math.min(score, scorePositions(textLower, positions));
+  }
+  if (normalizedQuery === textLower) {
+    score -= 100;
+  }
+  return { matches: true, score };
+}
+__name(matchQuery, "matchQuery");
 function fuzzyMatch(query, text) {
   const queryLower = query.toLowerCase();
   const textLower = text.toLowerCase();
-  const matchQuery = /* @__PURE__ */ __name((normalizedQuery) => {
-    if (normalizedQuery.length === 0) {
-      return { matches: true, score: 0 };
-    }
-    if (normalizedQuery.length > textLower.length) {
-      return { matches: false, score: 0 };
-    }
-    let queryIndex = 0;
-    let score = 0;
-    let lastMatchIndex = -1;
-    let consecutiveMatches = 0;
-    while (queryIndex < normalizedQuery.length) {
-      const i = textLower.indexOf(normalizedQuery[queryIndex], lastMatchIndex + 1);
-      if (i === -1)
-        break;
-      const isWordBoundary = i === 0 || /[\s\-_./:]/.test(textLower[i - 1]);
-      if (lastMatchIndex === i - 1) {
-        consecutiveMatches++;
-        score -= consecutiveMatches * 5;
-      } else {
-        consecutiveMatches = 0;
-        if (lastMatchIndex >= 0) {
-          score += (i - lastMatchIndex - 1) * 2;
-        }
-      }
-      if (isWordBoundary) {
-        score -= 10;
-      }
-      score += i * 0.1;
-      lastMatchIndex = i;
-      queryIndex++;
-    }
-    if (queryIndex < normalizedQuery.length) {
-      return { matches: false, score: 0 };
-    }
-    if (normalizedQuery === textLower) {
-      score -= 100;
-    }
-    return { matches: true, score };
-  }, "matchQuery");
-  const primaryMatch = matchQuery(queryLower);
+  const primaryMatch = matchQuery(queryLower, textLower);
   if (primaryMatch.matches) {
     return primaryMatch;
   }
@@ -64,7 +77,7 @@ function fuzzyMatch(query, text) {
   if (!swappedQuery) {
     return primaryMatch;
   }
-  const swappedMatch = matchQuery(swappedQuery);
+  const swappedMatch = matchQuery(swappedQuery, textLower);
   if (!swappedMatch.matches) {
     return primaryMatch;
   }

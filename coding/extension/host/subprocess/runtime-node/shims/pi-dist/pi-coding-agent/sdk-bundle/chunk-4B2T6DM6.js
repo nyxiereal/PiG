@@ -8,7 +8,7 @@ import {
   startToolTimer,
   str,
   toolTimerText
-} from "./chunk-QJIK7HVQ.js";
+} from "./chunk-T5YZVFVX.js";
 import {
   highlightCode,
   keyHint
@@ -194,7 +194,7 @@ import { CODEMODE_SOURCE_GRAMMAR } from "../../pi-codemode/source.js";
 import { Type as Type2 } from "../../../typebox.mjs";
 
 // pi-dist/pi-coding-agent/extensions/codemode/execute.lazy.js
-var loadCodemodeExecutor = /* @__PURE__ */ __name(() => import("./chunk-IJQXPPGQ.js"), "loadCodemodeExecutor");
+var loadCodemodeExecutor = /* @__PURE__ */ __name(() => import("./chunk-FUOCRXE5.js"), "loadCodemodeExecutor");
 
 // pi-dist/pi-coding-agent/extensions/codemode/renderer.js
 import { Container, Spacer, Text } from "../../../pi-tui.mjs";

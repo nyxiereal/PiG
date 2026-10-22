@@ -1,6 +1,6 @@
 import {
   getShellConfig
-} from "./chunk-RVJYK3FO.js";
+} from "./chunk-OH2Z3DNC.js";
 import {
   getAgentDir,
   getFileRevision,

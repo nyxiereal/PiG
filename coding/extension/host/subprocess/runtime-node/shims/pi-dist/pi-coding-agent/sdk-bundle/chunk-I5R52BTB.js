@@ -4,7 +4,7 @@ import {
   fetchWithRetry,
   getPiUserAgent,
   processImage
-} from "./chunk-ZYMNLKUS.js";
+} from "./chunk-UWJCOORC.js";
 import {
   SETTINGS_DEFAULTS,
   addUsageToTotals,
@@ -19,7 +19,7 @@ import {
   stripAnsi,
   truncateTail,
   wrapToolDefinition
-} from "./chunk-QJIK7HVQ.js";
+} from "./chunk-T5YZVFVX.js";
 import {
   FS_WATCH_RETRY_DELAY_MS,
   closeWatcher,
@@ -45,10 +45,10 @@ import {
   resolveConfigValueOrThrow,
   resolveHeadersOrThrow,
   validateMcpServerConfig
-} from "./chunk-RTGDH7DA.js";
+} from "./chunk-XNXPQFJN.js";
 import {
   sanitizeBinaryOutput
-} from "./chunk-RVJYK3FO.js";
+} from "./chunk-OH2Z3DNC.js";
 import {
   APP_NAME,
   CONFIG_DIR_NAME,
@@ -4367,13 +4367,13 @@ async function execCommand(command, args, cwd, options) {
         options.signal.removeEventListener("abort", killProcess);
       }
       resolve9({ stdout, stderr, code: code ?? 0, killed });
-    }).catch((_err) => {
+    }).catch((error) => {
       if (timeoutId)
         clearTimeout(timeoutId);
       if (options?.signal) {
         options.signal.removeEventListener("abort", killProcess);
       }
-      resolve9({ stdout, stderr, code: 1, killed });
+      resolve9({ stdout, stderr: stderr || error.message, code: 1, killed });
     });
   });
 }

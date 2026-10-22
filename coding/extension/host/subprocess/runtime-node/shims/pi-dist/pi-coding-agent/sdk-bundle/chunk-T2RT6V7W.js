@@ -4,7 +4,7 @@ import {
   loadMcpConfig,
   openBrowser,
   removeMcpServerConfig
-} from "./chunk-7NLBDVYL.js";
+} from "./chunk-N6HXWYKG.js";
 import {
   McpOAuthCredentialStore,
   McpServerConnection,
@@ -12,12 +12,12 @@ import {
   McpSignInCancelledError,
   createDefaultTransport,
   signInMcpServer
-} from "./chunk-7BSH4O3O.js";
+} from "./chunk-LNQUQKY2.js";
 import {
   getMcpToolExposure,
   validateMcpServerConfig
-} from "./chunk-RTGDH7DA.js";
-import "./chunk-RVJYK3FO.js";
+} from "./chunk-XNXPQFJN.js";
+import "./chunk-OH2Z3DNC.js";
 import {
   APP_NAME,
   CONFIG_DIR_NAME

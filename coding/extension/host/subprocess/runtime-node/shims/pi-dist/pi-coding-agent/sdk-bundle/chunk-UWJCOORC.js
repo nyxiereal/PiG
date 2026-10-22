@@ -19,7 +19,7 @@ import {
   truncateLine,
   truncateTail,
   wrapToolDefinition
-} from "./chunk-QJIK7HVQ.js";
+} from "./chunk-T5YZVFVX.js";
 import {
   getLanguageFromPath,
   highlightCode,
@@ -34,7 +34,7 @@ import {
   killProcessTree,
   trackDetachedChildPid,
   untrackDetachedChildPid
-} from "./chunk-RVJYK3FO.js";
+} from "./chunk-OH2Z3DNC.js";
 import {
   VERSION,
   formatPathRelativeToCwdOrAbsolute,

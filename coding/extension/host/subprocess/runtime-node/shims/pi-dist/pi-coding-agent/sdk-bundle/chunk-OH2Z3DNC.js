@@ -179,6 +179,12 @@ function killProcessTree(pid) {
     } catch {
     }
   } else {
+    if (process.platform === "darwin") {
+      try {
+        process.kill(-pid, "SIGSTOP");
+      } catch {
+      }
+    }
     try {
       process.kill(-pid, "SIGKILL");
     } catch {

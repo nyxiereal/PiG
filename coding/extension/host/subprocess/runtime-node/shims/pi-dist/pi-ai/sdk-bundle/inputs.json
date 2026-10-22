@@ -259,7 +259,7 @@
     },
     {
       "path": "pi-dist/pi-ai/providers/data/.manifest.json",
-      "sha256": "a9507ad3c47ac0da71a11b36e143842b41e0bda4f3d1a00811e7fe2eebbc9d8b"
+      "sha256": "3a3a1add6fa34a655bb701f708f11a5cbffaab3c5ea0cfe4e0b68d55ef03c133"
     },
     {
       "path": "pi-dist/pi-ai/providers/data/amazon-bedrock.json",
@@ -299,7 +299,7 @@
     },
     {
       "path": "pi-dist/pi-ai/providers/data/fireworks.json",
-      "sha256": "8e862806b0a69cefc6585c38b103de1baae782c51409748c6d16199daedcf1ca"
+      "sha256": "4282738fbe5d1da4ec7cce489a47602c869972377e1743636bf1df1ef44fec76"
     },
     {
       "path": "pi-dist/pi-ai/providers/data/github-copilot.json",
@@ -339,7 +339,7 @@
     },
     {
       "path": "pi-dist/pi-ai/providers/data/mistral.json",
-      "sha256": "c15e0ec8fcbc16b58342242b159af6ad035e7472d06ef4ccfc17fafc947ef3dc"
+      "sha256": "bac8c57f62b2353e5c0d575258152922afcd59ed77fc3d0ac5497ef53ef9b618"
     },
     {
       "path": "pi-dist/pi-ai/providers/data/moonshotai-cn.json",
@@ -371,7 +371,7 @@
     },
     {
       "path": "pi-dist/pi-ai/providers/data/openrouter.json",
-      "sha256": "9734b4f932db67d582ba1ad32682f3195db48fc555d3f681e23fb4c4eec80097"
+      "sha256": "b112ab297803e91b4c7d168389fa4146442a2ceb88a7ae0530f40e3c26a0040b"
     },
     {
       "path": "pi-dist/pi-ai/providers/data/qwen-token-plan-cn.json",
@@ -399,7 +399,7 @@
     },
     {
       "path": "pi-dist/pi-ai/providers/data/vercel-ai-gateway.json",
-      "sha256": "10f211af694b0ab1ed32176f562a74bfd1042031a70682dad8ad565a9a38c3fd"
+      "sha256": "44dd461972d0379d9c53e070c69ba9daae03b3efa9b717a8007b6feb50edec0d"
     },
     {
       "path": "pi-dist/pi-ai/providers/data/xai.json",

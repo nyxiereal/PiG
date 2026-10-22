@@ -3126,9 +3126,9 @@ rationale = ""
 [[files]]
 path = "packages/coding-agent/src/modes/interactive/components/session-selector-search.ts"
 change = "added"
-disposition = "pending"
-evidence = []
-rationale = ""
+disposition = "ported"
+evidence = ["internal/codingagent/session_selector.go", "docs/parity/session-selector-search.md"]
+rationale = "Ported per-field tiered search (Pi 8c03fef4d)."
 
 [[files]]
 path = "packages/coding-agent/src/modes/interactive/components/session-selector.ts"
@@ -3259,9 +3259,9 @@ rationale = ""
 [[files]]
 path = "packages/coding-agent/src/modes/interactive/model-search.ts"
 change = "added"
-disposition = "pending"
-evidence = []
-rationale = ""
+disposition = "ported"
+evidence = ["tui/model_search.go", "tui/model_search_test.go#TestModelSelectorSearchRanksContiguousMatchesAboveScatteredOnes"]
+rationale = "Model search ranks through the shared fuzzy matcher, which now prefers contiguous occurrences (Pi 8c03fef4d)."
 
 [[files]]
 path = "packages/coding-agent/src/modes/interactive/program-status-reporter.ts"
@@ -4659,9 +4659,9 @@ rationale = ""
 [[files]]
 path = "packages/tui/src/fuzzy.ts"
 change = "added"
-disposition = "pending"
-evidence = []
-rationale = ""
+disposition = "ported"
+evidence = ["tui/fuzzy.go", "extensions/sdk/tui/internal/engine/fuzzy.go", "tui/fuzzy_upstream_test.go#TestUpstreamFuzzyContiguousAlignment"]
+rationale = "Ported contiguous-alignment scoring (Pi 8c03fef4d)."
 
 [[files]]
 path = "packages/tui/src/index.ts"

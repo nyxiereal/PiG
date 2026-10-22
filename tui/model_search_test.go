@@ -152,3 +152,38 @@ func TestModelSelectorSearchMatchesRawNameAndFooterFallsBackToID(t *testing.T) {
 		t.Fatalf("footer did not fall back to id:\n%s", joined)
 	}
 }
+
+// Ports packages/coding-agent/test/model-search.test.ts (Pi #11220, #10065): ranking a query that a scattered alignment used to bury.
+func TestModelSelectorSearchRanksContiguousMatchesAboveScatteredOnes(t *testing.T) {
+	rank := func(items []ModelSearchItem, query string) []string {
+		filtered := FuzzyFilter(items, query, GetModelSelectorSearchText)
+		out := make([]string, len(filtered))
+		for i, item := range filtered {
+			out[i] = item.ID
+		}
+		return out
+	}
+	t.Run("ranks models containing the query above scattered matches", func(t *testing.T) {
+		got := rank([]ModelSearchItem{
+			{Provider: "openrouter", ID: "openai/gpt-oss-120b", Name: "OpenAI: gpt-oss-120b"},
+			{Provider: "openrouter", ID: "anthropic/claude-sonnet-4.5", Name: "Anthropic: Claude Sonnet 4.5"},
+			{Provider: "openrouter", ID: "anthropic/claude-opus-4.1", Name: "Anthropic: Claude Opus 4.1"},
+			{Provider: "anthropic", ID: "claude-sonnet-4-5", Name: "Claude Sonnet 4.5"},
+			{Provider: "anthropic", ID: "claude-opus-4-1", Name: "Claude Opus 4.1"},
+		}, "opus")
+		first := slices.Sorted(slices.Values(got[:2]))
+		if want := []string{"anthropic/claude-opus-4.1", "claude-opus-4-1"}; !slices.Equal(first, want) {
+			t.Fatalf("first two = %v, want %v", first, want)
+		}
+	})
+	t.Run("ranks the typed model above models sharing a long provider prefix", func(t *testing.T) {
+		got := rank([]ModelSearchItem{
+			{Provider: "fireworks", ID: "accounts/fireworks/models/deepseek-v4-flash-0731"},
+			{Provider: "fireworks", ID: "accounts/fireworks/models/kimi-k3"},
+			{Provider: "fireworks", ID: "accounts/fireworks/routers/firerouter", Name: "FireRouter"},
+		}, "firerouter")
+		if got[0] != "accounts/fireworks/routers/firerouter" {
+			t.Fatalf("ranking = %v, want the router first", got)
+		}
+	})
+}

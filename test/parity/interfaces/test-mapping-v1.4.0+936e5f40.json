@@ -4340,8 +4340,12 @@
     },
     {
       "path": "packages/coding-agent/test/model-search.test.ts",
-      "disposition": "pending",
-      "upstreamTestHash": "sha256:f328579bf7f746a8d69804753d8f0be7236c5198e89d2e802a0879318869cf80"
+      "disposition": "ported",
+      "upstreamTestHash": "sha256:f328579bf7f746a8d69804753d8f0be7236c5198e89d2e802a0879318869cf80",
+      "evidence": [
+        "tui/model_search_test.go#TestModelSelectorSearchRanksContiguousMatchesAboveScatteredOnes"
+      ],
+      "rationale": "Pi 8c03fef4d adds two ranking cases, a contiguous match above scattered ones and the typed model above models sharing a long provider prefix; both are ported with Pi inputs."
     },
     {
       "path": "packages/coding-agent/test/model-selector.test.ts",
@@ -5138,8 +5142,20 @@
     },
     {
       "path": "packages/coding-agent/test/session-selector-search.test.ts",
-      "disposition": "pending",
-      "upstreamTestHash": "sha256:ae7d224cbff258d61d720d4f6db0b9c2d236a7bacbc38e276921ee43fc9b4507"
+      "disposition": "ported",
+      "upstreamTestHash": "sha256:ae7d224cbff258d61d720d4f6db0b9c2d236a7bacbc38e276921ee43fc9b4507",
+      "evidence": [
+        "internal/codingagent/session_selector_search_test.go#TestUpstreamSessionSelectorSearch",
+        "internal/codingagent/session_selector_search_test.go#TestSessionSearchRetainsAndClampsSelection",
+        "internal/codingagent/session_selector_search_semantics_test.go",
+        "test/parity/scenarios/session/20-session-selector-search.toml",
+        "test/parity/scenarios/session/21-session-search-resume-picker.toml",
+        "docs/parity/session-selector-search.md",
+        "internal/codingagent/session_selector_search_semantics_test.go#TestSessionSearchScores",
+        "internal/codingagent/session_selector_search_semantics_test.go#TestSessionSearchQueryTokens",
+        "internal/codingagent/session_selector_test.go#TestFilterAndSortSessions"
+      ],
+      "rationale": "All nine original case sites (ten result assertions) retain their sessions, queries, modes, name filters and ordered IDs in the shared search-cases.json fixture. Native tests exercise both the pure search function and production picker. Published Pi 0.87.1 supplies the same results. Supplemental cases prove fuzzy scores, swapped alphanumeric queries, whitespace, stable ties, fields and selected-path behavior. Compiling pre-fix source overlays fail both exact-output scenarios; the real --resume picker shows alpha one and golf seven swapped before the fix. Pi 8c03fef4d searches each field on its own with tiered scores; the new cases (no match across a field boundary, name text above ID/message/cwd text, scattered characters last) are ported into the search score and filter tests and the session-search scenarios 20 and 21."
     },
     {
       "path": "packages/coding-agent/test/session-share.test.ts",
@@ -8132,8 +8148,16 @@
     },
     {
       "path": "packages/tui/test/fuzzy.test.ts",
-      "disposition": "pending",
-      "upstreamTestHash": "sha256:5421123fc6fa35db375882c6e8619d26b4283587fcf68bc4f6f54cb2d1ec013f"
+      "disposition": "ported",
+      "upstreamTestHash": "sha256:5421123fc6fa35db375882c6e8619d26b4283587fcf68bc4f6f54cb2d1ec013f",
+      "evidence": [
+        "tui/fuzzy_upstream_test.go#TestUpstreamFuzzyMatch",
+        "tui/fuzzy_upstream_test.go#TestUpstreamFuzzyFilter",
+        "tui/fuzzy_upstream_test.go#TestUpstreamFuzzyContiguousAlignment",
+        "tui/fuzzy_oracle_test.go",
+        "extensions/sdk/tui/vectors_test.go#TestFuzzyVectorsMatchPi"
+      ],
+      "rationale": "All 14 upstream cases are ported with identical inputs and assertions and per-case source-line citations. Removing the exact-match score bonus compiles and fails prioritizes exact matches over longer prefix matches; the restored implementation passes all cases. Pi 8c03fef4d scores every contiguous occurrence and keeps the best alignment; the two new cases are ported and the Go, SDK engine, Python and Rust vectors are regenerated from the pinned oracle."
     },
     {
       "path": "packages/tui/test/input.test.ts",

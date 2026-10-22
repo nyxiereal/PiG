@@ -5199,8 +5199,12 @@
     },
     {
       "path": "packages/coding-agent/test/shell-kill-process-tree.test.ts",
-      "disposition": "pending",
-      "upstreamTestHash": "sha256:e0e8c558ecae290228fdf31c717910a3b5965b95384e9a2eb1c2a77864bfb62a"
+      "disposition": "ported",
+      "upstreamTestHash": "sha256:e0e8c558ecae290228fdf31c717910a3b5965b95384e9a2eb1c2a77864bfb62a",
+      "evidence": [
+        "internal/codingagent/tools/bash_group_unix_kill_test.go#TestKillProcessTree"
+      ],
+      "rationale": "All 5 cases are subtests of TestKillProcessTree with Pi's pids, signals and call order: the macOS stop-then-kill, a failed stop that still kills the group, the single-process fallback when the group kill fails, a failure of all three signals, and the unchanged Linux group SIGKILL. Pi mocks process.kill and process.platform; Go injects the kill function and the darwin flag into killProcessTree, which killProcessGroup calls with syscall.Kill and runtime.GOOS."
     },
     {
       "path": "packages/coding-agent/test/shell-path-exists.test.ts",

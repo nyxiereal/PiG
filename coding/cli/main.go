@@ -1111,7 +1111,7 @@ func Main(args []string, options *MainOptions) {
 	}
 
 	// Metadata reports the startup settings diagnostics and the runtime diagnostics, such as the warning of a package that could not be installed, and never their failure status (main.ts, Pi 6dfb54678).
-	metadataDiagnostics := codingagent.DeduplicateDiagnostics(slices.Concat(startupSettingsDiagnostics, build.StartupDiagnostics, extensionDiagnostics))
+	metadataDiagnostics := codingagent.DeduplicateDiagnostics(slices.Concat(startupSettingsDiagnostics, startupDiagnostics))
 	if flags.Help {
 		codingagent.ReportDiagnostics(metadataDiagnostics)
 		// upstream: cli/args.ts printHelp styles with chalk.bold, whose level is chalk's stdout supports-color level (FORCE_COLOR, --no-color, TERM, CI), not only whether stdout is a terminal.

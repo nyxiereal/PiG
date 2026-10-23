@@ -287,7 +287,6 @@ The tmux scenario harness cannot drive a Windows `.exe`. Windows verification re
 | `packages/ai/src/utils/models-error.ts` | `ai/auth_resolve.go (ModelsErrorCode, ModelsError, NewModelsError)` | ✅ |
 | `packages/ai/src/utils/oauth-page.ts` | `ai/oauth_page.go (upstream 0.99.1 moved the file unchanged from auth/oauth/oauth-page.ts)` | ✅ |
 | `packages/ai/src/providers/openrouter-api.ts` | `ai/openrouter_api.go (OpenRouterModel, OpenRouterCost and the rest of the row's exported members), cmd/gen-models/` | ✅ |
-| `packages/ai/src/utils/openrouter-cost.ts` | `ai/openrouter_cost.go (isOpenRouterModel, applyOpenRouterReportedCost, the OpenRouter usage accounting; ai/openrouter_cost_test.go)` | ✅ |
 | `packages/ai/src/telemetry.ts` | `ai/telemetry.go` | ✅ |
 
 ## `packages/coding-agent/src/`
@@ -682,7 +681,7 @@ The tmux scenario harness cannot drive a Windows `.exe`. Windows verification re
 | `packages/chord/src/reload.ts` | `chord/host/reload.go (link protocol 4)` | ✅ |
 | `packages/chord/src/schema.ts` | `chord/host/schema.go` | ✅ |
 | `packages/chord/src/state.ts` | `chord/state.go` | ✅ |
-| `packages/chord/src/watch.ts` | `chord/watch.go WatchEnd, WatchEndReason, WatchHandle (Durable's package re-exports them as type aliases, as Pi's durable index does); chord/watch_impl.go Watch, NativeWatch, NativeWatchHandle, DeliveryScheduler (the delivery goroutines that stand for queueMicrotask)` | ✅ |
+| `packages/chord/src/watch.ts` | `chord/watch.go WatchEnd, WatchEndReason, WatchHandle, Watchable, NativeWatchable (Durable's package re-exports them as type aliases, as Pi's durable index does); chord/watch_impl.go Watch, NativeWatch, NativeWatchHandle, DeliveryScheduler (the delivery goroutines that stand for queueMicrotask)` | ✅ |
 | `packages/chord/src/websocket.ts` | `chord/host/websocket.go (link protocol 4)` | ✅ |
 | `packages/chord/src/wire.ts` | `chord/host/wire.go (link protocol 4)` | ✅ |
 | `packages/chord/src/telemetry-sqlite/index.ts` | `chord/telemetrysqlite/index.go` | ✅ |

@@ -571,6 +571,35 @@
       ]
     },
     {
+      "id": "BF-07da4ea",
+      "title": "A configured package or `-e` source that cannot be installed no longer ends startup",
+      "symptom": "A configured package or `-e` source that cannot be installed no longer ends startup.",
+      "rootCause": "Ports Pi (#11304). Resolving packages catches an install failure, skips that package as offline mode does and reports it in ResolvedPaths.InstallFailures. The resource loader and the CLI turn it into an extension warning that names `pig remove \u003csource\u003e` (`--local` for a project package), or tells an -e source to check the source; --help and --list-models print the runtime diagnostics, so the warning shows there too. The extension SDKs see installFailures on the resolve result.",
+      "rootCauseSource": "commit",
+      "userImpact": "An operation failed or was rejected",
+      "platform": "All platforms",
+      "class": "pi-port",
+      "fixedIn": "Unreleased",
+      "releaseNote": "A configured package or `-e` source that cannot be installed no longer ends startup. It is skipped, as in offline mode, and reported as an extension warning that says how to remove it (`pig remove \u003csource\u003e`, with `--local` for a project package) or to check the source; `--help` and `--list-models` print it too.",
+      "origin": "release note",
+      "commits": [
+        {
+          "hash": "07da4ea3a6",
+          "date": "2026-10-23"
+        }
+      ],
+      "tests": [
+        "coding/resource_loader_extension_files_test.go::TestDefaultResourceLoaderPointsProjectPackagesAtRemoveLocal",
+        "coding/resource_loader_extension_files_test.go::TestDefaultResourceLoaderPointsTemporaryExtensionSourcesAtTheSource",
+        "coding/resource_loader_extension_files_test.go::TestDefaultResourceLoaderWarnsAndKeepsLoadingWhenAConfiguredPackageCannotBeInstalled",
+        "coding/resource_loader_extension_files_test.go::TestDefaultResourceLoaderWarnsOnceAboutAFailingInstallWhenProjectTrustIsResolved",
+        "internal/packagemanager/managed_root_cwd_test.go::TestEmptyAgentDirNeverWritesIntoTheProcessDirectory",
+        "internal/packagemanager/resolve_gaps_test.go::TestResolveExtensionSourcesReportsATemporarySourceThatFailsToInstall",
+        "internal/packagemanager/resolve_gaps_test.go::TestResolveReportsNoInstallFailureForASkippedSourceAndKeepsTheErrorDecision",
+        "internal/packagemanager/resolve_gaps_test.go::TestResolveSkipsAPackageSourceThatFailsToInstallAndReportsIt"
+      ]
+    },
+    {
       "id": "BF-081e8c3",
       "title": "Bug report files against live Pi: new `TestBugReportFilesMatchPi`…",
       "symptom": "Bug report files against live Pi: new `TestBugReportFilesMatchPi` (`internal/codingagent/bug_report_files_oracle_test.go`; `collectBugReportDiagnostics` over a `SessionManager` opened on 500 generated session files plus a crash log, and `bugReportFiles`; bytes of diagnostics.json, member list, session.jsonl and summary.md).",
@@ -10035,6 +10064,28 @@
         "mcp/oauth/behavior_test.go::TestOAuthErrorMessagesAreTheOnesErrorsTSBuilds",
         "mcp/oauth/error_constructors_upstream_test.go::TestOAuthErrorConstructorsMatchErrorsTs",
         "mcp/oauth/errors_class_test.go::TestOAuthErrorClassesCarryTheirNameAndMessage"
+      ]
+    },
+    {
+      "id": "BF-619443a",
+      "title": "MCP sign-in now rejects authorization endpoints and other OAuth metadata URLs that are not `http:` or…",
+      "symptom": "MCP sign-in now rejects authorization endpoints and other OAuth metadata URLs that are not `http:` or `https:`, so a malicious server cannot make pig launch a `file:` or custom protocol URL.",
+      "rootCause": "Ports Pi. OAuth metadata URLs and the authorization endpoint must be http: or https:, so a server cannot make sign-in launch a file: or custom protocol URL through the platform URL handler.",
+      "rootCauseSource": "commit",
+      "userImpact": "An operation failed or was rejected",
+      "platform": "All platforms",
+      "class": "pi-port",
+      "fixedIn": "Unreleased",
+      "releaseNote": "MCP sign-in now rejects authorization endpoints and other OAuth metadata URLs that are not `http:` or `https:`, so a malicious server cannot make pig launch a `file:` or custom protocol URL.",
+      "origin": "release note",
+      "commits": [
+        {
+          "hash": "619443a024",
+          "date": "2026-10-23"
+        }
+      ],
+      "tests": [
+        "mcp/oauth/oauth_test.go::TestMCPOAuthRejectsNonHTTPAuthorizationEndpointsWhichThePlatformURLHandlerWouldLaunch"
       ]
     },
     {
@@ -20528,6 +20579,29 @@
       ]
     },
     {
+      "id": "BF-930c88e",
+      "title": "Claude models with per-message effort no longer fail with `Invalid effort level` on accounts whose…",
+      "symptom": "Claude models with per-message effort no longer fail with `Invalid effort level` on accounts whose organization caps effort below `high`: the fixed top-level effort is `low`.",
+      "rootCause": "Ports Pi (#10063). Effort markers set the level of every reply, so the top-level effort is a fixed \"low\", which organizations that cap effort accept. The expected requests of the effort cases follow.",
+      "rootCauseSource": "commit",
+      "userImpact": "An operation failed or was rejected",
+      "platform": "All platforms",
+      "class": "own",
+      "fixedIn": "Unreleased",
+      "releaseNote": "Claude models with per-message effort no longer fail with `Invalid effort level` on accounts whose organization caps effort below `high`: the fixed top-level effort is `low`.",
+      "origin": "release note",
+      "commits": [
+        {
+          "hash": "930c88ec0c",
+          "date": "2026-10-23"
+        }
+      ],
+      "tests": [
+        "ai/anthropic_beta_override_test.go::TestAnthropicManagedEffortBodyFollowsTheBetasSent",
+        "ai/anthropic_mid_effort_upstream_test.go::TestAnthropicUpstreamMidConversationEffort"
+      ]
+    },
+    {
       "id": "BF-93319f4",
       "title": "The terminal UI worked example now describes the typed `/model` prefix in words",
       "symptom": "The terminal UI worked example now describes the typed `/model` prefix in words.",
@@ -23370,6 +23444,28 @@
         "internal/codingagent/session_held_entry_test.go::TestHeldMessageEntryMatchesTheRecordDecode",
         "internal/codingagent/session_line_capacity_test.go::TestMessageEntryRecordKeepsNoSpareCapacity",
         "test/perfgate/process_test.go::TestRPCTurnProcessGate"
+      ]
+    },
+    {
+      "id": "BF-ae498eb",
+      "title": "A line of many `\u003e` characters no longer makes the Markdown renderer's output grow exponentially with the…",
+      "symptom": "A line of many `\u003e` characters no longer makes the Markdown renderer's output grow exponentially with the nesting depth.",
+      "rootCause": "Ports Pi (#11321). With no room for another border (width under 3) a blockquote renders its content without one and without wrapping it again, so a line of many \u003e no longer multiplies its output per level.",
+      "rootCauseSource": "commit",
+      "userImpact": "Wrong display",
+      "platform": "All platforms",
+      "class": "pi-port",
+      "fixedIn": "Unreleased",
+      "releaseNote": "A line of many `\u003e` characters no longer makes the Markdown renderer's output grow exponentially with the nesting depth.",
+      "origin": "release note",
+      "commits": [
+        {
+          "hash": "ae498ebdc6",
+          "date": "2026-10-23"
+        }
+      ],
+      "tests": [
+        "tui/markdown_upstream_test.go::TestMarkdownRendersQuotesNestedDeeperThanTheWidthAllowsWithoutExploding"
       ]
     },
     {

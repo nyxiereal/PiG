@@ -667,10 +667,10 @@ rationale = "Type declarations only (no exported function, const or class in the
 
 [[files]]
 path = "packages/chord/src/watch.ts"
-disposition = "pending"
-contracts = []
-evidence = []
-rationale = ""
+disposition = "translated"
+contracts = ["awaited", "cancellable", "detached-owned", "microtask-ordering"]
+evidence = ["test:chord/watch_upstream_test.go#TestWatchAwaitsEachCallbackAndBuffersFramesAdvancedWhileOneIsInFlight", "test:chord/watch_upstream_test.go#TestWatchNeverInvokesTheListenerInline", "test:chord/watch_upstream_test.go#TestWatchStopsFutureDeliveryWithoutAbortingOrAwaitingAnInFlightCallback", "test:chord/watch_upstream_test.go#TestWatchEndsCancelledWhenItsAcquisitionContextEndsAlsoWhenAlreadyDone", "test:chord/watch_upstream_test.go#TestWatchEndsListenerErrorOnAFailureReportsItAndDeliversNothingMore", "test:chord/watch_upstream_test.go#TestWatchNeverFoldsTheInFlightFrameIntoAnOverflow", "test:chord/watch_upstream_test.go#TestNativeWatchEndsWithEveryReasonOfItsLifecycle"]
+rationale = "WatchLifecycle (the base of Watch and NativeWatch). start installs the sole listener and queues one drain microtask when frames are already pending; advance and retire queue frames and, once started, a drain: #schedule queues at most one microtask, #drain runs one frame at a time, awaits the listener's promise, sets value to the frame's value before the call and hands it a context without the frame's abort signal. A listener that rejects reports the error, ends the watch listener_error (a non-Error wrapped in an Error) and stops delivery; the retirement frame ends it retired once delivered; stop ends it stopped at once without aborting or awaiting the callback in flight, and drops the pending frames and every reference into the source. observeCancellation ends it cancelled when the signal aborts, also when already aborted, and is installed once. Go chord/watch_impl.go keeps the sequence: Start installs the listener, a frame is taken into delivery under the lock in publish order and its listener runs on a delivery goroutine of the DeliveryScheduler (never inline, one at a time, joined by DeliveryScheduler.Wait), a returned error or panic is reported and ends the watch listener_error, Stop closes the watch without joining the running callback, ObserveCancellation uses context.AfterFunc, and the end drops detach, report, replace, listener, scheduler and pending frames. A started watch with no callback in flight takes a committed frame into delivery before Advance returns, as the drain microtask enters the listener before the publishing commit's caller resumes. The tests assert in-order awaited delivery with buffering, the goroutine hop, stop with a callback in flight, the cancelled and listener_error ends and the overflow that never folds the in-flight frame; the NativeWatch end reasons are covered the same way."
 
 [[files]]
 path = "packages/chord/src/websocket.ts"
@@ -1612,10 +1612,10 @@ rationale = "readContext and readContextFrom capture the bounds on the Session l
 
 [[files]]
 path = "packages/durable/src/harness/events.ts"
-disposition = "pending"
-contracts = []
-evidence = []
-rationale = ""
+disposition = "translated"
+contracts = ["awaited", "cancellable"]
+evidence = ["test:durable/harness/harness_events_test.go#TestAgentEvents", "test:durable/harness/tool_nested_test.go#TestSeveralRunningNestedCallsReportTheirOutputAndShowToALateSubscriber", "test:chord/watch_upstream_test.go#TestWatchAwaitsEachCallbackAndBuffersFramesAdvancedWhileOneIsInFlight"]
+rationale = "WatchEvents delivers batches to the listener in commit order and one at a time; the listener's returned error ends the watch (the Promise rejection of the TypeScript listener), and Stop cancels and returns once the delivery in flight ended. A nested call's result is read from the commit's changes at the commit, before the caller's documents retire, as the TypeScript reads it synchronously in the same turn. Pi 42cb822f1 only changes the watch class (Durable's CommittedWatch becomes Chord's Watch); the delivery rules are the shared lifecycle reviewed on packages/chord/src/watch.ts, which the Go watch implements once for every source."
 
 [[files]]
 path = "packages/durable/src/harness/generation.ts"
@@ -1675,10 +1675,10 @@ rationale = "Waiting for a submission to settle is a blocking call on the caller
 
 [[files]]
 path = "packages/durable/src/harness/task-graph.ts"
-disposition = "pending"
-contracts = []
-evidence = []
-rationale = ""
+disposition = "deferred"
+contracts = ["awaited", "cancellable"]
+evidence = ["test:durable/harness/harness_task_graph_test.go", "test:chord/watch_upstream_test.go#TestWatchAwaitsEachCallbackAndBuffersFramesAdvancedWhileOneIsInFlight"]
+rationale = "Harness.taskGraph() is removed in Pi 92ab5360: watchTaskGraph() returns a WatchHandle (see packages/chord/src/watch.ts), whose Promise members are the blocking Start, Stop and Closed of the Go watch, and whose value is the live graph once the watch is started. Pi 42cb822f1 builds that watch with Chord's Watch instead of Durable's CommittedWatch; the lifecycle is the one reviewed on packages/chord/src/watch.ts. The graph's own async obligations outside the watch remain deferred: the per-file contract has not been reviewed for this pin."
 
 [[files]]
 path = "packages/durable/src/harness/tool.ts"
@@ -1710,10 +1710,10 @@ rationale = "Waiters.add returns a Promise that settles once: resolve(key, value
 
 [[files]]
 path = "packages/durable/src/harness/view.ts"
-disposition = "pending"
-contracts = []
-evidence = []
-rationale = ""
+disposition = "translated"
+contracts = ["awaited", "cancellable"]
+evidence = ["test:durable/harness/harness_storage_failure_test.go#TestAFailedStorageCall", "test:durable/harness/harness_live_deltas_test.go#TestLiveDeltas", "test:chord/watch_upstream_test.go#TestWatchEndsListenerErrorOnAFailureReportsItAndDeliversNothingMore"]
+rationale = "A conversation view advances from the observed commits in order; an observer that throws is reported and the others still receive the revision, closing the Session passes its failure, and a watch stops when its context is cancelled or the Harness closes. Pi 42cb822f1 builds the view's watch with Chord's Watch instead of Durable's CommittedWatch; the lifecycle (one callback at a time, listener errors ending the watch listener_error and reported through the Session) is the one reviewed on packages/chord/src/watch.ts."
 
 [[files]]
 path = "packages/durable/src/images/index.ts"
@@ -1745,10 +1745,10 @@ rationale = "Added to the accounting when every monorepo package was listed: the
 
 [[files]]
 path = "packages/durable/src/session/session.ts"
-disposition = "pending"
-contracts = []
-evidence = []
-rationale = ""
+disposition = "deferred"
+contracts = ["awaited", "microtask-ordering"]
+evidence = ["test:durable/session/session_adoption_test.go#TestSessionAdoptionInsideStorageCommit", "test:durable/session/session_adoption_internal_test.go#TestSessionFailsWithItsOwnAdoptionErrorWhichNeverReachesStorage", "test:durable/session/session_watches_test.go#TestSessionWatchEntersTheCommittedFrameBeforeTheCommitReturns", "test:chord/watch_upstream_test.go#TestWatchAwaitsEachCallbackAndBuffersFramesAdvancedWhileOneIsInFlight"]
+rationale = "Storage adoption (Pi 92ab5360): #runCommit passes Storage.commit an adopt callback and Storage calls it once, synchronously, when the batch is durable and before its next commit; the Session adopts the staged documents inside it, so the adopted state is visible to any read that Storage starts from inside adopt. Go's runCommit does the same through a callback that keeps its own error or panic (a panic must not reach Storage), then publishes the commit synchronously before the Session's call returns, which is the microtask order of the upstream promise. A Storage that rejects after adopting fails the Session without discarding the adopted changes; one that rejects before adopting discards them and fails the Session; one that resolves without adopting fails it with 'Storage committed without adopting the batch'; a failed adoption fails the Session with its own error, which never reaches Storage. The Session's close, task, checkpoint and watch-acquisition async obligations outside the commit path remain deferred, as the per-file contract has not been reviewed for this pin. Pi 42cb822f1 builds each document watch with Chord's Watch instead of Durable's CommittedWatch (session.NewSessionWatch gives it the Session's delivery scheduler and report); the watch lifecycle is the one reviewed on packages/chord/src/watch.ts. The rest of the file's async obligations remain deferred as reviewed."
 
 [[files]]
 path = "packages/durable/src/session/transaction.ts"

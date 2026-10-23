@@ -1,5 +1,5 @@
 {
-  "piVersion": "1.4.0+42cb822f",
+  "piVersion": "1.4.0+8a2ebd38",
   "node": "v24.19.0",
   "scenarios": [
     {
@@ -191,7 +191,7 @@
         "stopReason": "toolUse",
         "responseId": "r1",
         "rawStopReason": "tool_calls",
-        "durationMs": 31
+        "durationMs": 34
       }
     },
     {
@@ -1754,7 +1754,7 @@
         "stopReason": "toolUse",
         "responseId": "r1",
         "rawStopReason": "tool_calls",
-        "durationMs": 1
+        "durationMs": 0
       }
     },
     {
@@ -2068,7 +2068,7 @@
         "stopReason": "toolUse",
         "responseId": "r1",
         "rawStopReason": "tool_calls",
-        "durationMs": 0
+        "durationMs": 1
       }
     },
     {
@@ -2260,7 +2260,7 @@
         "stopReason": "toolUse",
         "responseId": "r1",
         "rawStopReason": "tool_calls",
-        "durationMs": 0
+        "durationMs": 1
       }
     },
     {
@@ -2452,7 +2452,7 @@
         "stopReason": "toolUse",
         "responseId": "r1",
         "rawStopReason": "tool_calls",
-        "durationMs": 0
+        "durationMs": 1
       }
     },
     {

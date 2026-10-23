@@ -71,6 +71,7 @@ import {
   formatHttpIdleTimeoutMs,
   formatMissingSessionCwdPrompt,
   formatNoModelsAvailableMessage,
+  formatPackageInstallWarning,
   formatSkillsForPrompt,
   generateBranchSummary,
   generateSummary,
@@ -122,7 +123,7 @@ import {
   wrapRegisteredTools,
   writeBugReportArchive,
   writeRawStdout
-} from "./chunk-I5R52BTB.js";
+} from "./chunk-3P4U47VD.js";
 import {
   convertToPng,
   createBashToolDefinition,
@@ -21227,6 +21228,10 @@ async function handleConfigCommand(args, runtimeOptions = {}) {
     builtinExtensions
   }).resolve();
   const projectResolvedPaths = settingsManager.isProjectTrusted() ? await new DefaultPackageManager({ cwd, agentDir, settingsManager, builtinExtensions }).resolve() : globalResolvedPaths;
+  const installWarnings = new Set([...globalResolvedPaths.installFailures ?? [], ...projectResolvedPaths.installFailures ?? []].map(formatPackageInstallWarning));
+  for (const warning of installWarnings) {
+    console.error(chalk6.yellow(`Warning: ${warning}`));
+  }
   await selectConfig({
     resolvedPaths: { global: globalResolvedPaths, project: projectResolvedPaths },
     settingsManager,
@@ -22074,14 +22079,16 @@ async function main(args, options) {
   setCapabilityOverrides3(settingsManager.getTerminalCapabilityOverrides());
   applyHttpProxySettings(settingsManager.getGlobalSettings().httpProxy);
   configureHttpDispatcher(settingsManager.getHttpIdleTimeoutMs());
+  const startupDiagnostics = deduplicateDiagnostics([...startupSettingsDiagnostics, ...runtime.diagnostics]);
+  const hasRuntimeErrors = runtime.diagnostics.some((diagnostic) => diagnostic.type === "error");
   if (parsed.help) {
-    reportDiagnostics(startupSettingsDiagnostics);
+    reportDiagnostics(startupDiagnostics);
     const extensionFlags = resourceLoader.getExtensions().extensions.flatMap((extension) => Array.from(extension.flags.values()));
     printHelp(extensionFlags);
     process.exit(0);
   }
   if (parsed.listModels !== void 0) {
-    reportDiagnostics(startupSettingsDiagnostics);
+    reportDiagnostics(startupDiagnostics);
     const searchPattern = typeof parsed.listModels === "string" ? parsed.listModels : void 0;
     await listModels(modelRuntime, searchPattern, AbortSignal.timeout(15e3));
     process.exit(0);
@@ -22102,8 +22109,6 @@ async function main(args, options) {
     await showDeprecationWarnings(deprecationWarnings);
   }
   time("resolveModelScope");
-  const startupDiagnostics = deduplicateDiagnostics([...startupSettingsDiagnostics, ...runtime.diagnostics]);
-  const hasRuntimeErrors = runtime.diagnostics.some((diagnostic) => diagnostic.type === "error");
   if (appMode !== "interactive" || hasRuntimeErrors) {
     reportDiagnostics(startupDiagnostics);
   }

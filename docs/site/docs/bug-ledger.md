@@ -38,6 +38,7 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 | [BF-064181f](#bf-064181f) | fix(extension): hold the theme colors map the wire palette memo is keyed on | PiG's own defect | All platforms | Unreleased |
 | [BF-07151d0](#bf-07151d0) | In print and JSON mode, Node extensions in separate processes now keep Pi's order when a later extension's… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-0790d5e](#bf-0790d5e) | `String.prototype.trim` vs `strings.TrimSpace`: four Pi `.trim()` sites used Go's `strings.TrimSpace`, which… | PiG's own defect | All platforms | 0.5.0 |
+| [BF-07da4ea](#bf-07da4ea) | A configured package or `-e` source that cannot be installed no longer ends startup | A fix Pi shipped that PiG ported | All platforms | Unreleased |
 | [BF-081e8c3](#bf-081e8c3) | Bug report files against live Pi: new `TestBugReportFilesMatchPi`… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-082355f](#bf-082355f) | The session picker checks its keys in Pi's order when bindings overlap (delete before rename, list actions… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-082f350](#bf-082f350) | `markdown.codeBlockIndent`: Pi's getter is `markdown?.codeBlockIndent ?? " "`, so an authored `""` means no… | PiG's own defect | All platforms | 0.5.0 |
@@ -329,6 +330,7 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 | [BF-61300bb](#bf-61300bb) | MCP OAuth reads a non-HTTP redirect or server URL as Node's `new URL` does: dot segments are removed, a… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-61300bb-2](#bf-61300bb-2) | Sorting names with `localeCompare` (MCP servers, sessions, login providers, codemode namespaces, model lists… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-6132277](#bf-6132277) | An MCP OAuth authorization response with an `iss` parameter is now rejected when no authorization server… | A fix Pi shipped that PiG ported | All platforms | 0.5.0 |
+| [BF-619443a](#bf-619443a) | MCP sign-in now rejects authorization endpoints and other OAuth metadata URLs that are not `http:` or… | A fix Pi shipped that PiG ported | All platforms | Unreleased |
 | [BF-61fc01d](#bf-61fc01d) | `list_mcp_resources`, `list_mcp_resource_templates` and `read_mcp_resource` return every member a server sent… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-61fc01d-2](#bf-61fc01d-2) | MCP tool descriptions, resource MIME types, a pasted sign-in redirect URL and the resource tools' `server`… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-6235532](#bf-6235532) | Filterable selector lists (theme, images, tree-filter-like pickers) check up/down before confirm/cancel like… | PiG's own defect | All platforms | 0.5.0 |
@@ -711,6 +713,7 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 | [BF-928e15c-8](#bf-928e15c-8) | OpenAI Codex and OpenRouter OAuth responses read ill-formed UTF-8 and a body that fails to read as `fetch`… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-928e15c-9](#bf-928e15c-9) | An OpenAI Codex login or refresh whose success response is not JSON reports JavaScript's own message, as Pi… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-92da987](#bf-92da987) | Codemode no longer reserves its whole 256 MiB script-memory limit when a session starts: the QuickJS linear… | PiG's own defect | All platforms | 0.5.0 |
+| [BF-930c88e](#bf-930c88e) | Claude models with per-message effort no longer fail with `Invalid effort level` on accounts whose… | PiG's own defect | All platforms | Unreleased |
 | [BF-93319f4](#bf-93319f4) | The terminal UI worked example now describes the typed `/model` prefix in words | PiG's own defect | All platforms | 0.5.0 |
 | [BF-93c09d6](#bf-93c09d6) | A local package source that is a file Node cannot import, such as a packed `.tgz`, fails to load as in Pi… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-93c09d6-2](#bf-93c09d6-2) | `pig install --validate-only` on a Package root validates every extension the Package names in… | PiG's own defect | All platforms | 0.5.0 |
@@ -794,6 +797,7 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 | [BF-aca35e7](#bf-aca35e7) | In print and JSON mode, a Node extension no longer runs a timer or other callback between a prompt's last… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-ad9ed64](#bf-ad9ed64) | Appending a tool result whose details are a tool's own value (a truncated `read`, `bash` output details, an… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-ad9ed64-2](#bf-ad9ed64-2) | A large message's session record no longer keeps a regrown buffer when its text has escapes such as newlines… | PiG's own defect | All platforms | 0.5.0 |
+| [BF-ae498eb](#bf-ae498eb) | A line of many `>` characters no longer makes the Markdown renderer's output grow exponentially with the… | A fix Pi shipped that PiG ported | All platforms | Unreleased |
 | [BF-aeaaf97](#bf-aeaaf97) | Model requests reuse their HTTP connection | PiG's own defect | All platforms | 0.5.0 |
 | [BF-af1fe1a](#bf-af1fe1a) | Cycling models in the interactive UI goes through the Session as in Pi: the new model persists as the… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-af36fe8](#bf-af36fe8) | A streamed tool call whose arguments are valid JSON but not an object (`[]`, `null`, `5`, `"s"`) keeps them… | PiG's own defect | All platforms | 0.5.0 |
@@ -1413,6 +1417,20 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 - **Fix commits:** `0790d5eae8` (2026-10-11)
 - **Tests:** `agent/js_trim_test.go::TestReplayAndProxyLinesTrimLikeJavaScript`, `tui/js_trim_test.go::TestAssistantMessageComponentTrimsRunsLikeJavaScript`, `tui/js_trim_test.go::TestTextBlankCheckTrimsLikeJavaScript`
 - **Release note:** `String.prototype.trim` vs `strings.TrimSpace`: four Pi `.trim()` sites used Go's `strings.TrimSpace`, which trims U+0085 and not U+FEFF where JavaScript trims U+FEFF and not U+0085 (`jsstring.Trim` is the JS rule, already used in 100 other places). Fixed where the difference is observable: `Text` blank check (`tui/text.go`, text.ts:57), assistant-message text/thinking runs (`tui/assistant_message_block.go`, assistant-message.ts:110-125: a leading BOM is now trimmed before the markdown renders, U+0085 is kept), replayed empty-thinking filter (`agent/transform.go`, transform-messages.ts:111) and the proxy `data:` line (`agent/proxy.go`, proxy.ts:181). Regressions `TestTextBlankCheckTrimsLikeJavaScript`, `TestAssistantMessageComponentTrimsRunsLikeJavaScript`, `TestReplayAndProxyLinesTrimLikeJavaScript` (each red with the old call, 3 sites checked by swapping the call back). `parseStreamingJsonValue`'s guard (`ai/streaming_json.go`) was probed and left: the result is the same either way. Left for owners: `stripThinkingSignatures` (`ai/anthropic.go`, PiG's own D37 recovery, no Pi counterpart), the Pi `.trim()` sites in other providers if any still use `TrimSpace`. `./tui -race` (1,219 s) failed only the flaky `TestSurfaceRendersAnEditorBeforeAnythingAsksForItsTerminal` (race in `tui_surface_program_status_test.go:213`, passes alone) and `./agent` only `TestAgentClassMatchesPi`/`TestAgentLoopMatchesPi` (the oracle cannot import `@earendil-works/pi-ai` from `durable/interop`, a missing node_modules in this worktree).
+
+### BF-07da4ea
+
+**A configured package or `-e` source that cannot be installed no longer ends startup**
+
+- **Source:** A fix Pi shipped that PiG ported
+- **Symptom:** A configured package or `-e` source that cannot be installed no longer ends startup.
+- **Root cause:** Ports Pi (#11304). Resolving packages catches an install failure, skips that package as offline mode does and reports it in ResolvedPaths.InstallFailures. The resource loader and the CLI turn it into an extension warning that names `pig remove <source>` (`--local` for a project package), or tells an -e source to check the source; --help and --list-models print the runtime diagnostics, so the warning shows there too. The extension SDKs see installFailures on the resolve result.
+- **User impact:** An operation failed or was rejected
+- **Platform:** All platforms
+- **Fixed in:** Unreleased
+- **Fix commits:** `07da4ea3a6` (2026-10-23)
+- **Tests:** `coding/resource_loader_extension_files_test.go::TestDefaultResourceLoaderPointsProjectPackagesAtRemoveLocal`, `coding/resource_loader_extension_files_test.go::TestDefaultResourceLoaderPointsTemporaryExtensionSourcesAtTheSource`, `coding/resource_loader_extension_files_test.go::TestDefaultResourceLoaderWarnsAndKeepsLoadingWhenAConfiguredPackageCannotBeInstalled`, `coding/resource_loader_extension_files_test.go::TestDefaultResourceLoaderWarnsOnceAboutAFailingInstallWhenProjectTrustIsResolved`, `internal/packagemanager/managed_root_cwd_test.go::TestEmptyAgentDirNeverWritesIntoTheProcessDirectory`, `internal/packagemanager/resolve_gaps_test.go::TestResolveExtensionSourcesReportsATemporarySourceThatFailsToInstall`, `internal/packagemanager/resolve_gaps_test.go::TestResolveReportsNoInstallFailureForASkippedSourceAndKeepsTheErrorDecision`, `internal/packagemanager/resolve_gaps_test.go::TestResolveSkipsAPackageSourceThatFailsToInstallAndReportsIt`
+- **Release note:** A configured package or `-e` source that cannot be installed no longer ends startup. It is skipped, as in offline mode, and reported as an extension warning that says how to remove it (`pig remove <source>`, with `--local` for a project package) or to check the source; `--help` and `--list-models` print it too.
 
 ### BF-081e8c3
 
@@ -5434,6 +5452,20 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 - **Fix commits:** `61322774f1` (2026-10-10)
 - **Tests:** `mcp/oauth/absent_test.go::TestOAuthIssuerMismatchErrorNamesAMissingIssAsNone`, `mcp/oauth/absent_test.go::TestOAuthIssuerMismatchErrorQuotesIssuersAsJSONStringify`, `mcp/oauth/behavior_test.go::TestOAuthErrorMessagesAreTheOnesErrorsTSBuilds`, `mcp/oauth/error_constructors_upstream_test.go::TestOAuthErrorConstructorsMatchErrorsTs`, `mcp/oauth/errors_class_test.go::TestOAuthErrorClassesCarryTheirNameAndMessage`
 - **Release note:** An MCP OAuth authorization response with an `iss` parameter is now rejected when no authorization server metadata was discovered, so a malicious MCP server cannot receive a code another authorization server issued (as Pi c5f5b328 does).
+
+### BF-619443a
+
+**MCP sign-in now rejects authorization endpoints and other OAuth metadata URLs that are not `http:` or…**
+
+- **Source:** A fix Pi shipped that PiG ported
+- **Symptom:** MCP sign-in now rejects authorization endpoints and other OAuth metadata URLs that are not `http:` or `https:`, so a malicious server cannot make pig launch a `file:` or custom protocol URL.
+- **Root cause:** Ports Pi. OAuth metadata URLs and the authorization endpoint must be http: or https:, so a server cannot make sign-in launch a file: or custom protocol URL through the platform URL handler.
+- **User impact:** An operation failed or was rejected
+- **Platform:** All platforms
+- **Fixed in:** Unreleased
+- **Fix commits:** `619443a024` (2026-10-23)
+- **Tests:** `mcp/oauth/oauth_test.go::TestMCPOAuthRejectsNonHTTPAuthorizationEndpointsWhichThePlatformURLHandlerWouldLaunch`
+- **Release note:** MCP sign-in now rejects authorization endpoints and other OAuth metadata URLs that are not `http:` or `https:`, so a malicious server cannot make pig launch a `file:` or custom protocol URL.
 
 ### BF-61fc01d
 
@@ -10758,6 +10790,20 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 - **Tests:** `codemode/baseline_memory_test.go::TestIdleBaselineMemoryStaysSmall`
 - **Release note:** Codemode no longer reserves its whole 256 MiB script-memory limit when a session starts: the QuickJS linear memory now grows on demand, so an idle session with one small script allocates about 4 MiB instead of about 359 MiB (Go heap held, 321 MiB before, 4 MiB after), while a runaway allocation still fails inside the script at the same limit. Reported by @kayis-rahman (#211)
 
+### BF-930c88e
+
+**Claude models with per-message effort no longer fail with `Invalid effort level` on accounts whose…**
+
+- **Source:** PiG's own defect
+- **Symptom:** Claude models with per-message effort no longer fail with `Invalid effort level` on accounts whose organization caps effort below `high`: the fixed top-level effort is `low`.
+- **Root cause:** Ports Pi (#10063). Effort markers set the level of every reply, so the top-level effort is a fixed "low", which organizations that cap effort accept. The expected requests of the effort cases follow.
+- **User impact:** An operation failed or was rejected
+- **Platform:** All platforms
+- **Fixed in:** Unreleased
+- **Fix commits:** `930c88ec0c` (2026-10-23)
+- **Tests:** `ai/anthropic_beta_override_test.go::TestAnthropicManagedEffortBodyFollowsTheBetasSent`, `ai/anthropic_mid_effort_upstream_test.go::TestAnthropicUpstreamMidConversationEffort`
+- **Release note:** Claude models with per-message effort no longer fail with `Invalid effort level` on accounts whose organization caps effort below `high`: the fixed top-level effort is `low`.
+
 ### BF-93319f4
 
 **The terminal UI worked example now describes the typed `/model` prefix in words**
@@ -11916,6 +11962,20 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 - **Fix commits:** `ad9ed64513` (2026-10-13)
 - **Tests:** `internal/codingagent/session_append_allocs_norace_test.go::TestAppendingATurnDoesNotParseItsRecordsForAccounting`, `internal/codingagent/session_append_typed_details_test.go::TestAppendToolResultWithTypedDetailsDoesNotDecodeItsRecord`, `internal/codingagent/session_held_entry_test.go::FuzzHeldMessageEntryMatchesTheRecordDecode`, `internal/codingagent/session_held_entry_test.go::TestHeldMessageEntryMatchesTheRecordDecode`, `internal/codingagent/session_line_capacity_test.go::TestMessageEntryRecordKeepsNoSpareCapacity`, `test/perfgate/process_test.go::TestRPCTurnProcessGate`
 - **Release note:** A large message's session record no longer keeps a regrown buffer when its text has escapes such as newlines, tabs or quotes. A truncated 1 MiB read used to keep 1.6 MB of unused space for the life of the session and now keeps about 160 KB; a 1 MiB source-code message kept 226 KB and now keeps 88 KB.
+
+### BF-ae498eb
+
+**A line of many `>` characters no longer makes the Markdown renderer's output grow exponentially with the…**
+
+- **Source:** A fix Pi shipped that PiG ported
+- **Symptom:** A line of many `>` characters no longer makes the Markdown renderer's output grow exponentially with the nesting depth.
+- **Root cause:** Ports Pi (#11321). With no room for another border (width under 3) a blockquote renders its content without one and without wrapping it again, so a line of many > no longer multiplies its output per level.
+- **User impact:** Wrong display
+- **Platform:** All platforms
+- **Fixed in:** Unreleased
+- **Fix commits:** `ae498ebdc6` (2026-10-23)
+- **Tests:** `tui/markdown_upstream_test.go::TestMarkdownRendersQuotesNestedDeeperThanTheWidthAllowsWithoutExploding`
+- **Release note:** A line of many `>` characters no longer makes the Markdown renderer's output grow exponentially with the nesting depth.
 
 ### BF-aeaaf97
 

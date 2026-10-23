@@ -185210,6 +185210,17 @@
       "shapeHash": "sha256:60c06af2ab8dbe05a093fcda297ca37ab0155078bcee1a108937479e218ba9ff"
     },
     {
+      "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#PackageInstallFailure",
+      "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
+      "name": "PackageInstallFailure",
+      "kind": "type",
+      "exported": true,
+      "shape": {
+        "type": "PackageInstallFailure"
+      },
+      "shapeHash": "sha256:89b9119324c284f85077b1507eae0dea58cf19f1d28dbb779992135f2b16484e"
+    },
+    {
       "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#PackageManagerOptions",
       "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
       "name": "PackageManagerOptions",

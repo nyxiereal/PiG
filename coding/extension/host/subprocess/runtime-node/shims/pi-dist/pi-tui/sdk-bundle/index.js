@@ -5974,7 +5974,16 @@ var Markdown = class {
           const lineWithReappliedStyle = line.replace(/\x1b\[0m/g, `\x1B[0m${quoteStylePrefix}`);
           return quoteStyle(lineWithReappliedStyle);
         }, "applyQuoteStyle");
-        const quoteContentWidth = Math.max(1, width - 2);
+        if (width < 3) {
+          const quoteTokens2 = token.tokens || [];
+          for (let i = 0; i < quoteTokens2.length; i++) {
+            for (const line of this.renderToken(quoteTokens2[i], width, quoteTokens2[i + 1]?.type, styleContext)) {
+              lines.push(line);
+            }
+          }
+          break;
+        }
+        const quoteContentWidth = width - 2;
         const quoteInlineStyleContext = {
           applyText: /* @__PURE__ */ __name((text) => text, "applyText"),
           stylePrefix: quoteStylePrefix
@@ -5984,7 +5993,9 @@ var Markdown = class {
         for (let i = 0; i < quoteTokens.length; i++) {
           const quoteToken = quoteTokens[i];
           const nextQuoteToken = quoteTokens[i + 1];
-          renderedQuoteLines.push(...this.renderToken(quoteToken, quoteContentWidth, nextQuoteToken?.type, quoteInlineStyleContext));
+          for (const line of this.renderToken(quoteToken, quoteContentWidth, nextQuoteToken?.type, quoteInlineStyleContext)) {
+            renderedQuoteLines.push(line);
+          }
         }
         while (renderedQuoteLines.length > 0 && renderedQuoteLines[renderedQuoteLines.length - 1] === "") {
           renderedQuoteLines.pop();

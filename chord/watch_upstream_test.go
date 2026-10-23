@@ -658,7 +658,12 @@ func TestNativeWatchHandleInterface(t *testing.T) {
 	}
 	var mu sync.Mutex
 	var seen []int
-	handle.Start(func(_ context.Context, value int) error { mu.Lock(); seen = append(seen, value); mu.Unlock(); return nil })
+	handle.Start(func(_ context.Context, value int) error {
+		mu.Lock()
+		seen = append(seen, value)
+		mu.Unlock()
+		return nil
+	})
 	handle.(*NativeWatch[int]).Advance(context.Background(), 1)
 	scheduler.Wait()
 	end, err := handle.Stop()
@@ -673,5 +678,72 @@ func TestNativeWatchHandleInterface(t *testing.T) {
 	defer mu.Unlock()
 	if !slices.Equal(seen, []int{1}) {
 		t.Fatalf("seen = %v", seen)
+	}
+}
+
+// watchableCounter is a Watchable of an integer that a source changes: each Watch is a Watch handle that starts at the current value.
+type watchableCounter struct {
+	scheduler *DeliveryScheduler
+	mu        sync.Mutex
+	value     int
+	watches   []*Watch[int]
+}
+
+func (c *watchableCounter) Value() int { c.mu.Lock(); defer c.mu.Unlock(); return c.value }
+
+func (c *watchableCounter) Watch(ctx context.Context) (WatchHandle[int], error) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	watch := NewWatch(c.value, func() {}, func(error) {}, nil).On(c.scheduler)
+	watch.ObserveCancellation(ctx)
+	c.watches = append(c.watches, watch)
+	return watch, nil
+}
+
+func (c *watchableCounter) set(ctx context.Context, value int) {
+	c.mu.Lock()
+	c.value = value
+	watches := slices.Clone(c.watches)
+	c.mu.Unlock()
+	for _, watch := range watches {
+		watch.Advance(ctx, value, rootOps(float64(value)))
+	}
+}
+
+// packages/chord/src/watch.ts:33-42 Watchable (Pi a2fd25f56): a value that changes and can be watched; each watch holds the current value, then one frame per change,
+// and cancelling the context ends it.
+func TestWatchableWatchHoldsTheCurrentValueThenOneFramePerChangeAndEndsWithItsContext(t *testing.T) {
+	scheduler := NewDeliveryScheduler()
+	counter := &watchableCounter{scheduler: scheduler, value: 1}
+	var source Watchable[int] = counter
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	handle, err := source.Watch(ctx)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if source.Value() != 1 || handle.Value() != 1 {
+		t.Fatalf("value %d, watch value %d, want the current value 1", source.Value(), handle.Value())
+	}
+	var mu sync.Mutex
+	var values []int
+	handle.Start(func(_ context.Context, value int, _ []delta.Op) error {
+		mu.Lock()
+		values = append(values, value)
+		mu.Unlock()
+		return nil
+	})
+	counter.set(context.Background(), 2)
+	counter.set(context.Background(), 3)
+	scheduler.Wait()
+	mu.Lock()
+	if !slices.Equal(values, []int{2, 3}) || source.Value() != 3 {
+		t.Fatalf("frames %v value %d, want [2 3] and 3", values, source.Value())
+	}
+	mu.Unlock()
+	cancel()
+	<-handle.Closed()
+	if end := handle.End(); end.Reason != WatchCancelled {
+		t.Fatalf("end %+v, want cancelled", end)
 	}
 }

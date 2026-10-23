@@ -14689,7 +14689,7 @@ var DefaultPackageManager = class {
       allPackages.push({ pkg, scope: "user" });
     }
     const packageSources = this.dedupePackages(allPackages);
-    await this.resolvePackageSources(packageSources, accumulator, onMissing);
+    const installFailures = await this.resolvePackageSources(packageSources, accumulator, onMissing);
     const globalBaseDir = this.agentDir;
     const projectBaseDir = join10(this.cwd, CONFIG_DIR_NAME);
     for (const resourceType of RESOURCE_TYPES) {
@@ -14713,7 +14713,7 @@ var DefaultPackageManager = class {
       const projectEnabled = applyAutoloadDisabledPatterns([path2], getOverridePatterns(projectSettings.extensions ?? []), projectBaseDir).get(path2);
       this.addResource(accumulator.extensions, path2, { source: "builtin", scope: projectEnabled === void 0 ? "user" : "project", origin: "top-level" }, projectEnabled ?? isEnabledByOverrides(path2, globalSettings.extensions ?? [], globalBaseDir));
     }
-    return this.toResolvedPaths(accumulator);
+    return { ...this.toResolvedPaths(accumulator), installFailures };
   }
   async resolveExtensionSources(sources, options) {
     const accumulator = this.createAccumulator();
@@ -14722,8 +14722,8 @@ var DefaultPackageManager = class {
       this.addResource(accumulator.extensions, source, { source: "builtin", scope, origin: "top-level" }, true);
     }
     const packageSources = sources.filter((source) => !source.startsWith(BUILTIN_PATH_PREFIX)).map((source) => ({ pkg: source, scope }));
-    await this.resolvePackageSources(packageSources, accumulator);
-    return this.toResolvedPaths(accumulator);
+    const installFailures = await this.resolvePackageSources(packageSources, accumulator);
+    return { ...this.toResolvedPaths(accumulator), installFailures };
   }
   listConfiguredPackages() {
     const globalSettings = this.settingsManager.getGlobalSettings();
@@ -14960,6 +14960,7 @@ var DefaultPackageManager = class {
     return results.filter((result) => result !== void 0);
   }
   async resolvePackageSources(sources, accumulator, onMissing) {
+    const installFailures = [];
     for (const { pkg, scope } of sources) {
       const sourceStr = typeof pkg === "string" ? pkg : pkg.source;
       const filter = typeof pkg === "object" ? pkg : void 0;
@@ -14976,17 +14977,24 @@ var DefaultPackageManager = class {
       const installMissing = /* @__PURE__ */ __name(async () => {
         if (isOfflineModeEnabled())
           return false;
-        if (!onMissing) {
+        if (onMissing) {
+          const action = await onMissing(resolvedSource);
+          if (action === "skip")
+            return false;
+          if (action === "error")
+            throw new Error(`Missing source: ${resolvedSource}`);
+        }
+        try {
           await this.installParsedSource(parsed, resolvedScope);
           return true;
-        }
-        const action = await onMissing(resolvedSource);
-        if (action === "skip")
+        } catch (error) {
+          installFailures.push({
+            source: resolvedSource,
+            scope: resolvedScope,
+            message: error instanceof Error ? error.message : String(error)
+          });
           return false;
-        if (action === "error")
-          throw new Error(`Missing source: ${resolvedSource}`);
-        await this.installParsedSource(parsed, resolvedScope);
-        return true;
+        }
       }, "installMissing");
       if (parsed.type === "npm") {
         let installedPath = this.getNpmInstallPath(parsed, resolvedScope);
@@ -15016,6 +15024,7 @@ var DefaultPackageManager = class {
         this.collectPackageResources(installedPath, accumulator, filter, metadata);
       }
     }
+    return installFailures;
   }
   findAutoloadDeltaBase(pkg, scope, sources) {
     if (scope !== "project" || typeof pkg !== "object" || pkg.autoload !== false)
@@ -16489,6 +16498,19 @@ function collectExtensionPackageWarnings(extensionPaths, metadataByPath) {
   return warnings;
 }
 __name(collectExtensionPackageWarnings, "collectExtensionPackageWarnings");
+function describePackageInstallFailure(failure) {
+  const hint = failure.scope === "temporary" ? "Check the source and try again." : `Run "${APP_NAME} remove ${failure.source}${failure.scope === "project" ? " --local" : ""}" to remove it from settings.json.`;
+  return `failed to install (${failure.message}). ${hint}`;
+}
+__name(describePackageInstallFailure, "describePackageInstallFailure");
+function formatPackageInstallWarning(failure) {
+  return `Extension package "${failure.source}": ${describePackageInstallFailure(failure)}`;
+}
+__name(formatPackageInstallWarning, "formatPackageInstallWarning");
+function collectPackageInstallWarnings(...failures) {
+  return failures.flatMap((entries) => (entries ?? []).map((failure) => ({ path: failure.source, warning: describePackageInstallFailure(failure) })));
+}
+__name(collectPackageInstallWarnings, "collectPackageInstallWarnings");
 function mergeExtensionWarnings(result, warnings) {
   result.warnings = [
     ...new Map([...result.warnings ?? [], ...warnings].map((warning) => [warning.path, warning])).values()
@@ -16781,6 +16803,7 @@ var DefaultResourceLoader = class {
     const cliExtensionPaths = await this.packageManager.resolveExtensionSources(this.additionalExtensionPaths, {
       temporary: true
     });
+    const installWarnings = collectPackageInstallWarnings(resolvedPaths.installFailures, cliExtensionPaths.installFailures);
     this.resourceMetadataByPath = /* @__PURE__ */ new Map();
     const metadataByPath = this.resourceMetadataByPath;
     this.extensionSkillSourceInfos = /* @__PURE__ */ new Map();
@@ -16817,7 +16840,7 @@ var DefaultResourceLoader = class {
     const extensionPaths = (this.noExtensions ? cliEnabledExtensions : this.mergePaths(cliEnabledExtensions, enabledExtensions)).filter((path2) => !path2.startsWith(BUILTIN_PATH_PREFIX) || !this.disabledBuiltinExtensions.has(path2.slice(BUILTIN_PATH_PREFIX.length)));
     const packageWarnings = collectExtensionPackageWarnings(extensionPaths, metadataByPath);
     const extensionsResult = await this.loadFinalExtensionSet(extensionPaths, preTrustExtensions);
-    mergeExtensionWarnings(extensionsResult, packageWarnings);
+    mergeExtensionWarnings(extensionsResult, [...installWarnings, ...packageWarnings]);
     for (const p of this.additionalExtensionPaths) {
       if (isLocalPath(p)) {
         const resolved = this.resolveResourcePath(p);
@@ -16898,8 +16921,9 @@ var DefaultResourceLoader = class {
       resource.metadata
     ]));
     const packageWarnings = collectExtensionPackageWarnings(extensionPaths, metadataByPath);
+    const installWarnings = collectPackageInstallWarnings(resolvedPaths.installFailures, cliExtensionPaths.installFailures);
     const extensionsResult = await loadExtensionsCached(extensionPaths, this.cwd, this.eventBus);
-    mergeExtensionWarnings(extensionsResult, packageWarnings);
+    mergeExtensionWarnings(extensionsResult, [...installWarnings, ...packageWarnings]);
     if (!options.includeInlineFactories) {
       return extensionsResult;
     }
@@ -18272,6 +18296,7 @@ export {
   flushRawStdout,
   DefaultPackageManager,
   FooterDataProvider,
+  formatPackageInstallWarning,
   isBuiltinExtension,
   loadProjectContextFiles,
   DefaultResourceLoader,

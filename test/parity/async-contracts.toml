@@ -1,4 +1,4 @@
-version = "1.4.0+ede2c9b4"
+version = "1.4.0+3953e9ef"
 
 [[files]]
 path = "packages/agent/src/agent-loop.ts"
@@ -1521,10 +1521,10 @@ rationale = "The Session awaits normalization after tool_result hooks and before
 
 [[files]]
 path = "packages/coding-agent/src/utils/tools-manager.ts"
-disposition = "deferred"
+disposition = "pending"
 contracts = []
 evidence = []
-rationale = "PORT_MAP marks this file 🟡 partial: `internal/codingagent/tools/tools.go + tools_manager.go (asset table, releases/latest redirect version lookup, fetchWithRetry downloads, extraction per D14; tools_manager_test.go, tools_manager_latest_test.go ports the getLatestVersion cases); missing: ensureTool reports through an onStatus ToolStatus callback that interactive mode shows via showManagedToolStatus and grep/find keep silent, where PiG prints to stderr unless silent, and the failure message does not join the error cause chain`; delivery/unresolved.tsv row 'Review the v0.87.1 denominators' Delta at Pi bd3c9b82: adc5fa9f sends the identity User-Agent from getLatestVersion; no added or removed line contains async, await, Promise or .then, so the reviewed contract is unchanged."
+rationale = ""
 
 [[files]]
 path = "packages/coding-agent/src/utils/version-check.ts"
@@ -2123,10 +2123,10 @@ rationale = "Input callbacks settle in order before later negotiation effects. T
 
 [[files]]
 path = "packages/tui/src/tui-alt-screen.ts"
-disposition = "deferred"
+disposition = "pending"
 contracts = []
 evidence = []
-rationale = "async/Promise source; PORT_MAP marks this file ✅ ported (`tui/tui_alt_screen.go`), but a per-file cross-language ordering/cancellation/error contract has not yet been reviewed for 0.87.1; delivery/unresolved.tsv row 'Review the v0.87.1 denominators'"
+rationale = ""
 
 [[files]]
 path = "packages/tui/src/tui.ts"

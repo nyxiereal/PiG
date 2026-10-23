@@ -8455,7 +8455,7 @@ var MAX_CACHED_OFFSCREEN_KITTY_TRANSMISSION_BYTES = 32 * 1024 * 1024;
 var MAX_CACHED_OFFSCREEN_KITTY_DECODED_BYTES = 64 * 1024 * 1024;
 var DOUBLE_CLICK_INTERVAL_MS = 500;
 var COPY_ERROR_FLASH_DURATION_MS = 5e3;
-var TERMINAL_WORD_SELECTION_JOINERS = /* @__PURE__ */ new Set(["/", "-"]);
+var TERMINAL_WORD_SELECTION_JOINERS = /* @__PURE__ */ new Set(["/", "-", "+", "\\", "~", "_", "."]);
 var TuiAltScreen = class extends TuiBase {
   static {
     __name(this, "TuiAltScreen");

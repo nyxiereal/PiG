@@ -923,7 +923,7 @@
     },
     {
       "path": "pi-dist/pi-coding-agent/utils/tools-manager.js",
-      "sha256": "4a8c8fc56b88dc306d10f476f6dfed2469dbd8d812251f40cc20f3e97b6928ec"
+      "sha256": "969ef1a6018c1e773b3c0a4be42642c7cf10cb07687f74004f458fb2262d9595"
     },
     {
       "path": "pi-dist/pi-coding-agent/utils/version-check.js",

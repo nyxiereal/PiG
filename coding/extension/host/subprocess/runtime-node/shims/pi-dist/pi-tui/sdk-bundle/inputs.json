@@ -135,7 +135,7 @@
     },
     {
       "path": "pi-dist/pi-tui/tui-alt-screen.js",
-      "sha256": "cf8473e092e8f9909e7772f83814022becf8c6dfd0c7e2d042c945053d679906"
+      "sha256": "d1e07b1ff0bb22d19bb4b4ebb7ece018616feaf8d25753240419a0aa96e53182"
     },
     {
       "path": "pi-dist/pi-tui/tui-main-screen.js",

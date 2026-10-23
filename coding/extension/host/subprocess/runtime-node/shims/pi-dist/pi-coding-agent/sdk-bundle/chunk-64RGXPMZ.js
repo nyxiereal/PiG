@@ -4,7 +4,7 @@ import {
   fetchWithRetry,
   getPiUserAgent,
   processImage
-} from "./chunk-UWJCOORC.js";
+} from "./chunk-6HJCSATA.js";
 import {
   SETTINGS_DEFAULTS,
   addUsageToTotals,

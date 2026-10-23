@@ -4,7 +4,7 @@
 # ref: a release tag, or the full commit of a pinned pi-mono commit.
 # package_version: what Pi's package.json files and `pi --version` report.
 # version: the display and ledger version (a commit pin appends +<commit[:8]>).
-ref=ede2c9b468d8e061c557d16957513715e6d49cd6
-commit=ede2c9b468d8e061c557d16957513715e6d49cd6
+ref=3953e9ef497024d13c6f4aa646d0adda2e37b0f8
+commit=3953e9ef497024d13c6f4aa646d0adda2e37b0f8
 package_version=1.4.0
-version=1.4.0+ede2c9b4
+version=1.4.0+3953e9ef

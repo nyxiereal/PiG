@@ -291822,17 +291822,6 @@
       "shapeHash": "sha256:785d4f16f63f382228dd4ecfebed98767b8cbb265282e6c9986a648b5d0c5345"
     },
     {
-      "id": "go:github.com/MichaelKinsy/PiG/internal/codingagent/tools#archStr",
-      "package": "github.com/MichaelKinsy/PiG/internal/codingagent/tools",
-      "name": "archStr",
-      "kind": "function",
-      "exported": false,
-      "shape": {
-        "type": "func(architecture string) string"
-      },
-      "shapeHash": "sha256:4da2364efe6e445d2a60a4c7711cfbca72c0ee06c3fbddac0d970183e1e699c3"
-    },
-    {
       "id": "go:github.com/MichaelKinsy/PiG/internal/codingagent/tools#argumentSchemaOnce",
       "package": "github.com/MichaelKinsy/PiG/internal/codingagent/tools",
       "name": "argumentSchemaOnce",
@@ -293998,6 +293987,17 @@
         "type": "func(*os.Process)"
       },
       "shapeHash": "sha256:db76dbfdf14c1febad33979d9b70bd5bc662df927ae8906f71e1de5e6e4c197d"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/internal/codingagent/tools#releaseTarget",
+      "package": "github.com/MichaelKinsy/PiG/internal/codingagent/tools",
+      "name": "releaseTarget",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func(plat string, architecture string) string"
+      },
+      "shapeHash": "sha256:b5d07495f4a7889fc9ddb4b4c85c27c25ae304835ed404f32b30ab920d427ad9"
     },
     {
       "id": "go:github.com/MichaelKinsy/PiG/internal/codingagent/tools#reportToolStatus",
@@ -349361,6 +349361,17 @@
         "type": "func(text string) string"
       },
       "shapeHash": "sha256:712aa1f912ed8b2a515afd3e016ad20e83192eda792ea2444cc3e25c00ffe2fd"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/tui#terminalWordSelectionJoiners",
+      "package": "github.com/MichaelKinsy/PiG/tui",
+      "name": "terminalWordSelectionJoiners",
+      "kind": "variable",
+      "exported": false,
+      "shape": {
+        "type": "map[string]bool"
+      },
+      "shapeHash": "sha256:3af528a2ba91555bb23ee8186a48c3c9201b3cf65594c81b5d32e417b99fd811"
     },
     {
       "id": "go:github.com/MichaelKinsy/PiG/tui#terminalWriteLog",

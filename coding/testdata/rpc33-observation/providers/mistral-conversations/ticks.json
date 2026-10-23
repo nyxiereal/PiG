@@ -1,5 +1,5 @@
 {
-  "piVersion": "1.4.0+ede2c9b4",
+  "piVersion": "1.4.0+3953e9ef",
   "node": "v24.19.0",
   "scenarios": [
     {
@@ -191,7 +191,7 @@
         "stopReason": "toolUse",
         "responseId": "r1",
         "rawStopReason": "tool_calls",
-        "durationMs": 32
+        "durationMs": 30
       }
     },
     {

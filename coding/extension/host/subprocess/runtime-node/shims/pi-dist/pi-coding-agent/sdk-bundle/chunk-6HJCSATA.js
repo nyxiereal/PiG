@@ -1558,6 +1558,19 @@ function isOfflineModeEnabled() {
   return value === "1" || value.toLowerCase() === "true" || value.toLowerCase() === "yes";
 }
 __name(isOfflineModeEnabled, "isOfflineModeEnabled");
+function getReleaseTarget(plat, architecture) {
+  const archStr = architecture === "arm64" ? "aarch64" : architecture === "x64" ? "x86_64" : void 0;
+  if (!archStr)
+    return void 0;
+  if (plat === "darwin")
+    return `${archStr}-apple-darwin.tar.gz`;
+  if (plat === "linux")
+    return `${archStr}-unknown-linux-musl.tar.gz`;
+  if (plat === "win32")
+    return `${archStr}-pc-windows-msvc.zip`;
+  return void 0;
+}
+__name(getReleaseTarget, "getReleaseTarget");
 var TOOLS = {
   fd: {
     name: "fd",
@@ -1565,38 +1578,14 @@ var TOOLS = {
     binaryName: "fd",
     systemBinaryNames: ["fd", "fdfind"],
     tagPrefix: "v",
-    getAssetName: /* @__PURE__ */ __name((version, plat, architecture) => {
-      if (plat === "darwin") {
-        const archStr = architecture === "arm64" ? "aarch64" : "x86_64";
-        return `fd-v${version}-${archStr}-apple-darwin.tar.gz`;
-      } else if (plat === "linux") {
-        const archStr = architecture === "arm64" ? "aarch64" : "x86_64";
-        return `fd-v${version}-${archStr}-unknown-linux-musl.tar.gz`;
-      } else if (plat === "win32") {
-        const archStr = architecture === "arm64" ? "aarch64" : "x86_64";
-        return `fd-v${version}-${archStr}-pc-windows-msvc.zip`;
-      }
-      return null;
-    }, "getAssetName")
+    getAssetName: /* @__PURE__ */ __name((version, target) => `fd-v${version}-${target}`, "getAssetName")
   },
   rg: {
     name: "ripgrep",
     repo: "BurntSushi/ripgrep",
     binaryName: "rg",
     tagPrefix: "",
-    getAssetName: /* @__PURE__ */ __name((version, plat, architecture) => {
-      if (plat === "darwin") {
-        const archStr = architecture === "arm64" ? "aarch64" : "x86_64";
-        return `ripgrep-${version}-${archStr}-apple-darwin.tar.gz`;
-      } else if (plat === "linux") {
-        const archStr = architecture === "arm64" ? "aarch64" : "x86_64";
-        return `ripgrep-${version}-${archStr}-unknown-linux-musl.tar.gz`;
-      } else if (plat === "win32") {
-        const archStr = architecture === "arm64" ? "aarch64" : "x86_64";
-        return `ripgrep-${version}-${archStr}-pc-windows-msvc.zip`;
-      }
-      return null;
-    }, "getAssetName")
+    getAssetName: /* @__PURE__ */ __name((version, target) => `ripgrep-${version}-${target}`, "getAssetName")
   }
 };
 function commandExists(cmd) {
@@ -1759,11 +1748,12 @@ async function downloadTool(tool) {
     throw new Error(`Unknown tool: ${tool}`);
   const plat = platform();
   const architecture = arch();
-  const version = tool === "fd" && plat === "darwin" && architecture === "x64" ? "10.3.0" : await getLatestVersion(config.repo);
-  const assetName = config.getAssetName(version, plat, architecture);
-  if (!assetName) {
+  const target = getReleaseTarget(plat, architecture);
+  if (!target) {
     throw new Error(`Unsupported platform: ${plat}/${architecture}`);
   }
+  const version = tool === "fd" && plat === "darwin" && architecture === "x64" ? "10.3.0" : await getLatestVersion(config.repo);
+  const assetName = config.getAssetName(version, target);
   mkdirSync(TOOLS_DIR, { recursive: true });
   const downloadUrl = `https://github.com/${config.repo}/releases/download/${config.tagPrefix}${version}/${assetName}`;
   const archivePath = join(TOOLS_DIR, assetName);
@@ -1821,6 +1811,13 @@ async function ensureTool(tool, onStatus) {
   if (platform() === "android") {
     const pkgName = TERMUX_PACKAGES[tool] ?? tool;
     onStatus?.({ type: "warning", message: `${config.name} not found. Install with: pkg install ${pkgName}` });
+    return void 0;
+  }
+  if (!getReleaseTarget(platform(), arch())) {
+    onStatus?.({
+      type: "warning",
+      message: `${config.name} not found. Automatic download is not supported on ${platform()}/${arch()}. Install ${config.name} with your system package manager.`
+    });
     return void 0;
   }
   onStatus?.({ type: "info", message: `${config.name} not found. Downloading...` });

@@ -308460,9 +308460,9 @@
       "kind": "function",
       "exported": false,
       "shape": {
-        "type": "func(content string, lazyUnderlines []int, lazyLines []int, lazyIndented []int, lazyBreaks []int, width int, notLast bool) []string"
+        "type": "func(content string, lazyUnderlines []int, lazyLines []int, lazyIndented []int, lazyBreaks []int, width int, notLast bool) ([]string, bool)"
       },
-      "shapeHash": "sha256:e77ce1a8c0595dcbf3a19f979ee6c726b8039dd26e0e2436b824c0f932c0a458"
+      "shapeHash": "sha256:a698e333bf8c66d4ac2c9985efdb9e01f5f14bae98272d2dc78beeacbab4ad3f"
     },
     {
       "id": "go:github.com/MichaelKinsy/PiG/tui#Markdown.resumeDocument",

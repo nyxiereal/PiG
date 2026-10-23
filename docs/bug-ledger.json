@@ -13469,7 +13469,6 @@
         "coding/cli/cli_package_glob_test.go::TestCLIGitSourceRefreshesOncePerLoad",
         "coding/cli/cli_package_glob_test.go::TestCLIPackageSourceGlobThrowFirstSourceWins",
         "coding/cli/cli_package_glob_test.go::TestCLIPackageSourceGlobThrowFollowsPi",
-        "coding/cli/cli_package_glob_test.go::TestCLIPackageSourceInstallFailureStopsStartup",
         "coding/cli/cli_package_glob_test.go::TestReloadSnapshotReportsCLIPackageGlobThrow",
         "coding/cli/cli_package_glob_test.go::TestStartupStopsAtACLIPackageGlobThrow",
         "coding/cli/settings_file_url_upstream_test.go::TestNpmPackageManifestGlobThrowRejectsResolution",
@@ -13653,7 +13652,6 @@
         "coding/cli/cli_package_glob_test.go::TestCLIGitSourceRefreshesOncePerLoad",
         "coding/cli/cli_package_glob_test.go::TestCLIPackageSourceGlobThrowFirstSourceWins",
         "coding/cli/cli_package_glob_test.go::TestCLIPackageSourceGlobThrowFollowsPi",
-        "coding/cli/cli_package_glob_test.go::TestCLIPackageSourceInstallFailureStopsStartup",
         "coding/cli/cli_package_glob_test.go::TestReloadSnapshotReportsCLIPackageGlobThrow",
         "coding/cli/cli_package_glob_test.go::TestStartupStopsAtACLIPackageGlobThrow",
         "coding/cli/resource_loader_gaps_upstream_test.go::TestPrintModeInvalidDiscoveredFileURLFailsBind",
@@ -21259,6 +21257,25 @@
       ]
     },
     {
+      "id": "BF-9b2165f",
+      "title": "fix(tui): quotes narrower than a border keep their whitespace tokens like Pi (Pi)",
+      "symptom": "fix(tui): quotes narrower than a border keep their whitespace tokens like Pi (Pi)",
+      "rootCause": "The contract of Markdown.renderToken follows the new source hash.",
+      "rootCauseSource": "commit",
+      "userImpact": "Wrong output or ordering",
+      "platform": "All platforms",
+      "class": "own",
+      "fixedIn": "Unreleased",
+      "origin": "commit",
+      "commits": [
+        {
+          "hash": "9b2165ffb6",
+          "date": "2026-10-23"
+        }
+      ],
+      "tests": []
+    },
+    {
       "id": "BF-9b4312b",
       "title": "A Rust extension build that ends without a compiler diagnostic (cargo or rustc killed, cargo unable to start)…",
       "symptom": "A Rust extension build that ends without a compiler diagnostic (cargo or rustc killed, cargo unable to start) now says how it ended: the exit status or signal, the crate whose rustc was killed, how long cargo ran and whether the build's context had ended, instead of only \"cargo build failed\".",
@@ -25061,7 +25078,6 @@
         "coding/cli/cli_package_glob_test.go::TestCLIGitSourceRefreshesOncePerLoad",
         "coding/cli/cli_package_glob_test.go::TestCLIPackageSourceGlobThrowFirstSourceWins",
         "coding/cli/cli_package_glob_test.go::TestCLIPackageSourceGlobThrowFollowsPi",
-        "coding/cli/cli_package_glob_test.go::TestCLIPackageSourceInstallFailureStopsStartup",
         "coding/cli/settings_file_url_upstream_test.go::TestNpmPackageManifestGlobThrowRejectsResolution",
         "coding/cli/settings_file_url_upstream_test.go::TestSettingsPatternErrorsFollowPi",
         "coding/cli/startup_init_budget_test.go::TestLazyRegexpPatternsAllCompile",
@@ -35324,7 +35340,6 @@
         "coding/cli/cli_package_glob_test.go::TestCLIGitSourceRefreshesOncePerLoad",
         "coding/cli/cli_package_glob_test.go::TestCLIPackageSourceGlobThrowFirstSourceWins",
         "coding/cli/cli_package_glob_test.go::TestCLIPackageSourceGlobThrowFollowsPi",
-        "coding/cli/cli_package_glob_test.go::TestCLIPackageSourceInstallFailureStopsStartup",
         "coding/cli/cli_package_glob_test.go::TestReloadSnapshotReportsCLIPackageGlobThrow",
         "coding/cli/cli_package_glob_test.go::TestStartupStopsAtACLIPackageGlobThrow",
         "coding/cli/package_update_cases_upstream_test.go::TestPackageUpdateLookupPrefixesOriginal",

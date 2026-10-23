@@ -1593,9 +1593,9 @@ rationale = "Pi 3daa2028..b06c1f2c changes this file only in commits PiG ports f
 [[files]]
 path = "packages/chord/src/node.ts"
 change = "added"
-disposition = "pending"
+disposition = "designed-out"
 evidence = []
-rationale = ""
+rationale = "A re-export barrel with no runtime code of its own, so Go has none; every export has its Go counterpart in chord/host and is mapped by its own source row: nodeLoader is host.NodeLoader (loader.go:72), createHostManager is CreateHostManager (manager.go:218), childControl is ChildControl (manager.go:522), processLock is ProcessLock (manager_lock.go:21), forkDriver is ForkDriver (manager_unix.go:91, manager_fork_windows.go:47), and the types ControlMessage, Driver, Exit, ForkDriverOptions, HostManager, HostManagerOptions, Instance and Liveness are declared in manager.go."
 
 [[files]]
 path = "packages/chord/src/object.ts"
@@ -1670,9 +1670,9 @@ rationale = "PORT_MAP records this file n/a with the reason: (re-export barrel: 
 [[files]]
 path = "packages/chord/src/sqlite/migrations.ts"
 change = "added"
-disposition = "pending"
-evidence = []
-rationale = ""
+disposition = "ported"
+evidence = ["test:chord/sqlite/migrations_test.go#TestSqliteMigrations"]
+rationale = "Read against Pi migrations.ts: chord/sqlite/migrations.go ApplySqliteMigrations validates the table and the contiguous 1.. versions before touching the database, then in one Transaction creates the STRICT metadata table, inserts the singleton row, refuses a stored version above the newest migration, and applies each pending migration's statements and its version update in order, as Pi does, including the 'SQLite schema metadata is missing' check. TestSqliteMigrations ports all four cases of chord/test/sqlite/migrations.test.ts (independent histories and skipped applied migrations, invalid versions rejected with an empty sqlite_schema, invalid identifiers, and rollback of the bootstrap plus every pending migration together after a failing statement)."
 
 [[files]]
 path = "packages/chord/src/sqlite/node.ts"
@@ -1684,9 +1684,9 @@ rationale = "Pi 89e30958 reverts the WAL replication work and with it deletes No
 [[files]]
 path = "packages/chord/src/sqlite/schema.ts"
 change = "added"
-disposition = "pending"
-evidence = []
-rationale = ""
+disposition = "ported"
+evidence = ["test:chord/sqlite/migrations_test.go#TestSqliteMigrations"]
+rationale = "Read against Pi schema.ts: chord/sqlite/schema.go ValidateSqliteSchemaPrefix applies the same identifier pattern ^[A-Za-z_][A-Za-z0-9_]*$ and the same case-insensitive sqlite_ reservation, with Pi's two messages (the prefix quoted as JSON.stringify does). The port of migrations.test.ts case 'validates prefixes and migration table identifiers before executing SQL' (subtest of TestSqliteMigrations) feeds the empty, digit-first, hyphenated, injection, sqlite_ and SQLITE_ prefixes and the valid pi_, _private and app2, through ValidateSqliteSchemaPrefix and ApplySqliteMigrations. The function is synchronous in Pi, so it has no async contract."
 
 [[files]]
 path = "packages/chord/src/state.ts"
@@ -1810,9 +1810,9 @@ rationale = "PORT_MAP row is ✅ ported (codemode/assets/prelude.js; codemode/as
 [[files]]
 path = "packages/codemode/src/runtime/protocol.ts"
 change = "added"
-disposition = "pending"
-evidence = []
-rationale = ""
+disposition = "ported"
+evidence = ["test:codemode/remote_protocol_test.go#TestWireMessagesHaveUpstreamsJSONShape", "test:codemode/remote_protocol_test.go#TestWireRepliesAndRequestsHaveUpstreamsJSONShape", "test:codemode/remote_protocol_test.go#TestVMMessagesRoundTripThroughTheWire", "test:codemode/bridge_test.go#TestReportsABrokenBridgeAsASandboxError"]
+rationale = "Read against Pi protocol.ts: codemode/remote_protocol.go declares VmStartData (code, tools, globals, memoryLimitBytes, store, deterministic{startedAt, seed}), WorkerToHostMessage (call, output, done ok/error with during, crash, started, idle) and HostToWorkerMessage (result with ok, payload, seq, now, properties) with the same fields and JSON shapes; the wire tests check those shapes and a round trip. isWorkerToHostMessage/isHostToWorkerMessage check only the type upstream; Go carries an unknown type or a message lacking a required field unchanged (messageFromWire, remote.go:213) and the host fails the run as a broken bridge, covered by TestReportsABrokenBridgeAsASandboxError. WorkerData (the compiled wasm module and the SharedArrayBuffer interrupt flag) is specific to Bun/Node worker threads and has no Go counterpart: the Go VM seam is the vmdriver interface."
 
 [[files]]
 path = "packages/codemode/src/runtime/remote.ts"
@@ -3525,9 +3525,9 @@ rationale = "PORT_MAP row is ✅ ported (internal/managementhttp/managementhttp.
 [[files]]
 path = "packages/coding-agent/src/utils/mime.ts"
 change = "added"
-disposition = "pending"
-evidence = []
-rationale = ""
+disposition = "ported"
+evidence = ["test:internal/imageprocessing/mime_oracle_test.go#TestDetectSupportedImageMimeTypeMatchesPiOracle", "test:internal/imageprocessing/mime_oracle_test.go#TestDetectSupportedImageMimeTypeFromFileMatchesPiOracle", "scenario:test/parity/scenarios/cli-utils/08-mime-detection-deferred.toml"]
+rationale = "Read against Pi mime.ts: internal/imageprocessing/images.go DetectSupportedImageMimeType matches it branch for branch (JPEG 0xf7 exclusion, PNG signature + IHDR + acTL/IDAT walk, GIF87a/89a, RIFF/WEBP, BM header consistency with the 12 and 40..124 DIB sizes) and DetectSupportedImageMimeTypeFromFile reads the same 4100-byte sniff window. The oracle tests run Pi's own function on the same buffers (signatures, truncations, PNG chunk walks, BMP headers, seeded mutations); the print-mode scenario drives an @image argument through the CLI."
 
 [[files]]
 path = "packages/coding-agent/src/utils/open-browser.ts"
@@ -3637,9 +3637,9 @@ rationale = "PORT_MAP records this file n/a with the reason: (Go archive/zip, us
 [[files]]
 path = "packages/durable/src/codemode/codemode.ts"
 change = "added"
-disposition = "pending"
-evidence = []
-rationale = ""
+disposition = "ported"
+evidence = ["test:durable/codemode/codemode_test.go#TestDurableCodeMode", "test:durable/codemode/output_tool_test.go#TestDurableCodeModeOutputAndToolSearch", "test:durable/session/codemode_checkpoints_upstream_test.go#TestBuiltInDocumentCheckpointPolicies", "test:durable/codemode/describe_test.go#TestDescribeUsesTheLongestMatchingNamespacePrefix"]
+rationale = "The file is identical across the three pinned Pi trees (sha256 of codemode.ts and of codemode.test.ts unchanged between v1.4.0, +74f46864 and +936e5f40). Its exports map to durable/codemode: CODEMODE_MODULE_VERSION and CODEMODE_TOOL_NAME, the Run/Journal/Store documents (docs.go, StoreState, NestedCall, ToolDetails), CodemodeToolOptions/Global/Input (tool.go) and createCodemodeTool/createCodemodeExtension (CreateTool, CreateExtension). The reviewed test mapping (test-mapping-v1.4.0+936e5f40.json, upstreamTestHash matching the current tests) records all 40 cases of durable/test/codemode.test.ts as ported one to one under TestDurableCodeMode and TestDurableCodeModeOutputAndToolSearch, the 2 checkpoint cases under TestBuiltInDocumentCheckpointPolicies, 5 describe cases and 7 model cases. test/parity/coverage.md lists no scenario for this file; the evidence is the ported unit cases."
 
 [[files]]
 path = "packages/durable/src/codemode/describe.ts"

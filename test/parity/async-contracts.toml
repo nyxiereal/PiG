@@ -86,10 +86,10 @@ rationale = "async/Promise source; PORT_MAP marks this file ✅ ported (`ai/goog
 
 [[files]]
 path = "packages/ai/src/api/google-shared.ts"
-disposition = "pending"
-contracts = []
-evidence = []
-rationale = ""
+disposition = "translated"
+contracts = ["awaited", "cancellable"]
+evidence = ["test:ai/google_retry_request_test.go#TestRetryGoogleRequestRetriesAHeaderlessSDKErrorWithARetryableStatus", "test:ai/google_retry_request_test.go#TestRetryGoogleRequestDoesNotRetryWhenMaxRetriesIsUnset", "test:ai/google_retry_request_test.go#TestRetryGoogleRequestPassesTheDelayCapOn", "test:ai/google_retry_owner_test.go#TestGoogleRetryGoogleRequestIsTheOnlyRetryLayer", "test:ai/provider_retry_request_upstream_test.go#TestRetryProviderRequestAbortsTheRetryDelay", "test:ai/google_sdk_pipeline_test.go#TestGoogleSDKPipelineMatchesNodeTickOrder"]
+rationale = "The only async code is retryGoogleRequest (google-shared.ts:496-514): an async wrapper that awaits request() inside retryProviderRequest, adds the missing headers property to a status-only SDK error and rethrows it, passing maxRetries, maxRetryDelayMs and the AbortSignal on. Go: RetryGoogleRequest (ai/google.go:1483) calls RetryProviderRequest with the same options (the context is the signal) and hands the caller the original status error back; the call waits for every attempt and backoff sleep (awaited), a cancelled context ends the backoff with Pi's 'Request aborted' (TestRetryProviderRequestAbortsTheRetryDelay, the shared retry core), and the request-resolution microtask depth of the two async wrappers is modelled by googleRetryGoogleRequest (ai/google_sdk_pipeline.go:128) and replayed against Pi's Node tick oracle by TestGoogleSDKPipelineMatchesNodeTickOrder. The retry cases are the ports of packages/ai/test/google-shared-retry.test.ts. Only the SDK request-resolution path is replayed against Pi's Node ticks; the provider's other goroutine hand-offs are not claimed to preserve microtask order, so microtask-ordering is not listed as a contract of this row."
 
 [[files]]
 path = "packages/ai/src/api/google-vertex.ts"
@@ -156,10 +156,10 @@ rationale = "async/Promise source new in Pi 1.1.0; its per-file ordering/cancell
 
 [[files]]
 path = "packages/ai/src/api/openai-responses-shared.ts"
-disposition = "pending"
-contracts = []
-evidence = []
-rationale = ""
+disposition = "translated"
+contracts = ["awaited", "cancellable"]
+evidence = ["test:ai/provider_stream_events_upstream_test.go#TestProviderStreamEventsUpstream", "test:ai/provider_stream_event_order_test.go#TestProviderStreamEventObserverFollowsNormalization", "test:ai/openai_responses_test.go#TestResponsesSSE_ContextCancellation", "test:ai/azure_responses_tick_order_test.go#TestAzureResponsesTickOrder", "test:ai/openai_codex_ws_upstream_test.go#TestCodexProviderStreamEventCallbackFailureSkipsTransportRecovery"]
+rationale = "processResponsesStream (openai-responses-shared.ts:511) is the only async function: it consumes the SDK event stream with for-await and awaits options.onProviderStreamEvent(event, model) before it maps each event, so an observer that rejects ends the stream at that event and a slow observer delays the push of every later event. Go: openAIResponsesProvider.parseResponsesSSE and the Codex frame loop call OnProviderStreamEvent (ai/openai_responses.go:1974) before mapping and end the stream on its error; the context ends the loop with an aborted result (TestResponsesSSE_ContextCancellation); the Azure and Codex paths replay Pi's per-push microtask generation against the Node oracle (TestAzureResponsesTickOrder, the codex SSE oracle in ai/openai_codex_sse_stream.go); the observer-before-normalization order and in-order delivery are TestProviderStreamEventObserverFollowsNormalization and the openai-responses, azure and pi-messages subtests of TestProviderStreamEventsUpstream; a failing callback surfaces without a transport retry (TestCodexProviderStreamEventCallbackFailureSkipsTransportRecovery). Tick-for-tick microtask order is replayed only for the Azure and Codex paths named above; the plain Responses SSE path hands off to a goroutine and is not claimed to preserve microtask order, so microtask-ordering is not listed as a contract of this row."
 
 [[files]]
 path = "packages/ai/src/api/openai-responses.ts"
@@ -324,10 +324,10 @@ rationale = "refreshStoredOAuthCredential awaits the credential store's lock-hel
 
 [[files]]
 path = "packages/ai/src/auth/types.ts"
-disposition = "pending"
+disposition = "no-runtime-async"
 contracts = []
 evidence = []
-rationale = ""
+rationale = "Declarations only: the file has no exported function, const or class (grep of the pinned source), so the Promise return types of CredentialStore.read/list/modify/delete, AuthEnv.env/fileExists, ProviderAuthInteraction.prompt, ApiKeyAuth.login/check/resolve and OAuthProviderAuth.login/refresh/toAuth are signatures, not behavior. Their ordering, cancellation and error contracts belong to the implementing files' rows (auth/credential-store.ts, auth/resolve.ts, auth/helpers.ts and the provider auth files); the Go interfaces are in ai/auth.go and ai/oauth_types.go."
 
 [[files]]
 path = "packages/ai/src/cli.ts"
@@ -345,10 +345,10 @@ rationale = "async/Promise source; PORT_MAP marks this file ✅ ported (`ai/type
 
 [[files]]
 path = "packages/ai/src/compat/extension-oauth-types.ts"
-disposition = "pending"
+disposition = "no-runtime-async"
 contracts = []
 evidence = []
-rationale = ""
+rationale = "Type declarations only (no exported function, const or class in the pinned source): onPrompt, onManualCodeInput and onSelect are Promise-returning callback signatures of the legacy extension OAuth contract. The Go counterparts are the callback types in ai/oauth_types.go and coding/extension/provider.go; the behavior that awaits them is in the OAuth login rows."
 
 [[files]]
 path = "packages/ai/src/env-api-keys.ts"
@@ -541,17 +541,17 @@ rationale = ""
 
 [[files]]
 path = "packages/chord/src/declare.ts"
-disposition = "pending"
+disposition = "no-runtime-async"
 contracts = []
 evidence = []
-rationale = ""
+rationale = "Type declarations only (no exported function, const or class in the pinned source): ResourceDeclaration.open/close and ListenerDecl.fn are `T | Promise<T>` and `void | Promise<void>` signatures. The behavior that awaits them (resource open with its AbortSignal, listener dispatch) is in the host and object rows; the Go declarations are in chord/host/declare.go."
 
 [[files]]
 path = "packages/chord/src/errors.ts"
-disposition = "pending"
-contracts = []
-evidence = []
-rationale = ""
+disposition = "translated"
+contracts = ["awaited"]
+evidence = ["test:chord/host/errors_test.go#TestRunAllRunsEveryStepAndAggregates", "test:chord/host/errors_test.go#TestAsChordErrorKeepsChordErrorsAndWrapsOthers"]
+rationale = "runAll awaits each step in order inside try/catch, keeps going after a failure, then rejects with nothing, the single error itself, or an AggregateError(errors, message) of all of them in order. Go runAll (chord/host/errors.go:122) runs the steps sequentially, collecting failures (a panicking step counts as the thrown value) and returns nil, the one error, or *AggregateError; the rest of the file is synchronous. TestRunAllRunsEveryStepAndAggregates asserts the order after failures and the three outcomes; TestAsChordErrorKeepsChordErrorsAndWrapsOthers the synchronous asChordError."
 
 [[files]]
 path = "packages/chord/src/host.ts"
@@ -618,17 +618,17 @@ rationale = ""
 
 [[files]]
 path = "packages/chord/src/sqlite/database.ts"
-disposition = "pending"
+disposition = "no-runtime-async"
 contracts = []
 evidence = []
-rationale = ""
+rationale = "Interfaces only (no exported function, const or class in the pinned source): SqliteExecutor and SqliteDatabase declare Promise-returning exec/run/get/all/transaction/close. The Go counterparts are the blocking methods of chord/sqlite/database.go; their serialization and transaction behavior is proven on the adapters' rows (sqlite/cloudflare.ts, the node adapter) and by TestSqliteMigrations through the in-memory database."
 
 [[files]]
 path = "packages/chord/src/sqlite/migrations.ts"
-disposition = "pending"
-contracts = []
-evidence = []
-rationale = ""
+disposition = "translated"
+contracts = ["awaited"]
+evidence = ["test:chord/sqlite/migrations_test.go#TestSqliteMigrations"]
+rationale = "applySqliteMigrations validates the table name and the version sequence synchronously (a rejected Promise, before the database is used), then awaits one database.transaction whose awaited exec/run/get calls run strictly in order and whose failure rolls everything back, including the metadata-table bootstrap. Go ApplySqliteMigrations (chord/sqlite/migrations.go:24) does the same checks first and runs the same statements in order inside SqliteDatabase.Transaction, returning the first error. TestSqliteMigrations pins the check-before-touching behavior (empty sqlite_schema after a rejected call) and the joint rollback of the bootstrap and every pending migration after a failing statement."
 
 [[files]]
 path = "packages/chord/src/sqlite/node.ts"
@@ -660,10 +660,10 @@ rationale = "findTraces, getTrace and findMetrics await their queries. Go's Find
 
 [[files]]
 path = "packages/chord/src/types.ts"
-disposition = "pending"
+disposition = "no-runtime-async"
 contracts = []
 evidence = []
-rationale = ""
+rationale = "Type declarations only (no exported function, const or class in the pinned source): Host.get returns Promise<Ref<C>> and Host.ready is a Promise<void> as interface members. The code that settles them is in host.ts and object.ts; Go declares the surface in chord/host/types.go with context.Context in place of the abort signal."
 
 [[files]]
 path = "packages/chord/src/watch.ts"
@@ -674,10 +674,10 @@ rationale = "Types only, with three Promise members. WatchHandle.start installs 
 
 [[files]]
 path = "packages/chord/src/websocket.ts"
-disposition = "pending"
-contracts = []
-evidence = []
-rationale = ""
+disposition = "translated"
+contracts = ["detached-owned", "ui-handoff"]
+evidence = ["test:chord/host/websocket_test.go#TestAcceptWebSocketsClosesRefusedAndFailedClientsAfterAuthenticating", "test:chord/host/websocket_upstream_test.go#TestWebSocketLinksServesABrowserStyleClientOverARealSocketStampedByTheAuthenticator", "test:chord/host/websocket_upstream_test.go#TestWebSocketLinksPackedPayloadsLargeSnapshotsAndResultsReachTheClientAsBinaryMessagesClientsMayNotSendThem"]
+rationale = "acceptWebSockets returns nothing: the connection listener wraps the socket in a link at once, then settles the authenticator with Promise.resolve(options.principal(request)).then(...) without awaiting it; an undefined principal closes the link with 'unauthorized', a rejection with 'authentication failed', otherwise host.accept runs as a client. The socket's frames sent meanwhile are queued by the link. Go AcceptWebSockets (chord/host/websocket.go:29) builds the link in the listener and runs the possibly blocking Principal as a task the host owns (host.goTask, drained by Close), with the same three outcomes; an Accept error that Pi would leave an unhandled rejection is reported to the host's OnError. TestAcceptWebSocketsClosesRefusedAndFailedClientsAfterAuthenticating pins the refused and failed outcomes after authentication and the real-socket tests pin the stamped principal and the packed-frame rules."
 
 [[files]]
 path = "packages/codemode/src/cloudflare.ts"
@@ -772,10 +772,10 @@ rationale = "async/Promise source; PORT_MAP marks this file ✅ ported (`coding/
 
 [[files]]
 path = "packages/coding-agent/src/cli/credential-print.ts"
-disposition = "pending"
-contracts = []
-evidence = []
-rationale = ""
+disposition = "translated"
+contracts = ["awaited", "cancellable"]
+evidence = ["test:coding/cli/credential_print_test.go#TestCredentialPrintCancellationEndsTheCallBeforeRefreshing", "test:coding/cli/credential_print_test.go#TestCredentialPrintRefreshesExpiredOAuthTokenBeforePrinting", "test:coding/cli/credential_print_test.go#TestCredentialPrintModelWithoutProviderUsesCatalogOfConfiguredProviders", "test:coding/cli/credential_print_test.go#TestAuthCommandExitCodesAndErrors"]
+rationale = "resolveCredentialForPrint awaits listCredentials({signal}) and then, one provider at a time and in provider order, awaits getAuth with the signal and the bearer minimum validity; a rejection or an AuthCommandError ends the call, so an OAuth refresh is awaited before the value is returned. Go ResolveCredentialForPrint (coding/cli/credential_print.go:31) makes the same sequential calls with the context as the signal and returns the first error. TestCredentialPrintRefreshesExpiredOAuthTokenBeforePrinting proves the refresh is awaited and persisted before printing; TestCredentialPrintCancellationEndsTheCallBeforeRefreshing (added with this review) proves a cancelled context ends the call with context.Canceled before any refresh runs; the multi-provider selection and error messages are TestCredentialPrintModelWithoutProviderUsesCatalogOfConfiguredProviders and TestAuthCommandExitCodesAndErrors."
 
 [[files]]
 path = "packages/coding-agent/src/cli/file-processor.ts"
@@ -870,10 +870,10 @@ rationale = "PORT_MAP marks this file ⬜ not started (`(new upstream by 0.87.1;
 
 [[files]]
 path = "packages/coding-agent/src/core/compaction/branch-summarization.ts"
-disposition = "pending"
-contracts = []
-evidence = []
-rationale = ""
+disposition = "translated"
+contracts = ["awaited", "cancellable"]
+evidence = ["test:internal/codingagent/compaction/branch_summarization_test.go#TestGenerateBranchSummary_Abort", "test:internal/codingagent/compaction/branch_summarization_test.go#TestGenerateBranchSummary_Error", "test:internal/codingagent/compaction/branch_summarization_test.go#TestGenerateBranchSummary_Success", "test:coding/session_branch_summary_upstream_test.go#TestBranchSummaryAgentStreamCancellation", "test:coding/session_branch_summary_upstream_test.go#TestSummarizationUsesAgentStreamOverride"]
+rationale = "generateBranchSummary awaits completeSummarization (the session stream function or the default, retried by the configured policy) with the caller's signal; an aborted response returns { aborted: true } instead of throwing, an error or a tool call returns { error }, and only a clean response gets the preamble and file lists. Go GenerateBranchSummary (internal/codingagent/compaction/branch_summarization.go) makes the same single blocking call with the context and maps the three outcomes the same way: TestGenerateBranchSummary_Abort, _Error and _Success pin them, TestBranchSummaryAgentStreamCancellation proves cancelling mid-stream through the Agent stream override ends the call as aborted, and TestSummarizationUsesAgentStreamOverride that the session stream function is the one awaited."
 
 [[files]]
 path = "packages/coding-agent/src/core/compaction/compaction.ts"
@@ -891,10 +891,10 @@ rationale = "async/Promise source; PORT_MAP marks this file ✅ ported (`coding/
 
 [[files]]
 path = "packages/coding-agent/src/core/exec.ts"
-disposition = "pending"
-contracts = []
-evidence = []
-rationale = ""
+disposition = "translated"
+contracts = ["awaited", "cancellable", "detached-owned"]
+evidence = ["test:coding/extension/exec_test.go#TestExecCommand_SpawnFailureResolvesWithCodeOne", "test:coding/extension/exec_test.go#TestExecCommandReportsInitiationBeforeCompletion", "test:coding/extension/exec_timeout_unix_test.go#TestExecCommandStartsTheTimeoutAfterTheSpawnAsPiDoes", "test:coding/extension/exec_signal_unix_test.go#TestExecCommandOptionsSignalEndsTheCommand", "test:coding/extension/exec_signal_unix_test.go#TestExecCommandOptionsSignalAbortedBeforeTheCallKillsTheStartedCommand", "test:coding/extension/exec_tree_test.go#TestExecCommandDoesNotWaitForADescendantHoldingTheOutput", "test:coding/extension/exec_tree_test.go#TestExecCommandDoesNotEscalateAfterSIGTERM", "test:coding/extension/exec_oracle_test.go#TestExecCommandMatchesPi"]
+rationale = "execCommand returns a Promise that never rejects: it resolves after the child ends and waitForChildProcess has drained its pipes (a descendant holding a pipe open does not block it; a spawn error resolves with code 1 and the error message as stderr). The abort signal (already aborted or later) and the timeout both send SIGTERM once; the 5 s SIGKILL timer is armed detached but Node sets proc.killed on delivery so it never fires, and no descendant is signalled. Go ExecCommand (coding/extension/exec.go:53) waits for the child and the pipe grace, resolves a failed start as code 1, signals the leader only with SIGTERM from the timeout, the context or opts.Signal, and does not escalate; the tests above pin each of those, including the timeout starting after the spawn and the oracle comparison with Pi's own execCommand (TestExecCommandMatchesPi)."
 
 [[files]]
 path = "packages/coding-agent/src/core/export-html/index.ts"
@@ -919,10 +919,10 @@ rationale = "Partial review: each awaited emission captures all extensions' curr
 
 [[files]]
 path = "packages/coding-agent/src/core/extensions/types.ts"
-disposition = "pending"
+disposition = "no-runtime-async"
 contracts = []
 evidence = []
-rationale = ""
+rationale = "The runtime exports are synchronous: defineTool (types.ts:690) and the ToolCallEvent/ToolResultEvent type guards (isBashToolResult ... isToolCallEventType, :1343-1400) return without awaiting. Promise appears only in the declared handler, tool, UI-context and command signatures, which describe what the runner and wrappers await. Their ordering, cancellation and error contracts are recorded on the rows that implement them (core/extensions/runner.ts, wrapper.ts, loader.ts); the Go declarations are in coding/extension/*.go."
 
 [[files]]
 path = "packages/coding-agent/src/core/footer-data-provider.ts"
@@ -933,10 +933,10 @@ rationale = "async/Promise source; PORT_MAP marks this file ✅ ported (`interna
 
 [[files]]
 path = "packages/coding-agent/src/core/model-config.ts"
-disposition = "pending"
-contracts = []
-evidence = []
-rationale = ""
+disposition = "translated"
+contracts = ["awaited"]
+evidence = ["test:internal/codingagent/settings_test.go#TestModelRegistryReadError", "test:internal/codingagent/settings_file_diagnostics_test.go#TestModelsJSONParseErrorsMatchPi", "test:internal/codingagent/config_schemas_runtime_upstream_test.go#TestConfigSchemasValidateSchemaInModelsJSONAtRuntime", "test:internal/codingagent/model_registry_test.go#TestModelRegistry_RefreshReloadsModelsJSON"]
+rationale = "ModelConfig.load awaits a single readFile and never rejects: a missing file (ENOENT) is an empty config, any other read error, a parse error and a schema error become the config's error string (Failed to load / Failed to parse models.json, Invalid models.json schema, each followed by the file path). Go reads the file synchronously in ModelRegistry.readConfig (internal/codingagent/model_registry.go:481) with the same three outcomes, and every caller waits for the result, so no ordering is observable beyond Pi's await. TestModelRegistryReadError pins the read-error text, TestModelsJSONParseErrorsMatchPi the parse errors against Pi's own loader, TestConfigSchemasValidateSchemaInModelsJSONAtRuntime the schema errors, and TestModelRegistry_RefreshReloadsModelsJSON that a refresh re-reads the file."
 
 [[files]]
 path = "packages/coding-agent/src/core/model-registry.ts"
@@ -1304,10 +1304,10 @@ rationale = "async/Promise source; PORT_MAP marks this file ✅ ported (`tui/tex
 
 [[files]]
 path = "packages/coding-agent/src/modes/interactive/components/login-dialog.ts"
-disposition = "pending"
-contracts = []
-evidence = []
-rationale = ""
+disposition = "translated"
+contracts = ["awaited", "cancellable", "detached-owned", "ui-handoff"]
+evidence = ["test:tui/login_dialog_cancel_order_test.go#TestLoginDialogCancelAbortsBeforeEndingTheInput", "test:tui/login_dialog_test.go#TestLoginDialog_CancelClosesPendingInputChannel", "test:tui/login_dialog_gaps_test.go#TestLoginDialogComponentPromptFlow", "test:tui/login_dialog_device_code_test.go#TestDeviceCodeLoginOpensTheVerificationPageAndCopiesTheCodeOnceAfterConfirmation", "test:tui/login_dialog_device_code_test.go#TestDeviceCodeLoginKeepsManualLoginAvailableWhenBrowserAndClipboardAccessFail", "test:tui/login_dialog_device_code_test.go#TestDeviceCodeLoginCancelsWithoutOpeningABrowserOrChangingTheClipboard", "test:tui/login_dialog_oracle_test.go#TestLoginDialogInputMatchesPi"]
+rationale = "showPrompt and showManualInput return a Promise settled only by the input: Enter resolves it with the typed value, cancel (Escape) aborts the dialog's AbortController first, then rejects the pending Promise with 'Login cancelled' and calls onComplete(false, ...). Device-code confirmation consumes its action once and starts the browser open and the clipboard write without awaiting them: copyToClipboard runs under `void ... .then/.catch`, updating the status row only if the dialog is still focused, not aborted and still showing the hint, and an open or copy failure never interrupts the login. Go tui/login_dialog.go keeps the same order (TestLoginDialogCancelAbortsBeforeEndingTheInput, TestLoginDialog_CancelClosesPendingInputChannel), the prompt flow (TestLoginDialogComponentPromptFlow, TestLoginDialogInputMatchesPi against Pi's component), consumes the device-code action once and opens only web URLs without blocking on the clipboard, with failures leaving manual login available (the three device-code tests)."
 
 [[files]]
 path = "packages/coding-agent/src/modes/interactive/components/model-selector.ts"
@@ -1703,10 +1703,10 @@ rationale = "Added to the accounting when every monorepo package was listed: the
 
 [[files]]
 path = "packages/durable/src/harness/util.ts"
-disposition = "pending"
-contracts = []
-evidence = []
-rationale = ""
+disposition = "translated"
+contracts = ["awaited", "cancellable", "detached-owned"]
+evidence = ["test:durable/harness/harness_submissions_test.go#TestSubmissions", "test:durable/harness/context_extend_scaling_test.go"]
+rationale = "Waiters.add returns a Promise that settles once: resolve(key, value) resolves every waiter of the key, rejectAll rejects all pending ones, and an AbortSignal on the context rejects only that waiter with signal.reason (already-aborted: rejected at once) and detaches its abort listener when it settles; scanAll awaits the pages one after another in order. Go Waiters (durable/harness/util.go) keeps the same: Add fails an already-done context at once with its cause and otherwise registers an AfterFunc that removes only that waiter, Resolve and RejectAll close every waiter's done channel after storing the value or error, and ScanAll follows the cursor sequentially. TestSubmissions subtest 'cancels only a wait and rejects pending waits on close' drives two waits on one submission, cancels one with its cause (the other stays pending and the status stays placed) and then close rejects the other with 'Harness is closed'; ScanAll is exercised through its callers (durable/harness/context.go:536, scheduler.go:460 and :1463), e.g. by the context extension scaling test."
 
 [[files]]
 path = "packages/durable/src/harness/view.ts"
@@ -1794,10 +1794,10 @@ rationale = "async/Promise source; PORT_MAP marks this file ported, but the per-
 
 [[files]]
 path = "packages/durable/src/storage/sqlite/cloudflare.ts"
-disposition = "pending"
-contracts = []
-evidence = []
-rationale = ""
+disposition = "translated"
+contracts = ["awaited"]
+evidence = ["test:durable/storage/sqlite/cloudflare/cloudflare_test.go#TestDurableObjectSqliteAdapter", "test:chord/sqlite/cloudflare/adapter_semantics_test.go#TestDurableObjectSqliteDatabaseQueuesEveryOperationBehindATransaction"]
+rationale = "openDurableObjectSqliteStorage returns the Promise of SqliteStorage.open over a DurableObjectSqliteDatabase; storages opened from the same Durable Object storage object share one operation queue, so concurrent opens and transactions never overlap. Go OpenDurableObjectSqliteStorage (durable/storage/sqlite/cloudflare/cloudflare.go) blocks until the storage is open. The 'isolates concurrently opened prefixes on one Durable Object' subtest of TestDurableObjectSqliteAdapter opens two prefixes concurrently and commits to both at once; the shared queue itself is TestDurableObjectSqliteDatabaseQueuesEveryOperationBehindATransaction."
 
 [[files]]
 path = "packages/durable/src/storage/sqlite/migrations.ts"
@@ -1808,10 +1808,10 @@ rationale = "async/Promise source; PORT_MAP marks this file ported, but the per-
 
 [[files]]
 path = "packages/durable/src/storage/sqlite/node.ts"
-disposition = "pending"
-contracts = []
-evidence = []
-rationale = ""
+disposition = "translated"
+contracts = ["awaited"]
+evidence = ["test:durable/storage/sqlite/sqlite_storage_test.go#TestPicoSqliteStorage", "test:durable/storage/sqlite/node/sqlite_facade_test.go#TestDurableReExportsTheChordDriver"]
+rationale = "openNodeSqliteStorage validates a given prefix before it awaits anything (the returned Promise rejects without creating the file), then awaits openNodeSqliteDatabase and SqliteStorage.open in that order. Go OpenNodeSqliteStorage (durable/storage/sqlite/node/node.go:56) creates the schema from the prefix first, then opens the database, then opens the storage, blocking in the same order and returning the first error; D188's pre-upgrade schema backup sits between the prefix check and the open. The 'rejects an invalid prefix before creating the database' subtest of TestPicoSqliteStorage asserts the error and that the directory was never created."
 
 [[files]]
 path = "packages/durable/src/storage/sqlite/storage.ts"

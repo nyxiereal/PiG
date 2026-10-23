@@ -157,6 +157,9 @@ func (tracker *pending) awaitEntered(ctx context.Context) error {
 // one: the Durable Session for its watches, the native Durable core driver for its own.
 type DeliveryScheduler struct{ pending *pending }
 
+// defaultDeliveries runs the deliveries of a watch that no host moved to its own scheduler (Watch.On, NativeWatch.On).
+var defaultDeliveries = NewDeliveryScheduler()
+
 // NewDeliveryScheduler returns an idle delivery scheduler.
 func NewDeliveryScheduler() *DeliveryScheduler { return &DeliveryScheduler{pending: newPending()} }
 
@@ -205,8 +208,8 @@ type watchLifecycle[T, L any] struct {
 	stopAfter   func() bool
 }
 
-func (watch *watchLifecycle[T, L]) setup(scheduler *DeliveryScheduler, value T, detach func(), report func(error), replace func() T) {
-	watch.scheduler = scheduler.pending
+func (watch *watchLifecycle[T, L]) setup(value T, detach func(), report func(error), replace func() T) {
+	watch.scheduler = defaultDeliveries.pending
 	watch.detach = detach
 	watch.report = report
 	watch.replace = replace
@@ -232,6 +235,15 @@ func (watch *watchLifecycle[T, L]) End() WatchEnd {
 		return WatchEnd{}
 	}
 	return *watch.end
+}
+
+func (watch *watchLifecycle[T, L]) useScheduler(scheduler *DeliveryScheduler) {
+	watch.mu.Lock()
+	defer watch.mu.Unlock()
+	if watch.started || len(watch.pending) > 0 || watch.end != nil {
+		panic(errors.New("Watch deliveries are moved before it is advanced or started"))
+	}
+	watch.scheduler = scheduler.pending
 }
 
 func (watch *watchLifecycle[T, L]) start(listener L) {
@@ -479,12 +491,13 @@ type Watch[T any] struct {
 	watchLifecycle[T, func(ctx context.Context, value T, ops []delta.Op) error]
 }
 
-// NewWatch returns a watch holding value whose deliveries run on scheduler. detach runs once when the watch ends;
-// report receives a listener's failure, which also ends the watch; replace gives the value an overflow delivers, and
-// nil delivers the newest value.
-func NewWatch[T any](scheduler *DeliveryScheduler, value T, detach func(), report func(error), replace func() T) *Watch[T] {
+// NewWatch returns a watch holding value, as Pi's `new Watch(value, detach, report, replace?)`. detach runs once when
+// the watch ends; report receives a listener's failure, which also ends the watch; replace gives the value an overflow
+// delivers, and nil delivers the newest value. Its deliveries run on a process-wide scheduler until On gives it the
+// host's own.
+func NewWatch[T any](value T, detach func(), report func(error), replace func() T) *Watch[T] {
 	watch := &Watch[T]{}
-	watch.setup(scheduler, value, detach, report, replace)
+	watch.setup(value, detach, report, replace)
 	watch.invoke = func(listener func(context.Context, T, []delta.Op) error, frame watchFrame[T]) error {
 		return listener(frame.ctx, frame.value, frame.ops)
 	}
@@ -496,6 +509,13 @@ func NewWatch[T any](scheduler *DeliveryScheduler, value T, detach func(), repor
 		}
 		return []delta.Op{{"r", payload}}
 	}
+	return watch
+}
+
+// On runs the watch's deliveries on scheduler, the Go counterpart of the host's microtask queue. It is called once,
+// before the watch is advanced or started, and returns the watch.
+func (watch *Watch[T]) On(scheduler *DeliveryScheduler) *Watch[T] {
+	watch.useScheduler(scheduler)
 	return watch
 }
 
@@ -523,15 +543,21 @@ type NativeWatch[T any] struct {
 	watchLifecycle[T, func(ctx context.Context, value T) error]
 }
 
-// NewNativeWatch returns a watch holding value whose deliveries run on scheduler; detach and report as for NewWatch.
-func NewNativeWatch[T any](scheduler *DeliveryScheduler, value T, detach func(), report func(error)) *NativeWatch[T] {
+// NewNativeWatch returns a watch holding value; detach, report and the scheduler as for NewWatch.
+func NewNativeWatch[T any](value T, detach func(), report func(error)) *NativeWatch[T] {
 	watch := &NativeWatch[T]{}
 	// No replacement: an overflow delivers the newest value.
-	watch.setup(scheduler, value, detach, report, nil)
+	watch.setup(value, detach, report, nil)
 	watch.invoke = func(listener func(context.Context, T) error, frame watchFrame[T]) error {
 		return listener(frame.ctx, frame.value)
 	}
 	watch.overflowOps = func(T) []delta.Op { return nil }
+	return watch
+}
+
+// On runs the watch's deliveries on scheduler; see Watch.On.
+func (watch *NativeWatch[T]) On(scheduler *DeliveryScheduler) *NativeWatch[T] {
+	watch.useScheduler(scheduler)
 	return watch
 }
 

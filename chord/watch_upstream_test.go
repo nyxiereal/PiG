@@ -38,7 +38,7 @@ func (r *watchRecord) detachedCount() int { r.mu.Lock(); defer r.mu.Unlock(); re
 func recordedWatch(value any, replace func() any) (*Watch[any], *DeliveryScheduler, *watchRecord) {
 	scheduler := NewDeliveryScheduler()
 	record := &watchRecord{}
-	return NewWatch(scheduler, value, record.detach, record.report, replace), scheduler, record
+	return NewWatch(value, record.detach, record.report, replace).On(scheduler), scheduler, record
 }
 
 // collectListener returns a listener that appends each frame to the returned slice, read after scheduler.Wait.
@@ -537,14 +537,15 @@ func TestNativeWatchDeliversValuesByIdentityInOrderWithAContextNeverInline(t *te
 	type thing struct{ run int }
 	first, second := &thing{1}, &thing{2}
 	scheduler := NewDeliveryScheduler()
-	watch := NewNativeWatch(scheduler, &thing{0}, func() {}, func(error) {})
+	watch := NewNativeWatch(&thing{0}, func() {}, func(error) {}).On(scheduler)
 	type seen struct {
 		value *thing
 		frame any
 	}
 	var mu sync.Mutex
 	var delivered []seen
-	watch.Start(func(ctx context.Context, value *thing) error {
+	var handle NativeWatchHandle[*thing] = watch
+	handle.Start(func(ctx context.Context, value *thing) error {
 		mu.Lock()
 		delivered = append(delivered, seen{value, ctx.Value(watchContextKey{})})
 		mu.Unlock()
@@ -558,14 +559,23 @@ func TestNativeWatchDeliversValuesByIdentityInOrderWithAContextNeverInline(t *te
 	if len(delivered) != 2 || delivered[0].value != first || delivered[1].value != second || delivered[0].frame != "first" || delivered[1].frame != "second" {
 		t.Fatalf("delivered %#v", delivered)
 	}
-	if watch.Value() != second {
+	if handle.Value() != second {
 		t.Fatal("value is not the last delivered")
 	}
+	select {
+	case <-handle.Closed():
+		t.Fatal("an open watch is closed")
+	default:
+	}
+	if end, _ := handle.Stop(); end.Reason != WatchStopped {
+		t.Fatalf("end %+v", end)
+	}
+	<-handle.Closed()
 }
 
 func TestNativeWatchCollapses101PendingValuesToTheNewest(t *testing.T) {
 	scheduler := NewDeliveryScheduler()
-	watch := NewNativeWatch(scheduler, 0, func() {}, func(error) {})
+	watch := NewNativeWatch(0, func() {}, func(error) {}).On(scheduler)
 	for n := 1; n <= 101; n++ {
 		watch.Advance(context.Background(), n)
 	}
@@ -578,8 +588,8 @@ func TestNativeWatchCollapses101PendingValuesToTheNewest(t *testing.T) {
 }
 
 func TestNativeWatchEndsWithEveryReasonOfItsLifecycle(t *testing.T) {
-	create := func() *NativeWatch[int] {
-		return NewNativeWatch(NewDeliveryScheduler(), 0, func() {}, func(error) {})
+	create := func() NativeWatchHandle[int] {
+		return NewNativeWatch(0, func() {}, func(error) {}).On(NewDeliveryScheduler())
 	}
 	stopped := create()
 	if end, _ := stopped.Stop(); end.Reason != WatchStopped {
@@ -588,24 +598,25 @@ func TestNativeWatchEndsWithEveryReasonOfItsLifecycle(t *testing.T) {
 	cancelled := create()
 	done, cancel := context.WithCancel(context.Background())
 	cancel()
-	cancelled.ObserveCancellation(done)
+	cancelled.(*NativeWatch[int]).ObserveCancellation(done)
 	mustEnd(t, cancelled, cancelled.End, WatchCancelled)
 	ended := create()
-	ended.SourceEnded(nil)
+	ended.(*NativeWatch[int]).SourceEnded(nil)
 	mustEnd(t, ended, ended.End, WatchEnded)
 	failure := errors.New("source failed")
 	failed := create()
-	failed.SourceEnded(failure)
+	failed.(*NativeWatch[int]).SourceEnded(failure)
 	if end := mustEnd(t, failed, failed.End, WatchFailed); !errors.Is(end.Error, failure) {
 		t.Fatalf("end %+v", end)
 	}
 	var reported []error
 	var mu sync.Mutex
-	throwing := NewNativeWatch(NewDeliveryScheduler(), 0, func() {}, func(err error) { mu.Lock(); reported = append(reported, err); mu.Unlock() })
+	throwing := NewNativeWatch(0, func() {}, func(err error) { mu.Lock(); reported = append(reported, err); mu.Unlock() }).On(NewDeliveryScheduler())
+	var throwingHandle NativeWatchHandle[int] = throwing
 	listenerFailure := errors.New("listener failed")
-	throwing.Start(func(context.Context, int) error { return listenerFailure })
+	throwingHandle.Start(func(context.Context, int) error { return listenerFailure })
 	throwing.Advance(context.Background(), 1)
-	if end := mustEnd(t, throwing, throwing.End, WatchListenerError); !errors.Is(end.Error, listenerFailure) {
+	if end := mustEnd(t, throwingHandle, throwingHandle.End, WatchListenerError); !errors.Is(end.Error, listenerFailure) {
 		t.Fatalf("end %+v", end)
 	}
 	mu.Lock()
@@ -617,7 +628,7 @@ func TestNativeWatchEndsWithEveryReasonOfItsLifecycle(t *testing.T) {
 
 func TestNativeWatchRetainsNeitherItsSourceNorItsListenerOnceStopped(t *testing.T) {
 	scheduler := NewDeliveryScheduler()
-	watch := NewNativeWatch(scheduler, 0, func() {}, func(error) {})
+	watch := NewNativeWatch(0, func() {}, func(error) {}).On(scheduler)
 	watch.Start(func(context.Context, int) error { return nil })
 	watch.Advance(context.Background(), 1)
 	scheduler.Wait()
@@ -635,5 +646,32 @@ func TestNativeWatchRetainsNeitherItsSourceNorItsListenerOnceStopped(t *testing.
 	}
 	if watch.value != 1 {
 		t.Fatalf("last value = %v", watch.value)
+	}
+}
+
+// A NativeWatch is used through NativeWatchHandle, the interface a source hands out: value, start, stop and closed.
+func TestNativeWatchHandleInterface(t *testing.T) {
+	scheduler := NewDeliveryScheduler()
+	var handle NativeWatchHandle[int] = NewNativeWatch(0, func() {}, func(error) {}).On(scheduler)
+	if handle.Value() != 0 {
+		t.Fatalf("acquisition value = %d", handle.Value())
+	}
+	var mu sync.Mutex
+	var seen []int
+	handle.Start(func(_ context.Context, value int) error { mu.Lock(); seen = append(seen, value); mu.Unlock(); return nil })
+	handle.(*NativeWatch[int]).Advance(context.Background(), 1)
+	scheduler.Wait()
+	end, err := handle.Stop()
+	if err != nil || end.Reason != WatchStopped || handle.Value() != 1 {
+		t.Fatalf("stop = %+v, %v, value %d", end, err, handle.Value())
+	}
+	<-handle.Closed()
+	if handle.End().Reason != WatchStopped {
+		t.Fatalf("end = %+v", handle.End())
+	}
+	mu.Lock()
+	defer mu.Unlock()
+	if !slices.Equal(seen, []int{1}) {
+		t.Fatalf("seen = %v", seen)
 	}
 }

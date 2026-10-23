@@ -7,5 +7,5 @@ import "github.com/MichaelKinsy/PiG/chord"
 // (session.ts #attachDocument, view.ts, task-graph.ts, events.ts). detach runs once when the watch ends; replace gives the
 // value an overflow delivers, and nil delivers the newest value.
 func NewSessionWatch[T any](session *SessionImpl, value T, detach func(), replace func() T) *chord.Watch[T] {
-	return chord.NewWatch(session.scheduler, value, detach, session.reportListener, replace)
+	return chord.NewWatch(value, detach, session.reportListener, replace).On(session.scheduler)
 }

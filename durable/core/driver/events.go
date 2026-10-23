@@ -33,8 +33,8 @@ func (s *coreSession) WatchEvents(ctx context.Context, conversationId durable.Co
 	current := m.first
 	snapshot := harness.ViewSnapshotEvent(current)
 	var once sync.Once
-	watch := chord.NewWatch(m.hub.sched, []harness.AgentEvent{}, func() { once.Do(func() { m.hub.release(m.id); m.closeCore() }) }, m.hub.report,
-		func() []harness.AgentEvent { return []harness.AgentEvent{harness.ViewSnapshotEvent(current)} })
+	watch := chord.NewWatch([]harness.AgentEvent{}, func() { once.Do(func() { m.hub.release(m.id); m.closeCore() }) }, m.hub.report,
+		func() []harness.AgentEvent { return []harness.AgentEvent{harness.ViewSnapshotEvent(current)} }).On(m.hub.sched)
 	m.hub.bind(m.id, func(f rawFrame) {
 		after, ok := m.advance(f)
 		if !ok {

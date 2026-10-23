@@ -314,7 +314,7 @@ func typed[T any](v any) (T, error) {
 // watchOf wraps a mount in a chord.Watch delivering on the session's scheduler.
 func watchOf[T any](ctx context.Context, m *mountSource[T]) *chord.Watch[T] {
 	var once sync.Once
-	watch := chord.NewWatch(m.hub.sched, m.first, func() { once.Do(func() { m.hub.release(m.id); m.closeCore() }) }, m.hub.report, nil)
+	watch := chord.NewWatch(m.first, func() { once.Do(func() { m.hub.release(m.id); m.closeCore() }) }, m.hub.report, nil).On(m.hub.sched)
 	m.hub.bind(m.id, func(f rawFrame) {
 		// The core's frame of a retired document carries the value null: the source's explicit retirement.
 		if f.retires() {

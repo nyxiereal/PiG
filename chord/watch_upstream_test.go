@@ -747,3 +747,74 @@ func TestWatchableWatchHoldsTheCurrentValueThenOneFramePerChangeAndEndsWithItsCo
 		t.Fatalf("end %+v, want cancelled", end)
 	}
 }
+
+// cellValue is a value a NativeWatchable holds by identity.
+type cellValue struct{ n int }
+
+// nativeWatchableCell is a NativeWatchable of a value held by identity: each Watch is a NativeWatch that starts at the current value.
+type nativeWatchableCell struct {
+	scheduler *DeliveryScheduler
+	mu        sync.Mutex
+	value     *cellValue
+	watches   []*NativeWatch[*cellValue]
+}
+
+func (c *nativeWatchableCell) Value() *cellValue { c.mu.Lock(); defer c.mu.Unlock(); return c.value }
+
+func (c *nativeWatchableCell) Watch(ctx context.Context) (NativeWatchHandle[*cellValue], error) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	watch := NewNativeWatch(c.value, func() {}, func(error) {}).On(c.scheduler)
+	watch.ObserveCancellation(ctx)
+	c.watches = append(c.watches, watch)
+	return watch, nil
+}
+
+func (c *nativeWatchableCell) set(ctx context.Context, value *cellValue) {
+	c.mu.Lock()
+	c.value = value
+	watches := slices.Clone(c.watches)
+	c.mu.Unlock()
+	for _, watch := range watches {
+		watch.Advance(ctx, value)
+	}
+}
+
+// packages/chord/src/watch.ts NativeWatchable (Pi 5e106ab1c): an in-process value that changes and can be watched; each watch holds the current value,
+// then one frame per new value by identity, and cancelling the context ends it.
+func TestNativeWatchableWatchHoldsTheCurrentValueThenOneFramePerNewValueAndEndsWithItsContext(t *testing.T) {
+	scheduler := NewDeliveryScheduler()
+	first, second, third := &cellValue{1}, &cellValue{2}, &cellValue{3}
+	cell := &nativeWatchableCell{scheduler: scheduler, value: first}
+	var source NativeWatchable[*cellValue] = cell
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	handle, err := source.Watch(ctx)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if source.Value() != first || handle.Value() != first {
+		t.Fatalf("value %p, watch value %p, want the current value %p", source.Value(), handle.Value(), first)
+	}
+	var mu sync.Mutex
+	var values []*cellValue
+	handle.Start(func(_ context.Context, value *cellValue) error {
+		mu.Lock()
+		values = append(values, value)
+		mu.Unlock()
+		return nil
+	})
+	cell.set(context.Background(), second)
+	cell.set(context.Background(), third)
+	scheduler.Wait()
+	mu.Lock()
+	if len(values) != 2 || values[0] != second || values[1] != third || source.Value() != third {
+		t.Fatalf("frames %v value %p, want the second and third values by identity and the third as the current value", values, source.Value())
+	}
+	mu.Unlock()
+	cancel()
+	<-handle.Closed()
+	if end := handle.End(); end.Reason != WatchCancelled {
+		t.Fatalf("end %+v, want cancelled", end)
+	}
+}

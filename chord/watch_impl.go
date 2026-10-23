@@ -481,6 +481,7 @@ func (watch *watchLifecycle[T, L]) finishIfReadyLocked() {
 		watch.stopAfter()
 		watch.stopAfter = nil
 	}
+	//portlint:allow doubleclose closed once: resolved is set under mu before the close, as watch.ts #terminate settles closed once
 	close(watch.closed)
 }
 

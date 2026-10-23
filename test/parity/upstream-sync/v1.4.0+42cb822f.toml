@@ -1558,9 +1558,9 @@ rationale = "aa9cf15b (required self principal, no host named by the caller: Get
 [[files]]
 path = "packages/chord/src/index.ts"
 change = "added"
-disposition = "pending"
+disposition = "designed-out"
 evidence = []
-rationale = ""
+rationale = "PORT_MAP records this file n/a with the reason: (re-export barrel: every runtime export has its Go counterpart in chord/host, chord/delta, chord/context and chord/json.go; each is mapped by its own source row). Pi 42cb822f1 adds Watch, NativeWatch and NativeWatchHandle to the barrel; they are mapped by the watch.ts row."
 
 [[files]]
 path = "packages/chord/src/json.ts"
@@ -1719,9 +1719,9 @@ rationale = "PORT_MAP row is ✅ ported (chord/host/types.go (Context is context
 [[files]]
 path = "packages/chord/src/watch.ts"
 change = "added"
-disposition = "pending"
-evidence = []
-rationale = ""
+disposition = "ported"
+evidence = ["test:chord/watch_upstream_test.go#TestWatchRetirementDeliversTheLastFrameThenEndsRetired", "test:chord/watch_upstream_test.go#TestWatchEndsCancelledWhenItsAcquisitionContextEndsAlsoWhenAlreadyDone", "test:chord/watch_upstream_test.go#TestNativeWatchHandleInterface", "test:durable/session/session_watches_test.go#TestSessionDocumentWatches"]
+rationale = "Pi 42cb822f1 adds the one watch handle implementation to Chord: Watch (advance, retire, end, observeCancellation, a 100-frame bound that collapses to one root replacement), NativeWatchHandle and NativeWatch (the same lifecycle for in-process values, with listener (value, context) and no ops). Ported as chord/watch_impl.go: Watch, NativeWatch, NativeWatchHandle and DeliveryScheduler, which stands for the microtask queue; NewWatch(value, detach, report, replace) and NewNativeWatch take Pi's constructor arguments and On moves the deliveries to the host's scheduler. Pi's end() is SourceEnded (End reads the terminal result). chord/watch_upstream_test.go ports watch.test.ts case by case; durable's session, view, task-graph and event watches are chord.Watch values."
 
 [[files]]
 path = "packages/chord/src/websocket.ts"
@@ -3756,9 +3756,9 @@ rationale = "PORT_MAP row is ✅ ported (durable/harness/define.go). coverage.md
 [[files]]
 path = "packages/durable/src/harness/events.ts"
 change = "added"
-disposition = "pending"
-evidence = []
-rationale = ""
+disposition = "ported"
+evidence = ["test:durable/harness/harness_events_test.go#TestAgentEvents", "test:durable/harness/harness_compaction_test.go#TestCompactionEdgeCasesLater"]
+rationale = "durable/harness/events.go. Pi 42cb822f1 moves the watch implementation from Durable to Chord (CommittedWatch becomes chord's Watch, with NativeWatch beside it) and Durable builds every watch with it; behavior is unchanged. watchEvents builds its Watch with chord.NewWatch through session.NewSessionWatch; the overflow replacement is still a snapshot of the newest view."
 
 [[files]]
 path = "packages/durable/src/harness/generation.ts"
@@ -3833,9 +3833,9 @@ rationale = "Pi 2ec55d80 opens a pi.durable.submit span around each admission co
 [[files]]
 path = "packages/durable/src/harness/task-graph.ts"
 change = "added"
-disposition = "pending"
-evidence = []
-rationale = ""
+disposition = "ported"
+evidence = ["test:durable/examples/tasks_compaction_examples_test.go#TestExample23ChildTasks", "test:durable/harness/harness_lifecycle_test.go#TestHarnessClose", "test:durable/harness/harness_task_graph_test.go#TestTaskGraphView"]
+rationale = "durable/harness/task_graph.go. Pi 42cb822f1 moves the watch implementation from Durable to Chord (CommittedWatch becomes chord's Watch, with NativeWatch beside it) and Durable builds every watch with it; behavior is unchanged. The graph observer is a chord.Watch."
 
 [[files]]
 path = "packages/durable/src/harness/telemetry.ts"
@@ -3875,9 +3875,9 @@ rationale = "PORT_MAP row is ✅ ported (durable/harness/util.go). coverage.md r
 [[files]]
 path = "packages/durable/src/harness/view.ts"
 change = "added"
-disposition = "pending"
-evidence = []
-rationale = ""
+disposition = "ported"
+evidence = ["test:durable/examples/lifecycle_examples_test.go#TestExample20LateJoin", "test:durable/harness/harness_compaction_test.go#TestBlockingThresholdCompaction"]
+rationale = "durable/harness/view.go. Pi 42cb822f1 moves the watch implementation from Durable to Chord (CommittedWatch becomes chord's Watch, with NativeWatch beside it) and Durable builds every watch with it; behavior is unchanged. The conversation view's watch is a chord.Watch."
 
 [[files]]
 path = "packages/durable/src/ids.ts"
@@ -3952,9 +3952,9 @@ rationale = "PORT_MAP row is ✅ ported (durable/session/forks.go). coverage.md 
 [[files]]
 path = "packages/durable/src/session/session.ts"
 change = "added"
-disposition = "pending"
-evidence = []
-rationale = ""
+disposition = "ported"
+evidence = ["test:durable/session/session_adoption_test.go#TestSessionAdoptionInsideStorageCommit", "test:durable/session/session_adoption_internal_test.go#TestSessionFailsWithItsOwnAdoptionErrorWhichNeverReachesStorage", "test:chord/watch_upstream_test.go#TestWatchRetirementDeliversTheLastFrameThenEndsRetired", "test:durable/harness/harness_read_only_test.go#TestReadOnlyHarness"]
+rationale = "durable/session/session.go. Pi 92ab5360 and be14d9732 stay as reviewed for the previous pin (storage adoption, explicit retirement, the read-only Session). Pi 42cb822f1 moves the watch implementation from Durable to Chord (CommittedWatch becomes chord's Watch, with NativeWatch beside it) and Durable builds every watch with it; behavior is unchanged. A document watch is a chord.Watch built by session.NewSessionWatch, which gives it the Session's delivery scheduler and report."
 
 [[files]]
 path = "packages/durable/src/session/transaction.ts"

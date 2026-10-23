@@ -164,7 +164,7 @@ func TestSessionManagerForkFromFile_CopiesFullTreeToNewFile(t *testing.T) {
 	}
 }
 
-// .upstream/v1.4.0+3953e9ef/packages/coding-agent/test/session-manager/custom-session-id.test.ts "SessionManager.forkFrom copies all entries unchanged into
+// .upstream/current/packages/coding-agent/test/session-manager/custom-session-id.test.ts "SessionManager.forkFrom copies all entries unchanged into
 // the forked session" (Pi ed76cca69, for the one-fd write of Pi 8ddc44ec8).
 func TestSessionManagerForkFromFile_CopiesAllEntriesUnchangedIntoTheForkedSession(t *testing.T) {
 	dir := t.TempDir()

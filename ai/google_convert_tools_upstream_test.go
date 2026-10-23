@@ -127,7 +127,7 @@ func convertedGoogleParameters(t *testing.T, parameters string) (string, ToolSch
 	return string(encoded), tool
 }
 
-// Regression coverage for #11308 (Pi 7314819f0, a7b94a03f): .upstream/v1.4.0+ed76cca6/packages/ai/test/google-shared-convert-tools.test.ts
+// Regression coverage for #11308 (Pi 7314819f0, a7b94a03f): .upstream/current/packages/ai/test/google-shared-convert-tools.test.ts
 // "google-shared convertTools const handling".
 func TestGoogleSharedConvertToolsConstHandlingUpstream(t *testing.T) {
 	const literal = `{"const":"literal-data","properties":{"nested":{"const":1}}}`

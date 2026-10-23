@@ -6659,8 +6659,14 @@
     },
     {
       "path": "packages/coding-agent/test/tools-manager.test.ts",
-      "disposition": "pending",
-      "upstreamTestHash": "sha256:4f5a6b4804bfb95d22468092061222a4d389edee537c05b9ff60aabef8300ab4"
+      "disposition": "ported",
+      "upstreamTestHash": "sha256:4f5a6b4804bfb95d22468092061222a4d389edee537c05b9ff60aabef8300ab4",
+      "evidence": [
+        "internal/codingagent/tools/tools_manager_latest_test.go#TestGetLatestVersionResolvesTheReleasePageRedirect",
+        "internal/codingagent/tools/tools_manager_upstream_test.go#TestEnsureToolUpstream",
+        "internal/codingagent/tools/tools_manager_latest_test.go"
+      ],
+      "rationale": "The complete pinned upstream case set is reviewed in gate-close-01 and its delivered tests are composed from 90e2266d3. All named added evidence passes on the release union with Go 1.27.1, -race and -count=1; original upstream hashes and existing evidence are retained. This closes the test file, not unrelated partial or live-service obligations. Pi c8ec752cf (#11209) adds 'does not download x86-64 binaries on arm/ia32': ported as the arm and ia32 subtests of TestEnsureToolUpstream (EnsureTool reports the unsupported-architecture warning and makes no request) and TestReleaseTarget (tools_manager_test.go), with the production change of tools-manager.ts getReleaseTarget ported in internal/codingagent/tools/tools_manager.go releaseTarget."
     },
     {
       "path": "packages/coding-agent/test/tools.test.ts",
@@ -8528,8 +8534,23 @@
     },
     {
       "path": "packages/tui/test/tui-alt-screen.test.ts",
-      "disposition": "pending",
-      "upstreamTestHash": "sha256:e93422695c21dfb69bae246c18ee54312969298bc949f2e2dacc225507440d0c"
+      "disposition": "ported",
+      "upstreamTestHash": "sha256:e93422695c21dfb69bae246c18ee54312969298bc949f2e2dacc225507440d0c",
+      "evidence": [
+        "tui/tui_alt_screen_test.go",
+        "tui/tui_alt_screen_v087_test.go",
+        "tui/mouse_test.go",
+        "tui/tui_alt_screen_wheel_upstream_test.go#TestUpstreamAltScreenAppliesRuntimeWheelLineCountUpdates",
+        "tui/tui_alt_screen_wezterm_test.go#TestAltScreenRedrawsWezTermKittyImagesAfterWritesToCoveredRows",
+        "tui/tui_alt_screen_v087_test.go#TestAltScreenModifiedNavigationReachesFocusedComponent",
+        "tui/tui_alt_screen_v087_test.go#TestAltScreenKeyboardNavigationHasFourRowsOfPageOverlap",
+        "tui/tui_alt_screen_test.go#TestAltScreenKeyboardPageAndEdgeScroll",
+        "tui/fake_cursor_test.go#TestAltScreenKeepsTheSelectionHighlightAfterAFakeCursorCell",
+        "tui/tui_alt_screen_v087_test.go#TestAltScreenScrollsOnWheelAFocusedOverlayDoesNotHandle",
+        "tui/tui_alt_screen_v087_test.go#TestAltScreenFocusedOverlayOwnsViewportKeys",
+        "tui/tui_alt_screen_v087_test.go#TestAltScreenDoubleClickJoinsSlashAndHyphenSegments"
+      ],
+      "rationale": "Earlier evidence is retained for the unchanged cases. 1.2.0 changes three cases: \"keeps the selection highlight after a fake cursor cell\" (also in the 42a3497d pin) is ported in tui/fake_cursor_test.go and relies on TuiAltScreen resolving fake cursors before search highlights and overlays (tui_alt_screen.go resolveFakeCursors). \"scrolls the transcript on wheel input a focused overlay does not handle\" (#10769) is ported as TestAltScreenScrollsOnWheelAFocusedOverlayDoesNotHandle, with the production change of tui-alt-screen.ts handleViewportInput ported in tui/tui_alt_screen_mouse.go handleWheel, which no longer defers an unhandled wheel event to a focused overlay. \"gives wheel and viewport keys to a focused overlay\" becomes \"gives viewport keys to a focused overlay\" without the wheel report; TestAltScreenFocusedOverlayOwnsViewportKeys sends the same four keys. Pi ff6896471 (#11340) extends the double-click join cases with ~/.pi/agent/settings.json, ~\\Documents\\pi and foo+bar: the same three cases are in TestAltScreenDoubleClickJoinsSlashAndHyphenSegments, with the production change of tui-alt-screen.ts TERMINAL_WORD_SELECTION_JOINERS ported in tui/tui_alt_screen_selection.go."
     },
     {
       "path": "packages/tui/test/tui-cell-size-input.test.ts",

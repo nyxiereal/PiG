@@ -44432,6 +44432,17 @@
       "shapeHash": "sha256:40ad18545385456a7210410c20f0f3a7dcee52273332601906d0560db8c1b65b"
     },
     {
+      "id": "go:github.com/MichaelKinsy/PiG/ai#isJSONNumber",
+      "package": "github.com/MichaelKinsy/PiG/ai",
+      "name": "isJSONNumber",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func(value any) bool"
+      },
+      "shapeHash": "sha256:e97bf7bf1ecfdfceef9dc48e038cbf324758ba5a8557005c28b1eea4898962d3"
+    },
+    {
       "id": "go:github.com/MichaelKinsy/PiG/ai#isJSONObject",
       "package": "github.com/MichaelKinsy/PiG/ai",
       "name": "isJSONObject",
@@ -46036,6 +46047,28 @@
         "type": "func(schema any) bool"
       },
       "shapeHash": "sha256:a3bdb2707d5987242bf2c0df30cb31f04e94b2771d8f8390378ebd071c020950"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/ai#jsonSchemaNameMaps",
+      "package": "github.com/MichaelKinsy/PiG/ai",
+      "name": "jsonSchemaNameMaps",
+      "kind": "variable",
+      "exported": false,
+      "shape": {
+        "type": "map[string]bool"
+      },
+      "shapeHash": "sha256:3af528a2ba91555bb23ee8186a48c3c9201b3cf65594c81b5d32e417b99fd811"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/ai#jsonSchemaSubschemas",
+      "package": "github.com/MichaelKinsy/PiG/ai",
+      "name": "jsonSchemaSubschemas",
+      "kind": "variable",
+      "exported": false,
+      "shape": {
+        "type": "map[string]bool"
+      },
+      "shapeHash": "sha256:3af528a2ba91555bb23ee8186a48c3c9201b3cf65594c81b5d32e417b99fd811"
     },
     {
       "id": "go:github.com/MichaelKinsy/PiG/ai#jsonSchemaToolParameters",
@@ -59830,6 +59863,28 @@
         "type": "*github.com/MichaelKinsy/PiG/internal/lazyregexp.Regexp"
       },
       "shapeHash": "sha256:b2bada16c90e0a1f7a12c5d87c11865788ab6be78d85f83e367aec2254fdade4"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/ai#rewriteConstAsEnum",
+      "package": "github.com/MichaelKinsy/PiG/ai",
+      "name": "rewriteConstAsEnum",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func(schema map[string]any, order schemaObjectOrder) (map[string]any, schemaObjectOrder)"
+      },
+      "shapeHash": "sha256:15f95e772662621d084c5840ac889d9aab21b5cd44c766a2b73362f5ae8de670"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/ai#rewriteConstNode",
+      "package": "github.com/MichaelKinsy/PiG/ai",
+      "name": "rewriteConstNode",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func(schema any, order schemaObjectOrder, rewritten schemaObjectOrder, path string, isNameMap bool) any"
+      },
+      "shapeHash": "sha256:3d2d738b77897621881da9dafa673d07500a203d02a0a7ba87ec14c014317443"
     },
     {
       "id": "go:github.com/MichaelKinsy/PiG/ai#runGoogleTurn",
@@ -304879,6 +304934,17 @@
       "shapeHash": "sha256:9da83393322525e2d9c7a3dcee45b5c4cc6c06c7e6770018f66a4c6fd8c1f073"
     },
     {
+      "id": "go:github.com/MichaelKinsy/PiG/tui#GetMaxKittyImageRows",
+      "package": "github.com/MichaelKinsy/PiG/tui",
+      "name": "GetMaxKittyImageRows",
+      "kind": "function",
+      "exported": true,
+      "shape": {
+        "type": "func() int"
+      },
+      "shapeHash": "sha256:abda90b0a9dee566c1c4d8a5e69e5e1e0dc21a5f6a3f00ada27ad225d1a5f10b"
+    },
+    {
       "id": "go:github.com/MichaelKinsy/PiG/tui#GetModelSearchText",
       "package": "github.com/MichaelKinsy/PiG/tui",
       "name": "GetModelSearchText",
@@ -342024,6 +342090,17 @@
         "type": "func(a float64, b float64, lightness float64, peak [2]float64) float64"
       },
       "shapeHash": "sha256:ada9f2a652fa3267e4b0493d6354b5d2caaee1ef6fc5ee26bda15cc46f102318"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/tui#maxKittyImageRows",
+      "package": "github.com/MichaelKinsy/PiG/tui",
+      "name": "maxKittyImageRows",
+      "kind": "variable",
+      "exported": false,
+      "shape": {
+        "type": "int"
+      },
+      "shapeHash": "sha256:8227b502038b08acf2c1eaddd782f2d370e26cf4bed2d3b8c74045d4c95e78d0"
     },
     {
       "id": "go:github.com/MichaelKinsy/PiG/tui#maxPooledMarkedBytes",

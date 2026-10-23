@@ -1,5 +1,5 @@
 {
- "pi": "1.4.0+ed76cca6",
+ "pi": "1.4.0+acf83acf",
  "genai": "2.21.0",
  "node": "v24.19.0",
  "cap": 160,
@@ -5227,7 +5227,7 @@
       "timestamp": 0,
       "responseId": "g3",
       "rawStopReason": "STOP",
-      "durationMs": 2
+      "durationMs": 1
      }
     },
     {
@@ -5272,7 +5272,7 @@
       "timestamp": 0,
       "responseId": "g3",
       "rawStopReason": "STOP",
-      "durationMs": 2
+      "durationMs": 1
      }
     },
     {
@@ -5317,7 +5317,7 @@
       "timestamp": 0,
       "responseId": "g3",
       "rawStopReason": "STOP",
-      "durationMs": 2
+      "durationMs": 1
      }
     },
     {
@@ -5362,7 +5362,7 @@
       "timestamp": 0,
       "responseId": "g3",
       "rawStopReason": "STOP",
-      "durationMs": 2
+      "durationMs": 1
      }
     },
     {

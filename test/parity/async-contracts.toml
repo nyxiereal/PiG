@@ -506,17 +506,17 @@ rationale = "async/Promise source; PORT_MAP marks this file ✅ ported (`ai/prov
 
 [[files]]
 path = "packages/chord/src/cell.ts"
-disposition = "pending"
-contracts = []
-evidence = []
-rationale = ""
+disposition = "translated"
+contracts = ["awaited", "concurrent-joined"]
+evidence = ["test:chord/host/hydration_upstream_test.go#TestHydrationAnObjectThatForwardsAndDerivesFromARemoteMemberGoesLiveWithItsValue", "test:chord/host/hydration_upstream_test.go#TestHydrationAReferenceCycleAcrossHostsFailsAtReadyTimeoutWithACycleHint", "test:chord/replicated_state_upstream_test.go#TestTransactionalReplicatedState", "test:chord/host/awaiting_upstream_test.go#TestAwaitingCtxGetResolvesHydratedTheCallsReferenceIsReleasedWhenTheCallEnds"]
+rationale = "The async surface is Hydration.whenHydrated: a derived value over unhydrated remote members resolves with Promise.all of its sources' whenHydrated promises (so it resolves once every source has its snapshot and rejects as soon as one source ends first). cell.change and derive callbacks must be synchronous: a returned Promise throws TypeError('cell.change callbacks must be synchronous' / 'derive <key>: fn must be synchronous'). Go chord/host/cell.go declares Hydration.WhenHydrated as a *Promise[struct{}] on the host loop and joins the sources' promises (cell.go:711-715); the synchronous-callback guards have no Go form because a Go callback returns an error or a value, never a promise (the PromiseLike case of replicated-state.test.ts is recorded designed-out in the reviewed test mapping). The hydration tests pin the join (a derivation over a remote member goes live with its value, a reference cycle fails at readyTimeout with a cycle hint) and the awaiting test pins Ctx.get resolving once hydrated."
 
 [[files]]
 path = "packages/chord/src/cluster.ts"
-disposition = "pending"
-contracts = []
-evidence = []
-rationale = ""
+disposition = "translated"
+contracts = ["awaited", "concurrent-joined", "cancellable"]
+evidence = ["test:chord/host/cluster_upstream_test.go#TestCrossHostReloadPreparesEveryHostCommitsTheServerFirstThenTheWorkersCodeVersionsStayInStep", "test:chord/host/cluster_upstream_test.go#TestCrossHostReloadAFailingVoteAbortsEveryHostTheErrorKeepsItsCodeAndNamesTheHost", "test:chord/host/cluster_upstream_test.go#TestCrossHostReloadAWorkerGateBlockedPastItsDeadlineAbortsTheWholeReload", "test:chord/host/cluster_upstream_test.go#TestCrossHostReloadAnAbortWhileAWorkerIsStillPreparingALateOpenClosesItselfAndTheWorkerCanReloadAgain", "test:chord/host/cluster_upstream_test.go#TestCrossHostReloadAChildThatSaysHelloWhileAReloadRunsIsReconciledAfterItNeverLeftInStepWithTheOldCode"]
+rationale = "runClusterReload awaits beginReload and waitForRetirement (so every retire frame reaches the children before prepare), sends prepare to each participant with a deadline-bounded vote (awaitVote rejects with aborted/vote_deadline and clears its timer), then joins the local prepare and all votes with Promise.allSettled: if any settled rejected, every participant gets abort, a locally prepared reload is rolled back and the first failure is rethrown; otherwise it commits locally first, sends commit to the children and returns their reports by name, and endReload runs in finally. reconcileChild loops: waits out a running local reload, announces retirement before prepare, awaits a 30 s vote, aborts and retries when the host's code version moved on. Go chord/host/cluster.go runClusterReload/reconcileChild keep that order: the vote promises and the join are modelled with the host loop's promiseAllSettled over the local prepare task (host.goTask) and the votes, with the same abort-then-rollback-then-return sequence and a deferred endReload; the cited tests pin commit order (server first, code versions in step), a failing vote aborting every host and naming it, a gate blocked past its deadline aborting the whole reload, an abort while a worker is still preparing, and a child's hello during a reload being reconciled afterwards."
 
 [[files]]
 path = "packages/chord/src/connection.ts"
@@ -534,10 +534,10 @@ rationale = "A chord Context's abort signal is Go context cancellation, with the
 
 [[files]]
 path = "packages/chord/src/contract.ts"
-disposition = "pending"
+disposition = "no-runtime-async"
 contracts = []
 evidence = []
-rationale = ""
+rationale = "No async function or Promise-producing code in the pinned source: the only Promise mentions are the type aliases Returned<R> (a handler returns the value or a Promise of it) and the typed method signatures that wrap results in Promise<Resolved<R>>; everything else (checkHeader and the contract builders) is synchronous. The behavior that awaits handlers is in host.ts and object.ts; the Go contract declarations are in chord/host/contract.go with blocking handlers."
 
 [[files]]
 path = "packages/chord/src/declare.ts"
@@ -562,10 +562,10 @@ rationale = ""
 
 [[files]]
 path = "packages/chord/src/link.ts"
-disposition = "pending"
-contracts = []
-evidence = []
-rationale = ""
+disposition = "translated"
+contracts = ["microtask-ordering", "detached-owned"]
+evidence = ["test:chord/host/link_upstream_test.go#TestLinksStateMembersSnapshotThenDeltaOps", "test:chord/host/link_upstream_test.go#TestLinksADeadLinkIsClosedAndReleasesEverythingHeld", "test:chord/host/links_review_upstream_test.go#TestLinksReview10MalformedFramesAndDuplicateIDsCloseTheLink", "test:chord/host/links_review_upstream_test.go#TestLinksReview3TheParentLinkDyingWhileTheChildPreparesUnwindsTheChild"]
+rationale = "MemoryLink delivers each direction through one promise chain (`this.#pending = this.#pending.then(...)`), so frames reach the peer in send order, asynchronously, across links on the shared microtask queue; BaseLink.deliverLater chains a still-decoding frame behind the previous ones so a slow inflate never reorders frames, and a decode failure closes the link with 'protocol error'; close/peer-close notify once. Go chord/host/link.go models the shared queue as the process-wide memoryDeliveries FIFO (a single pump runs tasks in order; the asyncorder allowance cites link.ts:90), keeps Sever's silent drop, ends the peer through the same queue, and flush() reproduces the microtasks an awaiting caller lets run. The link tests pin snapshot-then-delta ordering and a dead link releasing everything it held; TestLinksReview10 pins malformed frames closing the link and TestLinksReview3 the link dying mid-prepare."
 
 [[files]]
 path = "packages/chord/src/loader.ts"
@@ -576,10 +576,10 @@ rationale = "The one async function in loader.ts is nodeLoader (:36-62): it regi
 
 [[files]]
 path = "packages/chord/src/manager.ts"
-disposition = "pending"
-contracts = []
-evidence = []
-rationale = ""
+disposition = "translated"
+contracts = ["awaited", "concurrent-joined", "cancellable", "detached-owned"]
+evidence = ["test:chord/host/manager_upstream_test.go#TestHostManagerStartsAChildHostLinksItStopsItGracefully", "test:chord/host/manager_upstream_test.go#TestHostManagerAChildOwnedKernelLockAdmitsOneLiveProcessReplaceWaitsForTheExitBeforeTheNextStart", "test:chord/host/manager_upstream_test.go#TestHostManagerKillsTheProcessTreeWhenAChildIgnoresShutdownPastTheGracePeriod", "test:chord/host/manager_upstream_test.go#TestHostManagerFatalChildFailsStart", "test:chord/host/manager_upstream_test.go#TestHostManagerStopsAnIdleChildWhenKeepAliveSaysSo", "test:chord/host/manager_upstream_test.go#TestHostManagerIdleForCountsFromTheBusyToIdleTransition"]
+rationale = "createHostManager runs start, stop and replace through one serialized chain (each step starts after the previous settles, success or failure); stop sends shutdown, then races the child's exit against the grace timer and kills the process tree when the grace elapses, awaiting the exit either way; start spawns, waits for ready with a readyTimeout, fails on an early exit or a fatal message (killing the tree and awaiting the exit before rethrowing), and arms the keep-alive interval, whose tick starts a stop detached with `void serialized(doStop)`; replace is stop then start inside one serialized step; the idle clock starts at the busy to idle transition. Go chord/host/manager.go keeps the same chain and race. The cited tests pin graceful stop, replace waiting for the exit before the next start, the tree kill after the grace period, a fatal child failing start, keep-alive stopping an idle child and idleFor counting from the transition."
 
 [[files]]
 path = "packages/chord/src/object.ts"
@@ -590,10 +590,10 @@ rationale = ""
 
 [[files]]
 path = "packages/chord/src/output.ts"
-disposition = "pending"
-contracts = []
-evidence = []
-rationale = ""
+disposition = "translated"
+contracts = ["awaited", "detached-owned", "cancellable"]
+evidence = ["test:chord/output/output_test.go#TestProgress", "test:chord/output/output_pi_oracle_test.go#TestOutputBufferMatchesPi"]
+rationale = "Progress paces output commits: mark() schedules a commit (the first after idle runs at once, later ones wait for max(minIntervalMs, bytes/100 KiB/s) and a timer that fires early re-checks the clock), at most one write is in flight and changes made meanwhile coalesce, markAndWait returns a waiter the commit that covers the change settles, a failed commit rejects its waiters and reports the error through onError, and stop() disarms the timer, awaits the commit in flight and returns the waiters no commit covered. Go chord/output/output.go Progress (output.go:634) keeps the same state machine with ProgressClock injected, ProgressWaiter in place of PromiseWithResolvers, and the in-flight write owned by the Progress. The subtests of TestProgress pin the first-commit-at-once and 100 KiB/s pacing, the minimum interval, the injected clock, rejected waiters with the error reported, and stop waiting for the commit in flight while handing back the uncovered waiters."
 
 [[files]]
 path = "packages/chord/src/reload.ts"
@@ -611,10 +611,10 @@ rationale = ""
 
 [[files]]
 path = "packages/chord/src/sqlite/cloudflare.ts"
-disposition = "pending"
-contracts = []
-evidence = []
-rationale = ""
+disposition = "translated"
+contracts = ["awaited", "concurrent-joined"]
+evidence = ["test:chord/sqlite/cloudflare/adapter_semantics_test.go#TestDurableObjectSqliteDatabaseQueuesEveryOperationBehindATransaction", "test:chord/sqlite/cloudflare/adapter_semantics_test.go#TestDurableObjectSqliteTransactionHandleRejectsEveryOperationAfterTheCallbackSettles", "test:chord/sqlite/cloudflare/adapter_semantics_test.go#TestDurableObjectSqliteDatabaseBindsIntegersExactlyWithinTheSafeRange", "test:chord/sqlite/cloudflare/cloudflare_test.go#TestDurableObjectSqliteDriver"]
+rationale = "DurableObjectSqliteDatabase runs a synchronous SQL call at once while its storage's SerialQueue is idle and holds every call (exec, run, get, all, close) behind a running transaction, which is enqueued as a whole with `hold` and runs through ctx.storage.transaction: the transaction handle is valid only until the callback settles (afterwards every operation throws 'SQLite transaction handle is no longer active'), a rejected callback rolls back, and adapters of one storage object share the queue. Go chord/sqlite/cloudflare/cloudflare.go keeps the same serialQueue (a call runs inline when nothing is queued, otherwise waits for the tail) and the same handle invalidation. TestDurableObjectSqliteDatabaseQueuesEveryOperationBehindATransaction starts a transaction, blocks it, and shows each of exec/run/get/all/close does not finish until it ends; the handle test and the integer-binding test pin the remaining rules, and TestDurableObjectSqliteDriver is the port of the driver conformance cases."
 
 [[files]]
 path = "packages/chord/src/sqlite/database.ts"
@@ -1633,10 +1633,10 @@ rationale = "async/Promise source; PORT_MAP marks this file ported, but the per-
 
 [[files]]
 path = "packages/durable/src/harness/inbox.ts"
-disposition = "pending"
-contracts = []
-evidence = []
-rationale = ""
+disposition = "translated"
+contracts = ["awaited"]
+evidence = ["test:durable/harness/harness_inbox_test.go#TestInbox"]
+rationale = "prepareBoundary, applyBoundary, removeInboxItem and withdrawQueuedInputs run inside one transaction and await its operations one at a time: applyBoundary appends the queued writes first (stale ones are settled as unanswered/stale without an append) and then the selected steer and follow-up items in ID order, each append awaited before the next so the placed entry order is deterministic, and only then removes the used items. Go PrepareBoundary/ApplyBoundary/RemoveInboxItem/WithdrawQueuedInputs (durable/harness/inbox.go) take the same Tx and perform the same sequence synchronously, returning the first error. The subtests of TestInbox pin the order (writes before user items at the final boundary, one follow-up per run, every follow-up with followUpMode all, steers at postTools, a queued reset, stale head writes, positional removals, withdrawals and persistence across reopen)."
 
 [[files]]
 path = "packages/durable/src/harness/live.ts"
@@ -1647,10 +1647,10 @@ rationale = "The live-state helpers are synchronous functions over a transaction
 
 [[files]]
 path = "packages/durable/src/harness/prompt.ts"
-disposition = "pending"
-contracts = []
-evidence = []
-rationale = ""
+disposition = "translated"
+contracts = ["awaited", "cancellable"]
+evidence = ["test:durable/harness/harness_prompt_test.go#TestSystemPromptPreparation", "test:durable/harness/prompt_pi_oracle_test.go#TestPromptPlanningMatchesPi"]
+rationale = "renderSections awaits each section's render in declaration order, so a later section never starts before an earlier one settles; a throwing section is reported and keeps its shown text, unless the context was aborted, in which case the error propagates and the remaining sections are not rendered. Go RenderSections (durable/harness/prompt.go:35) renders sequentially with the context, reports a failure and keeps the shown text, and returns the error at once when ctx.Err() is set. The subtests 'renders sections in order with tags, omissions, wrappers, and failures' and 'propagates section errors after cancellation' of TestSystemPromptPreparation pin the order, failure handling and the cancellation exception; the oracle test compares the planning with Pi's."
 
 [[files]]
 path = "packages/durable/src/harness/provider.ts"
@@ -1892,10 +1892,10 @@ rationale = "Added to the accounting when every monorepo package was listed: the
 
 [[files]]
 path = "packages/durable/src/tools/image-processor.ts"
-disposition = "pending"
+disposition = "no-runtime-async"
 contracts = []
-evidence = []
-rationale = ""
+evidence = ["test:durable/tools/read_images_test.go#TestToBase64MatchesTheStandardEncodingForEveryRemainder", "test:durable/tools/read_images_test.go#TestReadGivesTheProcessorsImageAndNotesWhatItDid"]
+rationale = "The only Promise is the return type of the ImageProcessor.prepare signature (`a promise, so a processor can do the work off the event loop`); the file's functions (toBase64, base64Length) are synchronous and the rest are types and constants. The awaiting of prepare is read.ts's contract (see that row); Go declares the processor as a blocking interface in durable/tools. TestToBase64MatchesTheStandardEncodingForEveryRemainder covers the synchronous encoder and TestReadGivesTheProcessorsImageAndNotesWhatItDid shows read calling a processor."
 
 [[files]]
 path = "packages/durable/src/tools/image.ts"
@@ -1913,10 +1913,10 @@ rationale = "Added to the accounting when every monorepo package was listed: the
 
 [[files]]
 path = "packages/durable/src/tools/read.ts"
-disposition = "pending"
-contracts = []
-evidence = []
-rationale = ""
+disposition = "translated"
+contracts = ["awaited"]
+evidence = ["test:durable/tools/read_retry_pi_test.go#TestReadReadsAChangedFileAgainOnceAndThenFails", "test:durable/tools/tools_images_test.go#TestReadOfAnImageThatChangesWhileItIsRead", "test:durable/tools/read_agent_order_test.go#TestReadAsksForTheAgentOnlyForAnImage", "test:durable/tools/read_images_test.go#TestReadGivesTheProcessorsImageAndNotesWhatItDid", "test:durable/tools/read_differential_test.go#TestReadToolReturnsExactlyWhatReadingTheWholeFileReturned"]
+rationale = "The read tool's execute awaits, in order: resolveReadToolPath, openBinaryReader, then per attempt reader.info, the MIME sniff through awaited reader.read calls, the text scan or the image read (the agent/model lookup happens only for an image), and reader.info again; a file that changed while read is read a second time and fails with '<path> changed while it was read' the second time, and the reader is always closed in finally. Go (durable/tools/read.go) runs the same sequence with ctx passed to every reader call and a deferred reader.Close(ctx) (read.go:149). The tests pin the retry-once-then-fail rule, the image-changing case, the agent lookup only for images, the processor hand-off and byte-for-byte equality with reading the whole file. No test cancels a read mid-way, so cancellation is carried by the context argument and not separately proven here."
 
 [[files]]
 path = "packages/durable/src/tools/write.ts"

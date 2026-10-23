@@ -1,4 +1,4 @@
-version = "1.4.0+936e5f40"
+version = "1.4.0+42cb822f"
 
 [[files]]
 path = "packages/agent/src/agent-loop.ts"
@@ -667,10 +667,10 @@ rationale = "Type declarations only (no exported function, const or class in the
 
 [[files]]
 path = "packages/chord/src/watch.ts"
-disposition = "translated"
-contracts = ["awaited", "cancellable", "detached-owned"]
-evidence = ["test:durable/session/observation_internal_test.go#TestCommittedWatchRetireDeliversTheLastFrameThenEndsRetired", "test:durable/session/committed_watch_retired_pi_test.go#TestCommittedWatchRejectsASecondCancellationObserver", "test:durable/session/session_watches_test.go#TestSessionDocumentWatches"]
-rationale = "Types only, with three Promise members. WatchHandle.start installs the sole listener, whose Promise<void> result is awaited by the watch's serial drain: Go's Start takes a func returning an error and runs it on a delivery goroutine, never inline, one frame at a time, and a returned error ends the watch with listener_error. WatchHandle.stop returns Promise<WatchEnd>: Go's Stop is a blocking call that ends the watch once and returns the terminal WatchEnd (a callback already running keeps running and is not joined). WatchHandle.closed is Promise<WatchEnd>: Go's Closed is a channel closed once by the single terminate, and End reads the result after it. The cancellation signal passed to observeCancellation is the context.Context given to ObserveCancellation, which ends the watch with cancelled. The end reasons are stopped, cancelled, retired, ended, listener_error and failed (session_closed and session_failed are ended and failed since Pi 92ab5360)."
+disposition = "pending"
+contracts = []
+evidence = []
+rationale = ""
 
 [[files]]
 path = "packages/chord/src/websocket.ts"
@@ -1612,10 +1612,10 @@ rationale = "readContext and readContextFrom capture the bounds on the Session l
 
 [[files]]
 path = "packages/durable/src/harness/events.ts"
-disposition = "translated"
-contracts = ["awaited", "cancellable"]
-evidence = ["test:durable/harness/harness_events_test.go#TestAgentEvents", "test:durable/harness/tool_nested_test.go#TestSeveralRunningNestedCallsReportTheirOutputAndShowToALateSubscriber"]
-rationale = "WatchEvents delivers batches to the listener in commit order and one at a time; the listener's returned error ends the watch (the Promise rejection of the TypeScript listener), and Stop cancels and returns once the delivery in flight ended. A nested call's result is read from the commit's changes at the commit, before the caller's documents retire, as the TypeScript reads it synchronously in the same turn."
+disposition = "pending"
+contracts = []
+evidence = []
+rationale = ""
 
 [[files]]
 path = "packages/durable/src/harness/generation.ts"
@@ -1675,10 +1675,10 @@ rationale = "Waiting for a submission to settle is a blocking call on the caller
 
 [[files]]
 path = "packages/durable/src/harness/task-graph.ts"
-disposition = "deferred"
-contracts = ["awaited", "cancellable"]
-evidence = ["test:durable/harness/harness_task_graph_test.go"]
-rationale = "Harness.taskGraph() is removed in Pi 92ab5360: watchTaskGraph() returns a WatchHandle (see packages/chord/src/watch.ts), whose Promise members are the blocking Start, Stop and Closed of the Go watch, and whose value is the live graph once the watch is started. The graph's own async obligations outside the watch remain deferred: the per-file contract has not been reviewed for this pin."
+disposition = "pending"
+contracts = []
+evidence = []
+rationale = ""
 
 [[files]]
 path = "packages/durable/src/harness/tool.ts"
@@ -1710,10 +1710,10 @@ rationale = "Waiters.add returns a Promise that settles once: resolve(key, value
 
 [[files]]
 path = "packages/durable/src/harness/view.ts"
-disposition = "translated"
-contracts = ["awaited", "cancellable"]
-evidence = ["test:durable/harness/harness_storage_failure_test.go#TestAFailedStorageCall", "test:durable/harness/harness_live_deltas_test.go#TestLiveDeltas"]
-rationale = "A conversation view advances from the observed commits in order; an observer that throws is reported and the others still receive the revision, closing the Session passes its failure, and a watch stops when its context is cancelled or the Harness closes."
+disposition = "pending"
+contracts = []
+evidence = []
+rationale = ""
 
 [[files]]
 path = "packages/durable/src/images/index.ts"
@@ -1744,18 +1744,11 @@ evidence = []
 rationale = "Added to the accounting when every monorepo package was listed: the Promise and async contract of this file is not yet reviewed. The durable lane records it as translated with evidence, or as no-runtime-async, before the release."
 
 [[files]]
-path = "packages/durable/src/session/observation.ts"
-disposition = "translated"
-contracts = ["detached-owned", "cancellable", "microtask-ordering"]
-evidence = ["test:durable/session/session_watches_test.go#TestSessionDocumentWatches", "test:durable/session/session_watches_test.go#TestSessionWatchEntersTheCommittedFrameBeforeTheCommitReturns", "test:durable/harness/harness_storage_failure_test.go#TestAFailedStorageCall", "test:durable/session/observation_internal_test.go#TestCommittedWatchEndsRetiredOnlyOnItsSourcesRetirement", "test:durable/session/observation_internal_test.go#TestCommittedWatchRetireDeliversTheLastFrameThenEndsRetired", "test:durable/session/observation_internal_test.go#TestCommittedWatchDropsItsReferencesOnceEnded"]
-rationale = "A watch drains its frames serially: one delivery at a time, in commit order, on a goroutine the Session tracks (WaitDeliveries), and a started watch with no callback in flight takes the committed frame into delivery before the publishing commit returns, as the drain microtask enters the listener before the commit's caller resumes. `closed` is a channel closed once by the single terminate, which detaches, drops the pending frames, removes the cancellation hook and ends the watch; a callback already running keeps running and is not joined. A listener's failure is reported through the Session before the watch ends with listener_error, and a failed Session ends it with the failed reason and the error. Since Pi 92ab5360 the source ends a watch explicitly: Retire(ctx) queues the last frame, [[\"r\", null]] with the zero value, which is delivered like any frame and after which the watch ends retired, and an Advance after it is dropped (an Advance of a null value no longer retires); SourceEnded(nil) ends it ended when the Session closes and SourceEnded(err) ends it failed with the error. Both are synchronous, once-only terminations through the single terminate: they drop the pending frames and every reference the watch holds into its source (listener, detach, report, replace, scheduler), so a stopped watch that is still referenced keeps nothing but its last value alive; a callback already running keeps running and is not joined. The frame the delivery goroutine took before an end still reaches the listener it was taken with, as the drain microtask has captured the listener by then. Upstream's FinalizationRegistry check of the dropped references has no Go counterpart: TestCommittedWatchDropsItsReferencesOnceEnded asserts the fields."
-
-[[files]]
 path = "packages/durable/src/session/session.ts"
-disposition = "deferred"
-contracts = ["awaited", "microtask-ordering"]
-evidence = ["test:durable/session/session_adoption_test.go#TestSessionAdoptionInsideStorageCommit", "test:durable/session/session_adoption_internal_test.go#TestSessionFailsWithItsOwnAdoptionErrorWhichNeverReachesStorage", "test:durable/session/session_watches_test.go#TestSessionWatchEntersTheCommittedFrameBeforeTheCommitReturns"]
-rationale = "Storage adoption (Pi 92ab5360): #runCommit passes Storage.commit an adopt callback and Storage calls it once, synchronously, when the batch is durable and before its next commit; the Session adopts the staged documents inside it, so the adopted state is visible to any read that Storage starts from inside adopt. Go's runCommit does the same through a callback that keeps its own error or panic (a panic must not reach Storage), then publishes the commit synchronously before the Session's call returns, which is the microtask order of the upstream promise. A Storage that rejects after adopting fails the Session without discarding the adopted changes; one that rejects before adopting discards them and fails the Session; one that resolves without adopting fails it with 'Storage committed without adopting the batch'; a failed adoption fails the Session with its own error, which never reaches Storage. The Session's close, task, checkpoint and watch-acquisition async obligations outside the commit path remain deferred, as the per-file contract has not been reviewed for this pin."
+disposition = "pending"
+contracts = []
+evidence = []
+rationale = ""
 
 [[files]]
 path = "packages/durable/src/session/transaction.ts"

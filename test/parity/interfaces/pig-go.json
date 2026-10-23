@@ -304769,6 +304769,17 @@
       "shapeHash": "sha256:31cac5b359d9888bdbe3fe08c486b2e404a728edce6e0aaaa60e59ceafc92fb5"
     },
     {
+      "id": "go:github.com/MichaelKinsy/PiG/tui#GetDistinctModelName",
+      "package": "github.com/MichaelKinsy/PiG/tui",
+      "name": "GetDistinctModelName",
+      "kind": "function",
+      "exported": true,
+      "shape": {
+        "type": "func(item ModelSearchItem) string"
+      },
+      "shapeHash": "sha256:ba7c7ab73c1ef78f63fde0bb547ec2e9b2182ff465e52530244fb03427a5e57d"
+    },
+    {
       "id": "go:github.com/MichaelKinsy/PiG/tui#GetGIFDimensions",
       "package": "github.com/MichaelKinsy/PiG/tui",
       "name": "GetGIFDimensions",
@@ -347821,6 +347832,17 @@
         "type": "func(body string) (taskMarker string, rest string)"
       },
       "shapeHash": "sha256:d2afcdc28bb76a8b8f5587a77546510d456abc4b5d06c2ee7660f183954cc15a"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/tui#splitModelLabel",
+      "package": "github.com/MichaelKinsy/PiG/tui",
+      "name": "splitModelLabel",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func(value string) []string"
+      },
+      "shapeHash": "sha256:b7f951ca71a0089eea0150b5b7d7dd07609688984fa9b73c0cb9c24adbf06565"
     },
     {
       "id": "go:github.com/MichaelKinsy/PiG/tui#splitSemicolons",

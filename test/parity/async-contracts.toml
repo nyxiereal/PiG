@@ -1,4 +1,4 @@
-version = "1.4.0+3953e9ef"
+version = "1.4.0+ed76cca6"
 
 [[files]]
 path = "packages/agent/src/agent-loop.ts"
@@ -415,10 +415,10 @@ rationale = "async/Promise source; PORT_MAP marks this file ✅ ported (`ai/mode
 
 [[files]]
 path = "packages/ai/src/providers/faux.ts"
-disposition = "deferred"
+disposition = "pending"
 contracts = []
 evidence = []
-rationale = "async/Promise source; PORT_MAP marks this file ✅ ported (`ai/faux.go`), but a per-file cross-language ordering/cancellation/error contract has not yet been reviewed for 0.87.1; delivery/unresolved.tsv row 'Review the v0.87.1 denominators'"
+rationale = ""
 
 [[files]]
 path = "packages/ai/src/providers/google-vertex.ts"
@@ -667,10 +667,10 @@ rationale = "Type declarations only (no exported function, const or class in the
 
 [[files]]
 path = "packages/chord/src/watch.ts"
-disposition = "translated"
-contracts = ["awaited", "cancellable", "detached-owned", "microtask-ordering"]
-evidence = ["test:chord/watch_upstream_test.go#TestWatchAwaitsEachCallbackAndBuffersFramesAdvancedWhileOneIsInFlight", "test:chord/watch_upstream_test.go#TestWatchNeverInvokesTheListenerInline", "test:chord/watch_upstream_test.go#TestWatchStopsFutureDeliveryWithoutAbortingOrAwaitingAnInFlightCallback", "test:chord/watch_upstream_test.go#TestWatchEndsCancelledWhenItsAcquisitionContextEndsAlsoWhenAlreadyDone", "test:chord/watch_upstream_test.go#TestWatchEndsListenerErrorOnAFailureReportsItAndDeliversNothingMore", "test:chord/watch_upstream_test.go#TestWatchNeverFoldsTheInFlightFrameIntoAnOverflow", "test:chord/watch_upstream_test.go#TestNativeWatchEndsWithEveryReasonOfItsLifecycle", "test:chord/watch_upstream_test.go#TestWatchableWatchHoldsTheCurrentValueThenOneFramePerChangeAndEndsWithItsContext"]
-rationale = "WatchLifecycle (the base of Watch and NativeWatch). start installs the sole listener and queues one drain microtask when frames are already pending; advance and retire queue frames and, once started, a drain: #schedule queues at most one microtask, #drain runs one frame at a time, awaits the listener's promise, sets value to the frame's value before the call and hands it a context without the frame's abort signal. A listener that rejects reports the error, ends the watch listener_error (a non-Error wrapped in an Error) and stops delivery; the retirement frame ends it retired once delivered; stop ends it stopped at once without aborting or awaiting the callback in flight, and drops the pending frames and every reference into the source. observeCancellation ends it cancelled when the signal aborts, also when already aborted, and is installed once. Go chord/watch_impl.go keeps the sequence: Start installs the listener, a frame is taken into delivery under the lock in publish order and its listener runs on a delivery goroutine of the DeliveryScheduler (never inline, one at a time, joined by DeliveryScheduler.Wait), a returned error or panic is reported and ends the watch listener_error, Stop closes the watch without joining the running callback, ObserveCancellation uses context.AfterFunc, and the end drops detach, report, replace, listener, scheduler and pending frames. A started watch with no callback in flight takes a committed frame into delivery before Advance returns, as the drain microtask enters the listener before the publishing commit's caller resumes. The tests assert in-order awaited delivery with buffering, the goroutine hop, stop with a callback in flight, the cancelled and listener_error ends and the overflow that never folds the in-flight frame; the NativeWatch end reasons are covered the same way. Pi a2fd25f56 adds the Watchable interface, whose watch(context) returns Promise<WatchHandle<T>>: Go's Watch(ctx) is a blocking call that returns the handle or an error; the lifecycle contract of the file is unchanged."
+disposition = "pending"
+contracts = []
+evidence = []
+rationale = ""
 
 [[files]]
 path = "packages/chord/src/websocket.ts"
@@ -1031,10 +1031,10 @@ rationale = "Reviewed streamFn/buildRequestOptions: request presence overrides s
 
 [[files]]
 path = "packages/coding-agent/src/core/session-manager.ts"
-disposition = "deferred"
+disposition = "pending"
 contracts = []
 evidence = []
-rationale = "async/Promise source; PORT_MAP marks this file ✅ ported (`internal/codingagent/session_manager.go`), but a per-file cross-language ordering/cancellation/error contract has not yet been reviewed for 0.87.1; delivery/unresolved.tsv row 'Review the v0.87.1 denominators'"
+rationale = ""
 
 [[files]]
 path = "packages/coding-agent/src/core/settings-manager.ts"
@@ -1311,17 +1311,17 @@ rationale = "showPrompt and showManualInput return a Promise settled only by the
 
 [[files]]
 path = "packages/coding-agent/src/modes/interactive/components/model-selector.ts"
-disposition = "deferred"
+disposition = "pending"
 contracts = []
 evidence = []
-rationale = "async/Promise source; PORT_MAP marks this file ✅ ported (`tui/model_select.go`), but a per-file cross-language ordering/cancellation/error contract has not yet been reviewed for 0.87.1; delivery/unresolved.tsv row 'Review the v0.87.1 denominators'"
+rationale = ""
 
 [[files]]
 path = "packages/coding-agent/src/modes/interactive/components/scoped-models-selector.ts"
-disposition = "deferred"
+disposition = "pending"
 contracts = []
 evidence = []
-rationale = "async/Promise source; PORT_MAP marks this file ✅ ported (`tui/scoped_models_list.go + internal/codingagent/interactive.go`), but a per-file cross-language ordering/cancellation/error contract has not yet been reviewed for 0.87.1; delivery/unresolved.tsv row 'Review the v0.87.1 denominators'"
+rationale = ""
 
 [[files]]
 path = "packages/coding-agent/src/modes/interactive/components/session-selector.ts"

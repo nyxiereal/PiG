@@ -3155,13 +3155,18 @@ var SessionManager = class _SessionManager {
       cwd: resolvedTargetCwd,
       parentSession: resolvedSourcePath
     };
-    writeFileSync2(newSessionFile, `${JSON.stringify(newHeader)}
-`, { flag: "wx" });
-    for (const entry of sourceEntries) {
-      if (entry.type !== "session") {
-        appendFileSync(newSessionFile, `${JSON.stringify(entry)}
+    const fd = openSync(newSessionFile, "wx");
+    try {
+      writeFileSync2(fd, `${JSON.stringify(newHeader)}
 `);
+      for (const entry of sourceEntries) {
+        if (entry.type !== "session") {
+          writeFileSync2(fd, `${JSON.stringify(entry)}
+`);
+        }
       }
+    } finally {
+      closeSync(fd);
     }
     return new _SessionManager(resolvedTargetCwd, dir, newSessionFile, true);
   }

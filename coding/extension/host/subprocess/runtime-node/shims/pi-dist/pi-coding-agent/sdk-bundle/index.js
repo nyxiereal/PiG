@@ -123,7 +123,7 @@ import {
   wrapRegisteredTools,
   writeBugReportArchive,
   writeRawStdout
-} from "./chunk-64RGXPMZ.js";
+} from "./chunk-7S6AHRTW.js";
 import {
   convertToPng,
   createBashToolDefinition,
@@ -9077,6 +9077,18 @@ function getModelSearchText(item) {
   return `${id} ${provider} ${provider}/${id} ${provider} ${id}${name}`;
 }
 __name(getModelSearchText, "getModelSearchText");
+var splitModelLabel = /* @__PURE__ */ __name((value) => value.toLowerCase().split(/[^\p{L}\p{N}]+/u).filter(Boolean), "splitModelLabel");
+function getDistinctModelName(item) {
+  const name = item.name?.trim();
+  if (!name)
+    return void 0;
+  const idWords = splitModelLabel(item.id);
+  const idTokens = new Set(idWords);
+  const compactId = idWords.join("");
+  const isCovered = /* @__PURE__ */ __name((word) => idTokens.has(word) || word.length > 1 && compactId.includes(word), "isCovered");
+  return splitModelLabel(name).every(isCovered) ? void 0 : name;
+}
+__name(getDistinctModelName, "getDistinctModelName");
 function getModelSelectorSearchText(item) {
   const { id, provider } = item;
   const name = item.name ? ` ${item.name}` : "";
@@ -9324,8 +9336,10 @@ var ModelSelectorComponent = class extends Container19 {
       const cursor = isSelected ? theme.fg("accent", "\u2192 ") : "  ";
       const currentMarker = isCurrent ? theme.fg("accent", "\u2713 ") : "  ";
       const modelText = isSelected ? theme.fg("accent", item.id) : item.id;
+      const name = getDistinctModelName({ id: item.id, name: item.model.name });
+      const nameText = name ? theme.fg("muted", ` (${name})`) : "";
       const providerBadge = theme.fg("muted", `[${item.provider}]`);
-      const line = `${cursor}${currentMarker}${modelText} ${providerBadge}${defaultBadge}`;
+      const line = `${cursor}${currentMarker}${modelText}${nameText} ${providerBadge}${defaultBadge}`;
       this.listContainer.addChild(new Text19(line, 0, 0));
     }
     if (startIndex > 0 || endIndex < this.filteredModels.length) {
@@ -9823,9 +9837,11 @@ var ScopedModelsSelectorComponent = class extends Container21 {
       const id = item.model?.id ?? item.fullId;
       const styledId = item.model ? id : theme.strikethrough(id);
       const modelText = isSelected ? theme.fg("accent", styledId) : styledId;
+      const name = item.model ? getDistinctModelName(item.model) : void 0;
+      const nameText = name ? theme.fg("muted", ` (${name})`) : "";
       const providerBadge = theme.fg("muted", item.model ? ` [${item.model.provider}]` : " [unavailable]");
       const status = item.model && item.enabled ? theme.fg("accent", "\u2713 ") : "  ";
-      this.listContainer.addChild(new Text21(`${prefix}${status}${modelText}${providerBadge}`, 0, 0));
+      this.listContainer.addChild(new Text21(`${prefix}${status}${modelText}${nameText}${providerBadge}`, 0, 0));
     }
     if (startIndex > 0 || endIndex < this.filteredItems.length) {
       this.listContainer.addChild(new Text21(theme.fg("muted", `  (${this.selectedIndex + 1}/${this.filteredItems.length})`), 0, 0));

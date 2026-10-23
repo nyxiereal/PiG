@@ -158,11 +158,11 @@ function withUsageEstimate(message, context, options, promptCache) {
     if (previousPrompt) {
       const cachedChars = commonPromptPrefixLength(previousPrompt, prompt);
       cacheRead = Math.ceil(cachedChars / 4);
-      cacheWrite = Math.ceil((promptLength - cachedChars) / 4);
-      input = Math.max(0, promptTokens - cacheRead);
+      cacheWrite = Math.max(0, promptTokens - cacheRead);
     } else {
       cacheWrite = promptTokens;
     }
+    input = 0;
     promptCache.set(sessionId, prompt);
   }
   return {

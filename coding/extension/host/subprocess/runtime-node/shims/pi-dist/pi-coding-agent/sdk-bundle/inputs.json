@@ -279,7 +279,7 @@
     },
     {
       "path": "pi-dist/pi-coding-agent/core/session-manager.js",
-      "sha256": "2fcdb6ea6c50f2cfa7aac17b8c9c79b5619e909b86eaf00cbf4bb5e6f0f73038"
+      "sha256": "14bed314bf4e42b7c44a8adec222ba27b33e20d699b3c0c076f196e4914bdd62"
     },
     {
       "path": "pi-dist/pi-coding-agent/core/settings-defaults.js",
@@ -651,7 +651,7 @@
     },
     {
       "path": "pi-dist/pi-coding-agent/modes/interactive/components/model-selector.js",
-      "sha256": "ab348207755fe65385309a671ed80e307536a85adb23065522d4f7b288517530"
+      "sha256": "b8ee91d00a5fa8f4c391a04c30b1a393e7e96c119305064802dd1597a2a5740c"
     },
     {
       "path": "pi-dist/pi-coding-agent/modes/interactive/components/oauth-selector.js",
@@ -667,7 +667,7 @@
     },
     {
       "path": "pi-dist/pi-coding-agent/modes/interactive/components/scoped-models-selector.js",
-      "sha256": "c44e3ffc90e676194d0d131a5d224f85adedd7ee390287d5562c0c57bf920d64"
+      "sha256": "28055bb808dd9b2daa6fca7fbfa28bde422b127cf9937d4dc5d722805e46b7bc"
     },
     {
       "path": "pi-dist/pi-coding-agent/modes/interactive/components/session-selector-search.js",
@@ -747,7 +747,7 @@
     },
     {
       "path": "pi-dist/pi-coding-agent/modes/interactive/model-search.js",
-      "sha256": "5fbe3c08cc30c21fe38bfb3a86bb790b020b8c4a2fec8e14e57419560f790a92"
+      "sha256": "934ba6a0bd884263e92ca28c843461e2758836db6a5dbfdef3b5324b6a1a3df0"
     },
     {
       "path": "pi-dist/pi-coding-agent/modes/interactive/program-status-reporter.js",

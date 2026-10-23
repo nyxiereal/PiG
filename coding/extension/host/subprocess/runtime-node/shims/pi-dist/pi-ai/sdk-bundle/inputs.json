@@ -439,7 +439,7 @@
     },
     {
       "path": "pi-dist/pi-ai/providers/faux.js",
-      "sha256": "f305a512f2d90547e87b402f2b335ba0d8a9f1b7c535b8a44bfc6fce8250d26a"
+      "sha256": "8128fe7916e8ebd5f778d6ad3a1bcb1594a9121fc771ba8bb3f4366503ac517b"
     },
     {
       "path": "pi-dist/pi-ai/providers/fireworks.js",

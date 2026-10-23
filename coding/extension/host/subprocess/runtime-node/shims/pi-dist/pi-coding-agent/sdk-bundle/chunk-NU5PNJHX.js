@@ -4320,6 +4320,7 @@ import { fileURLToPath } from "node:url";
 
 // pi-dist/pi-coding-agent/core/exec.js
 import { spawn } from "node:child_process";
+import { StringDecoder as StringDecoder2 } from "node:string_decoder";
 async function execCommand(command, args, cwd, options) {
   return new Promise((resolve9) => {
     const proc = spawn(command, args, {
@@ -4329,6 +4330,8 @@ async function execCommand(command, args, cwd, options) {
     });
     let stdout = "";
     let stderr = "";
+    const stdoutDecoder = new StringDecoder2("utf8");
+    const stderrDecoder = new StringDecoder2("utf8");
     let killed = false;
     let timeoutId;
     const killProcess = /* @__PURE__ */ __name(() => {
@@ -4355,14 +4358,16 @@ async function execCommand(command, args, cwd, options) {
       }, options.timeout);
     }
     proc.stdout?.on("data", (data) => {
-      stdout += data.toString();
+      stdout += stdoutDecoder.write(data);
     });
     proc.stderr?.on("data", (data) => {
-      stderr += data.toString();
+      stderr += stderrDecoder.write(data);
     });
     waitForChildProcess(proc).then((code) => {
       if (timeoutId)
         clearTimeout(timeoutId);
+      stdout += stdoutDecoder.end();
+      stderr += stderrDecoder.end();
       if (options?.signal) {
         options.signal.removeEventListener("abort", killProcess);
       }
@@ -4370,6 +4375,8 @@ async function execCommand(command, args, cwd, options) {
     }).catch((error) => {
       if (timeoutId)
         clearTimeout(timeoutId);
+      stdout += stdoutDecoder.end();
+      stderr += stderrDecoder.end();
       if (options?.signal) {
         options.signal.removeEventListener("abort", killProcess);
       }

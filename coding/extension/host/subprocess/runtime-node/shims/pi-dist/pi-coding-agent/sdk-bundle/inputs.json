@@ -3,7 +3,7 @@
   "inputs": [
     {
       "path": "pi-dist/pi-coding-agent/cli/args.js",
-      "sha256": "b05547c70311daba414710d1cba298e8fceb48601a83c99d7f4759680e37acb7"
+      "sha256": "391d4f5e9139130a0543fb3df5a8df177e0133151b0d0abb69a33ed18d4c952a"
     },
     {
       "path": "pi-dist/pi-coding-agent/cli/auth-check.js",

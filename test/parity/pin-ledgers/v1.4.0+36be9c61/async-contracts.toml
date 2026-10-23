@@ -891,10 +891,10 @@ rationale = "async/Promise source; PORT_MAP marks this file ✅ ported (`coding/
 
 [[files]]
 path = "packages/coding-agent/src/core/exec.ts"
-disposition = "pending"
-contracts = []
-evidence = []
-rationale = ""
+disposition = "translated"
+contracts = ["awaited", "cancellable", "detached-owned"]
+evidence = ["test:coding/extension/exec_test.go#TestExecCommand_SpawnFailureResolvesWithCodeOne", "test:coding/extension/exec_test.go#TestExecCommandReportsInitiationBeforeCompletion", "test:coding/extension/exec_timeout_unix_test.go#TestExecCommandStartsTheTimeoutAfterTheSpawnAsPiDoes", "test:coding/extension/exec_signal_unix_test.go#TestExecCommandOptionsSignalEndsTheCommand", "test:coding/extension/exec_signal_unix_test.go#TestExecCommandOptionsSignalAbortedBeforeTheCallKillsTheStartedCommand", "test:coding/extension/exec_tree_test.go#TestExecCommandDoesNotWaitForADescendantHoldingTheOutput", "test:coding/extension/exec_tree_test.go#TestExecCommandDoesNotEscalateAfterSIGTERM", "test:coding/extension/exec_oracle_test.go#TestExecCommandMatchesPi", "test:coding/extension/exec_test.go#TestExecCommand_DecodesAMultiByteCharacterSplitAcrossWrites"]
+rationale = "execCommand returns a Promise that never rejects: it resolves after the child ends and waitForChildProcess has drained its pipes (a descendant holding a pipe open does not block it; a spawn error resolves with code 1 and the error message as stderr). The abort signal (already aborted or later) and the timeout both send SIGTERM once; the 5 s SIGKILL timer is armed detached but Node sets proc.killed on delivery so it never fires, and no descendant is signalled. Go ExecCommand (coding/extension/exec.go:53) waits for the child and the pipe grace, resolves a failed start as code 1, signals the leader only with SIGTERM from the timeout, the context or opts.Signal, and does not escalate; the tests above pin each of those, including the timeout starting after the spawn and the oracle comparison with Pi's own execCommand (TestExecCommandMatchesPi). Pi 36be9c612 adds a synchronous decoder write per data event and a decoder flush before the promise settles (resolve and reject); the ordering and cancellation contract is unchanged: the output is complete when the promise settles, as the Go call returns after the pipes drain."
 
 [[files]]
 path = "packages/coding-agent/src/core/export-html/index.ts"

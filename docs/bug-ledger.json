@@ -8831,6 +8831,28 @@
       ]
     },
     {
+      "id": "BF-54dc372",
+      "title": "fix(release): carry main's PigVersion 0.5.3 and the post-bump goldens and pins",
+      "symptom": "fix(release): carry main's PigVersion 0.5.3 and the post-bump goldens and pins",
+      "rootCause": "The merge of main kept next's generated pigversion.go, which dropped main's PigVersion 0.5.3: the fused-extension cell then required extensions/sdk v0.5.2 against go.mod's v0.5.3 and every packed Go conformance cell failed to build, and TestParseChangelog_RealFile saw 0.5.3 as newer than the release line. PigVersion is back at 0.5.3 and the README example follows it.",
+      "rootCauseSource": "commit",
+      "userImpact": "Behavior differed from Pi",
+      "platform": "All platforms",
+      "class": "own",
+      "fixedIn": "Unreleased",
+      "origin": "commit",
+      "commits": [
+        {
+          "hash": "54dc372dae",
+          "date": "2026-10-23"
+        }
+      ],
+      "tests": [
+        "bench/k8s/cmd/k8sbench/pireference_test.go::TestCommittedPinHasAgentPins",
+        "internal/codingagent/changelog_test.go::TestParseChangelog_RealFile"
+      ]
+    },
+    {
       "id": "BF-55573f4",
       "title": "fix(sdk): Rust and Python fuzzy match score contiguous occurrences (Pi)",
       "symptom": "fix(sdk): Rust and Python fuzzy match score contiguous occurrences (Pi)",

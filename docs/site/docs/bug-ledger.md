@@ -291,6 +291,7 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 | [BF-542b536](#bf-542b536) | fix(cli): PIG_VERSION_FORMAT=pi prints the pinned Pi package version | PiG's own defect | All platforms | Unreleased |
 | [BF-5443b6c](#bf-5443b6c) | `durable/images` is the image processor of pi-durable: `images.CreatePhotonImages()` (also `images/node` and… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-54a5bf6](#bf-54a5bf6) | The host answers a parsed frontmatter with `<`, `>`, `&` and U+2028 as they are (as `JSON.stringify` writes… | PiG's own defect | All platforms | 0.5.0 |
+| [BF-54dc372](#bf-54dc372) | fix(release): carry main's PigVersion 0.5.3 and the post-bump goldens and pins | PiG's own defect | All platforms | Unreleased |
 | [BF-55573f4](#bf-55573f4) | fix(sdk): Rust and Python fuzzy match score contiguous occurrences (Pi) | PiG's own defect | All platforms | Unreleased |
 | [BF-5654e71](#bf-5654e71) | MCP OAuth discovery and resource selection now read URLs the way Node's `URL` does (default ports, dot… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-5654e71-2](#bf-5654e71-2) | A JSON-RPC request or notification with a malformed `error` member is no longer rejected, and a `method` that… | PiG's own defect | All platforms | 0.5.0 |
@@ -4924,6 +4925,19 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 - **Fix commits:** `6a6fffa638` (2026-10-10), `058e7a0e4b` (2026-10-11), `15cb4f2db8` (2026-10-11), `50f526d69e` (2026-10-11), `54a5bf6140` (2026-10-11), `8894a13f34` (2026-10-11), `a178939d6a` (2026-10-11), `a4e5b071cb` (2026-10-11), `e4aa58a078` (2026-10-11), `f51d8b4bea` (2026-10-11)
 - **Tests:** `agent/message_json_number_spelling_test.go::TestAgentMessageDecodeKeepsANonNumberWhereAnIntegerIsExpected`, `agent/message_json_test.go::TestAgentMessageJSONRejectsInvalidUnion`, `agent/message_type_mismatch_test.go::TestDecodedMessageKeepsMembersOfAnyType`, `agent/provider_content_block_decode_test.go::TestUnknownContentBlockCostsOnlyThatBlock`, `coding/extension/host/subprocess/host_helpers_quote_test.go::TestParseFrontmatterResultKeepsMarkupAndLineSeparatorsLiteral`, `extensions/sdk-py/tests/test_compaction_estimate.py`, `extensions/sdk-py/tests/test_helper_running.py`, `extensions/sdk-py/tests/test_serialize_conversation_surrogates.py` and 13 more in docs/bug-ledger.json
 - **Release note:** The host answers a parsed frontmatter with `<`, `>`, `&` and U+2028 as they are (as `JSON.stringify` writes them) instead of `\u003c`-style escapes, and a packed cell's helper without a `Context` keeps a live connection when the first extension to start has stopped (Go, Rust and Python SDKs).
+
+### BF-54dc372
+
+**fix(release): carry main's PigVersion 0.5.3 and the post-bump goldens and pins**
+
+- **Source:** PiG's own defect
+- **Symptom:** fix(release): carry main's PigVersion 0.5.3 and the post-bump goldens and pins
+- **Root cause:** The merge of main kept next's generated pigversion.go, which dropped main's PigVersion 0.5.3: the fused-extension cell then required extensions/sdk v0.5.2 against go.mod's v0.5.3 and every packed Go conformance cell failed to build, and TestParseChangelog_RealFile saw 0.5.3 as newer than the release line. PigVersion is back at 0.5.3 and the README example follows it.
+- **User impact:** Behavior differed from Pi
+- **Platform:** All platforms
+- **Fixed in:** Unreleased
+- **Fix commits:** `54dc372dae` (2026-10-23)
+- **Tests:** `bench/k8s/cmd/k8sbench/pireference_test.go::TestCommittedPinHasAgentPins`, `internal/codingagent/changelog_test.go::TestParseChangelog_RealFile`
 
 ### BF-55573f4
 

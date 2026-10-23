@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -18,7 +19,7 @@ import (
 	"github.com/MichaelKinsy/PiG/coding/extension/host/subprocess"
 )
 
-func newEntryAppendSession(t *testing.T) *coding.Session {
+func newEntryAppendSession(t *testing.T, options coding.SessionOptions) *coding.Session {
 	t.Helper()
 	root := t.TempDir()
 	services, err := coding.CreateAgentSessionServices(coding.CreateAgentSessionServicesOptions{CWD: root, AgentDir: filepath.Join(root, "agent")})
@@ -26,7 +27,9 @@ func newEntryAppendSession(t *testing.T) *coding.Session {
 		t.Fatal(err)
 	}
 	t.Cleanup(services.Close)
-	session, err := coding.NewSession(services, coding.SessionOptions{NoSession: true, ResourceLoader: coding.NoResources, SkipBuiltinTools: true})
+	options.ResourceLoader = coding.NoResources
+	options.SkipBuiltinTools = true
+	session, err := coding.NewSession(services, options)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -52,7 +55,7 @@ func flushAppendEvents(t *testing.T, session *coding.Session) {
 func TestAppendExtensionEntryPreservesIdentityAndEventSemantics(t *testing.T) {
 	for _, event := range []bool{false, true} {
 		t.Run(fmt.Sprintf("event=%t", event), func(t *testing.T) {
-			session := newEntryAppendSession(t)
+			session := newEntryAppendSession(t, coding.SessionOptions{NoSession: true})
 			parent := session.LeafID()
 			direct := &subprocess.DirectEntryAppend{ID: "a1b2c3d4", Timestamp: "2026-10-01T12:34:56.123456789+02:00", Event: event}
 			var events []json.RawMessage
@@ -94,7 +97,7 @@ func TestAppendExtensionEntryPreservesIdentityAndEventSemantics(t *testing.T) {
 }
 
 func TestAppendExtensionEntryRejectsWithoutChangingTheLog(t *testing.T) {
-	session := newEntryAppendSession(t)
+	session := newEntryAppendSession(t, coding.SessionOptions{NoSession: true})
 	seed, err := session.AppendCustomEntry("seed", "retained")
 	if err != nil {
 		t.Fatal(err)
@@ -133,7 +136,7 @@ func TestAppendExtensionEntryRejectsWithoutChangingTheLog(t *testing.T) {
 }
 
 func TestAppendExtensionEntrySharesTheNativeAppendLock(t *testing.T) {
-	session := newEntryAppendSession(t)
+	session := newEntryAppendSession(t, coding.SessionOptions{NoSession: true})
 	before := session.SessionManager().GetEntryCount()
 	parent := session.LeafID()
 	const writers = 64
@@ -147,7 +150,7 @@ func TestAppendExtensionEntrySharesTheNativeAppendLock(t *testing.T) {
 			if i%2 == 0 {
 				_, err = session.AppendExtensionEntry("extension", i, &subprocess.DirectEntryAppend{ID: fmt.Sprintf("entry-%d", i), Timestamp: "2026-10-01T00:00:00Z"})
 			} else {
-				_, err = session.SessionManager().AppendCustomEntry("native", i)
+				_, err = session.SessionManager().AppendMessage(agent.AgentMessage{User: &agent.UserMessage{Role: agent.RoleUser, Content: ai.UserText("native"), Timestamp: int64(i + 1)}})
 			}
 			errs <- err
 		})
@@ -176,6 +179,80 @@ func TestAppendExtensionEntrySharesTheNativeAppendLock(t *testing.T) {
 	}
 }
 
+func TestAppendExtensionEntryPersistsIdentityAcrossReopen(t *testing.T) {
+	session := newEntryAppendSession(t, coding.SessionOptions{})
+	if _, err := session.SessionManager().AppendMessage(agent.AgentMessage{User: &agent.UserMessage{Role: agent.RoleUser, Content: ai.UserText("persist"), Timestamp: 1}}); err != nil {
+		t.Fatal(err)
+	}
+	direct := &subprocess.DirectEntryAppend{ID: "retained", Timestamp: "2026-10-01T12:34:56.123456789+02:00", Event: true}
+	if _, err := session.AppendExtensionEntry("fixture", "persisted", direct); err != nil {
+		t.Fatal(err)
+	}
+	entry, _ := session.SessionManager().GetEntry(direct.ID)
+	path := session.Path()
+	if err := session.Close(); err != nil {
+		t.Fatal(err)
+	}
+	reopened := newEntryAppendSession(t, coding.SessionOptions{ResumePath: path})
+	retained, ok := reopened.SessionManager().GetEntry(direct.ID)
+	if !ok || !bytes.Equal(retained.Raw(), entry.Raw()) {
+		t.Fatalf("reopened entry = %+v, found = %t; want %s", retained, ok, entry.Raw())
+	}
+}
+
+func TestAppendExtensionEntryPropagatesNativeStorageFailure(t *testing.T) {
+	session := newEntryAppendSession(t, coding.SessionOptions{})
+	if _, err := session.SessionManager().AppendMessage(agent.AgentMessage{User: &agent.UserMessage{Role: agent.RoleUser, Content: ai.UserText("persist"), Timestamp: 1}}); err != nil {
+		t.Fatal(err)
+	}
+	path := session.Path()
+	backup := path + ".saved"
+	if err := os.Rename(path, backup); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Mkdir(path, 0o700); err != nil {
+		t.Fatal(err)
+	}
+	restore := sync.OnceFunc(func() {
+		if err := os.Remove(path); err != nil {
+			t.Error(err)
+		}
+		if err := os.Rename(backup, path); err != nil {
+			t.Error(err)
+		}
+	})
+	t.Cleanup(restore)
+	events := 0
+	stop := session.Subscribe(func(ev agent.AgentEvent) {
+		if _, ok := ev.(agent.EntryAppendedEvent); ok {
+			events++
+		}
+	})
+	defer stop()
+	direct := &subprocess.DirectEntryAppend{ID: "not-persisted", Timestamp: "2026-10-01T00:00:00Z", Event: true}
+	id, err := session.AppendExtensionEntry("fixture", "failed write", direct)
+	var pathError *os.PathError
+	if id != "" || !errors.As(err, &pathError) {
+		t.Fatalf("append = %q, %v; want the native filesystem error", id, err)
+	}
+	flushAppendEvents(t, session)
+	if events != 0 {
+		t.Fatalf("failed write emitted %d entry_appended events", events)
+	}
+	// Pi's native writer updates memory before persistence. The public wrapper reports the error without introducing rollback semantics.
+	if _, ok := session.SessionManager().GetEntry(direct.ID); !ok {
+		t.Fatal("the wrapper changed the native writer's in-memory failure semantics")
+	}
+	restore()
+	if err := session.Close(); err != nil {
+		t.Fatal(err)
+	}
+	reopened := newEntryAppendSession(t, coding.SessionOptions{ResumePath: path})
+	if _, ok := reopened.SessionManager().GetEntry(direct.ID); ok {
+		t.Fatal("the failed write appeared after reopening the persisted session")
+	}
+}
+
 const extensionEntryFixture = `export default function (pi) {
   const seen = [];
   pi.registerTool({ name: "append_probe", label: "Append", description: "Append a custom entry", parameters: { type: "object", properties: { event: { type: "boolean" } } },
@@ -199,7 +276,7 @@ func TestAppendExtensionEntryThroughNodeHost(t *testing.T) {
 		t.Run(isolation, func(t *testing.T) {
 			ctx, cancel := context.WithTimeout(t.Context(), 30*time.Second)
 			defer cancel()
-			session := newEntryAppendSession(t)
+			session := newEntryAppendSession(t, coding.SessionOptions{NoSession: true})
 			bridge := subprocess.NewUIBridge(nil)
 			coding.BindSessionReadActions(bridge, func() *coding.Session { return session }, session.CWD(), "")
 			bridge.SetHostAction("appendEntry", func(customType string, data any, direct *subprocess.DirectEntryAppend) error {

@@ -6,7 +6,7 @@ import (
 	"github.com/MichaelKinsy/PiG/chord/delta"
 )
 
-// Ports packages/chord/src/watch.ts (WatchEnd, WatchHandle).
+// Ports packages/chord/src/watch.ts (WatchEnd, WatchHandle, Watchable).
 
 // WatchEndReason is why a watch ended.
 //
@@ -45,4 +45,14 @@ type WatchHandle[T any] interface {
 	Closed() <-chan struct{}
 	// End returns the terminal result once Closed is closed.
 	End() WatchEnd
+}
+
+// Watchable is a value that changes and can be watched: documents, derives, members of references. Values are immutable by
+// convention (JSON for state); each watch starts at the current value and then gets one frame per change. Watch returns an
+// error where Pi's watch rejects.
+type Watchable[T any] interface {
+	// Value is the current value.
+	Value() T
+	// Watch returns a watch holding the current value, then one frame per change; cancelling ctx ends it.
+	Watch(ctx context.Context) (WatchHandle[T], error)
 }

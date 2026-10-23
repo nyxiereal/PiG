@@ -243,6 +243,7 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 | [BF-4649166](#bf-4649166) | fix(sdk): place the arrival-order start in the request scope so a tool_call round trip keeps its 68… | PiG's own defect | All platforms | Unreleased |
 | [BF-46abed3](#bf-46abed3) | Fix in shipped code | PiG's own defect | All platforms | Unreleased |
 | [BF-471c46e](#bf-471c46e) | An MCP tool or resource link with an explicit empty `title` keeps it, as Pi does, instead of falling back to… | PiG's own defect | All platforms | 0.5.0 |
+| [BF-4741f6a](#bf-4741f6a) | Fix in shipped code | PiG's own defect | All platforms | Unreleased |
 | [BF-4789fa5](#bf-4789fa5) | `thinking_level_select` and `turn_start` handlers are covered through the production Session: a handler sees… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-47c3007](#bf-47c3007) | `/mcp` now opens at once while servers are still connecting, and connection actions (reconnect, enable… | A fix Pi shipped that PiG ported | All platforms | 0.5.0 |
 | [BF-47c3007-2](#bf-47c3007-2) | MCP OAuth sign-ins can now be cancelled with Esc at every step, session shutdown stops a running sign-in, and… | A fix Pi shipped that PiG ported | All platforms | 0.5.0 |
@@ -4244,6 +4245,19 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 - **Fix commits:** `471c46e063` (2026-10-05)
 - **Tests:** `coding/mcpext/extension_test.go::TestAgentSessionMCPHidesToolsInTheOrderTheServerListedThem`, `coding/mcpext/tools_test.go::TestMCPToolsKeepAnExplicitEmptyTitle`, `mcp/client_cursor_test.go::TestToolsAndContentBlocksTrackWhetherTheServerSentATitle`
 - **Release note:** An MCP tool or resource link with an explicit empty `title` keeps it, as Pi does, instead of falling back to the annotation title or the name.
+
+### BF-4741f6a
+
+**Fix in shipped code**
+
+- **Source:** PiG's own defect
+- **Symptom:** Fix in shipped code
+- **Root cause:** Not recorded.
+- **User impact:** Behavior differed from Pi
+- **Platform:** All platforms
+- **Fixed in:** Unreleased
+- **Fix commits:** `4741f6ade2` (2026-10-23)
+- **Tests:** None recorded.
 
 ### BF-4789fa5
 

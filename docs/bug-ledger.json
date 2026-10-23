@@ -7169,6 +7169,25 @@
       ]
     },
     {
+      "id": "BF-4741f6a",
+      "title": "Fix in shipped code",
+      "symptom": "Fix in shipped code",
+      "rootCause": "",
+      "rootCauseSource": "",
+      "userImpact": "Behavior differed from Pi",
+      "platform": "All platforms",
+      "class": "own",
+      "fixedIn": "Unreleased",
+      "origin": "commit",
+      "commits": [
+        {
+          "hash": "4741f6ade2",
+          "date": "2026-10-23"
+        }
+      ],
+      "tests": []
+    },
+    {
       "id": "BF-4789fa5",
       "title": "`thinking_level_select` and `turn_start` handlers are covered through the production Session: a handler sees…",
       "symptom": "`thinking_level_select` and `turn_start` handlers are covered through the production Session: a handler sees the clamped effective level only when it changes, and `turn_start` carries the per-run turn index and the time of the turn.",

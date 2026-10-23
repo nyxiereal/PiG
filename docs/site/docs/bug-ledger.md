@@ -150,6 +150,7 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 | [BF-2ea8ad2](#bf-2ea8ad2) | The openai-completions, openai-responses and openrouter-images requests build their URL as the openai SDK… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-2f881ba](#bf-2f881ba) | "Your first extension" now says that `pig install --validate-only` exits 1 when the extension does not build | PiG's own defect | All platforms | 0.5.0 |
 | [BF-2fc2307](#bf-2fc2307) | A scalar that names a collection tag (`!!map 1`, `!!seq true`) inside a complex mapping key stays plain in… | PiG's own defect | All platforms | 0.5.0 |
+| [BF-305432b](#bf-305432b) | fix(coding-agent): stop macOS shell groups before killing them (Pi) | A fix Pi shipped that PiG ported | macOS | Unreleased |
 | [BF-305bd8b](#bf-305bd8b) | A durable task that panics with a value whose `String` method panics now faults with the message `[object… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-30d4a6d](#bf-30d4a6d) | Fix in shipped code | PiG's own defect | All platforms | Unreleased |
 | [BF-30e47f4](#bf-30e47f4) | fix(tui): SetThemeInstance notifies the active theme observers, as Pi's setThemeInstance runs its callback | PiG's own defect | All platforms | Unreleased |
@@ -192,6 +193,7 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 | [BF-3840820](#bf-3840820) | MCP tool results whose content blocks carry members of another type than the protocol's (a numeric `text`, a… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-38b0f0c](#bf-38b0f0c) | Syntax highlighting keeps its colors after the first line of multiline strings and comments in fenced code… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-397866f](#bf-397866f) | A Go MCP client that declares an empty capability, such as `sampling` or `elicitation`, now sends it as `{}` | PiG's own defect | All platforms | 0.5.0 |
+| [BF-3ab4c24](#bf-3ab4c24) | fix(coding-agent): render HTML export for sessions deeper than the call stack (Pi) | A fix Pi shipped that PiG ported | All platforms | Unreleased |
 | [BF-3ad9ec8](#bf-3ad9ec8) | fix(tui): tree label prompt gives its input width-2 cells (Pi LabelInput) | PiG's own defect | All platforms | Unreleased |
 | [BF-3b009a3](#bf-3b009a3) | `chord/host`: a child host forked by `ForkDriver` no longer inherits its parent's `CHORD2_LOCK` | PiG's own defect | All platforms | 0.5.0 |
 | [BF-3b3dba6](#bf-3b3dba6) | A streamed tool argument of `-0` is held as `0`, so the serialized arguments write `0` as Pi's… | PiG's own defect | All platforms | 0.5.0 |
@@ -204,6 +206,7 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 | [BF-3d475c4](#bf-3d475c4) | Image resize strategy against live Pi: new `TestResizeImageDimensionStrategyMatchesPi`… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-3def2a7](#bf-3def2a7) | MCP servers whose names are numbers (`"9"`, `"42"`) load and report their errors in the order Pi does: a JSON… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-3e755ef](#bf-3e755ef) | Fix in shipped code | PiG's own defect | All platforms | Unreleased |
+| [BF-3e88414](#bf-3e88414) | fix(coding-agent): render system messages in HTML export (Pi) | A fix Pi shipped that PiG ported | All platforms | Unreleased |
 | [BF-3ee123c](#bf-3ee123c) | CI: the `Linux / portmap` job (`make portmap-check`) no longer runs out its 60-minute limit | PiG's own defect | Linux | 0.5.2 |
 | [BF-3fa6e63](#bf-3fa6e63) | MCP servers with resources registered no tools until every resource was listed, so a slow listing (a large… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-3fbdfd2](#bf-3fbdfd2) | A configured number in settings text prints as JavaScript's `String(number)`: `-0` is `0`, and a magnitude of… | PiG's own defect | All platforms | 0.5.0 |
@@ -712,6 +715,7 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 | [BF-93c09d6-2](#bf-93c09d6-2) | `pig install --validate-only` on a Package root validates every extension the Package names in… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-93c5def](#bf-93c5def) | A built-in extension named with `-e builtin:<name>` loads before the extensions from settings and the… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-93f8b7c](#bf-93f8b7c) | fix(agent): a listener failure at agent_start ends the run as in Pi; failure messages carry the model's api | PiG's own defect | All platforms | Unreleased |
+| [BF-942bc6c](#bf-942bc6c) | fix(coding-agent): preserve pi.exec spawn errors (Pi) | PiG's own defect | All platforms | Unreleased |
 | [BF-94e3498](#bf-94e3498) | On Windows, PiG no longer searches `C:\etc\pig\piglets` or `C:\opt\pig\piglet.yaml` for a Piglet | PiG's own defect | Windows | 0.5.0 |
 | [BF-94e6796](#bf-94e6796) | A Durable Harness task that went to sleep for a short time, such as the 1 ms backoff before a generation… | PiG's own defect | All platforms | 0.5.2 |
 | [BF-94f1e6f](#bf-94f1e6f) | fix(coding): a provider of only virtual models is configured with source virtual | PiG's own defect | All platforms | Unreleased |
@@ -2958,6 +2962,19 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 - **Tests:** `internal/yaml12/parse_mutation_test.go::TestParseMatchesTheLibraryOnCollectionTagsOnScalars`
 - **Release note:** A scalar that names a collection tag (`!!map 1`, `!!seq true`) inside a complex mapping key stays plain in the key's text, as the yaml library prints it; it used to be quoted (`!!map "1"`) as a string scalar is, so the object key differed.
 
+### BF-305432b
+
+**fix(coding-agent): stop macOS shell groups before killing them (Pi)**
+
+- **Source:** A fix Pi shipped that PiG ported
+- **Symptom:** fix(coding-agent): stop macOS shell groups before killing them (Pi)
+- **Root cause:** Ports Pi (#11252). On macOS the group is stopped before it is killed, so a killed foreground child cannot wake its waiting shell before the shell is signalled and let `a; b` start b during cancellation. The stop is best-effort and a failed stop never prevents the kill; Linux keeps the single group SIGKILL. Unix kills also fall back to the shell alone when the group kill fails, as killProcessTree does.
+- **User impact:** Behavior differed from Pi
+- **Platform:** macOS
+- **Fixed in:** Unreleased
+- **Fix commits:** `305432b20d` (2026-10-22)
+- **Tests:** `internal/codingagent/tools/bash_group_unix_kill_test.go::TestKillProcessTree`
+
 ### BF-305bd8b
 
 **A durable task that panics with a value whose `String` method panics now faults with the message `[object…**
@@ -3542,6 +3559,19 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 - **Tests:** `mcp/client_options_test.go::TestClientInitializeCarriesTheConfiguredClientOptions`
 - **Release note:** A Go MCP client that declares an empty capability, such as `sampling` or `elicitation`, now sends it as `{}`. The capability used to be left out of `initialize`, so a server could not see that the client supports it.
 
+### BF-3ab4c24
+
+**fix(coding-agent): render HTML export for sessions deeper than the call stack (Pi)**
+
+- **Source:** A fix Pi shipped that PiG ported
+- **Symptom:** fix(coding-agent): render HTML export for sessions deeper than the call stack (Pi)
+- **Root cause:** Ports Pi (#11225).
+- **User impact:** Wrong display
+- **Platform:** All platforms
+- **Fixed in:** Unreleased
+- **Fix commits:** `3ab4c240b3` (2026-10-22)
+- **Tests:** `internal/codingagent/export/upstream_test.go::TestExportHTMLDeepSessionTree`, `internal/codingagent/export/upstream_test.go::TestExportHTMLPinnedAssets`
+
 ### BF-3ad9ec8
 
 **fix(tui): tree label prompt gives its input width-2 cells (Pi LabelInput)**
@@ -3703,6 +3733,19 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 - **Fixed in:** Unreleased
 - **Fix commits:** `3e755ef501` (2026-10-22)
 - **Tests:** `ai/system_one_wire_test.go::TestSystemOneWireRequestImagesKeepAnExplicitEmptyList`, `ai/system_one_wire_test.go::TestTypesafeSystemOneDetectCompatShapes`, `internal/codingagent/tools/mutation_queue_test.go::TestFileMutationQueueWithPanickingCallbackStillDrains`, `internal/codingagent/tools/mutation_queue_test.go::TestMutationTicketWaitContextGaveUpTicketPassesOnAfterEveryPredecessor`
+
+### BF-3e88414
+
+**fix(coding-agent): render system messages in HTML export (Pi)**
+
+- **Source:** A fix Pi shipped that PiG ported
+- **Symptom:** fix(coding-agent): render system messages in HTML export (Pi)
+- **Root cause:** Ports Pi (#11261, #3464). The export template renders the leading system message as the system prompt and tool list, and later system messages as named section and tool updates.
+- **User impact:** Wrong display
+- **Platform:** All platforms
+- **Fixed in:** Unreleased
+- **Fix commits:** `3e88414c8c` (2026-10-22)
+- **Tests:** `internal/codingagent/export/upstream_test.go::TestExportHTMLPinnedAssets`, `internal/codingagent/export/upstream_test.go::TestExportHTMLRendering`, `internal/codingagent/export/upstream_test.go::TestExportHTMLSystemMessages`
 
 ### BF-3ee123c
 
@@ -10767,6 +10810,19 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 - **Fixed in:** Unreleased
 - **Fix commits:** `93f8b7c250` (2026-10-10)
 - **Tests:** `agent/agent_class_pi_oracle_test.go::TestAgentClassMatchesPi`
+
+### BF-942bc6c
+
+**fix(coding-agent): preserve pi.exec spawn errors (Pi)**
+
+- **Source:** PiG's own defect
+- **Symptom:** fix(coding-agent): preserve pi.exec spawn errors (Pi)
+- **Root cause:** Ports Pi (#11085). A command that cannot start resolves with code 1 as before, and its stderr now carries the spawn error's message instead of staying empty (`stderr || error.message`). nodespawn.SpawnMessage gives any start error the message Node's spawn reports (`spawn <program> ENOENT`), and the bash tool's shell spawn error uses it too.
+- **User impact:** An operation failed or was rejected
+- **Platform:** All platforms
+- **Fixed in:** Unreleased
+- **Fix commits:** `942bc6c05b` (2026-10-22)
+- **Tests:** `coding/extension/exec_test.go::TestExecCommand_SilentExitKeepsStderrEmpty`, `coding/extension/exec_test.go::TestExecCommand_SpawnFailureResolvesWithCodeOne`
 
 ### BF-94e3498
 

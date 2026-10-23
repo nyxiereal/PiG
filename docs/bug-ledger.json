@@ -4208,6 +4208,27 @@
       ]
     },
     {
+      "id": "BF-305432b",
+      "title": "fix(coding-agent): stop macOS shell groups before killing them (Pi)",
+      "symptom": "fix(coding-agent): stop macOS shell groups before killing them (Pi)",
+      "rootCause": "Ports Pi (#11252). On macOS the group is stopped before it is killed, so a killed foreground child cannot wake its waiting shell before the shell is signalled and let `a; b` start b during cancellation. The stop is best-effort and a failed stop never prevents the kill; Linux keeps the single group SIGKILL. Unix kills also fall back to the shell alone when the group kill fails, as killProcessTree does.",
+      "rootCauseSource": "commit",
+      "userImpact": "Behavior differed from Pi",
+      "platform": "macOS",
+      "class": "pi-port",
+      "fixedIn": "Unreleased",
+      "origin": "commit",
+      "commits": [
+        {
+          "hash": "305432b20d",
+          "date": "2026-10-22"
+        }
+      ],
+      "tests": [
+        "internal/codingagent/tools/bash_group_unix_kill_test.go::TestKillProcessTree"
+      ]
+    },
+    {
       "id": "BF-305bd8b",
       "title": "A durable task that panics with a value whose `String` method panics now faults with the message `[object…",
       "symptom": "A durable task that panics with a value whose `String` method panics now faults with the message `[object Object]`, as Pi's `errorMessage` gives for a thrown value that cannot be formatted, instead of Go's `%!v(PANIC=...)` text.",
@@ -5573,6 +5594,28 @@
       ]
     },
     {
+      "id": "BF-3ab4c24",
+      "title": "fix(coding-agent): render HTML export for sessions deeper than the call stack (Pi)",
+      "symptom": "fix(coding-agent): render HTML export for sessions deeper than the call stack (Pi)",
+      "rootCause": "Ports Pi (#11225).",
+      "rootCauseSource": "commit",
+      "userImpact": "Wrong display",
+      "platform": "All platforms",
+      "class": "pi-port",
+      "fixedIn": "Unreleased",
+      "origin": "commit",
+      "commits": [
+        {
+          "hash": "3ab4c240b3",
+          "date": "2026-10-22"
+        }
+      ],
+      "tests": [
+        "internal/codingagent/export/upstream_test.go::TestExportHTMLDeepSessionTree",
+        "internal/codingagent/export/upstream_test.go::TestExportHTMLPinnedAssets"
+      ]
+    },
+    {
       "id": "BF-3ad9ec8",
       "title": "fix(tui): tree label prompt gives its input width-2 cells (Pi LabelInput)",
       "symptom": "fix(tui): tree label prompt gives its input width-2 cells (Pi LabelInput)",
@@ -5908,6 +5951,29 @@
         "ai/system_one_wire_test.go::TestTypesafeSystemOneDetectCompatShapes",
         "internal/codingagent/tools/mutation_queue_test.go::TestFileMutationQueueWithPanickingCallbackStillDrains",
         "internal/codingagent/tools/mutation_queue_test.go::TestMutationTicketWaitContextGaveUpTicketPassesOnAfterEveryPredecessor"
+      ]
+    },
+    {
+      "id": "BF-3e88414",
+      "title": "fix(coding-agent): render system messages in HTML export (Pi)",
+      "symptom": "fix(coding-agent): render system messages in HTML export (Pi)",
+      "rootCause": "Ports Pi (#11261, #3464). The export template renders the leading system message as the system prompt and tool list, and later system messages as named section and tool updates.",
+      "rootCauseSource": "commit",
+      "userImpact": "Wrong display",
+      "platform": "All platforms",
+      "class": "pi-port",
+      "fixedIn": "Unreleased",
+      "origin": "commit",
+      "commits": [
+        {
+          "hash": "3e88414c8c",
+          "date": "2026-10-22"
+        }
+      ],
+      "tests": [
+        "internal/codingagent/export/upstream_test.go::TestExportHTMLPinnedAssets",
+        "internal/codingagent/export/upstream_test.go::TestExportHTMLRendering",
+        "internal/codingagent/export/upstream_test.go::TestExportHTMLSystemMessages"
       ]
     },
     {
@@ -20559,6 +20625,28 @@
       ],
       "tests": [
         "agent/agent_class_pi_oracle_test.go::TestAgentClassMatchesPi"
+      ]
+    },
+    {
+      "id": "BF-942bc6c",
+      "title": "fix(coding-agent): preserve pi.exec spawn errors (Pi)",
+      "symptom": "fix(coding-agent): preserve pi.exec spawn errors (Pi)",
+      "rootCause": "Ports Pi (#11085). A command that cannot start resolves with code 1 as before, and its stderr now carries the spawn error's message instead of staying empty (`stderr || error.message`). nodespawn.SpawnMessage gives any start error the message Node's spawn reports (`spawn \u003cprogram\u003e ENOENT`), and the bash tool's shell spawn error uses it too.",
+      "rootCauseSource": "commit",
+      "userImpact": "An operation failed or was rejected",
+      "platform": "All platforms",
+      "class": "own",
+      "fixedIn": "Unreleased",
+      "origin": "commit",
+      "commits": [
+        {
+          "hash": "942bc6c05b",
+          "date": "2026-10-22"
+        }
+      ],
+      "tests": [
+        "coding/extension/exec_test.go::TestExecCommand_SilentExitKeepsStderrEmpty",
+        "coding/extension/exec_test.go::TestExecCommand_SpawnFailureResolvesWithCodeOne"
       ]
     },
     {

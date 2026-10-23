@@ -158,9 +158,9 @@ rationale = "Pi adc5fa9f and 04a93bad move client identity and attribution into 
 [[files]]
 path = "packages/ai/src/api/google-shared.ts"
 change = "added"
-disposition = "pending"
-evidence = []
-rationale = ""
+disposition = "ported"
+evidence = ["test:ai/google_convert_tools_upstream_test.go#TestGoogleSharedConvertToolsConstHandlingUpstream"]
+rationale = "Pi 7314819f0 and a7b94a03f (#11308) make convertTools send string and number const values of the schema as single-value enums in parametersJsonSchema (Gemini ignores const there), rewriting only schema-bearing keywords and leaving literal data and schema-map names alone: ported as ai/google.go rewriteConstAsEnum, member order included; the test asserts the byte-exact parametersJsonSchema text of Pi's four cases and that the authored schema is not modified."
 
 [[files]]
 path = "packages/ai/src/api/google-vertex.lazy.ts"
@@ -746,9 +746,9 @@ rationale = "PORT_MAP row is ✅ ported (ai/models_generated.go + internal/codin
 [[files]]
 path = "packages/ai/src/providers/faux.ts"
 change = "added"
-disposition = "pending"
-evidence = []
-rationale = ""
+disposition = "ported"
+evidence = ["test:ai/faux_provider_upstream_test.go#TestFauxProviderUpstream", "test:ai/faux_usage_estimate_test.go#TestFauxUsageEstimateMatchesTheDirectComputation"]
+rationale = "Pi f3fa8bd92 stops the faux provider counting newly cached prompt tokens as input: with a session every prompt token is a cache read or a cache write and input is 0. Ported in ai/faux.go estimateUsage; TestFauxProviderUpstream asserts Pi's first-call, extended and edited usages and the direct-computation reference test follows the same arithmetic."
 
 [[files]]
 path = "packages/ai/src/providers/fireworks.models.ts"
@@ -1558,9 +1558,9 @@ rationale = "aa9cf15b (required self principal, no host named by the caller: Get
 [[files]]
 path = "packages/chord/src/index.ts"
 change = "added"
-disposition = "pending"
-evidence = []
-rationale = ""
+disposition = "ported"
+evidence = ["test:chord/watch_upstream_test.go#TestNativeWatchableWatchHoldsTheCurrentValueThenOneFramePerNewValueAndEndsWithItsContext"]
+rationale = "Pi 5e106ab1c adds the NativeWatchable type export to the chord index; the Go counterpart is the exported chord.NativeWatchable in chord/watch.go, which the test uses as a public type."
 
 [[files]]
 path = "packages/chord/src/json.ts"
@@ -1719,9 +1719,9 @@ rationale = "PORT_MAP row is ✅ ported (chord/host/types.go (Context is context
 [[files]]
 path = "packages/chord/src/watch.ts"
 change = "added"
-disposition = "pending"
-evidence = []
-rationale = ""
+disposition = "ported"
+evidence = ["test:chord/watch_upstream_test.go#TestNativeWatchableWatchHoldsTheCurrentValueThenOneFramePerNewValueAndEndsWithItsContext"]
+rationale = "Pi 5e106ab1c adds NativeWatchable<T> (value, watch(context) returning a NativeWatchHandle<T>), the in-process counterpart of Watchable: ported as chord.NativeWatchable in chord/watch.go. The test drives it through NativeWatch: the current value, one frame per new value by identity, and the context ending the watch."
 
 [[files]]
 path = "packages/chord/src/websocket.ts"
@@ -2412,9 +2412,9 @@ rationale = "PORT_MAP row is ✅ ported (internal/codingagent/session_export.go 
 [[files]]
 path = "packages/coding-agent/src/core/session-manager.ts"
 change = "added"
-disposition = "pending"
-evidence = []
-rationale = ""
+disposition = "ported"
+evidence = ["test:internal/codingagent/session_manager_test.go#TestSessionManagerForkFromFile_CopiesAllEntriesUnchangedIntoTheForkedSession"]
+rationale = "Pi 8ddc44ec8 (#11253) makes forkFrom write the header and every entry through one fd instead of reopening the file per entry; ForkFromFile already writes the whole fork through one handle (internal/codingagent/session_manager.go), so only its comment changes, and the test ports Pi's 50-entry copy case byte for byte."
 
 [[files]]
 path = "packages/coding-agent/src/core/settings-defaults.ts"
@@ -3091,9 +3091,9 @@ rationale = "PORT_MAP row is ✅ ported (internal/codingagent/mermaid_transform.
 [[files]]
 path = "packages/coding-agent/src/modes/interactive/components/model-selector.ts"
 change = "added"
-disposition = "pending"
-evidence = []
-rationale = ""
+disposition = "ported"
+evidence = ["test:tui/model_select_test.go#TestModelSelector_ShowsModelNamesThatDifferFromTheID", "test:tui/model_selector_oracle_test.go#TestModelSelectorInputMatchesPi"]
+rationale = "Pi 606af8662 (#5916) shows the model name in parentheses after the id when it has words the id lacks: ported in tui/model_select.go through GetDistinctModelName; the test asserts both rows of Pi's case and the oracle test compares every frame with the pinned Pi."
 
 [[files]]
 path = "packages/coding-agent/src/modes/interactive/components/oauth-selector.ts"
@@ -3119,9 +3119,9 @@ rationale = "PORT_MAP row is ✅ ported (internal/codingagent/radius_login_selec
 [[files]]
 path = "packages/coding-agent/src/modes/interactive/components/scoped-models-selector.ts"
 change = "added"
-disposition = "pending"
-evidence = []
-rationale = ""
+disposition = "ported"
+evidence = ["test:tui/scoped_models_list_test.go#TestScopedModels_ShowsModelNamesThatDifferFromTheID"]
+rationale = "Pi 606af8662 (#5916) shows the model name in parentheses after the id for the /scoped-models rows when it has words the id lacks: ported in tui/scoped_models_list.go renderRow through GetDistinctModelName; an unavailable model has no name to show."
 
 [[files]]
 path = "packages/coding-agent/src/modes/interactive/components/session-selector-search.ts"
@@ -3259,9 +3259,9 @@ rationale = "PORT_MAP row is ✅ ported (internal/codingagent/model_catalog_refr
 [[files]]
 path = "packages/coding-agent/src/modes/interactive/model-search.ts"
 change = "added"
-disposition = "pending"
-evidence = []
-rationale = ""
+disposition = "ported"
+evidence = ["test:tui/model_search_test.go#TestGetDistinctModelName"]
+rationale = "Pi 606af8662 (#5916) adds getDistinctModelName: the name when it has words the id lacks (single-character words must match a whole id token), else undefined. Ported as tui.GetDistinctModelName (empty string for undefined); the test ports Pi's three cases."
 
 [[files]]
 path = "packages/coding-agent/src/modes/interactive/program-status-reporter.ts"
@@ -3602,9 +3602,9 @@ rationale = "PORT_MAP row is ✅ ported (internal/imageprocessing/images.go + co
 [[files]]
 path = "packages/coding-agent/src/utils/tools-manager.ts"
 change = "added"
-disposition = "pending"
-evidence = []
-rationale = ""
+disposition = "ported"
+evidence = ["test:internal/codingagent/tools/tools_manager_upstream_test.go#TestEnsureToolUpstream", "test:internal/codingagent/tools/tools_manager_test.go#TestReleaseTarget"]
+rationale = "Pi c8ec752cf (#11209) maps only x64 and arm64 to prebuilt fd and ripgrep archives (getReleaseTarget): ARM32, ia32 and other architectures no longer fall back to x86-64 binaries, ensureTool warns and recommends the system package manager before any request, and downloadTool refuses the target. Ported as internal/codingagent/tools releaseTarget; TestEnsureToolUpstream asserts the warning and that no request is made, TestReleaseTarget the mapping."
 
 [[files]]
 path = "packages/coding-agent/src/utils/version-check.ts"
@@ -4701,9 +4701,9 @@ rationale = "PORT_MAP row is ✅ ported (tui/layout_node.go). coverage.md report
 [[files]]
 path = "packages/tui/src/layout.ts"
 change = "added"
-disposition = "pending"
-evidence = []
-rationale = ""
+disposition = "ported"
+evidence = ["test:tui/tui_alt_screen_kitty_cache_test.go#TestAltScreenCropsAKittyImageWhosePlaceholderRowsContainText", "test:tui/tui_alt_screen_kitty_cache_test.go#TestAltScreenCropsAKittyImageInAPaddedColoredBoxWhoseFirstLineIsAboveTheViewport"]
+rationale = "Pi 4464442f9 and 1c8cb1781 (#11271) bound the backward search for the image line above a scrolled viewport by the tallest registered image and skip rows that are not image lines, so a Kitty image in a padded or colored box, or beside text, is cropped instead of dropped. Ported in tui/layout.go paintBox; both tests assert the cropped placement y=66,h=34,r=1 and the viewport top."
 
 [[files]]
 path = "packages/tui/src/native-modifiers.ts"
@@ -4757,9 +4757,9 @@ rationale = "PORT_MAP row is ✅ ported (tui/terminal_colors.go; tui/terminal_co
 [[files]]
 path = "packages/tui/src/terminal-image.ts"
 change = "added"
-disposition = "pending"
-evidence = []
-rationale = ""
+disposition = "ported"
+evidence = ["test:tui/tui_alt_screen_kitty_cache_test.go#TestAltScreenCropsAKittyImageWhosePlaceholderRowsContainText"]
+rationale = "Pi 1c8cb1781 adds getMaxKittyImageRows, the row height of the tallest image registered so far, ported as tui.GetMaxKittyImageRows (tui/kitty_metadata.go); the crop tests depend on it. Pi bc73eb8b1 only removes a comment above the Rex branch of detectCapabilitiesFromEnvironment."
 
 [[files]]
 path = "packages/tui/src/terminal.ts"
@@ -4771,9 +4771,9 @@ rationale = "Pi 9df819de (#11170): Terminal.restoreOnExit and ProcessTerminal.re
 [[files]]
 path = "packages/tui/src/tui-alt-screen.ts"
 change = "added"
-disposition = "pending"
-evidence = []
-rationale = ""
+disposition = "ported"
+evidence = ["test:tui/tui_alt_screen_v087_test.go#TestAltScreenDoubleClickJoinsSlashAndHyphenSegments"]
+rationale = "Pi ff6896471 (#11340) makes the fullscreen double-click word selection join iTerm2's default word characters (~ . \\ + _ and the existing / -): ported in tui/tui_alt_screen_selection.go; the test adds Pi's three new cases (~/.pi/agent/settings.json, ~\\Documents\\pi, foo+bar)."
 
 [[files]]
 path = "packages/tui/src/tui-main-screen.ts"

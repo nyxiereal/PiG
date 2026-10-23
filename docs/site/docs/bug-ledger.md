@@ -20,6 +20,7 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 | ID | Bug | Source | Platform | Fixed in |
 |---|---|---|---|---|
 | [BF-003f6f0](#bf-003f6f0) | Ctrl+U, Ctrl+K and the word-delete keys leave an open autocomplete list open, as Pi's editor does | PiG's own defect | All platforms | 0.5.0 |
+| [BF-006a496](#bf-006a496) | The faux provider no longer counts newly cached prompt tokens as input as well as cache writes: with a… | PiG's own defect | All platforms | Unreleased |
 | [BF-007c91d](#bf-007c91d) | Go, Python and Rust extensions: in a `before_agent_start` handler, the event's `systemPrompt` and the… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-02114ff](#bf-02114ff) | fix(tui): filterable list drops the label when no cell remains (Pi select-list) | PiG's own defect | All platforms | Unreleased |
 | [BF-0225a43](#bf-0225a43) | A device-attributes reply delivered in slow reads no longer reaches the editor as input: an `ESC[?` prefix… | A Pi defect that PiG fixed first | All platforms | 0.5.0 |
@@ -290,6 +291,7 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 | [BF-542b536](#bf-542b536) | fix(cli): PIG_VERSION_FORMAT=pi prints the pinned Pi package version | PiG's own defect | All platforms | Unreleased |
 | [BF-5443b6c](#bf-5443b6c) | `durable/images` is the image processor of pi-durable: `images.CreatePhotonImages()` (also `images/node` and… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-54a5bf6](#bf-54a5bf6) | The host answers a parsed frontmatter with `<`, `>`, `&` and U+2028 as they are (as `JSON.stringify` writes… | PiG's own defect | All platforms | 0.5.0 |
+| [BF-55573f4](#bf-55573f4) | fix(sdk): Rust and Python fuzzy match score contiguous occurrences (Pi) | PiG's own defect | All platforms | Unreleased |
 | [BF-5654e71](#bf-5654e71) | MCP OAuth discovery and resource selection now read URLs the way Node's `URL` does (default ports, dot… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-5654e71-2](#bf-5654e71-2) | A JSON-RPC request or notification with a malformed `error` member is no longer rejected, and a `method` that… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-56731e9](#bf-56731e9) | `/login` runs a provider object's OAuth login with Pi's login interaction, so an `info` event shows in the… | PiG's own defect | All platforms | 0.5.0 |
@@ -524,6 +526,7 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 | [BF-70d8a41](#bf-70d8a41) | Keybinding conflict detection ignores user bindings for actions the table does not define, as Pi's… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-70e1841](#bf-70e1841) | /settings warnings submenu: a warning the settings never set shows as on and a toggle always reports the… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-7177d5f](#bf-7177d5f) | fix(tui): card of an unregistered tool is Pi's formatToolExecution | PiG's own defect | All platforms | Unreleased |
+| [BF-72e0ca2](#bf-72e0ca2) | A Kitty image in a padded or colored box, or with text beside it, is no longer dropped from the fullscreen… | PiG's own defect | All platforms | Unreleased |
 | [BF-72e7ab2](#bf-72e7ab2) | A tool card whose `app.tools.expand` key is unbound shows an empty key in ".. | PiG's own defect | All platforms | 0.5.0 |
 | [BF-72e7ab2-2](#bf-72e7ab2-2) | `TestMcpManagerViewMatchesPi` renders the /mcp manager footers under rebound, multi-key and unbound… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-72e7ab2-3](#bf-72e7ab2-3) | `TestLlamaViewMatchesPi` runs a quarter of its 700 scenarios under rebound, multi-key and unbound… | PiG's own defect | All platforms | 0.5.0 |
@@ -748,6 +751,7 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 | [BF-9be5765](#bf-9be5765) | Pressing Escape while an extension tool runs now lets the tool finish: a tool that stops on its abort signal… | A Pi defect that PiG fixed first | All platforms | 0.5.0 |
 | [BF-9c1a0e9](#bf-9c1a0e9) | An OpenAI Responses stream event or output item with a member of an unexpected type is read as Pi's… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-9c98038](#bf-9c98038) | An unclosed `$$` or `\[` display-math block no longer swallows or corrupts every Markdown table after it | A fix Pi shipped that PiG ported | All platforms | 0.5.2 |
+| [BF-9d02a48](#bf-9d02a48) | Gemini tool schemas send string and number `const` values as single-value `enum`s, which Gemini honors where… | PiG's own defect | All platforms | Unreleased |
 | [BF-9d4fe9c](#bf-9d4fe9c) | Selecting a model or cycling models with Ctrl+P no longer freezes the interactive mode when an extension's… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-9d64980](#bf-9d64980) | fix(coding): provider order and availability of virtual models follow Pi | PiG's own defect | All platforms | Unreleased |
 | [BF-9f4702c](#bf-9f4702c) | A failed extension shortcut handler is now reported as `Error: Shortcut handler error: …` in the error… | PiG's own defect | All platforms | 0.5.0 |
@@ -873,6 +877,7 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 | [BF-c5ce588](#bf-c5ce588) | Gemini 4 and later models send `thinkingLevel` instead of `thinkingBudget`, fixing Gemini 4 Argon on Vertex… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-c625bb4](#bf-c625bb4) | The durable `powershell` tool fails with "No command to run" when its program list is empty, instead of… | PiG's own defect | Windows | 0.5.0 |
 | [BF-c6c2cf3](#bf-c6c2cf3) | An `env` request whose context is already cancelled is now always sent to the daemon and then cancelled, as… | PiG's own defect | All platforms | 0.5.0 |
+| [BF-c6cad39](#bf-c6cad39) | fix(session): fork writes the header and entries through one file (Pi,) | PiG's own defect | All platforms | Unreleased |
 | [BF-c7ebb23](#bf-c7ebb23) | A cancelled prompt in a `config.oauth` login now rejects with Pi's `Login cancelled` in every SDK (it was… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-c7ebb23-2](#bf-c7ebb23-2) | A `config.oauth` login's `onManualCodeInput` asks "Paste the authorization code", as Pi does, and a provider… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-c8a90a6](#bf-c8a90a6) | Pressing the login dialog's cancel key again cancels again, and Enter after a cancelled prompt leaves the… | PiG's own defect | All platforms | 0.5.0 |
@@ -1176,6 +1181,20 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 - **Fix commits:** `003f6f0e70` (2026-10-09)
 - **Tests:** `tui/editor_kill_keeps_autocomplete_test.go::TestKillCommandsLeaveTheOpenAutocompleteList`
 - **Release note:** Ctrl+U, Ctrl+K and the word-delete keys leave an open autocomplete list open, as Pi's editor does.
+
+### BF-006a496
+
+**The faux provider no longer counts newly cached prompt tokens as input as well as cache writes: with a…**
+
+- **Source:** PiG's own defect
+- **Symptom:** The faux provider no longer counts newly cached prompt tokens as input as well as cache writes: with a session every prompt token is a cache read or a cache write.
+- **Root cause:** With a session the faux provider reported newly cached prompt tokens as both input and cache write. Every prompt token now goes to cache read or cache write and input is 0 while caching is simulated. The direct-computation reference in the usage estimate tests follows the same arithmetic.
+- **User impact:** Behavior differed from Pi
+- **Platform:** All platforms
+- **Fixed in:** Unreleased
+- **Fix commits:** `006a4963df` (2026-10-23)
+- **Tests:** `ai/faux_provider_upstream_test.go::TestFauxProviderCountsCachedCharactersUpToTheFirstDifference`, `ai/faux_provider_upstream_test.go::TestFauxProviderRoundsCachedCharactersUp`, `ai/faux_provider_upstream_test.go::TestFauxProviderUpstream`, `ai/faux_retention_norace_test.go::TestFauxSessionHeapRetentionAt4MTokens`
+- **Release note:** The faux provider no longer counts newly cached prompt tokens as input as well as cache writes: with a session every prompt token is a cache read or a cache write.
 
 ### BF-007c91d
 
@@ -4905,6 +4924,19 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 - **Tests:** `agent/message_json_number_spelling_test.go::TestAgentMessageDecodeKeepsANonNumberWhereAnIntegerIsExpected`, `agent/message_json_test.go::TestAgentMessageJSONRejectsInvalidUnion`, `agent/message_type_mismatch_test.go::TestDecodedMessageKeepsMembersOfAnyType`, `agent/provider_content_block_decode_test.go::TestUnknownContentBlockCostsOnlyThatBlock`, `coding/extension/host/subprocess/host_helpers_quote_test.go::TestParseFrontmatterResultKeepsMarkupAndLineSeparatorsLiteral`, `extensions/sdk-py/tests/test_compaction_estimate.py`, `extensions/sdk-py/tests/test_helper_running.py`, `extensions/sdk-py/tests/test_serialize_conversation_surrogates.py` and 13 more in docs/bug-ledger.json
 - **Release note:** The host answers a parsed frontmatter with `<`, `>`, `&` and U+2028 as they are (as `JSON.stringify` writes them) instead of `\u003c`-style escapes, and a packed cell's helper without a `Context` keeps a live connection when the first extension to start has stopped (Go, Rust and Python SDKs).
 
+### BF-55573f4
+
+**fix(sdk): Rust and Python fuzzy match score contiguous occurrences (Pi)**
+
+- **Source:** PiG's own defect
+- **Symptom:** fix(sdk): Rust and Python fuzzy match score contiguous occurrences (Pi)
+- **Root cause:** The Go tui and SDK engine score every contiguous occurrence of the query and keep the best alignment (); the Rust and Python SDK matchers still scored only the greedy one, so the shared pi-tui fuzzy vectors failed in both. Both now share one alignment scorer between the greedy alignment and each contiguous run, as Pi's scorePositions does.
+- **User impact:** Behavior differed from Pi
+- **Platform:** All platforms
+- **Fixed in:** Unreleased
+- **Fix commits:** `55573f475d` (2026-10-23)
+- **Tests:** None recorded.
+
 ### BF-5654e71
 
 **MCP OAuth discovery and resource selection now read URLs the way Node's `URL` does (default ports, dot…**
@@ -8172,6 +8204,20 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 - **Fix commits:** `7177d5f92b` (2026-10-11)
 - **Tests:** `tui/summary_output_pad_test.go::TestToolAndBashBlocksFollowOutputPad`, `tui/tool_execution_test.go::TestToolExecutionStreamingFallbackUsesLeadingPreview`, `tui/tool_execution_test.go::TestUnregisteredToolCardIsUpstreamFormatToolExecution`
 
+### BF-72e0ca2
+
+**A Kitty image in a padded or colored box, or with text beside it, is no longer dropped from the fullscreen…**
+
+- **Source:** PiG's own defect
+- **Symptom:** A Kitty image in a padded or colored box, or with text beside it, is no longer dropped from the fullscreen view once its first row scrolls above the viewport: the visible rows are cropped.
+- **Root cause:** The backward search for the image line above a scrolled viewport stopped at the first row with content, so padded or colored boxes, borders and side-by-side text made the whole image disappear. It now searches back at most the tallest registered image (GetMaxKittyImageRows) and skips rows that are not image lines. Both Pi commits are one change here because the first state is never observable. Two alt-screen tests port Pi's cases.
+- **User impact:** Wrong display
+- **Platform:** All platforms
+- **Fixed in:** Unreleased
+- **Fix commits:** `72e0ca2b6b` (2026-10-23)
+- **Tests:** `tui/tui_alt_screen_kitty_cache_test.go::TestAltScreenCropsAKittyImageInAPaddedColoredBoxWhoseFirstLineIsAboveTheViewport`, `tui/tui_alt_screen_kitty_cache_test.go::TestAltScreenCropsAKittyImageWhosePlaceholderRowsContainText`
+- **Release note:** A Kitty image in a padded or colored box, or with text beside it, is no longer dropped from the fullscreen view once its first row scrolls above the viewport: the visible rows are cropped.
+
 ### BF-72e7ab2
 
 **A tool card whose `app.tools.expand` key is unbound shows an empty key in "..**
@@ -11283,6 +11329,20 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 - **Tests:** `tui/markdown_latex_table_test.go::TestMarkdownContainsTableStart`, `tui/markdown_latex_table_test.go::TestMarkdownUnclosedDisplayMathBeforeTables`, `tui/markdown_latex_table_test.go::TestMarkdownUnclosedDisplayMathBeforeTablesMatchesPi`
 - **Release note:** An unclosed `$$` or `\[` display-math block no longer swallows or corrupts every Markdown table after it. A display-math block never spans a table, and the streaming pending-math fallback no longer treats a following table as pending math (Pi 2ed3118b, #11159).
 
+### BF-9d02a48
+
+**Gemini tool schemas send string and number `const` values as single-value `enum`s, which Gemini honors where…**
+
+- **Source:** PiG's own defect
+- **Symptom:** Gemini tool schemas send string and number `const` values as single-value `enum`s, which Gemini honors where it ignores `const`; literal data such as `default` and `examples` is left as written.
+- **Root cause:** Gemini ignores const in parametersJsonSchema but honors enum. geminiConvertTools now rewrites string and number const values of the schema, and of the subschemas under the schema-bearing keywords, to single-value enums, and leaves literal data (default, examples, enum, const, unknown keywords) and names in schema maps (including __proto__) alone, as Pi's rewriteConstAsEnum does after. The authored schema is not modified and the member order of the objects follows the rewrite. Both Pi commits are one change here because the first state is never observable.
+- **User impact:** Behavior differed from Pi
+- **Platform:** All platforms
+- **Fixed in:** Unreleased
+- **Fix commits:** `9d02a488f0` (2026-10-23)
+- **Tests:** `ai/google_convert_tools_upstream_test.go::TestGoogleSharedConvertToolsConstHandlingUpstream`
+- **Release note:** Gemini tool schemas send string and number `const` values as single-value `enum`s, which Gemini honors where it ignores `const`; literal data such as `default` and `examples` is left as written.
+
 ### BF-9d4fe9c
 
 **Selecting a model or cycling models with Ctrl+P no longer freezes the interactive mode when an extension's…**
@@ -13026,6 +13086,19 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 - **Fix commits:** `1f5a782c0a` (2026-10-08), `5dd595fb87` (2026-10-08), `beefcd709e` (2026-10-09), `f68aa400e5` (2026-10-09), `ffe6a53a07` (2026-10-09), `c6c2cf3239` (2026-10-10)
 - **Tests:** `chord/delta/apply_immutable_upstream_test.go::TestCheckedImmutableOperationApplication`, `chord/delta/delta_upstream_test.go::TestDeltaCanonicalStrings`, `chord/delta/delta_upstream_test.go::TestDeltaPathAndPrototypeSafety`, `chord/delta/json_kind_message_test.go::TestCloneJSONReportsPisMessageForEachGoKind`, `chord/delta/normalize_error_order_test.go::TestDiffCandidateReportsTheFirstInvalidPropertyDeterministically`, `chord/delta/retention_upstream_test.go::TestDeltaTrackerRetentionAcrossGCJobs`, `chord/delta/retention_upstream_test.go::TestTrackerReleasesADroppedOpenChange`, `chord/delta/tracker_delta_lifecycle_upstream_test.go::TestDeltaImmutableTrackerLifecycle` and 8 more in docs/bug-ledger.json
 - **Release note:** An `env` request whose context is already cancelled is now always sent to the daemon and then cancelled, as in Pi, instead of failing about half the time with a local `aborted` error before it was sent. A request cancelled while the daemon is starting now waits for the start, as in Pi.
+
+### BF-c6cad39
+
+**fix(session): fork writes the header and entries through one file (Pi,)**
+
+- **Source:** PiG's own defect
+- **Symptom:** fix(session): fork writes the header and entries through one file (Pi,)
+- **Root cause:** Pi forkFrom now opens the new session file once and writes every entry through that fd. ForkFromFile already wrote through one buffered handle; its comment now says Pi matches it.
+- **User impact:** Behavior differed from Pi
+- **Platform:** All platforms
+- **Fixed in:** Unreleased
+- **Fix commits:** `c6cad39de5` (2026-10-23)
+- **Tests:** `internal/codingagent/session_manager_test.go::TestSessionManagerForkFromFile_CopiesAllEntriesUnchangedIntoTheForkedSession`
 
 ### BF-c7ebb23
 

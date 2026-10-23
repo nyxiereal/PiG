@@ -24,6 +24,31 @@
       ]
     },
     {
+      "id": "BF-006a496",
+      "title": "The faux provider no longer counts newly cached prompt tokens as input as well as cache writes: with a…",
+      "symptom": "The faux provider no longer counts newly cached prompt tokens as input as well as cache writes: with a session every prompt token is a cache read or a cache write.",
+      "rootCause": "With a session the faux provider reported newly cached prompt tokens as both input and cache write. Every prompt token now goes to cache read or cache write and input is 0 while caching is simulated. The direct-computation reference in the usage estimate tests follows the same arithmetic.",
+      "rootCauseSource": "commit",
+      "userImpact": "Behavior differed from Pi",
+      "platform": "All platforms",
+      "class": "own",
+      "fixedIn": "Unreleased",
+      "releaseNote": "The faux provider no longer counts newly cached prompt tokens as input as well as cache writes: with a session every prompt token is a cache read or a cache write.",
+      "origin": "release note",
+      "commits": [
+        {
+          "hash": "006a4963df",
+          "date": "2026-10-23"
+        }
+      ],
+      "tests": [
+        "ai/faux_provider_upstream_test.go::TestFauxProviderCountsCachedCharactersUpToTheFirstDifference",
+        "ai/faux_provider_upstream_test.go::TestFauxProviderRoundsCachedCharactersUp",
+        "ai/faux_provider_upstream_test.go::TestFauxProviderUpstream",
+        "ai/faux_retention_norace_test.go::TestFauxSessionHeapRetentionAt4MTokens"
+      ]
+    },
+    {
       "id": "BF-007c91d",
       "title": "Go, Python and Rust extensions: in a `before_agent_start` handler, the event's `systemPrompt` and the…",
       "symptom": "Go, Python and Rust extensions: in a `before_agent_start` handler, the event's `systemPrompt` and the context's system prompt getter now return the prompt the shared options render when read, as Pi and Node do.",
@@ -8806,6 +8831,25 @@
       ]
     },
     {
+      "id": "BF-55573f4",
+      "title": "fix(sdk): Rust and Python fuzzy match score contiguous occurrences (Pi)",
+      "symptom": "fix(sdk): Rust and Python fuzzy match score contiguous occurrences (Pi)",
+      "rootCause": "The Go tui and SDK engine score every contiguous occurrence of the query and keep the best alignment (); the Rust and Python SDK matchers still scored only the greedy one, so the shared pi-tui fuzzy vectors failed in both. Both now share one alignment scorer between the greedy alignment and each contiguous run, as Pi's scorePositions does.",
+      "rootCauseSource": "commit",
+      "userImpact": "Behavior differed from Pi",
+      "platform": "All platforms",
+      "class": "own",
+      "fixedIn": "Unreleased",
+      "origin": "commit",
+      "commits": [
+        {
+          "hash": "55573f475d",
+          "date": "2026-10-23"
+        }
+      ],
+      "tests": []
+    },
+    {
       "id": "BF-5654e71",
       "title": "MCP OAuth discovery and resource selection now read URLs the way Node's `URL` does (default ports, dot…",
       "symptom": "MCP OAuth discovery and resource selection now read URLs the way Node's `URL` does (default ports, dot segments, backslashes, punycode hosts), and `WWW-Authenticate` challenges with quoted or odd values parse as Pi parses them.",
@@ -15294,6 +15338,29 @@
       ]
     },
     {
+      "id": "BF-72e0ca2",
+      "title": "A Kitty image in a padded or colored box, or with text beside it, is no longer dropped from the fullscreen…",
+      "symptom": "A Kitty image in a padded or colored box, or with text beside it, is no longer dropped from the fullscreen view once its first row scrolls above the viewport: the visible rows are cropped.",
+      "rootCause": "The backward search for the image line above a scrolled viewport stopped at the first row with content, so padded or colored boxes, borders and side-by-side text made the whole image disappear. It now searches back at most the tallest registered image (GetMaxKittyImageRows) and skips rows that are not image lines. Both Pi commits are one change here because the first state is never observable. Two alt-screen tests port Pi's cases.",
+      "rootCauseSource": "commit",
+      "userImpact": "Wrong display",
+      "platform": "All platforms",
+      "class": "own",
+      "fixedIn": "Unreleased",
+      "releaseNote": "A Kitty image in a padded or colored box, or with text beside it, is no longer dropped from the fullscreen view once its first row scrolls above the viewport: the visible rows are cropped.",
+      "origin": "release note",
+      "commits": [
+        {
+          "hash": "72e0ca2b6b",
+          "date": "2026-10-23"
+        }
+      ],
+      "tests": [
+        "tui/tui_alt_screen_kitty_cache_test.go::TestAltScreenCropsAKittyImageInAPaddedColoredBoxWhoseFirstLineIsAboveTheViewport",
+        "tui/tui_alt_screen_kitty_cache_test.go::TestAltScreenCropsAKittyImageWhosePlaceholderRowsContainText"
+      ]
+    },
+    {
       "id": "BF-72e7ab2",
       "title": "A tool card whose `app.tools.expand` key is unbound shows an empty key in \"..",
       "symptom": "A tool card whose `app.tools.expand` key is unbound shows an empty key in \"...",
@@ -21768,6 +21835,28 @@
       ]
     },
     {
+      "id": "BF-9d02a48",
+      "title": "Gemini tool schemas send string and number `const` values as single-value `enum`s, which Gemini honors where…",
+      "symptom": "Gemini tool schemas send string and number `const` values as single-value `enum`s, which Gemini honors where it ignores `const`; literal data such as `default` and `examples` is left as written.",
+      "rootCause": "Gemini ignores const in parametersJsonSchema but honors enum. geminiConvertTools now rewrites string and number const values of the schema, and of the subschemas under the schema-bearing keywords, to single-value enums, and leaves literal data (default, examples, enum, const, unknown keywords) and names in schema maps (including __proto__) alone, as Pi's rewriteConstAsEnum does after. The authored schema is not modified and the member order of the objects follows the rewrite. Both Pi commits are one change here because the first state is never observable.",
+      "rootCauseSource": "commit",
+      "userImpact": "Behavior differed from Pi",
+      "platform": "All platforms",
+      "class": "own",
+      "fixedIn": "Unreleased",
+      "releaseNote": "Gemini tool schemas send string and number `const` values as single-value `enum`s, which Gemini honors where it ignores `const`; literal data such as `default` and `examples` is left as written.",
+      "origin": "release note",
+      "commits": [
+        {
+          "hash": "9d02a488f0",
+          "date": "2026-10-23"
+        }
+      ],
+      "tests": [
+        "ai/google_convert_tools_upstream_test.go::TestGoogleSharedConvertToolsConstHandlingUpstream"
+      ]
+    },
+    {
       "id": "BF-9d4fe9c",
       "title": "Selecting a model or cycling models with Ctrl+P no longer freezes the interactive mode when an extension's…",
       "symptom": "Selecting a model or cycling models with Ctrl+P no longer freezes the interactive mode when an extension's `model_select` handler registers a tool.",
@@ -25786,6 +25875,27 @@
         "env/connection_cancelled_request_test.go::TestRequestCancelledWhileTheDaemonStartsWaitsForTheStart",
         "env/connection_cancelled_request_test.go::TestRequestWithACancelledContextIsStillSentOnAStartedConnection",
         "env/daemon/watch_event_test.go::TestWatchEventsMatchTheRustDaemon"
+      ]
+    },
+    {
+      "id": "BF-c6cad39",
+      "title": "fix(session): fork writes the header and entries through one file (Pi,)",
+      "symptom": "fix(session): fork writes the header and entries through one file (Pi,)",
+      "rootCause": "Pi forkFrom now opens the new session file once and writes every entry through that fd. ForkFromFile already wrote through one buffered handle; its comment now says Pi matches it.",
+      "rootCauseSource": "commit",
+      "userImpact": "Behavior differed from Pi",
+      "platform": "All platforms",
+      "class": "own",
+      "fixedIn": "Unreleased",
+      "origin": "commit",
+      "commits": [
+        {
+          "hash": "c6cad39de5",
+          "date": "2026-10-23"
+        }
+      ],
+      "tests": [
+        "internal/codingagent/session_manager_test.go::TestSessionManagerForkFromFile_CopiesAllEntriesUnchangedIntoTheForkedSession"
       ]
     },
     {

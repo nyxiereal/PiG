@@ -637,8 +637,14 @@
     },
     {
       "path": "packages/ai/test/faux-provider.test.ts",
-      "disposition": "pending",
-      "upstreamTestHash": "sha256:1662f4aa1c914fb2916d9cb95da6446133fdbbfd85b9e6681b7a3af57c64c2a4"
+      "disposition": "ported",
+      "upstreamTestHash": "sha256:1662f4aa1c914fb2916d9cb95da6446133fdbbfd85b9e6681b7a3af57c64c2a4",
+      "evidence": [
+        "ai/faux_provider_upstream_test.go",
+        "ai/faux_model_definitions_test.go",
+        "ai/faux_provider_upstream_test.go#TestFauxProviderCountsCachedCharactersUpToTheFirstDifference"
+      ],
+      "rationale": "All 24 cases are ported. The case added at 1.1.0, 'counts cached characters up to the first difference in the joined prompt', has its own test with the upstream prompts and token counts; a compiling mutation of the cached-token rounding fails it. Pi f3fa8bd92 (every prompt token is a cache read or a cache write, input is 0 while caching is simulated) changes the expectations of 'counts cached characters up to the first difference in the joined prompt' and adds the first-call usage check; both are ported in TestFauxProviderUpstream and TestFauxProviderCountsCachedCharactersUpToTheFirstDifference, with the production change of faux.ts withUsageEstimate ported in ai/faux.go estimateUsage."
     },
     {
       "path": "packages/ai/test/fetch-option.test.ts",
@@ -726,8 +732,13 @@
     },
     {
       "path": "packages/ai/test/google-shared-convert-tools.test.ts",
-      "disposition": "pending",
-      "upstreamTestHash": "sha256:fe29fec4dffdd166400df99b0d31970f5ff09d2eaa612f7ff978c7362048d5d5"
+      "disposition": "ported",
+      "upstreamTestHash": "sha256:fe29fec4dffdd166400df99b0d31970f5ff09d2eaa612f7ff978c7362048d5d5",
+      "evidence": [
+        "ai/google_convert_tools_upstream_test.go#TestGoogleSharedConvertToolsUpstream",
+        "ai/google_convert_tools_upstream_test.go#TestGoogleSharedConvertToolsConstHandlingUpstream"
+      ],
+      "rationale": "All eight cases ported: exact top-level/nested meta stripping, preserved references, original-schema immutability, JSON-schema mode preservation, ordinary schema, strict support/error/VALIDATED production payload, and both empty-list modes. A compiling overlay disabling legacy parameters fails five cases. Stock Google/Vertex continue selecting parametersJsonSchema; legacy helper behavior is unit evidence only and does not claim a CLI caller. Pi 7314819f0 and a7b94a03f (#11308) add 'google-shared convertTools const handling': literal data under default, examples, enum, const and x-custom is preserved, names in schema maps (including __proto__) are preserved while their schemas are rewritten, only schema-bearing keywords are rewritten, and string and number const values become single-value enums; all four are ported in TestGoogleSharedConvertToolsConstHandlingUpstream (byte-exact parametersJsonSchema text, authored schema unchanged), with the production change ported in ai/google.go rewriteConstAsEnum."
     },
     {
       "path": "packages/ai/test/google-shared-gemini3-unsigned-tool-call.test.ts",
@@ -4365,13 +4376,25 @@
     },
     {
       "path": "packages/coding-agent/test/model-search.test.ts",
-      "disposition": "pending",
-      "upstreamTestHash": "sha256:1a2a86f52ceabd6353ddc97651ca926e2540e6fce3a66ce2b0935122560fefbc"
+      "disposition": "ported",
+      "upstreamTestHash": "sha256:1a2a86f52ceabd6353ddc97651ca926e2540e6fce3a66ce2b0935122560fefbc",
+      "evidence": [
+        "tui/model_search_test.go#TestModelSelectorSearchRanksContiguousMatchesAboveScatteredOnes",
+        "tui/model_search_test.go#TestGetDistinctModelName"
+      ],
+      "rationale": "Pi 8c03fef4d adds two ranking cases, a contiguous match above scattered ones and the typed model above models sharing a long provider prefix; both are ported with Pi inputs. Pi 606af8662 (#5916) adds the getDistinctModelName cases (names that restate the ID are hidden; names with words the ID lacks are shown; single-character words must match a whole ID token): ported as TestGetDistinctModelName, with the production change ported in tui/model_search.go GetDistinctModelName."
     },
     {
       "path": "packages/coding-agent/test/model-selector.test.ts",
-      "disposition": "pending",
-      "upstreamTestHash": "sha256:048ce1f6930f315ca8f92ae10e9f7dc4e66e079226e7ffc6efe7213ce1bdfcea"
+      "disposition": "ported",
+      "upstreamTestHash": "sha256:048ce1f6930f315ca8f92ae10e9f7dc4e66e079226e7ffc6efe7213ce1bdfcea",
+      "evidence": [
+        "tui/model_selector_upstream_test.go#TestModelSelectorUpstream",
+        "internal/codingagent/model_selector_errors_upstream_test.go#TestModelSelectorListsEveryFailedCatalogUpstream",
+        "test/parity/scenarios/model-runtime-store-catalog/14-model-selector-error-order.toml",
+        "tui/model_select_test.go#TestModelSelector_ShowsModelNamesThatDifferFromTheID"
+      ],
+      "rationale": "All three upstream cases are ported: exact current/browsed row markers, remapped save binding and selected model, and every failed catalog in insertion order. The failure-order case drives real concurrent refreshes and failed before preserving completion order. Compiling order reversal fails the test and its real-Pi diagnostic comparator. Pi 606af8662 (#5916) adds 'shows model names that differ from the ID': ported as TestModelSelector_ShowsModelNamesThatDifferFromTheID, with the production change ported in tui/model_select.go; TestModelSelectorInputMatchesPi compares the rows with the pinned Pi."
     },
     {
       "path": "packages/coding-agent/test/models-store.test.ts",
@@ -4903,8 +4926,13 @@
     },
     {
       "path": "packages/coding-agent/test/scoped-models-selector.test.ts",
-      "disposition": "pending",
-      "upstreamTestHash": "sha256:2c8cfd507d9f0ba54f273d659e02d91373ed9a76cf48426fdccdf85b3e33d497"
+      "disposition": "ported",
+      "upstreamTestHash": "sha256:2c8cfd507d9f0ba54f273d659e02d91373ed9a76cf48426fdccdf85b3e33d497",
+      "evidence": [
+        "tui/scoped_models_list_test.go#TestScopedModels_UpstreamToggleCases",
+        "tui/scoped_models_list_test.go#TestScopedModels_ShowsModelNamesThatDifferFromTheID"
+      ],
+      "rationale": "TestScopedModels_UpstreamToggleCases directly ports the four all-enabled/explicit-enabled toggle and rendering cases; the surrounding selector suite locks filtering, unavailable IDs, provider toggles, reorder and persistence. Pi 606af8662 (#5916) adds 'shows model names that differ from the ID': ported as TestScopedModels_ShowsModelNamesThatDifferFromTheID, with the production change ported in tui/scoped_models_list.go renderRow."
     },
     {
       "path": "packages/coding-agent/test/scrollbar-theme.test.ts",
@@ -5040,8 +5068,14 @@
     },
     {
       "path": "packages/coding-agent/test/session-manager/custom-session-id.test.ts",
-      "disposition": "pending",
-      "upstreamTestHash": "sha256:c1bf49a69ee775ecab3c39132bdbc2a64dcd6cb45616ac45a05fc0e565478c95"
+      "disposition": "ported",
+      "upstreamTestHash": "sha256:c1bf49a69ee775ecab3c39132bdbc2a64dcd6cb45616ac45a05fc0e565478c95",
+      "evidence": [
+        "internal/codingagent/session_custom_id_upstream_test.go#TestCustomSessionIDUpstream",
+        "test/parity/scenarios/session/12-session-custom-identity.toml",
+        "internal/codingagent/session_manager_test.go#TestSessionManagerForkFromFile_CopiesAllEntriesUnchangedIntoTheForkedSession"
+      ],
+      "rationale": "All 12 cases and all 10 invalid-ID rows are ported: explicit/omitted identity, punctuation validation, header/filename parity, generated UUIDv7 and custom/generated fork IDs. Validation and supplied fork identity were red-proven. Compiling mutations disabling validation and dropping the fork ID fail the units and real Pi pair. Invalid persisted constructors are also checked before directory creation. Pi 8ddc44ec8 and ed76cca69 (#11253) add 'SessionManager.forkFrom copies all entries unchanged into the forked session': ported as TestSessionManagerForkFromFile_CopiesAllEntriesUnchangedIntoTheForkedSession (51 lines, parentSession, entries byte for byte); ForkFromFile already writes through one file handle."
     },
     {
       "path": "packages/coding-agent/test/session-manager/file-operations.test.ts",
@@ -5658,8 +5692,13 @@
     },
     {
       "path": "packages/coding-agent/test/suite/regressions/3217-scoped-model-order.test.ts",
-      "disposition": "pending",
-      "upstreamTestHash": "sha256:aae11fd462de5807df3853140e2b102a20da326c7bf2ca9505abaebcc0c5e8f3"
+      "disposition": "ported",
+      "upstreamTestHash": "sha256:aae11fd462de5807df3853140e2b102a20da326c7bf2ca9505abaebcc0c5e8f3",
+      "evidence": [
+        "tui/scoped_models_list_test.go#TestScopedModels_ReorderUpDown",
+        "tui/model_select_test.go#TestModelSelector_ScopedModelsKeepConfiguredOrder"
+      ],
+      "rationale": "The reorder callback test and scoped-tab configured-order test directly cover both #3217 regression cases. Pi 606af8662 only changes how the test reads the id out of a row (the id now ends at the first space because a row can carry the model name); the ordering it checks is the one TestScopedModels_ReorderUpDown and TestModelSelector_ScopedModelsKeepConfiguredOrder already cover, and no PiG test reads a row by splitting at the provider badge."
     },
     {
       "path": "packages/coding-agent/test/suite/regressions/3302-find-path-glob.test.ts",
@@ -6087,8 +6126,12 @@
     },
     {
       "path": "packages/coding-agent/test/suite/regressions/7209-model-selector-filter-resets-selection.test.ts",
-      "disposition": "pending",
-      "upstreamTestHash": "sha256:9ad6548c1420ab436f4bd723c3c006a8dad79c3370c4420797ebcff38948ea74"
+      "disposition": "ported",
+      "upstreamTestHash": "sha256:9ad6548c1420ab436f4bd723c3c006a8dad79c3370c4420797ebcff38948ea74",
+      "evidence": [
+        "tui/model_selector_filter_upstream_test.go#TestModelSelectorFilterResetsSelectionUpstream7209"
+      ],
+      "rationale": "Both upstream cases are ported with the exact alpha/beta models and intentionally reordered scoped list. Render assertions check initial selection, pre-query navigation, narrowed results and the new first-row selection. Compiling cursor-clamp mutation fails both cases. Pi 606af8662 changes how the test reads the selected id out of a row (the id ends at the first space because a row can carry the model name); catalogSelectedID in model_selector_filter_upstream_test.go reads it the same way."
     },
     {
       "path": "packages/coding-agent/test/suite/regressions/7253-manual-compact-during-response.test.ts",
@@ -8496,8 +8539,25 @@
     },
     {
       "path": "packages/tui/test/tui-alt-screen.test.ts",
-      "disposition": "pending",
-      "upstreamTestHash": "sha256:43a2a20b764285087a8d979999592a38bcb3ecd2db8df4ebeca831ad66b7abe9"
+      "disposition": "ported",
+      "upstreamTestHash": "sha256:43a2a20b764285087a8d979999592a38bcb3ecd2db8df4ebeca831ad66b7abe9",
+      "evidence": [
+        "tui/tui_alt_screen_test.go",
+        "tui/tui_alt_screen_v087_test.go",
+        "tui/mouse_test.go",
+        "tui/tui_alt_screen_wheel_upstream_test.go#TestUpstreamAltScreenAppliesRuntimeWheelLineCountUpdates",
+        "tui/tui_alt_screen_wezterm_test.go#TestAltScreenRedrawsWezTermKittyImagesAfterWritesToCoveredRows",
+        "tui/tui_alt_screen_v087_test.go#TestAltScreenModifiedNavigationReachesFocusedComponent",
+        "tui/tui_alt_screen_v087_test.go#TestAltScreenKeyboardNavigationHasFourRowsOfPageOverlap",
+        "tui/tui_alt_screen_test.go#TestAltScreenKeyboardPageAndEdgeScroll",
+        "tui/fake_cursor_test.go#TestAltScreenKeepsTheSelectionHighlightAfterAFakeCursorCell",
+        "tui/tui_alt_screen_v087_test.go#TestAltScreenScrollsOnWheelAFocusedOverlayDoesNotHandle",
+        "tui/tui_alt_screen_v087_test.go#TestAltScreenFocusedOverlayOwnsViewportKeys",
+        "tui/tui_alt_screen_v087_test.go#TestAltScreenDoubleClickJoinsSlashAndHyphenSegments",
+        "tui/tui_alt_screen_kitty_cache_test.go#TestAltScreenCropsAKittyImageWhosePlaceholderRowsContainText",
+        "tui/tui_alt_screen_kitty_cache_test.go#TestAltScreenCropsAKittyImageInAPaddedColoredBoxWhoseFirstLineIsAboveTheViewport"
+      ],
+      "rationale": "Earlier evidence is retained for the unchanged cases. 1.2.0 changes three cases: \"keeps the selection highlight after a fake cursor cell\" (also in the 42a3497d pin) is ported in tui/fake_cursor_test.go and relies on TuiAltScreen resolving fake cursors before search highlights and overlays (tui_alt_screen.go resolveFakeCursors). \"scrolls the transcript on wheel input a focused overlay does not handle\" (#10769) is ported as TestAltScreenScrollsOnWheelAFocusedOverlayDoesNotHandle, with the production change of tui-alt-screen.ts handleViewportInput ported in tui/tui_alt_screen_mouse.go handleWheel, which no longer defers an unhandled wheel event to a focused overlay. \"gives wheel and viewport keys to a focused overlay\" becomes \"gives viewport keys to a focused overlay\" without the wheel report; TestAltScreenFocusedOverlayOwnsViewportKeys sends the same four keys. Pi ff6896471 (#11340) extends the double-click join cases with ~/.pi/agent/settings.json, ~\\Documents\\pi and foo+bar: the same three cases are in TestAltScreenDoubleClickJoinsSlashAndHyphenSegments, with the production change of tui-alt-screen.ts TERMINAL_WORD_SELECTION_JOINERS ported in tui/tui_alt_screen_selection.go. Pi 4464442f9 and 1c8cb1781 (#11271) add 'crops a Kitty image in a padded, colored box whose first line is above the viewport' and 'crops a Kitty image whose placeholder rows contain text when its first line is above the viewport': ported as TestAltScreenCropsAKittyImageInAPaddedColoredBoxWhoseFirstLineIsAboveTheViewport and TestAltScreenCropsAKittyImageWhosePlaceholderRowsContainText, with the production change of layout.ts paintBox and terminal-image.ts getMaxKittyImageRows ported in tui/layout.go and tui/kitty_metadata.go."
     },
     {
       "path": "packages/tui/test/tui-cell-size-input.test.ts",

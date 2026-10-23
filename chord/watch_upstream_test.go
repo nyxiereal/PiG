@@ -780,7 +780,7 @@ func (c *nativeWatchableCell) set(ctx context.Context, value *cellValue) {
 	}
 }
 
-// packages/chord/src/watch.ts NativeWatchable (Pi 5e106ab1c): an in-process value that changes and can be watched; each watch holds the current value,
+// packages/chord/src/watch.ts:44-53 NativeWatchable (Pi 5e106ab1c): an in-process value that changes and can be watched; each watch holds the current value,
 // then one frame per new value by identity, and cancelling the context ends it.
 func TestNativeWatchableWatchHoldsTheCurrentValueThenOneFramePerNewValueAndEndsWithItsContext(t *testing.T) {
 	scheduler := NewDeliveryScheduler()

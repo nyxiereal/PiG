@@ -31389,6 +31389,25 @@
       ]
     },
     {
+      "id": "BF-e4252b4",
+      "title": "Fix in shipped code",
+      "symptom": "Fix in shipped code",
+      "rootCause": "",
+      "rootCauseSource": "",
+      "userImpact": "Behavior differed from Pi",
+      "platform": "All platforms",
+      "class": "own",
+      "fixedIn": "Unreleased",
+      "origin": "commit",
+      "commits": [
+        {
+          "hash": "e4252b49a7",
+          "date": "2026-10-23"
+        }
+      ],
+      "tests": []
+    },
+    {
       "id": "BF-e42ae82",
       "title": "`SettingsManager` structured getters (settings-manager.ts getBranchSummarySettings, getRetrySettings…",
       "symptom": "`SettingsManager` structured getters (settings-manager.ts getBranchSummarySettings, getRetrySettings, getProviderRetrySettings, getCacheWarmingMode, getQuietStartup, getDefaultProjectTrust, getDoubleEscapeAction, getTreeFilterMode, getOutputPad, getMermaidRenderingMode, getImageWidthCells, getTuiMode, the fullscreen getters, getEnabledModels, getNpmCommand, getTrackingId and others): new live-Pi oracle `TestSettingsManagerStructuredGettersMatchPi` (2,000 layered global/project file pairs).",

@@ -122,8 +122,10 @@ func TestBedrockBearerTokenDivergencesFromPi(t *testing.T) {
 			}
 
 			for _, name := range []string{"AWS_PROFILE", "AWS_DEFAULT_PROFILE", "AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY", "AWS_SESSION_TOKEN", "AWS_BEARER_TOKEN_BEDROCK", "AWS_BEDROCK_SKIP_AUTH"} {
-				t.Setenv(name, "")
-				os.Unsetenv(name)
+				t.Setenv(name, "") // registers the restore; the variable must then be unset, not empty
+				if err := os.Unsetenv(name); err != nil {
+					t.Fatal(err)
+				}
 			}
 			for k, v := range env {
 				t.Setenv(k, v)

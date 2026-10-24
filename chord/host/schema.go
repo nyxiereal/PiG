@@ -180,12 +180,7 @@ func assertValid(reason, what string, schema, value any) error {
 			path = "/"
 		}
 		parts[index] = path + " " + failure.Message
-		var params any = chordjson.NewObject(0)
-		if failure.Params != nil {
-			params = failure.Params
-		}
-		// Pi's details are TypeBox's error objects themselves, in its member order.
-		details[index] = chordjson.ObjectOf("keyword", failure.Keyword, "schemaPath", failure.SchemaPath, "instancePath", failure.InstancePath, "params", params, "message", failure.Message)
+		details[index] = chordjson.ObjectOf("keyword", failure.Keyword, "schemaPath", failure.SchemaPath, "instancePath", failure.InstancePath, "params", failure.ParamsObject(), "message", failure.Message)
 	}
 	return Invalid(reason, what+": "+strings.Join(parts, "; "), details)
 }

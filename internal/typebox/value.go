@@ -27,9 +27,50 @@ type ValueError struct {
 	Keyword      string
 	SchemaPath   string
 	InstancePath string
-	// Params is the keyword's params object, in the order TypeBox writes its members.
-	Params  *chordjson.Object
-	Message string
+	Message      string
+	params       errParams
+}
+
+// ParamsObject is the error's params object, its members in the order TypeBox writes them (empty for none).
+func (e ValueError) ParamsObject() *chordjson.Object {
+	list := func(value any) any {
+		if names, ok := value.([]string); ok {
+			out := make([]any, len(names))
+			for index, name := range names {
+				out[index] = name
+			}
+			return out
+		}
+		return value
+	}
+	switch e.Keyword {
+	case "type", "format", "pattern", "multipleOf", "additionalProperties", "propertyNames", "unevaluatedItems", "unevaluatedProperties":
+		return chordjson.ObjectOf(e.Keyword, list(e.params.val1))
+	case "minLength", "maxLength", "minItems", "maxItems", "minProperties", "maxProperties":
+		return chordjson.ObjectOf("limit", e.params.val1)
+	case "const":
+		return chordjson.ObjectOf("allowedValue", e.params.val1)
+	case "enum":
+		return chordjson.ObjectOf("allowedValues", e.params.val1)
+	case "required":
+		return chordjson.ObjectOf("requiredProperties", list(e.params.val1))
+	case "uniqueItems":
+		return chordjson.ObjectOf("duplicateItems", e.params.val1)
+	case "oneOf":
+		return chordjson.ObjectOf("passingSchemas", e.params.val1)
+	case "if":
+		return chordjson.ObjectOf("failingKeyword", e.params.val1)
+	case "exclusiveMaximum", "exclusiveMinimum", "maximum", "minimum":
+		return chordjson.ObjectOf("comparison", e.params.val1, "limit", e.params.val2)
+	case "dependencies", "dependentRequired":
+		return chordjson.ObjectOf("property", e.params.val1, "dependencies", e.params.val2)
+	case "contains":
+		if e.params.val2 != nil {
+			return chordjson.ObjectOf("minContains", e.params.val1, "maxContains", e.params.val2)
+		}
+		return chordjson.ObjectOf("minContains", e.params.val1)
+	}
+	return chordjson.NewObject(0)
 }
 
 // compiledCacheLimit bounds the compiled-schema cache; a full cache starts over.

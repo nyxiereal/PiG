@@ -28,23 +28,68 @@ type errorContext struct{ errors []ValueError }
 func (c *errorContext) atCapacity() bool { return len(c.errors) >= maxErrors }
 
 // addError appends an error unless the context is full; it returns false as the engine's AddError does.
-func (c *errorContext) addError(keyword string, params *chordjson.Object, schemaPath, instancePath, message string) bool {
+func (c *errorContext) addError(keyword string, p errParams, spath *pathSeg, instancePath, message string) bool {
 	if !c.atCapacity() {
-		c.errors = append(c.errors, ValueError{Keyword: keyword, SchemaPath: schemaPath, InstancePath: instancePath, Params: params, Message: message})
+		c.errors = append(c.errors, ValueError{Keyword: keyword, SchemaPath: spath.String(), InstancePath: instancePath, Message: message, params: p})
 	}
 	return false
 }
 
-// params is an error's params object: its members in the order TypeBox writes them.
-func params(pairs ...any) *chordjson.Object { return chordjson.ObjectOf(pairs...) }
+// params is an error's params: up to two member values. Their names follow from the keyword (ValueError.ParamsObject), so
+// an error holds two values and no names or object; a list of names is kept as a []string and becomes the JSON list only
+// when the params object is asked for.
+func params1(v any) errParams { return errParams{val1: v} }
 
-// anyStrings is a string list as the JSON list TypeBox puts in params.
-func anyStrings(items []string) []any {
-	out := make([]any, len(items))
-	for index, item := range items {
-		out[index] = item
+func params2(v1, v2 any) errParams { return errParams{val1: v1, val2: v2} }
+
+// errParams are the params of one error: the values of its first and second member.
+type errParams struct{ val1, val2 any }
+
+// pathSeg is one step of a schema path, linked to its parent so the path string is built only for an error that is
+// emitted. A nil *pathSeg is the root, "#"; a $ref restarts at it.
+type pathSeg struct {
+	parent *pathSeg
+	a, b   string
+	hasB   bool
+}
+
+func (p *pathSeg) String() string {
+	if p == nil {
+		return "#"
 	}
-	return out
+	size := 1
+	for q := p; q != nil; q = q.parent {
+		size += 1 + len(q.a)
+		if q.hasB {
+			size += 1 + len(q.b)
+		}
+	}
+	var out strings.Builder
+	out.Grow(size)
+	out.WriteByte('#')
+	p.write(&out)
+	return out.String()
+}
+
+// write appends the path from the root down to p, each step after a slash.
+func (p *pathSeg) write(out *strings.Builder) {
+	if p.parent != nil {
+		p.parent.write(out)
+	}
+	out.WriteByte('/')
+	out.WriteString(p.a)
+	if p.hasB {
+		out.WriteByte('/')
+		out.WriteString(p.b)
+	}
+}
+
+func (w errorWalker) seg(parent *pathSeg, a string) *pathSeg {
+	return &pathSeg{parent: parent, a: a}
+}
+
+func (w errorWalker) seg2(parent *pathSeg, a, b string) *pathSeg {
+	return &pathSeg{parent: parent, a: a, b: b, hasB: true}
 }
 
 func (c *errorContext) addAll(from *errorContext) {
@@ -57,10 +102,11 @@ func (c *errorContext) addAll(from *errorContext) {
 
 // Errors is Value.Errors(schema, value).
 func Errors(schema, value any) []ValueError {
-	orders := map[uintptr][]string{}
+	var orders map[uintptr][]string
+	plain := orderedPlain(value, &orders)
 	walker := errorWalker{root: schema, orders: orders}
 	context := &errorContext{}
-	walker.schema(context, "#", "", schema, orderedPlain(value, orders))
+	walker.schema(context, nil, "", schema, plain)
 	return context.errors
 }
 
@@ -80,8 +126,9 @@ func (w errorWalker) keys(object map[string]any) []string {
 	return valueKeys(object)
 }
 
-// orderedPlain is Plain that also records the member order of every *chordjson.Object it converts.
-func orderedPlain(value any, orders map[uintptr][]string) any {
+// orderedPlain is Plain that also records the member order of every *chordjson.Object it converts whose order a sorted
+// walk would not reproduce; the table is made only when one is found.
+func orderedPlain(value any, orders *map[uintptr][]string) any {
 	switch typed := value.(type) {
 	case *chordjson.Object:
 		if typed == nil {
@@ -91,7 +138,12 @@ func orderedPlain(value any, orders map[uintptr][]string) any {
 		for key, item := range typed.All() {
 			out[key] = orderedPlain(item, orders)
 		}
-		orders[reflect.ValueOf(out).Pointer()] = typed.Keys()
+		if keys := typed.Keys(); !sortedKeys(keys) {
+			if *orders == nil {
+				*orders = map[uintptr][]string{}
+			}
+			(*orders)[reflect.ValueOf(out).Pointer()] = keys
+		}
 		return out
 	case map[string]any:
 		out := make(map[string]any, len(typed))
@@ -108,6 +160,22 @@ func orderedPlain(value any, orders map[uintptr][]string) any {
 	default:
 		return Plain(value)
 	}
+}
+
+// sortedKeys reports whether keys are already in the order a Go map's members are visited in (MapOwnKeys): ascending
+// ASCII names with no integer-like name, which JavaScript lists first.
+func sortedKeys(keys []string) bool {
+	for index, key := range keys {
+		if key == "" || key[0] >= '0' && key[0] <= '9' || index > 0 && keys[index-1] >= key {
+			return false
+		}
+		for position := 0; position < len(key); position++ {
+			if key[position] >= 0x80 {
+				return false
+			}
+		}
+	}
+	return true
 }
 
 // node is a schema object of either Go kind; keys are in the schema's own order (sorted for a Go map).
@@ -220,12 +288,12 @@ func typeMatches(typeName string, value any) bool {
 }
 
 // schema is engine ErrorSchema: every applicable keyword runs, in this order, and the schema fails if any did.
-func (w errorWalker) schema(context *errorContext, spath, path string, schema, value any) bool {
+func (w errorWalker) schema(context *errorContext, spath *pathSeg, path string, schema, value any) bool {
 	if context.atCapacity() {
 		return false
 	}
 	if boolean, ok := schema.(bool); ok {
-		return boolean || context.addError("boolean", params(), spath, path, "schema is false")
+		return boolean || context.addError("boolean", errParams{}, spath, path, "schema is false")
 	}
 	n, ok := asNode(schema)
 	if !ok {
@@ -251,11 +319,7 @@ func (w errorWalker) schema(context *errorContext, spath, path string, schema, v
 		} {
 			if n.has(rule.key) {
 				limit, _ := n.get(rule.key)
-				member := rule.key
-				if rule.key == "maxLength" || rule.key == "minLength" {
-					member = "limit"
-				}
-				step(Check(n.keyword(rule.key), value) || context.addError(rule.key, params(member, Plain(limit)), spath, path, rule.message))
+				step(Check(n.keyword(rule.key), value) || context.addError(rule.key, params1(Plain(limit)), spath, path, rule.message))
 			}
 		}
 	}
@@ -265,27 +329,27 @@ func (w errorWalker) schema(context *errorContext, spath, path string, schema, v
 		} {
 			if n.has(rule.key) {
 				limit := n.keyword(rule.key)[rule.key]
-				step(Check(n.keyword(rule.key), value) || context.addError(rule.key, params("comparison", rule.comparison, "limit", Plain(limit)), spath, path, "must be "+rule.comparison+" "+numberText(limit)))
+				step(Check(n.keyword(rule.key), value) || context.addError(rule.key, params2(rule.comparison, Plain(limit)), spath, path, "must be "+rule.comparison+" "+numberText(limit)))
 			}
 		}
 		if n.has("multipleOf") {
-			step(Check(n.keyword("multipleOf"), value) || context.addError("multipleOf", params("multipleOf", Plain(n.keyword("multipleOf")["multipleOf"])), spath, path, "must be multiple of "+numberText(n.keyword("multipleOf")["multipleOf"])))
+			step(Check(n.keyword("multipleOf"), value) || context.addError("multipleOf", params1(Plain(n.keyword("multipleOf")["multipleOf"])), spath, path, "must be multiple of "+numberText(n.keyword("multipleOf")["multipleOf"])))
 		}
 	}
 	if ref, ok := n.get("$ref"); ok {
 		step(w.ref(context, path, ref, value))
 	}
 	if n.has("const") {
-		step(Check(n.keyword("const"), value) || context.addError("const", params("allowedValue", Plain(n.keyword("const")["const"])), spath, path, "must be equal to constant"))
+		step(Check(n.keyword("const"), value) || context.addError("const", params1(Plain(n.keyword("const")["const"])), spath, path, "must be equal to constant"))
 	}
 	if n.has("enum") {
-		step(Check(n.keyword("enum"), value) || context.addError("enum", params("allowedValues", Plain(n.keyword("enum")["enum"])), spath, path, "must be equal to one of the allowed values"))
+		step(Check(n.keyword("enum"), value) || context.addError("enum", params1(Plain(n.keyword("enum")["enum"])), spath, path, "must be equal to one of the allowed values"))
 	}
 	if condition, ok := n.get("if"); ok {
 		step(w.ifKeyword(context, spath, path, n, condition, value))
 	}
 	if n.has("not") {
-		step(Check(n.keyword("not"), value) || context.addError("not", params(), spath, path, "must not be valid"))
+		step(Check(n.keyword("not"), value) || context.addError("not", errParams{}, spath, path, "must not be valid"))
 	}
 	if operands, ok := n.list("allOf"); ok {
 		step(w.combinator(context, spath, path, operands, value, "allOf"))
@@ -301,9 +365,9 @@ func (w errorWalker) schema(context *errorContext, spath, path string, schema, v
 		if !Check(schema, value) {
 			_, isArray := value.([]any)
 			if valid && isArray && n.has("unevaluatedItems") {
-				context.addError("unevaluatedItems", params("unevaluatedItems", w.unevaluatedItems(n, value.([]any))), spath, path, "must not have unevaluated items")
+				context.addError("unevaluatedItems", params1(w.unevaluatedItems(n, value.([]any))), spath, path, "must not have unevaluated items")
 			} else if valid && !isArray && n.has("unevaluatedProperties") {
-				context.addError("unevaluatedProperties", params("unevaluatedProperties", anyStrings(w.unevaluatedProperties(n, value))), spath, path, "must not have unevaluated properties")
+				context.addError("unevaluatedProperties", params1(w.unevaluatedProperties(n, value)), spath, path, "must not have unevaluated properties")
 			}
 			step(false)
 		}
@@ -317,20 +381,20 @@ func textOf(n node, key string) string {
 	return text
 }
 
-func (w errorWalker) typeKeyword(context *errorContext, spath, path string, typeValue, value any) bool {
+func (w errorWalker) typeKeyword(context *errorContext, spath *pathSeg, path string, typeValue, value any) bool {
 	if names, ok := typeValue.([]any); ok {
 		for _, name := range names {
 			if text, _ := name.(string); typeMatches(text, value) {
 				return true
 			}
 		}
-		return context.addError("type", params("type", typeValue), spath, path, "must be either "+strings.Join(stringsOf(names), " or "))
+		return context.addError("type", params1(typeValue), spath, path, "must be either "+strings.Join(stringsOf(names), " or "))
 	}
 	name, _ := typeValue.(string)
-	return typeMatches(name, value) || context.addError("type", params("type", typeValue), spath, path, "must be "+name)
+	return typeMatches(name, value) || context.addError("type", params1(typeValue), spath, path, "must be "+name)
 }
 
-func (w errorWalker) object(context *errorContext, spath, path string, n node, object map[string]any) bool {
+func (w errorWalker) object(context *errorContext, spath *pathSeg, path string, n node, object map[string]any) bool {
 	valid := true
 	step := func(result bool) { valid = result && valid }
 	properties, hasProperties := n.child("properties")
@@ -342,7 +406,7 @@ func (w errorWalker) object(context *errorContext, spath, path string, n node, o
 				missing = append(missing, name)
 			}
 		}
-		step(len(missing) == 0 || context.addError("required", params("requiredProperties", anyStrings(missing)), spath, path, "must have required properties "+strings.Join(missing, ", ")))
+		step(len(missing) == 0 || context.addError("required", params1(missing), spath, path, "must have required properties "+strings.Join(missing, ", ")))
 	}
 	if additional, ok := n.get("additionalProperties"); ok {
 		var known []string
@@ -364,11 +428,11 @@ func (w errorWalker) object(context *errorContext, spath, path string, n node, o
 			if matcher != nil && matcher.MatchString(key) {
 				continue
 			}
-			if !w.schema(context, spath+"/additionalProperties", join(path, key), additional, object[key]) {
+			if !w.schema(context, w.seg(spath, "additionalProperties"), join(path, key), additional, object[key]) {
 				rejected = append(rejected, key)
 			}
 		}
-		step(len(rejected) == 0 || context.addError("additionalProperties", params("additionalProperties", anyStrings(rejected)), spath, path, "must not have additional properties"))
+		step(len(rejected) == 0 || context.addError("additionalProperties", params1(rejected), spath, path, "must not have additional properties"))
 	}
 	for _, keyword := range []string{"dependencies", "dependentRequired", "dependentSchemas"} {
 		dependencies, ok := n.child(keyword)
@@ -384,7 +448,7 @@ func (w errorWalker) object(context *errorContext, spath, path string, n node, o
 			if names, isList := dependency.([]any); isList {
 				for _, name := range stringsOf(names) {
 					if _, exists := object[name]; !exists {
-						every = context.addError(keyword, params("property", key, "dependencies", dependency), spath, path, "must have properties "+strings.Join(stringsOf(names), ", ")+" when property "+key+" is present") && every
+						every = context.addError(keyword, params2(key, dependency), spath, path, "must have properties "+strings.Join(stringsOf(names), ", ")+" when property "+key+" is present") && every
 						if keyword == "dependencies" {
 							break
 						}
@@ -392,7 +456,7 @@ func (w errorWalker) object(context *errorContext, spath, path string, n node, o
 				}
 				continue
 			}
-			every = w.schema(context, spath+"/"+keyword+"/"+key, path, dependency, object) && every
+			every = w.schema(context, w.seg2(spath, keyword, key), path, dependency, object) && every
 		}
 		step(len(object) == 0 || every)
 	}
@@ -402,7 +466,7 @@ func (w errorWalker) object(context *errorContext, spath, path string, n node, o
 			patternSchema, _ := patterns.get(pattern)
 			for _, key := range w.keys(object) {
 				if err == nil && matcher.MatchString(key) {
-					step(w.schema(context, spath+"/patternProperties/"+pattern, join(path, key), patternSchema, object[key]))
+					step(w.schema(context, w.seg2(spath, "patternProperties", pattern), join(path, key), patternSchema, object[key]))
 				}
 			}
 		}
@@ -411,31 +475,31 @@ func (w errorWalker) object(context *errorContext, spath, path string, n node, o
 		for _, key := range properties.keys() {
 			if item, exists := object[key]; exists {
 				propertySchema, _ := properties.get(key)
-				step(w.schema(context, spath+"/properties/"+key, join(path, key), propertySchema, item))
+				step(w.schema(context, w.seg2(spath, "properties", key), join(path, key), propertySchema, item))
 			}
 		}
 	}
 	if names, ok := n.get("propertyNames"); ok {
 		var invalid []string
 		for _, key := range w.keys(object) {
-			if !w.schema(context, spath+"/propertyNames", join(path, key), names, key) {
+			if !w.schema(context, w.seg(spath, "propertyNames"), join(path, key), names, key) {
 				invalid = append(invalid, key)
 			}
 		}
-		step(len(invalid) == 0 || context.addError("propertyNames", params("propertyNames", anyStrings(invalid)), spath, path, "property names "+strings.Join(invalid, ", ")+" are invalid"))
+		step(len(invalid) == 0 || context.addError("propertyNames", params1(invalid), spath, path, "property names "+strings.Join(invalid, ", ")+" are invalid"))
 	}
 	for _, rule := range []struct{ key, message string }{
 		{"minProperties", "must not have fewer than %s properties"},
 		{"maxProperties", "must not have more than %s properties"},
 	} {
 		if n.has(rule.key) {
-			step(Check(n.keyword(rule.key), object) || context.addError(rule.key, params("limit", Plain(n.keyword(rule.key)[rule.key])), spath, path, strings.Replace(rule.message, "%s", numberText(n.keyword(rule.key)[rule.key]), 1)))
+			step(Check(n.keyword(rule.key), object) || context.addError(rule.key, params1(Plain(n.keyword(rule.key)[rule.key])), spath, path, strings.Replace(rule.message, "%s", numberText(n.keyword(rule.key)[rule.key]), 1)))
 		}
 	}
 	return valid
 }
 
-func (w errorWalker) array(context *errorContext, spath, path string, n node, items []any) bool {
+func (w errorWalker) array(context *errorContext, spath *pathSeg, path string, n node, items []any) bool {
 	valid := true
 	step := func(result bool) { valid = result && valid }
 	index := func(i int) string { return join(path, strconv.Itoa(i)) }
@@ -443,7 +507,7 @@ func (w errorWalker) array(context *errorContext, spath, path string, n node, it
 	if additional, ok := n.get("additionalItems"); ok && isTuple {
 		// additionalItems.mjs uses Every: it stops at the first failing extra element.
 		for i := len(tuple); i < len(items); i++ {
-			if !w.schema(context, spath+"/additionalItems", index(i), additional, items[i]) {
+			if !w.schema(context, w.seg(spath, "additionalItems"), index(i), additional, items[i]) {
 				step(false)
 				break
 			}
@@ -457,12 +521,12 @@ func (w errorWalker) array(context *errorContext, spath, path string, n node, it
 				matching++
 			}
 		}
-		step(matching > 0 || context.addError("contains", params("minContains", float64(1)), spath, path, "must contain at least 1 valid item"))
+		step(matching > 0 || context.addError("contains", params1(float64(1)), spath, path, "must contain at least 1 valid item"))
 	}
 	if itemsSchema, ok := n.get("items"); ok {
 		if isTuple {
 			for i := range min(len(tuple), len(items)) {
-				step(w.schema(context, spath+"/items/"+strconv.Itoa(i), index(i), tuple[i], items[i]))
+				step(w.schema(context, w.seg2(spath, "items", strconv.Itoa(i)), index(i), tuple[i], items[i]))
 			}
 		} else {
 			offset := 0
@@ -470,7 +534,7 @@ func (w errorWalker) array(context *errorContext, spath, path string, n node, it
 				offset = len(prefix)
 			}
 			for i := offset; i < len(items); i++ {
-				step(w.schema(context, spath+"/items", index(i), itemsSchema, items[i]))
+				step(w.schema(context, w.seg(spath, "items"), index(i), itemsSchema, items[i]))
 			}
 		}
 	}
@@ -489,20 +553,20 @@ func (w errorWalker) array(context *errorContext, spath, path string, n node, it
 			if declared, has := n.get("minContains"); has {
 				minContains = Plain(declared)
 			}
-			step(!hasContains || !ok || float64(matching) <= limit || context.addError("contains", params("minContains", minContains, "maxContains", Plain(n.keyword(rule.key)[rule.key])), spath, path, "must contain at least 1 valid item"))
+			step(!hasContains || !ok || float64(matching) <= limit || context.addError("contains", params2(minContains, Plain(n.keyword(rule.key)[rule.key])), spath, path, "must contain at least 1 valid item"))
 		case "minContains":
-			step(!hasContains || !ok || float64(matching) >= limit || context.addError("contains", params("minContains", Plain(n.keyword(rule.key)[rule.key])), spath, path, "must contain at least 1 valid item"))
+			step(!hasContains || !ok || float64(matching) >= limit || context.addError("contains", params1(Plain(n.keyword(rule.key)[rule.key])), spath, path, "must contain at least 1 valid item"))
 		default:
-			step(Check(n.keyword(rule.key), items) || context.addError(rule.key, params("limit", Plain(n.keyword(rule.key)[rule.key])), spath, path, strings.Replace(rule.message, "%s", numberText(limit), 1)))
+			step(Check(n.keyword(rule.key), items) || context.addError(rule.key, params1(Plain(n.keyword(rule.key)[rule.key])), spath, path, strings.Replace(rule.message, "%s", numberText(limit), 1)))
 		}
 	}
 	if prefix, ok := n.list("prefixItems"); ok && len(items) > 0 {
 		for i := range min(len(prefix), len(items)) {
-			step(w.schema(context, spath+"/prefixItems/"+strconv.Itoa(i), index(i), prefix[i], items[i]))
+			step(w.schema(context, w.seg2(spath, "prefixItems", strconv.Itoa(i)), index(i), prefix[i], items[i]))
 		}
 	}
 	if unique, _ := n.get("uniqueItems"); unique == true {
-		step(Check(n.keyword("uniqueItems"), items) || context.addError("uniqueItems", params("duplicateItems", duplicateIndices(items)), spath, path, "must not have duplicate items"))
+		step(Check(n.keyword("uniqueItems"), items) || context.addError("uniqueItems", params1(duplicateIndices(items)), spath, path, "must not have duplicate items"))
 	}
 	return valid
 }
@@ -513,7 +577,7 @@ func (w errorWalker) ref(context *errorContext, path string, ref, value any) boo
 	if target == nil {
 		return false
 	}
-	result := w.schema(next, "#", path, target, value)
+	result := w.schema(next, nil, path, target, value)
 	if !result {
 		context.addAll(next)
 	}
@@ -552,7 +616,7 @@ func (w errorWalker) resolve(ref any) any {
 	return current
 }
 
-func (w errorWalker) ifKeyword(context *errorContext, spath, path string, n node, condition, value any) bool {
+func (w errorWalker) ifKeyword(context *errorContext, spath *pathSeg, path string, n node, condition, value any) bool {
 	thenSchema, ok := n.get("then")
 	if !ok {
 		thenSchema = true
@@ -564,20 +628,20 @@ func (w errorWalker) ifKeyword(context *errorContext, spath, path string, n node
 	// if.mjs: the condition and "then" run in a context of their own whose errors are dropped; "else" runs in the
 	// caller's.
 	trueContext := &errorContext{}
-	if w.schema(trueContext, spath+"/if", path, condition, value) {
-		return w.schema(trueContext, spath+"/then", path, thenSchema, value) || context.addError("if", params("failingKeyword", "then"), spath, path, `must match "then" schema`)
+	if w.schema(trueContext, w.seg(spath, "if"), path, condition, value) {
+		return w.schema(trueContext, w.seg(spath, "then"), path, thenSchema, value) || context.addError("if", params1("then"), spath, path, `must match "then" schema`)
 	}
-	return w.schema(context, spath+"/else", path, elseSchema, value) || context.addError("if", params("failingKeyword", "else"), spath, path, `must match "else" schema`)
+	return w.schema(context, w.seg(spath, "else"), path, elseSchema, value) || context.addError("if", params1("else"), spath, path, `must match "else" schema`)
 }
 
 // combinator is allOf.mjs, anyOf.mjs and oneOf.mjs: each operand runs in a context of its own; the failing
 // operands' errors reach the caller's context when the keyword fails (for oneOf, only when no operand passed).
-func (w errorWalker) combinator(context *errorContext, spath, path string, operands []any, value any, keyword string) bool {
+func (w errorWalker) combinator(context *errorContext, spath *pathSeg, path string, operands []any, value any, keyword string) bool {
 	var failed []*errorContext
 	var passing []any
 	for index, operand := range operands {
 		next := &errorContext{}
-		if w.schema(next, spath+"/"+keyword+"/"+strconv.Itoa(index), path, operand, value) {
+		if w.schema(next, w.seg2(spath, keyword, strconv.Itoa(index)), path, operand, value) {
 			passing = append(passing, float64(index))
 		} else {
 			failed = append(failed, next)
@@ -602,9 +666,9 @@ func (w errorWalker) combinator(context *errorContext, spath, path string, opera
 	case valid || keyword == "allOf":
 		return valid
 	case keyword == "anyOf":
-		return context.addError("anyOf", params(), spath, path, "must match a schema in anyOf")
+		return context.addError("anyOf", errParams{}, spath, path, "must match a schema in anyOf")
 	default:
-		return context.addError("oneOf", params("passingSchemas", append([]any{}, passing...)), spath, path, "must match exactly one schema in oneOf")
+		return context.addError("oneOf", params1(append([]any{}, passing...)), spath, path, "must match exactly one schema in oneOf")
 	}
 }
 

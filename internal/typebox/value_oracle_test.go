@@ -38,13 +38,21 @@ func (e *ValueError) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	e.Keyword, e.SchemaPath, e.InstancePath, e.Message = wire.Keyword, wire.SchemaPath, wire.InstancePath, wire.Message
-	e.Params = nil
+	e.params = errParams{}
 	if len(wire.Params) > 0 {
-		params, err := chordjson.Decode(wire.Params)
+		decoded, err := chordjson.Decode(wire.Params)
 		if err != nil {
 			return err
 		}
-		e.Params, _ = params.(*chordjson.Object)
+		if object, _ := decoded.(*chordjson.Object); object != nil {
+			keys := object.Keys()
+			if len(keys) > 0 {
+				e.params.val1 = object.Value(keys[0])
+			}
+			if len(keys) > 1 {
+				e.params.val2 = object.Value(keys[1])
+			}
+		}
 	}
 	return nil
 }
@@ -165,11 +173,7 @@ func errorsJSON(t *testing.T, errors []ValueError) string {
 	t.Helper()
 	rows := make([]any, 0, len(errors))
 	for _, failure := range errors {
-		var params any
-		if failure.Params != nil {
-			params = failure.Params
-		}
-		rows = append(rows, chordjson.ObjectOf("keyword", failure.Keyword, "schemaPath", failure.SchemaPath, "instancePath", failure.InstancePath, "params", params, "message", failure.Message))
+		rows = append(rows, chordjson.ObjectOf("keyword", failure.Keyword, "schemaPath", failure.SchemaPath, "instancePath", failure.InstancePath, "params", failure.ParamsObject(), "message", failure.Message))
 	}
 	text, err := json.Marshal(rows)
 	if err != nil {

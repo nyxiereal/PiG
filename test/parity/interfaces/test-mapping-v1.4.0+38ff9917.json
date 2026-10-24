@@ -452,7 +452,7 @@
       "upstreamTestHash": "sha256:4e3fa06dbece89937474cb249099b7c91f0465408a90f4ad68596b84d21dc173",
       "evidence": [
         "ai/bedrock_stream_state_upstream_test.go#TestBedrockStreamStateStaysOffPartialBlocksAndTheToolCallFinishesWithItsExactArguments",
-        "ai/streaming_tool_arguments_norace_test.go#TestBedrockStreamingToolArgumentsAllocateLinearlyInTheArgumentText"
+        "ai/bedrock_streaming_tool_arguments_norace_test.go#TestBedrockStreamingToolArgumentsAllocateLinearlyInTheArgumentText"
       ],
       "rationale": "Both cases ported over the provider's event handler with the same events (encrypted reasoning in two deltas, a write call in 32-character deltas): no partial block carries stream state, the redacted reasoning signature is AQID and the call finishes with its exact arguments; and the allocation of a 250 KB call is within 25 times that of a 25 KB one and 5,000 bytes per argument byte. Upstream mocks the AWS SDK client; Go feeds the typed events the SDK decoder would yield."
     },

@@ -89,7 +89,7 @@ rationale = "PORT_MAP records this file n/a with the reason: (lazy dynamic-impor
 path = "packages/ai/src/api/bedrock-converse-stream.ts"
 change = "added"
 disposition = "ported"
-evidence = ["test:ai/bedrock_stream_state_upstream_test.go#TestBedrockStreamStateStaysOffPartialBlocksAndTheToolCallFinishesWithItsExactArguments", "test:ai/streaming_tool_arguments_norace_test.go#TestBedrockStreamingToolArgumentsAllocateLinearlyInTheArgumentText"]
+evidence = ["test:ai/bedrock_stream_state_upstream_test.go#TestBedrockStreamStateStaysOffPartialBlocksAndTheToolCallFinishesWithItsExactArguments", "test:ai/bedrock_streaming_tool_arguments_norace_test.go#TestBedrockStreamingToolArgumentsAllocateLinearlyInTheArgumentText"]
 rationale = "Pi f715a15c1 keeps the open blocks (content index, ToolCallArgumentsStream, encrypted reasoning bytes) in an OpenBlocks Map and finalizes them from it, so the content blocks carry no index, partialJson or reasoning bytes. Ported in ai/bedrock.go and ai/bedrock_stream_state.go (activeBlock holds the reasoning bytes and the builder holds the argument stream); the ported bedrock-stream-state tests check no partial block carries stream state, the redacted reasoning signature and the exact tool arguments, and linear allocation."
 
 [[files]]

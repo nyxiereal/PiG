@@ -96,13 +96,16 @@ func (w *terminalInputWaiter) wait(file *os.File, ms int) (bool, error) {
 	return event == windows.WAIT_OBJECT_0, nil
 }
 
-// waitPipe waits for a pipe to have input or to end, for ms milliseconds (without limit when ms is negative) or until the terminal is cancelled, and reports whether the pipe is readable. A pipe handle is signalled from the moment the pipe exists and again after every read, so waiting on it cannot tell an empty pipe from one with input, and a reader sent into ReadFile on an empty pipe could not be stopped. A zero-byte ReadFile instead blocks until the pipe has input or ends and takes no input; CancelIoEx ends it (libuv's uv_pipe_zero_readfile_thread_proc and uv__pipe_interrupt_read).
+// waitPipe waits for a pipe to have input or to end, for ms milliseconds (without limit when ms is negative) or until the terminal is cancelled, and reports whether the pipe is readable. A pipe handle is signalled from the moment the pipe exists and again after every read, so waiting on it cannot tell an empty pipe from one with input, and a reader sent into ReadFile on an empty pipe could not be stopped. A zero-byte ReadFile instead blocks until the pipe has input or ends and takes no input, and returns at once when input is queued; CancelIoEx ends it (libuv's uv_pipe_zero_readfile_thread_proc and uv__pipe_interrupt_read).
 func (w *terminalInputWaiter) waitPipe(handle windows.Handle, ms int) bool {
-	if pipeReadable(handle) {
-		return true
-	}
-	if ms == 0 {
-		return false
+	// A bounded wait looks first, so queued input arms no timer. An unbounded one goes straight to the zero-byte read, which is the one system call that both checks and blocks.
+	if ms >= 0 {
+		if pipeReadable(handle) {
+			return true
+		}
+		if ms == 0 {
+			return false
+		}
 	}
 	w.mu.Lock()
 	if w.ctx.Err() != nil {

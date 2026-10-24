@@ -34034,12 +34034,7 @@
         "internal/codingagent/shutdown_input_owner_test.go::TestInteractiveShutdownLeavesTerminalFileForNextReader",
         "tui/terminal_native_windows_test.go::TestWindowsInputWaiterTimesOutSignalsAndCancels",
         "tui/terminal_pipe_windows_test.go::TestReadInputStreamDeliversAPipeToItsEnd",
-        "tui/terminal_pipe_windows_test.go::TestReadInputStreamLeavesAPipeForTheNextReader",
-        "tui/terminal_pipe_windows_test.go::TestWindowsInputWaiterCancelsAWaitOnAnEmptyPipe",
-        "tui/terminal_pipe_windows_test.go::TestWindowsInputWaiterIdlePipeWaitStaysIdle",
-        "tui/terminal_pipe_windows_test.go::TestWindowsInputWaiterTimeoutDoesNotAbortALaterWait",
-        "tui/terminal_pipe_windows_test.go::TestWindowsInputWaiterWaitsOnAPipeForInput",
-        "tui/terminal_pipe_windows_test.go::TestWindowsInputWaiterWakesOnPipeInput"
+        "tui/terminal_pipe_windows_test.go::TestReadInputStreamLeavesAPipeForTheNextReader"
       ]
     },
     {

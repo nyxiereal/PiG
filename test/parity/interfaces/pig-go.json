@@ -348846,6 +348846,17 @@
       "shapeHash": "sha256:032e891204f123caf14d3d421fa9728efc3f31299c17e98859c219dccddd74fb"
     },
     {
+      "id": "go:github.com/MichaelKinsy/PiG/tui#terminalInputWaiter.readPipe",
+      "package": "github.com/MichaelKinsy/PiG/tui",
+      "name": "terminalInputWaiter.readPipe",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func(*os.File, int) ([]byte, bool, error)"
+      },
+      "shapeHash": "sha256:ba8306a9367add3e31d5c5cf0de304a4a4ba0ff8cd3410360898cff452f050b7"
+    },
+    {
       "id": "go:github.com/MichaelKinsy/PiG/tui#terminalInputWaiter.wait",
       "package": "github.com/MichaelKinsy/PiG/tui",
       "name": "terminalInputWaiter.wait",

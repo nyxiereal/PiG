@@ -777,6 +777,7 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 | [BF-a3bfab2](#bf-a3bfab2) | A Radius gateway config cached on an OAuth credential is sanitized as Pi does | PiG's own defect | All platforms | 0.5.0 |
 | [BF-a40a16d](#bf-a40a16d) | fix(codingagent): typed input restarts the idle collection's wait on every route | PiG's own defect | All platforms | Unreleased |
 | [BF-a46f930](#bf-a46f930) | A Package configured as a settings object reads a resource kind its `pi` manifest does not declare (or… | PiG's own defect | All platforms | 0.5.0 |
+| [BF-a4732f5](#bf-a4732f5) | A `ChordError` of code `invalid` from a failed args, result, state or input check carries TypeBox's whole… | PiG's own defect | All platforms | Unreleased |
 | [BF-a4753ec](#bf-a4753ec) | A panic in a background goroutine of an interactive session no longer ends PiG with only a stderr dump | PiG's own defect | All platforms | 0.5.0 |
 | [BF-a4753ec-2](#bf-a4753ec-2) | The prompt-cache refresh that fires minutes after a prompt now treats a panic in the extension decision or in… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-a4753ec-3](#bf-a4753ec-3) | When the terminal's input ends while its output is still there, PiG keeps running as Pi does instead of… | PiG's own defect | All platforms | 0.5.0 |
@@ -11697,6 +11698,20 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 - **Fix commits:** `12cd60837e` (2026-10-09), `1a29f511e7` (2026-10-09), `3def2a7bd8` (2026-10-10), `7e1a05ccfd` (2026-10-10), `a46f930200` (2026-10-10), `f3b4045e8a` (2026-10-10)
 - **Tests:** `coding/mcpext/config_load_oracle_test.go::TestLoadMcpConfigMatchesPiOnRandomFiles`, `coding/packagecontent/discover_filtered_test.go::TestDiscoverFilteredFallsBackToConventionalDirectories`, `internal/codingagent/migrations_tree_oracle_test.go::TestRunMigrationsTreeMatchesPi`, `internal/codingagent/settings_file_bytes_oracle_test.go::TestSettingsFileBytesMatchPi`, `internal/ignorerules/ignore_oracle_test.go::TestIgnoredMatchesPiIgnorePackage`, `internal/ignorerules/ignorerules_test.go::TestIgnoreRulesFollowTheIgnorePackage`, `internal/orderedjson/orderedjson_test.go::TestObjectEnumeratesArrayIndexKeysFirst`, `internal/packagemanager/resolve_oracle_test.go::TestResolveMatchesPiOnRandomFixtures`
 - **Release note:** A Package configured as a settings object reads a resource kind its `pi` manifest does not declare (or declares empty, when patterns are given) from the conventional directory, and a `pi` manifest field that is not an array of strings counts as absent, as in Pi's `collectPackageResources`.
+
+### BF-a4732f5
+
+**A `ChordError` of code `invalid` from a failed args, result, state or input check carries TypeBox's whole…**
+
+- **Source:** PiG's own defect
+- **Symptom:** A `ChordError` of code `invalid` from a failed args, result, state or input check carries TypeBox's whole error objects as `details` (keyword, schemaPath, instancePath, params and message), as Pi's does; it carried only instancePath and message.
+- **Root cause:** Pi's assertValid throws invalid with the first three Value.Errors as details: keyword, schemaPath, instancePath, params and message of each. PiG kept only instancePath and message, so a caller reading ChordError.Details of a failed args, result, state or input check saw less than Pi shows. internal/typebox.ValueError now carries the keyword, the schema path of the failing schema and the params of every keyword TypeBox reports, and the walker threads the schema path the way the engine does (properties/<key>, items/<index>, anyOf/<index>, then, else, $ref restarting at #). chord/host assertValid builds the details from them in Pi's member order.
+- **User impact:** An operation failed or was rejected
+- **Platform:** All platforms
+- **Fixed in:** Unreleased
+- **Fix commits:** `a4732f5842` (2026-10-24)
+- **Tests:** `chord/host/schema_pi_oracle_test.go::TestAssertValidMatchesPi`, `chord/host/schema_pi_oracle_test.go::TestCanonicalIdentityAndNormalizeMatchPi`, `internal/typebox/value_oracle_test.go::TestValueMatchesTypeboxOnCases`
+- **Release note:** A `ChordError` of code `invalid` from a failed args, result, state or input check carries TypeBox's whole error objects as `details` (keyword, schemaPath, instancePath, params and message), as Pi's does; it carried only instancePath and message.
 
 ### BF-a4753ec
 

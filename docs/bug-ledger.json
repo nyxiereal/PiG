@@ -22660,6 +22660,30 @@
       ]
     },
     {
+      "id": "BF-a4732f5",
+      "title": "A `ChordError` of code `invalid` from a failed args, result, state or input check carries TypeBox's whole…",
+      "symptom": "A `ChordError` of code `invalid` from a failed args, result, state or input check carries TypeBox's whole error objects as `details` (keyword, schemaPath, instancePath, params and message), as Pi's does; it carried only instancePath and message.",
+      "rootCause": "Pi's assertValid throws invalid with the first three Value.Errors as details: keyword, schemaPath, instancePath, params and message of each. PiG kept only instancePath and message, so a caller reading ChordError.Details of a failed args, result, state or input check saw less than Pi shows. internal/typebox.ValueError now carries the keyword, the schema path of the failing schema and the params of every keyword TypeBox reports, and the walker threads the schema path the way the engine does (properties/\u003ckey\u003e, items/\u003cindex\u003e, anyOf/\u003cindex\u003e, then, else, $ref restarting at #). chord/host assertValid builds the details from them in Pi's member order.",
+      "rootCauseSource": "commit",
+      "userImpact": "An operation failed or was rejected",
+      "platform": "All platforms",
+      "class": "own",
+      "fixedIn": "Unreleased",
+      "releaseNote": "A `ChordError` of code `invalid` from a failed args, result, state or input check carries TypeBox's whole error objects as `details` (keyword, schemaPath, instancePath, params and message), as Pi's does; it carried only instancePath and message.",
+      "origin": "release note",
+      "commits": [
+        {
+          "hash": "a4732f5842",
+          "date": "2026-10-24"
+        }
+      ],
+      "tests": [
+        "chord/host/schema_pi_oracle_test.go::TestAssertValidMatchesPi",
+        "chord/host/schema_pi_oracle_test.go::TestCanonicalIdentityAndNormalizeMatchPi",
+        "internal/typebox/value_oracle_test.go::TestValueMatchesTypeboxOnCases"
+      ]
+    },
+    {
       "id": "BF-a4753ec",
       "title": "A panic in a background goroutine of an interactive session no longer ends PiG with only a stderr dump",
       "symptom": "A panic in a background goroutine of an interactive session no longer ends PiG with only a stderr dump.",

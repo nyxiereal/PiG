@@ -2253,6 +2253,320 @@
 			]
 		},
 		{
+			"schema": {
+				"type": "object",
+				"properties": {
+					"a": {
+						"type": "string"
+					}
+				},
+				"additionalProperties": false
+			},
+			"value": {
+				"z": 1,
+				"a": "x",
+				"m": 2,
+				"b": 3
+			},
+			"ok": false,
+			"message": "invalid/state: state thing: /z schema is false; /m schema is false; /b schema is false",
+			"details": [
+				{
+					"keyword": "boolean",
+					"schemaPath": "#/additionalProperties",
+					"instancePath": "/z",
+					"params": {},
+					"message": "schema is false"
+				},
+				{
+					"keyword": "boolean",
+					"schemaPath": "#/additionalProperties",
+					"instancePath": "/m",
+					"params": {},
+					"message": "schema is false"
+				},
+				{
+					"keyword": "boolean",
+					"schemaPath": "#/additionalProperties",
+					"instancePath": "/b",
+					"params": {},
+					"message": "schema is false"
+				}
+			]
+		},
+		{
+			"schema": {
+				"type": "object",
+				"properties": {
+					"a": {
+						"type": "string"
+					}
+				},
+				"additionalProperties": {
+					"type": "number"
+				}
+			},
+			"value": {
+				"z": "x",
+				"a": "y",
+				"m": "z",
+				"b": 1
+			},
+			"ok": false,
+			"message": "invalid/state: state thing: /z must be number; /m must be number; / must not have additional properties",
+			"details": [
+				{
+					"keyword": "type",
+					"schemaPath": "#/additionalProperties",
+					"instancePath": "/z",
+					"params": {
+						"type": "number"
+					},
+					"message": "must be number"
+				},
+				{
+					"keyword": "type",
+					"schemaPath": "#/additionalProperties",
+					"instancePath": "/m",
+					"params": {
+						"type": "number"
+					},
+					"message": "must be number"
+				},
+				{
+					"keyword": "additionalProperties",
+					"schemaPath": "#",
+					"instancePath": "",
+					"params": {
+						"additionalProperties": [
+							"z",
+							"m"
+						]
+					},
+					"message": "must not have additional properties"
+				}
+			]
+		},
+		{
+			"schema": {
+				"type": "object",
+				"propertyNames": {
+					"pattern": "^[a-z]+$"
+				}
+			},
+			"value": {
+				"z": 1,
+				"B": 2,
+				"a": 3,
+				"Q": 4
+			},
+			"ok": false,
+			"message": "invalid/state: state thing: /B must match pattern \"^[a-z]+$\"; /Q must match pattern \"^[a-z]+$\"; / property names B, Q are invalid",
+			"details": [
+				{
+					"keyword": "pattern",
+					"schemaPath": "#/propertyNames",
+					"instancePath": "/B",
+					"params": {
+						"pattern": "^[a-z]+$"
+					},
+					"message": "must match pattern \"^[a-z]+$\""
+				},
+				{
+					"keyword": "pattern",
+					"schemaPath": "#/propertyNames",
+					"instancePath": "/Q",
+					"params": {
+						"pattern": "^[a-z]+$"
+					},
+					"message": "must match pattern \"^[a-z]+$\""
+				},
+				{
+					"keyword": "propertyNames",
+					"schemaPath": "#",
+					"instancePath": "",
+					"params": {
+						"propertyNames": [
+							"B",
+							"Q"
+						]
+					},
+					"message": "property names B, Q are invalid"
+				}
+			]
+		},
+		{
+			"schema": {
+				"properties": {
+					"a": {}
+				},
+				"unevaluatedProperties": false
+			},
+			"value": {
+				"z": 1,
+				"a": 2,
+				"m": 3
+			},
+			"ok": false,
+			"message": "invalid/state: state thing: / must not have unevaluated properties",
+			"details": [
+				{
+					"keyword": "unevaluatedProperties",
+					"schemaPath": "#",
+					"instancePath": "",
+					"params": {
+						"unevaluatedProperties": [
+							"z",
+							"m"
+						]
+					},
+					"message": "must not have unevaluated properties"
+				}
+			]
+		},
+		{
+			"schema": {
+				"type": "object",
+				"patternProperties": {
+					"^x": {
+						"type": "integer"
+					}
+				},
+				"additionalProperties": false
+			},
+			"value": {
+				"y": 1,
+				"x2": "a",
+				"x1": "b",
+				"w": 2
+			},
+			"ok": false,
+			"message": "invalid/state: state thing: /y schema is false; /w schema is false; / must not have additional properties",
+			"details": [
+				{
+					"keyword": "boolean",
+					"schemaPath": "#/additionalProperties",
+					"instancePath": "/y",
+					"params": {},
+					"message": "schema is false"
+				},
+				{
+					"keyword": "boolean",
+					"schemaPath": "#/additionalProperties",
+					"instancePath": "/w",
+					"params": {},
+					"message": "schema is false"
+				},
+				{
+					"keyword": "additionalProperties",
+					"schemaPath": "#",
+					"instancePath": "",
+					"params": {
+						"additionalProperties": [
+							"y",
+							"w"
+						]
+					},
+					"message": "must not have additional properties"
+				}
+			]
+		},
+		{
+			"schema": {
+				"type": "object",
+				"properties": {
+					"b": {
+						"type": "string"
+					},
+					"a": {
+						"type": "string"
+					}
+				}
+			},
+			"value": {
+				"a": 1,
+				"b": 2
+			},
+			"ok": false,
+			"message": "invalid/state: state thing: /b must be string; /a must be string",
+			"details": [
+				{
+					"keyword": "type",
+					"schemaPath": "#/properties/b",
+					"instancePath": "/b",
+					"params": {
+						"type": "string"
+					},
+					"message": "must be string"
+				},
+				{
+					"keyword": "type",
+					"schemaPath": "#/properties/a",
+					"instancePath": "/a",
+					"params": {
+						"type": "string"
+					},
+					"message": "must be string"
+				}
+			]
+		},
+		{
+			"schema": {
+				"type": "object",
+				"properties": {
+					"o": {
+						"type": "object",
+						"additionalProperties": false
+					},
+					"l": {
+						"type": "array",
+						"items": {
+							"type": "object",
+							"additionalProperties": false
+						}
+					}
+				}
+			},
+			"value": {
+				"o": {
+					"z": 1,
+					"a": 2,
+					"m": 3
+				},
+				"l": [
+					{
+						"q": 1,
+						"b": 2
+					}
+				]
+			},
+			"ok": false,
+			"message": "invalid/state: state thing: /o/z schema is false; /o/a schema is false; /o/m schema is false",
+			"details": [
+				{
+					"keyword": "boolean",
+					"schemaPath": "#/properties/o/additionalProperties",
+					"instancePath": "/o/z",
+					"params": {},
+					"message": "schema is false"
+				},
+				{
+					"keyword": "boolean",
+					"schemaPath": "#/properties/o/additionalProperties",
+					"instancePath": "/o/a",
+					"params": {},
+					"message": "schema is false"
+				},
+				{
+					"keyword": "boolean",
+					"schemaPath": "#/properties/o/additionalProperties",
+					"instancePath": "/o/m",
+					"params": {},
+					"message": "schema is false"
+				}
+			]
+		},
+		{
 			"schema": false,
 			"value": 1,
 			"ok": false,
@@ -21057,6 +21371,54 @@
 			},
 			"what": "input of thing",
 			"value": {
+				"name": "a",
+				"z": "s",
+				"b": "t",
+				"m": 1
+			},
+			"ok": true,
+			"expect": {
+				"name": "a",
+				"limit": 10,
+				"mode": "fast"
+			}
+		},
+		{
+			"schema": {
+				"type": "object",
+				"required": [
+					"limit",
+					"mode",
+					"name"
+				],
+				"properties": {
+					"limit": {
+						"type": "integer",
+						"default": 10
+					},
+					"mode": {
+						"type": "string",
+						"default": "fast"
+					},
+					"name": {
+						"type": "string"
+					},
+					"nested": {
+						"type": "object",
+						"required": [
+							"on"
+						],
+						"properties": {
+							"on": {
+								"type": "boolean",
+								"default": false
+							}
+						}
+					}
+				}
+			},
+			"what": "input of thing",
+			"value": {
 				"limit": "x",
 				"mode": 3,
 				"nested": {
@@ -21652,6 +22014,55 @@
 						"message": "must be string"
 					}
 				]
+			}
+		},
+		{
+			"schema": {
+				"type": "object",
+				"required": [
+					"limit",
+					"mode",
+					"name"
+				],
+				"properties": {
+					"limit": {
+						"type": "integer",
+						"default": 10
+					},
+					"mode": {
+						"type": "string",
+						"default": "fast"
+					},
+					"name": {
+						"type": "string"
+					},
+					"nested": {
+						"type": "object",
+						"required": [
+							"on"
+						],
+						"properties": {
+							"on": {
+								"type": "boolean",
+								"default": false
+							}
+						}
+					}
+				},
+				"additionalProperties": false
+			},
+			"what": "input of thing",
+			"value": {
+				"name": "a",
+				"z": "s",
+				"b": "t",
+				"m": 1
+			},
+			"ok": true,
+			"expect": {
+				"name": "a",
+				"limit": 10,
+				"mode": "fast"
 			}
 		},
 		{
@@ -22307,6 +22718,58 @@
 						"message": "must be string"
 					}
 				]
+			}
+		},
+		{
+			"schema": {
+				"type": "object",
+				"required": [
+					"limit",
+					"mode",
+					"name"
+				],
+				"properties": {
+					"limit": {
+						"type": "integer",
+						"default": 10
+					},
+					"mode": {
+						"type": "string",
+						"default": "fast"
+					},
+					"name": {
+						"type": "string"
+					},
+					"nested": {
+						"type": "object",
+						"required": [
+							"on"
+						],
+						"properties": {
+							"on": {
+								"type": "boolean",
+								"default": false
+							}
+						}
+					}
+				},
+				"additionalProperties": {
+					"type": "number"
+				}
+			},
+			"what": "input of thing",
+			"value": {
+				"name": "a",
+				"z": "s",
+				"b": "t",
+				"m": 1
+			},
+			"ok": true,
+			"expect": {
+				"name": "a",
+				"m": 1,
+				"limit": 10,
+				"mode": "fast"
 			}
 		},
 		{

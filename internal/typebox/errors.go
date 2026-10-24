@@ -7,7 +7,7 @@ package typebox
 // numeric bounds, not, contains) use Check on the keyword alone. unevaluatedItems and unevaluatedProperties, which
 // need the evaluated-key tracking, use Check on the whole schema and report TypeBox's message when every other keyword passed; when another keyword failed too, TypeBox may add the unevaluated error after it and this walker does not. A schema object visits its members in its own order: a
 // *chordjson.Object keeps the declaration order TypeBox follows, a Go map has none and visits them in JavaScript
-// own-key order of the sorted names, so errors of several properties may come in another order than TypeBox's.
+// own-key order of the sorted names. Members of the value are visited in the order they arrived in when it is a *chordjson.Object (Errors records each object's member order), and sorted when it is a Go map.
 
 import (
 	"math"
@@ -57,13 +57,58 @@ func (c *errorContext) addAll(from *errorContext) {
 
 // Errors is Value.Errors(schema, value).
 func Errors(schema, value any) []ValueError {
-	walker := errorWalker{root: schema}
+	orders := map[uintptr][]string{}
+	walker := errorWalker{root: schema, orders: orders}
 	context := &errorContext{}
-	walker.schema(context, "#", "", schema, Plain(value))
+	walker.schema(context, "#", "", schema, orderedPlain(value, orders))
 	return context.errors
 }
 
-type errorWalker struct{ root any }
+type errorWalker struct {
+	root any
+	// orders is the member order of each object of the value being walked, by the address of its map: a map has no
+	// order of its own, and TypeBox lists errors and params in the instance's insertion order.
+	orders map[uintptr][]string
+}
+
+// keys are the members of object in the order TypeBox visits them: the order the value arrived in (a
+// *chordjson.Object keeps it), or the sorted names for a value that was a Go map.
+func (w errorWalker) keys(object map[string]any) []string {
+	if keys, ok := w.orders[reflect.ValueOf(object).Pointer()]; ok {
+		return keys
+	}
+	return valueKeys(object)
+}
+
+// orderedPlain is Plain that also records the member order of every *chordjson.Object it converts.
+func orderedPlain(value any, orders map[uintptr][]string) any {
+	switch typed := value.(type) {
+	case *chordjson.Object:
+		if typed == nil {
+			return nil
+		}
+		out := make(map[string]any, typed.Len())
+		for key, item := range typed.All() {
+			out[key] = orderedPlain(item, orders)
+		}
+		orders[reflect.ValueOf(out).Pointer()] = typed.Keys()
+		return out
+	case map[string]any:
+		out := make(map[string]any, len(typed))
+		for key, item := range typed {
+			out[key] = orderedPlain(item, orders)
+		}
+		return out
+	case []any:
+		out := make([]any, len(typed))
+		for index, item := range typed {
+			out[index] = orderedPlain(item, orders)
+		}
+		return out
+	default:
+		return Plain(value)
+	}
+}
 
 // node is a schema object of either Go kind; keys are in the schema's own order (sorted for a Go map).
 type node struct {
@@ -315,7 +360,7 @@ func (w errorWalker) object(context *errorContext, spath, path string, n node, o
 		}
 		matcher, _ := CompilePattern(pattern)
 		var rejected []string
-		for _, key := range valueKeys(object) {
+		for _, key := range w.keys(object) {
 			if matcher != nil && matcher.MatchString(key) {
 				continue
 			}
@@ -355,7 +400,7 @@ func (w errorWalker) object(context *errorContext, spath, path string, n node, o
 		for _, pattern := range patterns.keys() {
 			matcher, err := CompilePattern(pattern)
 			patternSchema, _ := patterns.get(pattern)
-			for _, key := range valueKeys(object) {
+			for _, key := range w.keys(object) {
 				if err == nil && matcher.MatchString(key) {
 					step(w.schema(context, spath+"/patternProperties/"+pattern, join(path, key), patternSchema, object[key]))
 				}
@@ -372,7 +417,7 @@ func (w errorWalker) object(context *errorContext, spath, path string, n node, o
 	}
 	if names, ok := n.get("propertyNames"); ok {
 		var invalid []string
-		for _, key := range valueKeys(object) {
+		for _, key := range w.keys(object) {
 			if !w.schema(context, spath+"/propertyNames", join(path, key), names, key) {
 				invalid = append(invalid, key)
 			}
@@ -588,7 +633,7 @@ func (w errorWalker) unevaluatedProperties(n node, value any) []string {
 	w.evaluatedProperties(n, object, evaluated)
 	extra, _ := n.get("unevaluatedProperties")
 	var out []string
-	for _, key := range valueKeys(object) {
+	for _, key := range w.keys(object) {
 		if !evaluated[key] && !Check(extra, object[key]) {
 			out = append(out, key)
 		}

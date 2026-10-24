@@ -160,7 +160,9 @@ func TestAssertValidMatchesPi(t *testing.T) {
 		t.Fatalf("Pi oracle has %d assertion cases", len(oracle.Assertions))
 	}
 	for _, item := range oracle.Assertions {
-		err := assertValid("state", "state thing", schemaOf(t, item.Schema), decodeChordJSON(t, item.Value))
+		// The schema is decoded in order too: TypeBox visits the properties of a schema in its declaration order, which a Go
+		// map cannot keep.
+		err := assertValid("state", "state thing", decodeChordJSON(t, item.Schema), decodeChordJSON(t, item.Value))
 		if item.OK {
 			if err != nil {
 				t.Errorf("assertValid(%s, %s) = %v, Pi accepted it", item.Schema, item.Value, err)

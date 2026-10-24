@@ -192,6 +192,7 @@ const normalizeInputs = [
 	{ name: 1 },
 	{ name: "a", limit: "x" },
 	{ name: "a", limit: 1.5, mode: 3 },
+	{ name: "a", z: "s", b: "t", m: 1 },
 	{ limit: "x", mode: 3, nested: { on: "no" } },
 ];
 const normalizes = normalizeSchemas.flatMap((schema) =>
@@ -245,6 +246,13 @@ const assertSchemas = [
 	[{ type: "array", prefixItems: [{ type: "integer" }], unevaluatedItems: false }, [[1, 2, 3]]],
 	[{ type: "array", contains: { type: "string" }, unevaluatedItems: { type: "integer" } }, [["a", 1, "b", 2.5, "c", "d"]]],
 	[{ type: "array", items: [{ type: "string" }], unevaluatedItems: false }, [["a", 1, 2]]],
+	[{ type: "object", properties: { a: { type: "string" } }, additionalProperties: false }, [{ z: 1, a: "x", m: 2, b: 3 }]],
+	[{ type: "object", properties: { a: { type: "string" } }, additionalProperties: { type: "number" } }, [{ z: "x", a: "y", m: "z", b: 1 }]],
+	[{ type: "object", propertyNames: { pattern: "^[a-z]+$" } }, [{ z: 1, B: 2, a: 3, Q: 4 }]],
+	[{ properties: { a: {} }, unevaluatedProperties: false }, [{ z: 1, a: 2, m: 3 }]],
+	[{ type: "object", patternProperties: { "^x": { type: "integer" } }, additionalProperties: false }, [{ y: 1, x2: "a", x1: "b", w: 2 }]],
+	[{ type: "object", properties: { b: { type: "string" }, a: { type: "string" } } }, [{ a: 1, b: 2 }]],
+	[{ type: "object", properties: { o: { type: "object", additionalProperties: false }, l: { type: "array", items: { type: "object", additionalProperties: false } } } }, [{ o: { z: 1, a: 2, m: 3 }, l: [{ q: 1, b: 2 }] }]],
 	[false, [1]],
 	[{ type: "object", properties: { a: { type: "string" }, b: { type: "string" }, c: { type: "string" }, d: { type: "string" } } }, [{ a: 1, b: 1, c: 1, d: 1 }]],
 ];

@@ -11380,7 +11380,7 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 - **Fixed in:** Unreleased
 - **Pi issue:** none recorded
 - **Removed when Pi fixes it:** Pi or its AWS SDK treats an empty `AWS_BEARER_TOKEN_BEDROCK` as unset (Pi passes `authSchemePreference` itself, or the SDK tests for a non-empty value), or an owner decision reverses this one; then the marker, the D195 cases of the test and this record go.
-- **Fix commits:** Not yet committed.
+- **Fix commits:** `cca788e454` (2026-10-24)
 - **Tests:** `ai/bedrock_bearer_divergence_test.go::TestBedrockBearerTokenDivergencesFromPi`, `ai/bedrock_request_body_oracle_test.go::TestBedrockRequestBodyMatchesPi`
 
 ### BF-D196
@@ -11395,7 +11395,7 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 - **Fixed in:** Unreleased
 - **Pi issue:** none recorded
 - **Removed when Pi fixes it:** Pi refuses to send a bearer token over HTTP (its SDK adds an HTTPS check, or Pi installs a signer that does), or PiG installs `bedrockBearerSigner` under skip-auth and the owner approves sending the token over HTTP there; then the markers, the D196 case of the test and this record go.
-- **Fix commits:** Not yet committed.
+- **Fix commits:** `cca788e454` (2026-10-24)
 - **Tests:** `ai/bedrock_bearer_divergence_test.go::TestBedrockBearerTokenDivergencesFromPi`
 
 ### BF-a076a50

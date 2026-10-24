@@ -6,7 +6,7 @@
 // Each case holds its inputs (JSON text, so -0, 1e21 and key order survive) and what Pi's code returned for them; the Go
 // test replays the inputs through chord/host. The fits pairs are curated edge cases plus seeded random schema pairs.
 import { Type } from "../../../.upstream/current/node_modules/typebox/build/index.mjs";
-import { canonicalIdentity, canonicalJson, fits, hash64, normalize } from "../../../.upstream/current/packages/chord/src/schema.ts";
+import { assertValid, canonicalIdentity, canonicalJson, fits, hash64, normalize } from "../../../.upstream/current/packages/chord/src/schema.ts";
 
 function mulberry32(seed) {
 	let state = seed >>> 0;
@@ -205,4 +205,58 @@ const normalizes = normalizeSchemas.flatMap((schema) =>
 	}),
 );
 
-process.stdout.write(`${JSON.stringify({ canonical, hashes, fits: fitsCases, identities, normalizes }, null, "\t")}\n`);
+
+const assertSchemas = [
+	[{ type: "string" }, [1, null, "a"]],
+	[{ type: ["string", "null"] }, [1, "a", null]],
+	[{ type: "string", minLength: 2, maxLength: 3, pattern: "^a" }, ["", "bbbb", "abc"]],
+	[{ type: "string", format: "date-time" }, ["x", "2020-01-01T00:00:00Z"]],
+	[{ type: "number", minimum: 1, maximum: 3, multipleOf: 0.5 }, [0, 4, 1.25, 2]],
+	[{ type: "number", exclusiveMinimum: 1, exclusiveMaximum: 3 }, [1, 3, 2]],
+	[{ enum: ["a", 1, { k: [1] }] }, ["b", 2, { k: [1] }, { k: [2] }]],
+	[{ const: { a: [1, 2] } }, [{ a: [1] }, { a: [1, 2] }, 3]],
+	[{ type: "object", required: ["a", "b"], properties: { a: { type: "integer" } } }, [{}, { a: "x" }, { a: 1, b: 2 }]],
+	[{ type: "object", properties: { a: { type: "string" } }, additionalProperties: false }, [{ a: "x", b: 1, c: 2 }, { a: 1 }]],
+	[{ type: "object", properties: { a: { type: "string" } }, additionalProperties: { type: "number" } }, [{ a: "x", b: "y", c: 1 }]],
+	[{ type: "object", patternProperties: { "^x": { type: "integer" } }, additionalProperties: false }, [{ x1: "a", y: 1, x2: 2 }]],
+	[{ type: "object", minProperties: 2, maxProperties: 3 }, [{}, { a: 1 }, { a: 1, b: 2, c: 3, d: 4 }]],
+	[{ type: "object", propertyNames: { pattern: "^[a-z]+$" } }, [{ ok: 1, B: 2, "9": 3 }]],
+	[{ type: "object", dependencies: { a: ["b", "c"] } }, [{ a: 1 }, { a: 1, b: 2, c: 3 }]],
+	[{ type: "object", dependentRequired: { a: ["b"] } }, [{ a: 1 }]],
+	[{ type: "object", dependentSchemas: { a: { required: ["b"] } } }, [{ a: 1 }]],
+	[{ anyOf: [{ type: "string" }, { type: "integer" }] }, [true, "a", 1]],
+	[{ oneOf: [{ type: "number" }, { type: "integer" }] }, [1, 1.5, "a"]],
+	[{ allOf: [{ type: "object", required: ["a"] }, { type: "object", required: ["b"] }] }, [{}, { a: 1 }, { a: 1, b: 2 }]],
+	[{ not: { type: "string" } }, ["a", 1]],
+	[{ type: "array", items: { type: "integer" }, minItems: 1, maxItems: 2 }, [[], [1, "a", 2], [1, 2, 3], ["x"]]],
+	[{ type: "array", items: [{ type: "integer" }, { type: "string" }] }, [["a", 1], [1, "a"]]],
+	[{ type: "array", prefixItems: [{ type: "integer" }], items: { type: "string" } }, [["a", 1], [1, "a"]]],
+	[{ type: "array", uniqueItems: true }, [[1, 2, 1, 1], [{ a: 1 }, { a: 1 }], [1, 2]]],
+	[{ type: "array", contains: { type: "string" } }, [[], [1], ["a"]]],
+	[{ type: "array", contains: { type: "string" }, minContains: 2, maxContains: 3 }, [["a"], ["a", "b"], ["a", "b", "c", "d"]]],
+	[{ if: { type: "string" }, then: { minLength: 3 }, else: { type: "integer" } }, ["ab", "abc", 1, true]],
+	[{ type: "object", properties: { n: { $ref: "#/$defs/n" } }, $defs: { n: { type: "integer", minimum: 0 } } }, [{ n: "a" }, { n: -1 }]],
+	[{ type: "object", properties: { a: { type: "object", properties: { b: { type: "array", items: { type: "string" } } } } } }, [{ a: { b: [1, "x", 2] } }]],
+	[{ type: "object", properties: { a: {} }, patternProperties: { "^x": {} }, unevaluatedProperties: false }, [{ a: 1, x1: 2, y: 4, z: 3 }]],
+	[{ allOf: [{ properties: { a: {} } }], unevaluatedProperties: false }, [{ a: 1, b: 2 }]],
+	[{ anyOf: [{ properties: { a: {} }, required: ["a"] }, { properties: { b: {} } }], unevaluatedProperties: false }, [{ a: 1, c: 2 }]],
+	[{ properties: { a: {} }, unevaluatedProperties: { type: "integer" } }, [{ a: 1, b: "x", c: 2, d: "y" }]],
+	[{ if: { properties: { k: { const: 1 } }, required: ["k"] }, then: { properties: { t: {} } }, else: { properties: { e: {} } }, unevaluatedProperties: false }, [{ k: 1, t: 1, e: 2 }, { k: 2, t: 1, e: 2 }]],
+	[{ type: "array", prefixItems: [{ type: "integer" }], unevaluatedItems: false }, [[1, 2, 3]]],
+	[{ type: "array", contains: { type: "string" }, unevaluatedItems: { type: "integer" } }, [["a", 1, "b", 2.5, "c", "d"]]],
+	[{ type: "array", items: [{ type: "string" }], unevaluatedItems: false }, [["a", 1, 2]]],
+	[false, [1]],
+	[{ type: "object", properties: { a: { type: "string" }, b: { type: "string" }, c: { type: "string" }, d: { type: "string" } } }, [{ a: 1, b: 1, c: 1, d: 1 }]],
+];
+const assertions = assertSchemas.flatMap(([schema, values]) =>
+	values.map((value) => {
+		try {
+			assertValid("state", "state thing", schema, value);
+			return { schema, value, ok: true };
+		} catch (error) {
+			return { schema, value, ok: false, message: error.message, details: error.details };
+		}
+	}),
+);
+
+process.stdout.write(`${JSON.stringify({ assertions, canonical, hashes, fits: fitsCases, identities, normalizes }, null, "\t")}\n`);

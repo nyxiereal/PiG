@@ -22,10 +22,14 @@ import (
 	"github.com/MichaelKinsy/PiG/third_party/jsonschema"
 )
 
-// ValueError is one error of Errors: the instance path of the failing value ("" for the root; member names appended unescaped, as TypeBox does) and the en_US message.
+// ValueError is one error of Errors, as TypeBox reports it: the keyword that failed, the schema path of the failing schema, the instance path of the failing value ("" for the root; member names appended unescaped, as TypeBox does) and the en_US message.
 type ValueError struct {
+	Keyword      string
+	SchemaPath   string
 	InstancePath string
-	Message      string
+	// Params is the keyword's params object, in the order TypeBox writes its members.
+	Params  *chordjson.Object
+	Message string
 }
 
 // compiledCacheLimit bounds the compiled-schema cache; a full cache starts over.

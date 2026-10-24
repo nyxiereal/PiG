@@ -14,6 +14,13 @@ import (
 )
 
 type piSchemaOracle struct {
+	Assertions []struct {
+		Schema  json.RawMessage `json:"schema"`
+		Value   json.RawMessage `json:"value"`
+		OK      bool            `json:"ok"`
+		Message string          `json:"message"`
+		Details json.RawMessage `json:"details"`
+	} `json:"assertions"`
 	Canonical []struct {
 		Text   string `json:"text"`
 		Expect string `json:"expect"`
@@ -139,36 +146,37 @@ func TestCanonicalIdentityAndNormalizeMatchPi(t *testing.T) {
 		if chordError.Message != want.Message || chordError.Code != want.Code || chordError.Reason != want.Reason {
 			t.Errorf("normalize(%s) threw %q (%s/%s), Pi %q (%s/%s)", item.Value, chordError.Message, chordError.Code, chordError.Reason, want.Message, want.Code, want.Reason)
 		}
-		if gotDetails, wantDetails := detailsOf(chordError.Details), detailsOf(decodeChordJSON(t, want.Details)); gotDetails != wantDetails {
+		if gotDetails, wantDetails := CanonicalJSON(chordError.Details), CanonicalJSON(decodeChordJSON(t, want.Details)); gotDetails != wantDetails {
 			t.Errorf("normalize(%s) details %s, Pi %s", item.Value, gotDetails, wantDetails)
 		}
 	}
 }
 
-// detailsOf is the instancePath and message of each schema error in details. Pi's errors also carry keyword, schemaPath
-// and params; internal/typebox.ValueError has only the first two (a numbered divergence is proposed for the rest).
-func detailsOf(details any) string {
-	var rows []any
-	switch typed := details.(type) {
-	case []any:
-		rows = typed
-	default:
-		return CanonicalJSON(details)
+// assertValid throws invalid with the first three TypeBox errors of the value as details, whole: keyword, schemaPath,
+// instancePath, params and message.
+func TestAssertValidMatchesPi(t *testing.T) {
+	oracle := loadPiSchemaOracle(t)
+	if len(oracle.Assertions) < 70 {
+		t.Fatalf("Pi oracle has %d assertion cases", len(oracle.Assertions))
 	}
-	projected := make([]any, len(rows))
-	for index, row := range rows {
-		keys, get, ok := objectEntries(row)
-		if !ok {
-			projected[index] = row
+	for _, item := range oracle.Assertions {
+		err := assertValid("state", "state thing", schemaOf(t, item.Schema), decodeChordJSON(t, item.Value))
+		if item.OK {
+			if err != nil {
+				t.Errorf("assertValid(%s, %s) = %v, Pi accepted it", item.Schema, item.Value, err)
+			}
 			continue
 		}
-		entry := map[string]any{}
-		for _, key := range keys {
-			if key == "instancePath" || key == "message" {
-				entry[key] = get(key)
-			}
+		chordError, ok := err.(*ChordError) //nolint:errorlint // assertValid returns the ChordError itself
+		if !ok {
+			t.Errorf("assertValid(%s, %s) = %v, Pi threw %q", item.Schema, item.Value, err, item.Message)
+			continue
 		}
-		projected[index] = entry
+		if chordError.Message != item.Message {
+			t.Errorf("assertValid(%s, %s) message %q, Pi %q", item.Schema, item.Value, chordError.Message, item.Message)
+		}
+		if got, want := CanonicalJSON(chordError.Details), CanonicalJSON(decodeChordJSON(t, item.Details)); got != want {
+			t.Errorf("assertValid(%s, %s) details\n  go %s\n  pi %s", item.Schema, item.Value, got, want)
+		}
 	}
-	return CanonicalJSON(projected)
 }

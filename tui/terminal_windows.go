@@ -31,21 +31,28 @@ const resizePollInterval = 120 * time.Millisecond
 // console read that could block.
 func pollReadable(_ uintptr, _ int) (int, error) { return 0, nil }
 
+// pipePollInterval is how often waiting on a pipe looks for queued input. A pipe handle is signalled from the moment it exists, and again after every read, so waiting on the handle cannot tell an empty pipe from one with input.
+const pipePollInterval = 5 * time.Millisecond
+
 type terminalInputWaiter struct {
-	ctx          context.Context
-	cancelEvent  windows.Handle
+	ctx         context.Context
+	cancelEvent windows.Handle
+	// pipe: the input is a pipe, which wait polls; any other input signals its handle when it has input.
+	pipe         bool
 	stopCallback func() bool
 	callbackDone chan struct{}
 }
 
-func newTerminalInputWaiter(ctx context.Context) (*terminalInputWaiter, error) {
+func newTerminalInputWaiter(ctx context.Context, file *os.File) (*terminalInputWaiter, error) {
 	cancelEvent, err := windows.CreateEvent(nil, 1, 0, nil)
 	if err != nil {
 		return nil, err
 	}
+	fileType, _ := windows.GetFileType(windows.Handle(file.Fd()))
 	w := &terminalInputWaiter{
 		ctx:          ctx,
 		cancelEvent:  cancelEvent,
+		pipe:         fileType == windows.FILE_TYPE_PIPE,
 		callbackDone: make(chan struct{}),
 	}
 	w.stopCallback = context.AfterFunc(ctx, func() {
@@ -58,14 +65,18 @@ func newTerminalInputWaiter(ctx context.Context) (*terminalInputWaiter, error) {
 
 // wait waits for either console input or cancellation before issuing ReadFile.
 // Stop therefore cannot leave an old reader blocked inside the read that
-// belongs to the next terminal owner.
+// belongs to the next terminal owner. A pipe is polled for input instead.
 func (w *terminalInputWaiter) wait(file *os.File, ms int) (bool, error) {
+	handle := windows.Handle(file.Fd())
+	if w.pipe {
+		return w.waitPipe(handle, ms), nil
+	}
 	timeout := uint32(windows.INFINITE)
 	if ms >= 0 {
 		timeout = uint32(min(int64(ms), int64(windows.INFINITE)-1))
 	}
 	event, err := windows.WaitForMultipleObjects(
-		[]windows.Handle{windows.Handle(file.Fd()), w.cancelEvent},
+		[]windows.Handle{handle, w.cancelEvent},
 		false,
 		timeout,
 	)
@@ -76,6 +87,34 @@ func (w *terminalInputWaiter) wait(file *os.File, ms int) (bool, error) {
 		return false, err
 	}
 	return event == windows.WAIT_OBJECT_0, nil
+}
+
+// waitPipe polls the pipe until it has input or has ended, ms milliseconds pass (never when ms is negative) or the terminal is cancelled; the cancel event ends each pause between polls.
+func (w *terminalInputWaiter) waitPipe(handle windows.Handle, ms int) bool {
+	const pollMs = int64(pipePollInterval / time.Millisecond)
+	var deadline time.Time
+	if ms >= 0 {
+		deadline = time.Now().Add(time.Duration(ms) * time.Millisecond)
+	}
+	for {
+		if w.ctx.Err() != nil {
+			return false
+		}
+		if pipeReadable(handle) {
+			return true
+		}
+		pause := pollMs
+		if !deadline.IsZero() {
+			remaining := time.Until(deadline)
+			if remaining <= 0 {
+				return false
+			}
+			pause = min(pause, remaining.Milliseconds()+1)
+		}
+		if event, _ := windows.WaitForSingleObject(w.cancelEvent, uint32(pause)); event == windows.WAIT_OBJECT_0 {
+			return false
+		}
+	}
 }
 
 func (w *terminalInputWaiter) close() {
@@ -237,7 +276,15 @@ var (
 	kernel32              = windows.NewLazySystemDLL("kernel32.dll")
 	procPeekConsoleInputW = kernel32.NewProc("PeekConsoleInputW")
 	procReadConsoleInputW = kernel32.NewProc("ReadConsoleInputW")
+	procPeekNamedPipe     = kernel32.NewProc("PeekNamedPipe")
 )
+
+// pipeReadable reports whether a read of the pipe returns without blocking: input is queued, or the pipe has ended and the read reports the end of input. A pipe that cannot be peeked is readable too, so the read reports its failure.
+func pipeReadable(handle windows.Handle) bool {
+	var available uint32
+	r1, _, _ := procPeekNamedPipe.Call(uintptr(handle), 0, 0, 0, uintptr(unsafe.Pointer(&available)), 0) //nolint:gosec // G103: PeekNamedPipe writes the count of bytes queued, and x/sys has no wrapper for it.
+	return r1 == 0 || available != 0
+}
 
 // peekConsoleInput copies the console's queued input records into records
 // without removing them and returns how many it copied.

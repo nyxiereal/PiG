@@ -55,7 +55,7 @@ func newTerminalReader(ctx context.Context, source io.Reader) (*terminalReader, 
 	r := &terminalReader{ctx: ctx, source: source}
 	if file, ok := source.(*os.File); ok {
 		r.file = file
-		waiter, err := newTerminalInputWaiter(ctx)
+		waiter, err := newTerminalInputWaiter(ctx, file)
 		if err != nil {
 			return nil, err
 		}

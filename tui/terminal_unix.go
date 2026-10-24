@@ -62,7 +62,7 @@ type terminalInputWaiter struct {
 	callbackDone chan struct{}
 }
 
-func newTerminalInputWaiter(ctx context.Context) (*terminalInputWaiter, error) {
+func newTerminalInputWaiter(ctx context.Context, _ *os.File) (*terminalInputWaiter, error) {
 	cancelRead, cancelWrite, err := os.Pipe()
 	if err != nil {
 		return nil, err

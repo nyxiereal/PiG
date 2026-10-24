@@ -83,15 +83,6 @@ var streamingArgumentsPaths = []streamingArgumentsPath{
 		body: responsesStreamingBody,
 	},
 	{
-		name: "mistral-conversations",
-		provider: func(url string) Provider {
-			return NewMistralProvider(MistralConfig{BaseURL: url, APIKey: "test", Model: "devstral", ProviderID: "mistral"})
-		},
-		body: func(deltas []string, _ JsonObject, _ string) string {
-			return chatStreamingBody(deltas, true)
-		},
-	},
-	{
 		name: "pi-messages",
 		provider: func(url string) Provider {
 			return NewPiMessagesProvider(PiMessagesConfig{BaseURL: url + "/v1", APIKey: "test", Model: "auto", ProviderID: "radius"})

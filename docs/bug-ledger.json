@@ -4441,7 +4441,7 @@
       "origin": "release note",
       "commits": [
         {
-          "hash": "3154dfb77f",
+          "hash": "633152df76",
           "date": "2026-10-23"
         }
       ],
@@ -8235,6 +8235,28 @@
       "tests": [
         "coding/extension/host/subprocess/retained_factory_test.go::TestNodeIsolatedCrashAfterRetainedReloadRestarts",
         "coding/extension/host/subprocess/retained_factory_test.go::TestNodeIsolatedReloadWaitsForCrashRestart"
+      ]
+    },
+    {
+      "id": "BF-4ff1a44",
+      "title": "Fix in shipped code",
+      "symptom": "Fix in shipped code",
+      "rootCause": "Use copy for the array elements of an open path, a switch for the number grammar, a direct conversion for the text content wire, errors.Is for the recovered panic and a reasoned nolint for the test that cuts text from a larger buffer; the read-only test uses errors.AsType. The credential-expiry fixture records the pin's display version.",
+      "rootCauseSource": "commit",
+      "userImpact": "Behavior differed from Pi",
+      "platform": "All platforms",
+      "class": "own",
+      "fixedIn": "Unreleased",
+      "origin": "commit",
+      "commits": [
+        {
+          "hash": "4ff1a44623",
+          "date": "2026-10-24"
+        }
+      ],
+      "tests": [
+        "chord/delta/append_text_test.go::TestAppendTextOwnsTheTextItKeeps",
+        "durable/session/session_deferred_commits_upstream_test.go::TestHoldingADeferredCommit"
       ]
     },
     {
@@ -17373,15 +17395,16 @@
     },
     {
       "id": "BF-8153bc7",
-      "title": "Fix in shipped code",
-      "symptom": "Fix in shipped code",
+      "title": "A tool round whose results request `Handoff` no longer ends the run on the tool-calling answer: the handoff's…",
+      "symptom": "A tool round whose results request `Handoff` no longer ends the run on the tool-calling answer: the handoff's `pi.reset` entry is written and the same run continues with a new generation in the new context, so the submission settles with the eventual answer.",
       "rootCause": "",
       "rootCauseSource": "",
       "userImpact": "Behavior differed from Pi",
       "platform": "All platforms",
       "class": "own",
       "fixedIn": "Unreleased",
-      "origin": "commit",
+      "releaseNote": "A tool round whose results request `Handoff` no longer ends the run on the tool-calling answer: the handoff's `pi.reset` entry is written and the same run continues with a new generation in the new context, so the submission settles with the eventual answer. Queued writes and selected steers are placed after the handoff text, follow-ups wait for the run's final boundary, and a queued reset still ends the run `unanswered` with reason `reset`. A round whose every result also sets `Terminate` ends the run after the handoff.",
+      "origin": "release note",
       "commits": [
         {
           "hash": "8153bc7a9e",

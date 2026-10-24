@@ -6,9 +6,12 @@ the guards read: ``Type.object`` builds ``required`` from the properties that ar
 ``{"type": "string"}``. A TSchema is not changed after it is built: every constructor returns a new one. The Codec family (``Codec``, ``Decode``, ``Encode``, ``DecodeBuilder``,
 ``EncodeBuilder``, ``IsCodec``) is a numbered divergence (D198) and is absent.
 """
+import json
 import math
 import re
 from typing import Any, Dict, List, Mapping, Optional, Sequence
+
+from .compaction_estimate import _js_number_string
 
 
 class TSchema(dict):
@@ -26,8 +29,51 @@ class TSchema(dict):
         kind = self.hidden.get("~kind")
         return kind if isinstance(kind, str) else ""
 
+    def to_json(self) -> str:
+        """What JSON.stringify of the TypeBox value writes: the members in order, numbers as JavaScript prints them (1e21, 1e-7, 0 for -0) and only the escapes JSON.stringify writes."""
+        return type_to_json(self)
+
     def __repr__(self) -> str:
         return f"TSchema({dict.__repr__(self)}, hidden={self.hidden!r})"
+
+
+class TSchemaArray(list):
+    """A schema that is a list: Pi's ``Type.Unsafe``, ``Type.Optional`` and the other updates accept an array, whose own members JSON.stringify ignores. ``hidden`` holds the array's
+    ``length`` as well as the markers."""
+
+    __slots__ = ("hidden",)
+
+    def __init__(self, items: Any = (), hidden: Optional[Dict[str, Any]] = None) -> None:
+        super().__init__(items)
+        self.hidden: Dict[str, Any] = dict(hidden) if hidden else {}
+
+    @property
+    def kind(self) -> str:
+        kind = self.hidden.get("~kind")
+        return kind if isinstance(kind, str) else ""
+
+    def to_json(self) -> str:
+        return type_to_json(self)
+
+
+def type_to_json(value: Any) -> str:
+    """JSON.stringify of a schema (or any value built from dicts, lists, strings, numbers, booleans and None): the dict's insertion order, numbers through the one JavaScript number formatter
+    of the SDK (a number beyond 2**53 is the float it rounds to, as JavaScript reads it), strings with only the escapes JSON.stringify writes."""
+    if value is None:
+        return "null"
+    if value is True:
+        return "true"
+    if value is False:
+        return "false"
+    if isinstance(value, str):
+        return json.dumps(value, ensure_ascii=False)
+    if isinstance(value, (int, float)):
+        return _js_number_string(value)
+    if isinstance(value, dict):
+        return "{" + ",".join(json.dumps(str(key), ensure_ascii=False) + ":" + type_to_json(member) for key, member in value.items()) + "}"
+    if isinstance(value, (list, tuple)):
+        return "[" + ",".join(type_to_json(member) for member in value) + "]"
+    raise TypeError(f"cannot write a {type(value).__name__} as JSON")
 
 
 def _index_key(key: str) -> Optional[int]:
@@ -55,8 +101,16 @@ def _create(kind: str, enumerable: Sequence[Any], options: Optional[Mapping[str,
     return TSchema(_js_order(merged), {"~kind": kind})
 
 
-def _update(current: Any, hidden: Optional[Mapping[str, Any]], enumerable: Optional[Mapping[str, Any]]) -> TSchema:
+def _update(current: Any, hidden: Optional[Mapping[str, Any]], enumerable: Optional[Mapping[str, Any]]) -> Any:
     """TypeBox's ``Memory.Update``: a copy of ``current`` with the hidden members set and the enumerable ones assigned (replaced in place, or appended)."""
+    if isinstance(current, (list, tuple)):
+        # A copy of the array, whose own length is a hidden member, as JavaScript's is; the options are members JSON.stringify ignores.
+        # TypeBox's Clone of an array is ``map``, which drops every non-index member, so a marker set by one update is gone after the next: Type.optional, readonly and immutable
+        # (two updates) leave an array with only its length, and Type.unsafe (one) keeps ``~unsafe``.
+        kept = {"length": len(current)}
+        if hidden and "~unsafe" in hidden:
+            kept.update(hidden)
+        return TSchemaArray(list(current), kept)  # type: ignore[return-value]
     if isinstance(current, TSchema):
         merged, kept = dict(current), dict(current.hidden)
     elif isinstance(current, dict):
@@ -83,6 +137,8 @@ def _member(value: Any, name: str) -> Any:
         if name in value:
             return True, value[name]
         return False, None
+    if isinstance(value, TSchemaArray):
+        return (True, value.hidden[name]) if name in value.hidden else (False, None)
     if isinstance(value, dict) and name in value:
         return True, value[name]
     return False, None
@@ -101,10 +157,7 @@ def _js_number(value: Any) -> Any:
 
 def _js_number_key(number: Any) -> str:
     """``String(number)``: the property name a JavaScript number makes."""
-    number = _js_number(number)
-    if isinstance(number, int):
-        return str(number)
-    return re.sub(r"e([+-])0*(\d)", r"e\1\2", repr(float(number)))
+    return _js_number_string(number)
 
 
 _NUMERIC_STRING = re.compile(r"^(?:[+-]?(?:Infinity|(?:[0-9]+\.?[0-9]*|\.[0-9]+)(?:[eE][+-]?[0-9]+)?)|0[xX][0-9a-fA-F]+|0[oO][0-7]+|0[bB][01]+)$")
@@ -170,7 +223,7 @@ class _Type:
 
     @staticmethod
     def is_unsafe(value: Any) -> bool:
-        if isinstance(value, list):
+        if isinstance(value, (list, tuple)):
             return False
         found, have = _member(value, "~unsafe")
         return found and have is None
@@ -270,7 +323,7 @@ class _Type:
 
     @staticmethod
     def unsafe(schema: Any) -> TSchema:
-        """``Type.Unsafe(schema)``: a copy of the object schema with ``~unsafe`` (None). A value that is not an object raises TypeError."""
+        """``Type.Unsafe(schema)``: a copy of the object (or list) schema with ``~unsafe`` (None). Any other value raises TypeError."""
         return _update(schema, {"~unsafe": None}, None)
 
     @staticmethod

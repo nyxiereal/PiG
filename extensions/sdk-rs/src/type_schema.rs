@@ -1,6 +1,6 @@
 //! pi-ai's `Type` (TypeBox 1.3.27's builder namespace).
 //!
-//! A [`TSchema`] is the JSON Schema TypeBox writes, its members in the order TypeBox wrote them (`to_value` of it is what `JSON.stringify` of Pi's value is), together with TypeBox's
+//! A [`TSchema`] is the JSON Schema TypeBox writes, its members in the order TypeBox wrote them (`to_json` of it is what `JSON.stringify` of Pi's value is), together with TypeBox's
 //! hidden members (`~kind`, `~optional`, `~readonly`, `~immutable`, `~unsafe`). JSON drops those, but the constructors and the guards read them: `Type::object` builds `required` from
 //! the properties that are not `~optional`, and `Type::is_string` is true for `Type::string(None)` and false for the JSON `{"type":"string"}`. A `TSchema` is not changed after it is
 //! built: every constructor returns a new one. The Codec family (`Codec`, `Decode`, `Encode`, `DecodeBuilder`, `EncodeBuilder`, `IsCodec`) is a numbered divergence (D198) and is absent.
@@ -78,6 +78,8 @@ impl TValue {
 pub struct TSchema {
     fields: Vec<(String, TValue)>,
     hidden: BTreeMap<String, Value>,
+    /// The list a schema made of a JavaScript array is (`Type::unsafe_`, `Type::optional` and the other updates accept an array, whose own members JSON.stringify ignores).
+    items: Option<Vec<TValue>>,
 }
 
 impl Serialize for TSchema {
@@ -89,7 +91,18 @@ impl Serialize for TSchema {
 impl TSchema {
     /// The enumerable members as a JSON object, in order, with every nested schema as JSON too.
     pub fn to_value(&self) -> Value {
+        if let Some(items) = &self.items {
+            return Value::Array(items.iter().map(TValue::to_value).collect());
+        }
         Value::Object(self.fields.iter().map(|(key, value)| (key.clone(), value.to_value())).collect())
+    }
+
+    /// What JSON.stringify of the TypeBox value writes: the members in order, numbers as JavaScript prints them (`1e21`, `1e-7`, `0` for -0) through the SDK's one JavaScript
+    /// number formatter, and only the escapes JSON.stringify writes.
+    pub fn to_json(&self) -> String {
+        let mut out = String::new();
+        write_js_json(&self.to_value(), &mut out);
+        out
     }
 
     /// The enumerable member `key`.
@@ -115,6 +128,41 @@ impl TSchema {
     /// The value of `~kind`, or "" for a value without one.
     pub fn kind(&self) -> &str {
         self.hidden.get("~kind").and_then(Value::as_str).unwrap_or("")
+    }
+}
+
+/// JSON.stringify of a JSON value: object members in order, numbers through [`crate::tui::js_number_string`] (a non-finite number is `null`).
+fn write_js_json(value: &Value, out: &mut String) {
+    match value {
+        Value::Null => out.push_str("null"),
+        Value::Bool(flag) => out.push_str(if *flag { "true" } else { "false" }),
+        Value::Number(number) => match number.as_f64().filter(|n| n.is_finite()) {
+            Some(number) => out.push_str(&crate::tui::js_number_string(number)),
+            None => out.push_str("null"),
+        },
+        Value::String(text) => out.push_str(&serde_json::to_string(text).unwrap_or_default()),
+        Value::Array(items) => {
+            out.push('[');
+            for (index, item) in items.iter().enumerate() {
+                if index > 0 {
+                    out.push(',');
+                }
+                write_js_json(item, out);
+            }
+            out.push(']');
+        }
+        Value::Object(map) => {
+            out.push('{');
+            for (index, (key, member)) in map.iter().enumerate() {
+                if index > 0 {
+                    out.push(',');
+                }
+                out.push_str(&serde_json::to_string(key).unwrap_or_default());
+                out.push(':');
+                write_js_json(member, out);
+            }
+            out.push('}');
+        }
     }
 }
 
@@ -150,11 +198,26 @@ fn create(kind: &str, enumerable: Vec<(&str, TValue)>, options: Option<&Map<Stri
     for (key, value) in options.into_iter().flatten() {
         set(&mut fields, key, TValue::Json(value.clone()));
     }
-    TSchema { fields: js_order(fields), hidden: BTreeMap::from([("~kind".to_string(), json!(kind))]) }
+    TSchema { fields: js_order(fields), hidden: BTreeMap::from([("~kind".to_string(), json!(kind))]), items: None }
 }
 
 /// TypeBox's `Memory.Update`: a copy of `current` with the hidden members set and the enumerable ones assigned (replaced in place, or appended).
 fn update(current: &TValue, hidden: &[(&str, Value)], enumerable: Option<&Map<String, Value>>) -> Result<TSchema, String> {
+    if let Some(items) = match current {
+        TValue::List(items) => Some(items.clone()),
+        TValue::Json(Value::Array(items)) => Some(items.iter().cloned().map(TValue::Json).collect()),
+        TValue::Schema(schema) if schema.items.is_some() => schema.items.clone(),
+        _ => None,
+    } {
+        // A copy of the array, whose own `length` is a hidden member, as JavaScript's is; the options are members JSON.stringify ignores.
+        // TypeBox's Clone of an array is `map`, which drops every non-index member, so a marker set by one update is gone after the next: `optional`, `readonly` and
+        // `immutable` (two updates) leave an array with only its length, and `unsafe_` (one) keeps `~unsafe`.
+        let mut kept = BTreeMap::from([("length".to_string(), json!(items.len()))]);
+        for (name, value) in hidden.iter().filter(|(name, _)| *name == "~unsafe") {
+            kept.insert((*name).to_string(), value.clone());
+        }
+        return Ok(TSchema { fields: Vec::new(), hidden: kept, items: Some(items) });
+    }
     let (mut fields, mut kept) = match current {
         TValue::Schema(schema) => (schema.fields.clone(), schema.hidden.clone()),
         TValue::Json(Value::Object(map)) => (map.iter().map(|(key, value)| (key.clone(), TValue::Json(value.clone()))).collect(), BTreeMap::new()),
@@ -167,12 +230,24 @@ fn update(current: &TValue, hidden: &[(&str, Value)], enumerable: Option<&Map<St
     for (key, value) in enumerable.into_iter().flatten() {
         set(&mut fields, key, TValue::Json(value.clone()));
     }
-    Ok(TSchema { fields: js_order(fields), hidden: kept })
+    Ok(TSchema { fields: js_order(fields), hidden: kept, items: None })
 }
 
 fn mark(mut schema: TSchema, name: &str) -> TSchema {
+    if schema.items.is_some() {
+        // A list schema loses the marker to the second clone TypeBox makes (see `update`).
+        schema.hidden = BTreeMap::from([("length".to_string(), json!(schema.items.as_ref().map_or(0, Vec::len)))]);
+        return schema;
+    }
     schema.hidden.insert(name.to_string(), json!(true));
     schema
+}
+
+fn mark_value(value: TValue, name: &str) -> Result<TSchema, String> {
+    match value {
+        TValue::Schema(schema) => Ok(mark(schema, name)),
+        other => update(&other, &[(name, json!(true))], None),
+    }
 }
 
 fn is_schema(value: &TValue) -> bool {
@@ -188,10 +263,7 @@ fn js_number(number: f64) -> Value {
 }
 
 fn js_number_key(number: f64) -> String {
-    match js_number(number) {
-        Value::Number(text) => text.to_string(),
-        _ => number.to_string(),
-    }
+    crate::tui::js_number_string(number)
 }
 
 const INTEGER_KEY: &str = "^-?(?:0|[1-9][0-9]*)$";
@@ -327,7 +399,7 @@ impl Type {
     /// An object (not a list) whose `~unsafe` is null.
     pub fn is_unsafe(value: impl Into<TValue>) -> bool {
         let value = value.into();
-        !matches!(value, TValue::List(_) | TValue::Json(Value::Array(_))) && value.member("~unsafe") == Some(TValue::Json(Value::Null))
+        !matches!(&value, TValue::List(_) | TValue::Json(Value::Array(_))) && !matches!(&value, TValue::Schema(schema) if schema.items.is_some()) && value.member("~unsafe") == Some(TValue::Json(Value::Null))
     }
 
     /// A string or a finite number.
@@ -414,7 +486,20 @@ impl Type {
     pub fn immutable(schema: impl Into<TSchema>) -> TSchema {
         mark(schema.into(), "~immutable")
     }
-    /// `Type.Unsafe(schema)`: a copy of the object schema with `~unsafe` (null). A value that is not an object is an error.
+    /// `Type.Optional(value)` of a value that is not a [`TSchema`]: a plain JSON object, or a list (whose copy loses the marker, see [`Type::unsafe_`]). Any other value is an error.
+    pub fn optional_value(value: impl Into<TValue>) -> Result<TSchema, String> {
+        mark_value(value.into(), "~optional")
+    }
+    /// `Type.Readonly(value)` of a value that is not a [`TSchema`]; see [`Type::optional_value`].
+    pub fn readonly_value(value: impl Into<TValue>) -> Result<TSchema, String> {
+        mark_value(value.into(), "~readonly")
+    }
+    /// `Type.Immutable(value)` of a value that is not a [`TSchema`]; see [`Type::optional_value`].
+    pub fn immutable_value(value: impl Into<TValue>) -> Result<TSchema, String> {
+        mark_value(value.into(), "~immutable")
+    }
+
+    /// `Type.Unsafe(schema)`: a copy of the object (or list) schema with `~unsafe` (null). Any other value is an error.
     pub fn unsafe_(schema: impl Into<TValue>) -> Result<TSchema, String> {
         update(&schema.into(), &[("~unsafe", Value::Null)], None)
     }

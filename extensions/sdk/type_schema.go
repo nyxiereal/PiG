@@ -20,10 +20,19 @@ import (
 type TSchema struct {
 	object *OrderedObject
 	hidden map[string]any
+	// items is the list a schema made of a JavaScript array is (Type.Unsafe, Type.Optional and the other updates accept an array, whose own members JSON.stringify ignores): it
+	// is nil for an object.
+	items []any
 }
 
-// MarshalJSON writes the enumerable members in order, as JSON.stringify of the TypeBox value does.
-func (s *TSchema) MarshalJSON() ([]byte, error) { return s.object.MarshalJSON() }
+// MarshalJSON writes what JSON.stringify of the TypeBox value writes: the enumerable members in order, numbers as JavaScript prints them (1e21, 1e-7, 0 for -0), and strings
+// with only the escapes JSON.stringify writes.
+func (s *TSchema) MarshalJSON() ([]byte, error) {
+	if s.items != nil {
+		return json.MarshalStringify(s.items)
+	}
+	return json.MarshalStringify(s.object)
+}
 
 // Keys returns the enumerable keys in order.
 func (s *TSchema) Keys() []string { return s.object.Keys() }
@@ -43,14 +52,41 @@ func (s *TSchema) Kind() string {
 	return kind
 }
 
-// Schema is the schema as the plain map an [Extension.Tool] takes. Nested members keep their order and hidden members; the root's keys are a Go map's, so
-// they marshal in alphabetical order. Use the TSchema itself where the order of the root's keys matters.
+// Schema is the schema as the plain map an [Extension.Tool] takes. Nested members keep their order and hidden members. A Go map has no order of its own, so the map carries the
+// root's key order under the member [schemaOrderKey] (a list of the keys); registering the tool writes the root in that order and leaves the member out, so the host and the provider see
+// the schema as Pi's `Type` wrote it. Code that reads the map sees that one extra member.
 func (s *TSchema) Schema() Schema {
-	out := make(Schema, len(s.object.keys))
+	out := make(Schema, len(s.object.keys)+1)
 	for _, key := range s.object.keys {
 		out[key] = s.object.values[key]
 	}
+	out[schemaOrderKey] = slices.Clone(s.object.keys)
 	return out
+}
+
+// schemaOrderKey is the member of a [Schema] that lists its root keys in the order they were declared in; see [TSchema.Schema].
+const schemaOrderKey = "~order"
+
+// schemaRoot is the root of a tool's parameter schema as it goes on the wire: a map, written with the key order [TSchema.Schema] recorded when there is one and in
+// alphabetical order otherwise (a Go map's own).
+type schemaRoot map[string]any
+
+// MarshalJSON writes the root's members in the recorded order, then any that are not in it (added after the schema was built) alphabetically; a recorded key the map no longer
+// has is skipped, and the record itself is not written.
+func (r schemaRoot) MarshalJSON() ([]byte, error) {
+	declared, _ := r[schemaOrderKey].([]string)
+	object := &OrderedObject{values: map[string]any{}}
+	for _, key := range declared {
+		if value, present := r[key]; present && key != schemaOrderKey {
+			object.set(key, value)
+		}
+	}
+	for _, key := range sortedKeys(r) {
+		if _, written := object.values[key]; !written && key != schemaOrderKey {
+			object.set(key, r[key])
+		}
+	}
+	return json.MarshalJS(object)
 }
 
 // TypeOptions is the options object of a constructor (Pi's `options?: TSchemaOptions`): the members are appended to the schema in their order, after the ones the constructor writes,
@@ -127,6 +163,9 @@ func firstOptions(options []TypeOptions) TypeOptions {
 // update is Memory.Update(current, hidden, enumerable): a copy of current with the hidden members set and the enumerable ones assigned (replaced in place, or appended).
 func update(current any, hidden map[string]any, enumerable TypeOptions) *TSchema {
 	var result *TSchema
+	if schema, isSchema := current.(*TSchema); isSchema && schema != nil && schema.items != nil {
+		current = schema.items // a schema made of an array is cloned as the array it is: its hidden members are not copied
+	}
 	switch current := current.(type) {
 	case *TSchema:
 		result = &TSchema{object: current.object.clone(), hidden: maps.Clone(current.hidden)}
@@ -138,6 +177,16 @@ func update(current any, hidden map[string]any, enumerable TypeOptions) *TSchema
 			object.set(key, current[key])
 		}
 		result = &TSchema{object: object, hidden: map[string]any{}}
+	case []any:
+		// A copy of the array, whose own `length` is a hidden member, as JavaScript's is. TypeBox's Clone of an array is `map`, which drops every non-index member, so a marker
+		// set by one update is gone after the next: Type.Optional, Readonly and Immutable (two updates) leave an array with only its length, and Type.Unsafe (one) keeps `~unsafe`.
+		result = &TSchema{object: &OrderedObject{}, hidden: map[string]any{"length": float64(len(current))}, items: slices.Clone(current)}
+		if current == nil {
+			result.items = []any{}
+		}
+		if _, unsafe := hidden["~unsafe"]; !unsafe {
+			hidden = nil
+		}
 	default:
 		panic(fmt.Sprintf("TypeError: cannot update a %T, a schema is an object", current))
 	}
@@ -247,6 +296,9 @@ func (t typeNamespace) IsImmutable(value any) bool { return t.isOptionalMember(v
 // IsUnsafe reports whether value is a Type.Unsafe schema: an object (not an array) whose `~unsafe` is null.
 func (typeNamespace) IsUnsafe(value any) bool {
 	if _, isSlice := value.([]any); isSlice {
+		return false
+	}
+	if schema, isSchema := value.(*TSchema); isSchema && schema != nil && schema.items != nil {
 		return false
 	}
 	have, ok := memberValue(value, "~unsafe")
@@ -432,7 +484,7 @@ func (typeNamespace) Immutable(schema any) *TSchema {
 	return update(schema, map[string]any{"~immutable": true}, nil)
 }
 
-// Unsafe is `Type.Unsafe(schema)`: a copy of the object schema with the hidden `~unsafe` (null), for a schema TypeBox has no constructor for. A value that is not an object panics.
+// Unsafe is `Type.Unsafe(schema)`: a copy of the object (or array) schema with the hidden `~unsafe` (null), for a schema TypeBox has no constructor for. Any other value panics.
 func (typeNamespace) Unsafe(schema any) *TSchema {
 	return update(schema, map[string]any{"~unsafe": nil}, nil)
 }

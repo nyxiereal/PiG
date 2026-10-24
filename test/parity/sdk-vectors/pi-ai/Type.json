@@ -2587,6 +2587,1836 @@
    }
   },
   {
+   "name": "unsafe of an array",
+   "args": [
+    {
+     "$call": "Unsafe",
+     "args": [
+      [
+       1,
+       "a",
+       null
+      ]
+     ]
+    }
+   ],
+   "result": {
+    "json": "[1,\"a\",null]",
+    "hidden": {
+     "length": 3,
+     "~unsafe": null
+    }
+   }
+  },
+  {
+   "name": "unsafe of an empty array",
+   "args": [
+    {
+     "$call": "Unsafe",
+     "args": [
+      []
+     ]
+    }
+   ],
+   "result": {
+    "json": "[]",
+    "hidden": {
+     "length": 0,
+     "~unsafe": null
+    }
+   }
+  },
+  {
+   "name": "unsafe of nested arrays",
+   "args": [
+    {
+     "$call": "Unsafe",
+     "args": [
+      [
+       [
+        1
+       ],
+       {
+        "a": 2
+       }
+      ]
+     ]
+    }
+   ],
+   "result": {
+    "json": "[[1],{\"a\":2}]",
+    "hidden": {
+     "length": 2,
+     "~unsafe": null
+    }
+   }
+  },
+  {
+   "name": "optional of an array",
+   "args": [
+    {
+     "$call": "Optional",
+     "args": [
+      [
+       1,
+       2
+      ]
+     ]
+    }
+   ],
+   "result": {
+    "json": "[1,2]",
+    "hidden": {
+     "length": 2
+    }
+   }
+  },
+  {
+   "name": "readonly of an array",
+   "args": [
+    {
+     "$call": "Readonly",
+     "args": [
+      [
+       "x"
+      ]
+     ]
+    }
+   ],
+   "result": {
+    "json": "[\"x\"]",
+    "hidden": {
+     "length": 1
+    }
+   }
+  },
+  {
+   "name": "with options on an array",
+   "args": [
+    {
+     "$call": "With",
+     "args": [
+      [
+       1
+      ],
+      {
+       "description": "d"
+      }
+     ]
+    }
+   ],
+   "result": {
+    "json": "[1]",
+    "hidden": {
+     "length": 1
+    }
+   }
+  },
+  {
+   "name": "IsUnsafe of an unsafe array",
+   "args": [
+    {
+     "$call": "IsUnsafe",
+     "args": [
+      {
+       "$call": "Unsafe",
+       "args": [
+        [
+         1
+        ]
+       ]
+      }
+     ]
+    }
+   ],
+   "result": false
+  },
+  {
+   "name": "IsSchema of an unsafe array",
+   "args": [
+    {
+     "$call": "IsSchema",
+     "args": [
+      {
+       "$call": "Unsafe",
+       "args": [
+        [
+         1
+        ]
+       ]
+      }
+     ]
+    }
+   ],
+   "result": true
+  },
+  {
+   "name": "IsOptional of an optional array",
+   "args": [
+    {
+     "$call": "IsOptional",
+     "args": [
+      {
+       "$call": "Optional",
+       "args": [
+        [
+         1
+        ]
+       ]
+      }
+     ]
+    }
+   ],
+   "result": false
+  },
+  {
+   "name": "number option 1e+21",
+   "args": [
+    {
+     "$call": "Number",
+     "args": [
+      {
+       "minimum": 1e+21,
+       "maximum": 1e+21
+      }
+     ]
+    }
+   ],
+   "result": {
+    "json": "{\"type\":\"number\",\"minimum\":1e+21,\"maximum\":1e+21}",
+    "hidden": {
+     "~kind": "Number"
+    }
+   }
+  },
+  {
+   "name": "literal 1e+21",
+   "args": [
+    {
+     "$call": "Literal",
+     "args": [
+      1e+21
+     ]
+    }
+   ],
+   "result": {
+    "json": "{\"type\":\"number\",\"const\":1e+21}",
+    "hidden": {
+     "~kind": "Literal"
+    }
+   }
+  },
+  {
+   "name": "record of literal 1e+21",
+   "args": [
+    {
+     "$call": "Record",
+     "args": [
+      {
+       "$call": "Literal",
+       "args": [
+        1e+21
+       ]
+      },
+      {
+       "$call": "String",
+       "args": []
+      }
+     ]
+    }
+   ],
+   "result": {
+    "json": "{\"type\":\"object\",\"required\":[\"1e+21\"],\"properties\":{\"1e+21\":{\"type\":\"string\"}}}",
+    "hidden": {
+     "~kind": "Object"
+    }
+   }
+  },
+  {
+   "name": "number option 1e-7",
+   "args": [
+    {
+     "$call": "Number",
+     "args": [
+      {
+       "minimum": 1e-7,
+       "maximum": 1e-7
+      }
+     ]
+    }
+   ],
+   "result": {
+    "json": "{\"type\":\"number\",\"minimum\":1e-7,\"maximum\":1e-7}",
+    "hidden": {
+     "~kind": "Number"
+    }
+   }
+  },
+  {
+   "name": "literal 1e-7",
+   "args": [
+    {
+     "$call": "Literal",
+     "args": [
+      1e-7
+     ]
+    }
+   ],
+   "result": {
+    "json": "{\"type\":\"number\",\"const\":1e-7}",
+    "hidden": {
+     "~kind": "Literal"
+    }
+   }
+  },
+  {
+   "name": "record of literal 1e-7",
+   "args": [
+    {
+     "$call": "Record",
+     "args": [
+      {
+       "$call": "Literal",
+       "args": [
+        1e-7
+       ]
+      },
+      {
+       "$call": "String",
+       "args": []
+      }
+     ]
+    }
+   ],
+   "result": {
+    "json": "{\"type\":\"object\",\"required\":[\"1e-7\"],\"properties\":{\"1e-7\":{\"type\":\"string\"}}}",
+    "hidden": {
+     "~kind": "Object"
+    }
+   }
+  },
+  {
+   "name": "number option 0.000001",
+   "args": [
+    {
+     "$call": "Number",
+     "args": [
+      {
+       "minimum": 0.000001,
+       "maximum": 0.000001
+      }
+     ]
+    }
+   ],
+   "result": {
+    "json": "{\"type\":\"number\",\"minimum\":0.000001,\"maximum\":0.000001}",
+    "hidden": {
+     "~kind": "Number"
+    }
+   }
+  },
+  {
+   "name": "literal 0.000001",
+   "args": [
+    {
+     "$call": "Literal",
+     "args": [
+      0.000001
+     ]
+    }
+   ],
+   "result": {
+    "json": "{\"type\":\"number\",\"const\":0.000001}",
+    "hidden": {
+     "~kind": "Literal"
+    }
+   }
+  },
+  {
+   "name": "record of literal 0.000001",
+   "args": [
+    {
+     "$call": "Record",
+     "args": [
+      {
+       "$call": "Literal",
+       "args": [
+        0.000001
+       ]
+      },
+      {
+       "$call": "String",
+       "args": []
+      }
+     ]
+    }
+   ],
+   "result": {
+    "json": "{\"type\":\"object\",\"required\":[\"0.000001\"],\"properties\":{\"0.000001\":{\"type\":\"string\"}}}",
+    "hidden": {
+     "~kind": "Object"
+    }
+   }
+  },
+  {
+   "name": "number option 1.5e-10",
+   "args": [
+    {
+     "$call": "Number",
+     "args": [
+      {
+       "minimum": 1.5e-10,
+       "maximum": 1.5e-10
+      }
+     ]
+    }
+   ],
+   "result": {
+    "json": "{\"type\":\"number\",\"minimum\":1.5e-10,\"maximum\":1.5e-10}",
+    "hidden": {
+     "~kind": "Number"
+    }
+   }
+  },
+  {
+   "name": "literal 1.5e-10",
+   "args": [
+    {
+     "$call": "Literal",
+     "args": [
+      1.5e-10
+     ]
+    }
+   ],
+   "result": {
+    "json": "{\"type\":\"number\",\"const\":1.5e-10}",
+    "hidden": {
+     "~kind": "Literal"
+    }
+   }
+  },
+  {
+   "name": "record of literal 1.5e-10",
+   "args": [
+    {
+     "$call": "Record",
+     "args": [
+      {
+       "$call": "Literal",
+       "args": [
+        1.5e-10
+       ]
+      },
+      {
+       "$call": "String",
+       "args": []
+      }
+     ]
+    }
+   ],
+   "result": {
+    "json": "{\"type\":\"object\",\"required\":[\"1.5e-10\"],\"properties\":{\"1.5e-10\":{\"type\":\"string\"}}}",
+    "hidden": {
+     "~kind": "Object"
+    }
+   }
+  },
+  {
+   "name": "number option 123456789012345680000",
+   "args": [
+    {
+     "$call": "Number",
+     "args": [
+      {
+       "minimum": 123456789012345680000,
+       "maximum": 123456789012345680000
+      }
+     ]
+    }
+   ],
+   "result": {
+    "json": "{\"type\":\"number\",\"minimum\":123456789012345680000,\"maximum\":123456789012345680000}",
+    "hidden": {
+     "~kind": "Number"
+    }
+   }
+  },
+  {
+   "name": "literal 123456789012345680000",
+   "args": [
+    {
+     "$call": "Literal",
+     "args": [
+      123456789012345680000
+     ]
+    }
+   ],
+   "result": {
+    "json": "{\"type\":\"number\",\"const\":123456789012345680000}",
+    "hidden": {
+     "~kind": "Literal"
+    }
+   }
+  },
+  {
+   "name": "record of literal 123456789012345680000",
+   "args": [
+    {
+     "$call": "Record",
+     "args": [
+      {
+       "$call": "Literal",
+       "args": [
+        123456789012345680000
+       ]
+      },
+      {
+       "$call": "String",
+       "args": []
+      }
+     ]
+    }
+   ],
+   "result": {
+    "json": "{\"type\":\"object\",\"required\":[\"123456789012345680000\"],\"properties\":{\"123456789012345680000\":{\"type\":\"string\"}}}",
+    "hidden": {
+     "~kind": "Object"
+    }
+   }
+  },
+  {
+   "name": "number option 12345678901234567000",
+   "args": [
+    {
+     "$call": "Number",
+     "args": [
+      {
+       "minimum": 12345678901234567000,
+       "maximum": 12345678901234567000
+      }
+     ]
+    }
+   ],
+   "result": {
+    "json": "{\"type\":\"number\",\"minimum\":12345678901234567000,\"maximum\":12345678901234567000}",
+    "hidden": {
+     "~kind": "Number"
+    }
+   }
+  },
+  {
+   "name": "literal 12345678901234567000",
+   "args": [
+    {
+     "$call": "Literal",
+     "args": [
+      12345678901234567000
+     ]
+    }
+   ],
+   "result": {
+    "json": "{\"type\":\"number\",\"const\":12345678901234567000}",
+    "hidden": {
+     "~kind": "Literal"
+    }
+   }
+  },
+  {
+   "name": "record of literal 12345678901234567000",
+   "args": [
+    {
+     "$call": "Record",
+     "args": [
+      {
+       "$call": "Literal",
+       "args": [
+        12345678901234567000
+       ]
+      },
+      {
+       "$call": "String",
+       "args": []
+      }
+     ]
+    }
+   ],
+   "result": {
+    "json": "{\"type\":\"object\",\"required\":[\"12345678901234567000\"],\"properties\":{\"12345678901234567000\":{\"type\":\"string\"}}}",
+    "hidden": {
+     "~kind": "Object"
+    }
+   }
+  },
+  {
+   "name": "number option 5e-324",
+   "args": [
+    {
+     "$call": "Number",
+     "args": [
+      {
+       "minimum": 5e-324,
+       "maximum": 5e-324
+      }
+     ]
+    }
+   ],
+   "result": {
+    "json": "{\"type\":\"number\",\"minimum\":5e-324,\"maximum\":5e-324}",
+    "hidden": {
+     "~kind": "Number"
+    }
+   }
+  },
+  {
+   "name": "literal 5e-324",
+   "args": [
+    {
+     "$call": "Literal",
+     "args": [
+      5e-324
+     ]
+    }
+   ],
+   "result": {
+    "json": "{\"type\":\"number\",\"const\":5e-324}",
+    "hidden": {
+     "~kind": "Literal"
+    }
+   }
+  },
+  {
+   "name": "record of literal 5e-324",
+   "args": [
+    {
+     "$call": "Record",
+     "args": [
+      {
+       "$call": "Literal",
+       "args": [
+        5e-324
+       ]
+      },
+      {
+       "$call": "String",
+       "args": []
+      }
+     ]
+    }
+   ],
+   "result": {
+    "json": "{\"type\":\"object\",\"required\":[\"5e-324\"],\"properties\":{\"5e-324\":{\"type\":\"string\"}}}",
+    "hidden": {
+     "~kind": "Object"
+    }
+   }
+  },
+  {
+   "name": "number option 1.7976931348623157e+308",
+   "args": [
+    {
+     "$call": "Number",
+     "args": [
+      {
+       "minimum": 1.7976931348623157e+308,
+       "maximum": 1.7976931348623157e+308
+      }
+     ]
+    }
+   ],
+   "result": {
+    "json": "{\"type\":\"number\",\"minimum\":1.7976931348623157e+308,\"maximum\":1.7976931348623157e+308}",
+    "hidden": {
+     "~kind": "Number"
+    }
+   }
+  },
+  {
+   "name": "literal 1.7976931348623157e+308",
+   "args": [
+    {
+     "$call": "Literal",
+     "args": [
+      1.7976931348623157e+308
+     ]
+    }
+   ],
+   "result": {
+    "json": "{\"type\":\"number\",\"const\":1.7976931348623157e+308}",
+    "hidden": {
+     "~kind": "Literal"
+    }
+   }
+  },
+  {
+   "name": "record of literal 1.7976931348623157e+308",
+   "args": [
+    {
+     "$call": "Record",
+     "args": [
+      {
+       "$call": "Literal",
+       "args": [
+        1.7976931348623157e+308
+       ]
+      },
+      {
+       "$call": "String",
+       "args": []
+      }
+     ]
+    }
+   ],
+   "result": {
+    "json": "{\"type\":\"object\",\"required\":[\"1.7976931348623157e+308\"],\"properties\":{\"1.7976931348623157e+308\":{\"type\":\"string\"}}}",
+    "hidden": {
+     "~kind": "Object"
+    }
+   }
+  },
+  {
+   "name": "number option 0.30000000000000004",
+   "args": [
+    {
+     "$call": "Number",
+     "args": [
+      {
+       "minimum": 0.30000000000000004,
+       "maximum": 0.30000000000000004
+      }
+     ]
+    }
+   ],
+   "result": {
+    "json": "{\"type\":\"number\",\"minimum\":0.30000000000000004,\"maximum\":0.30000000000000004}",
+    "hidden": {
+     "~kind": "Number"
+    }
+   }
+  },
+  {
+   "name": "literal 0.30000000000000004",
+   "args": [
+    {
+     "$call": "Literal",
+     "args": [
+      0.30000000000000004
+     ]
+    }
+   ],
+   "result": {
+    "json": "{\"type\":\"number\",\"const\":0.30000000000000004}",
+    "hidden": {
+     "~kind": "Literal"
+    }
+   }
+  },
+  {
+   "name": "record of literal 0.30000000000000004",
+   "args": [
+    {
+     "$call": "Record",
+     "args": [
+      {
+       "$call": "Literal",
+       "args": [
+        0.30000000000000004
+       ]
+      },
+      {
+       "$call": "String",
+       "args": []
+      }
+     ]
+    }
+   ],
+   "result": {
+    "json": "{\"type\":\"object\",\"required\":[\"0.30000000000000004\"],\"properties\":{\"0.30000000000000004\":{\"type\":\"string\"}}}",
+    "hidden": {
+     "~kind": "Object"
+    }
+   }
+  },
+  {
+   "name": "number option 4.35",
+   "args": [
+    {
+     "$call": "Number",
+     "args": [
+      {
+       "minimum": 4.35,
+       "maximum": 4.35
+      }
+     ]
+    }
+   ],
+   "result": {
+    "json": "{\"type\":\"number\",\"minimum\":4.35,\"maximum\":4.35}",
+    "hidden": {
+     "~kind": "Number"
+    }
+   }
+  },
+  {
+   "name": "literal 4.35",
+   "args": [
+    {
+     "$call": "Literal",
+     "args": [
+      4.35
+     ]
+    }
+   ],
+   "result": {
+    "json": "{\"type\":\"number\",\"const\":4.35}",
+    "hidden": {
+     "~kind": "Literal"
+    }
+   }
+  },
+  {
+   "name": "record of literal 4.35",
+   "args": [
+    {
+     "$call": "Record",
+     "args": [
+      {
+       "$call": "Literal",
+       "args": [
+        4.35
+       ]
+      },
+      {
+       "$call": "String",
+       "args": []
+      }
+     ]
+    }
+   ],
+   "result": {
+    "json": "{\"type\":\"object\",\"required\":[\"4.35\"],\"properties\":{\"4.35\":{\"type\":\"string\"}}}",
+    "hidden": {
+     "~kind": "Object"
+    }
+   }
+  },
+  {
+   "name": "number option 9007199254740992",
+   "args": [
+    {
+     "$call": "Number",
+     "args": [
+      {
+       "minimum": 9007199254740992,
+       "maximum": 9007199254740992
+      }
+     ]
+    }
+   ],
+   "result": {
+    "json": "{\"type\":\"number\",\"minimum\":9007199254740992,\"maximum\":9007199254740992}",
+    "hidden": {
+     "~kind": "Number"
+    }
+   }
+  },
+  {
+   "name": "literal 9007199254740992",
+   "args": [
+    {
+     "$call": "Literal",
+     "args": [
+      9007199254740992
+     ]
+    }
+   ],
+   "result": {
+    "json": "{\"type\":\"number\",\"const\":9007199254740992}",
+    "hidden": {
+     "~kind": "Literal"
+    }
+   }
+  },
+  {
+   "name": "record of literal 9007199254740992",
+   "args": [
+    {
+     "$call": "Record",
+     "args": [
+      {
+       "$call": "Literal",
+       "args": [
+        9007199254740992
+       ]
+      },
+      {
+       "$call": "String",
+       "args": []
+      }
+     ]
+    }
+   ],
+   "result": {
+    "json": "{\"type\":\"object\",\"required\":[\"9007199254740992\"],\"properties\":{\"9007199254740992\":{\"type\":\"string\"}}}",
+    "hidden": {
+     "~kind": "Object"
+    }
+   }
+  },
+  {
+   "name": "number option 9007199254740994",
+   "args": [
+    {
+     "$call": "Number",
+     "args": [
+      {
+       "minimum": 9007199254740994,
+       "maximum": 9007199254740994
+      }
+     ]
+    }
+   ],
+   "result": {
+    "json": "{\"type\":\"number\",\"minimum\":9007199254740994,\"maximum\":9007199254740994}",
+    "hidden": {
+     "~kind": "Number"
+    }
+   }
+  },
+  {
+   "name": "literal 9007199254740994",
+   "args": [
+    {
+     "$call": "Literal",
+     "args": [
+      9007199254740994
+     ]
+    }
+   ],
+   "result": {
+    "json": "{\"type\":\"number\",\"const\":9007199254740994}",
+    "hidden": {
+     "~kind": "Literal"
+    }
+   }
+  },
+  {
+   "name": "record of literal 9007199254740994",
+   "args": [
+    {
+     "$call": "Record",
+     "args": [
+      {
+       "$call": "Literal",
+       "args": [
+        9007199254740994
+       ]
+      },
+      {
+       "$call": "String",
+       "args": []
+      }
+     ]
+    }
+   ],
+   "result": {
+    "json": "{\"type\":\"object\",\"required\":[\"9007199254740994\"],\"properties\":{\"9007199254740994\":{\"type\":\"string\"}}}",
+    "hidden": {
+     "~kind": "Object"
+    }
+   }
+  },
+  {
+   "name": "number option 100",
+   "args": [
+    {
+     "$call": "Number",
+     "args": [
+      {
+       "minimum": 100,
+       "maximum": 100
+      }
+     ]
+    }
+   ],
+   "result": {
+    "json": "{\"type\":\"number\",\"minimum\":100,\"maximum\":100}",
+    "hidden": {
+     "~kind": "Number"
+    }
+   }
+  },
+  {
+   "name": "literal 100",
+   "args": [
+    {
+     "$call": "Literal",
+     "args": [
+      100
+     ]
+    }
+   ],
+   "result": {
+    "json": "{\"type\":\"number\",\"const\":100}",
+    "hidden": {
+     "~kind": "Literal"
+    }
+   }
+  },
+  {
+   "name": "record of literal 100",
+   "args": [
+    {
+     "$call": "Record",
+     "args": [
+      {
+       "$call": "Literal",
+       "args": [
+        100
+       ]
+      },
+      {
+       "$call": "String",
+       "args": []
+      }
+     ]
+    }
+   ],
+   "result": {
+    "json": "{\"type\":\"object\",\"required\":[\"100\"],\"properties\":{\"100\":{\"type\":\"string\"}}}",
+    "hidden": {
+     "~kind": "Object"
+    }
+   }
+  },
+  {
+   "name": "number option 0.000001234",
+   "args": [
+    {
+     "$call": "Number",
+     "args": [
+      {
+       "minimum": 0.000001234,
+       "maximum": 0.000001234
+      }
+     ]
+    }
+   ],
+   "result": {
+    "json": "{\"type\":\"number\",\"minimum\":0.000001234,\"maximum\":0.000001234}",
+    "hidden": {
+     "~kind": "Number"
+    }
+   }
+  },
+  {
+   "name": "literal 0.000001234",
+   "args": [
+    {
+     "$call": "Literal",
+     "args": [
+      0.000001234
+     ]
+    }
+   ],
+   "result": {
+    "json": "{\"type\":\"number\",\"const\":0.000001234}",
+    "hidden": {
+     "~kind": "Literal"
+    }
+   }
+  },
+  {
+   "name": "record of literal 0.000001234",
+   "args": [
+    {
+     "$call": "Record",
+     "args": [
+      {
+       "$call": "Literal",
+       "args": [
+        0.000001234
+       ]
+      },
+      {
+       "$call": "String",
+       "args": []
+      }
+     ]
+    }
+   ],
+   "result": {
+    "json": "{\"type\":\"object\",\"required\":[\"0.000001234\"],\"properties\":{\"0.000001234\":{\"type\":\"string\"}}}",
+    "hidden": {
+     "~kind": "Object"
+    }
+   }
+  },
+  {
+   "name": "number option 1e+300",
+   "args": [
+    {
+     "$call": "Number",
+     "args": [
+      {
+       "minimum": 1e+300,
+       "maximum": 1e+300
+      }
+     ]
+    }
+   ],
+   "result": {
+    "json": "{\"type\":\"number\",\"minimum\":1e+300,\"maximum\":1e+300}",
+    "hidden": {
+     "~kind": "Number"
+    }
+   }
+  },
+  {
+   "name": "literal 1e+300",
+   "args": [
+    {
+     "$call": "Literal",
+     "args": [
+      1e+300
+     ]
+    }
+   ],
+   "result": {
+    "json": "{\"type\":\"number\",\"const\":1e+300}",
+    "hidden": {
+     "~kind": "Literal"
+    }
+   }
+  },
+  {
+   "name": "record of literal 1e+300",
+   "args": [
+    {
+     "$call": "Record",
+     "args": [
+      {
+       "$call": "Literal",
+       "args": [
+        1e+300
+       ]
+      },
+      {
+       "$call": "String",
+       "args": []
+      }
+     ]
+    }
+   ],
+   "result": {
+    "json": "{\"type\":\"object\",\"required\":[\"1e+300\"],\"properties\":{\"1e+300\":{\"type\":\"string\"}}}",
+    "hidden": {
+     "~kind": "Object"
+    }
+   }
+  },
+  {
+   "name": "number option -1e+21",
+   "args": [
+    {
+     "$call": "Number",
+     "args": [
+      {
+       "minimum": -1e+21,
+       "maximum": -1e+21
+      }
+     ]
+    }
+   ],
+   "result": {
+    "json": "{\"type\":\"number\",\"minimum\":-1e+21,\"maximum\":-1e+21}",
+    "hidden": {
+     "~kind": "Number"
+    }
+   }
+  },
+  {
+   "name": "literal -1e+21",
+   "args": [
+    {
+     "$call": "Literal",
+     "args": [
+      -1e+21
+     ]
+    }
+   ],
+   "result": {
+    "json": "{\"type\":\"number\",\"const\":-1e+21}",
+    "hidden": {
+     "~kind": "Literal"
+    }
+   }
+  },
+  {
+   "name": "record of literal -1e+21",
+   "args": [
+    {
+     "$call": "Record",
+     "args": [
+      {
+       "$call": "Literal",
+       "args": [
+        -1e+21
+       ]
+      },
+      {
+       "$call": "String",
+       "args": []
+      }
+     ]
+    }
+   ],
+   "result": {
+    "json": "{\"type\":\"object\",\"required\":[\"-1e+21\"],\"properties\":{\"-1e+21\":{\"type\":\"string\"}}}",
+    "hidden": {
+     "~kind": "Object"
+    }
+   }
+  },
+  {
+   "name": "number option -1e-7",
+   "args": [
+    {
+     "$call": "Number",
+     "args": [
+      {
+       "minimum": -1e-7,
+       "maximum": -1e-7
+      }
+     ]
+    }
+   ],
+   "result": {
+    "json": "{\"type\":\"number\",\"minimum\":-1e-7,\"maximum\":-1e-7}",
+    "hidden": {
+     "~kind": "Number"
+    }
+   }
+  },
+  {
+   "name": "literal -1e-7",
+   "args": [
+    {
+     "$call": "Literal",
+     "args": [
+      -1e-7
+     ]
+    }
+   ],
+   "result": {
+    "json": "{\"type\":\"number\",\"const\":-1e-7}",
+    "hidden": {
+     "~kind": "Literal"
+    }
+   }
+  },
+  {
+   "name": "record of literal -1e-7",
+   "args": [
+    {
+     "$call": "Record",
+     "args": [
+      {
+       "$call": "Literal",
+       "args": [
+        -1e-7
+       ]
+      },
+      {
+       "$call": "String",
+       "args": []
+      }
+     ]
+    }
+   ],
+   "result": {
+    "json": "{\"type\":\"object\",\"required\":[\"-1e-7\"],\"properties\":{\"-1e-7\":{\"type\":\"string\"}}}",
+    "hidden": {
+     "~kind": "Object"
+    }
+   }
+  },
+  {
+   "name": "number option 1.5",
+   "args": [
+    {
+     "$call": "Number",
+     "args": [
+      {
+       "minimum": 1.5,
+       "maximum": 1.5
+      }
+     ]
+    }
+   ],
+   "result": {
+    "json": "{\"type\":\"number\",\"minimum\":1.5,\"maximum\":1.5}",
+    "hidden": {
+     "~kind": "Number"
+    }
+   }
+  },
+  {
+   "name": "literal 1.5",
+   "args": [
+    {
+     "$call": "Literal",
+     "args": [
+      1.5
+     ]
+    }
+   ],
+   "result": {
+    "json": "{\"type\":\"number\",\"const\":1.5}",
+    "hidden": {
+     "~kind": "Literal"
+    }
+   }
+  },
+  {
+   "name": "record of literal 1.5",
+   "args": [
+    {
+     "$call": "Record",
+     "args": [
+      {
+       "$call": "Literal",
+       "args": [
+        1.5
+       ]
+      },
+      {
+       "$call": "String",
+       "args": []
+      }
+     ]
+    }
+   ],
+   "result": {
+    "json": "{\"type\":\"object\",\"required\":[\"1.5\"],\"properties\":{\"1.5\":{\"type\":\"string\"}}}",
+    "hidden": {
+     "~kind": "Object"
+    }
+   }
+  },
+  {
+   "name": "number option 0",
+   "args": [
+    {
+     "$call": "Number",
+     "args": [
+      {
+       "minimum": 0,
+       "maximum": 0
+      }
+     ]
+    }
+   ],
+   "result": {
+    "json": "{\"type\":\"number\",\"minimum\":0,\"maximum\":0}",
+    "hidden": {
+     "~kind": "Number"
+    }
+   }
+  },
+  {
+   "name": "literal 0",
+   "args": [
+    {
+     "$call": "Literal",
+     "args": [
+      0
+     ]
+    }
+   ],
+   "result": {
+    "json": "{\"type\":\"number\",\"const\":0}",
+    "hidden": {
+     "~kind": "Literal"
+    }
+   }
+  },
+  {
+   "name": "record of literal 0",
+   "args": [
+    {
+     "$call": "Record",
+     "args": [
+      {
+       "$call": "Literal",
+       "args": [
+        0
+       ]
+      },
+      {
+       "$call": "String",
+       "args": []
+      }
+     ]
+    }
+   ],
+   "result": {
+    "json": "{\"type\":\"object\",\"required\":[\"0\"],\"properties\":{\"0\":{\"type\":\"string\"}}}",
+    "hidden": {
+     "~kind": "Object"
+    }
+   }
+  },
+  {
+   "name": "number option 123456789",
+   "args": [
+    {
+     "$call": "Number",
+     "args": [
+      {
+       "minimum": 123456789,
+       "maximum": 123456789
+      }
+     ]
+    }
+   ],
+   "result": {
+    "json": "{\"type\":\"number\",\"minimum\":123456789,\"maximum\":123456789}",
+    "hidden": {
+     "~kind": "Number"
+    }
+   }
+  },
+  {
+   "name": "literal 123456789",
+   "args": [
+    {
+     "$call": "Literal",
+     "args": [
+      123456789
+     ]
+    }
+   ],
+   "result": {
+    "json": "{\"type\":\"number\",\"const\":123456789}",
+    "hidden": {
+     "~kind": "Literal"
+    }
+   }
+  },
+  {
+   "name": "record of literal 123456789",
+   "args": [
+    {
+     "$call": "Record",
+     "args": [
+      {
+       "$call": "Literal",
+       "args": [
+        123456789
+       ]
+      },
+      {
+       "$call": "String",
+       "args": []
+      }
+     ]
+    }
+   ],
+   "result": {
+    "json": "{\"type\":\"object\",\"required\":[\"123456789\"],\"properties\":{\"123456789\":{\"type\":\"string\"}}}",
+    "hidden": {
+     "~kind": "Object"
+    }
+   }
+  },
+  {
+   "name": "number option 0.5",
+   "args": [
+    {
+     "$call": "Number",
+     "args": [
+      {
+       "minimum": 0.5,
+       "maximum": 0.5
+      }
+     ]
+    }
+   ],
+   "result": {
+    "json": "{\"type\":\"number\",\"minimum\":0.5,\"maximum\":0.5}",
+    "hidden": {
+     "~kind": "Number"
+    }
+   }
+  },
+  {
+   "name": "literal 0.5",
+   "args": [
+    {
+     "$call": "Literal",
+     "args": [
+      0.5
+     ]
+    }
+   ],
+   "result": {
+    "json": "{\"type\":\"number\",\"const\":0.5}",
+    "hidden": {
+     "~kind": "Literal"
+    }
+   }
+  },
+  {
+   "name": "record of literal 0.5",
+   "args": [
+    {
+     "$call": "Record",
+     "args": [
+      {
+       "$call": "Literal",
+       "args": [
+        0.5
+       ]
+      },
+      {
+       "$call": "String",
+       "args": []
+      }
+     ]
+    }
+   ],
+   "result": {
+    "json": "{\"type\":\"object\",\"required\":[\"0.5\"],\"properties\":{\"0.5\":{\"type\":\"string\"}}}",
+    "hidden": {
+     "~kind": "Object"
+    }
+   }
+  },
+  {
+   "name": "number option 100000000000000000000",
+   "args": [
+    {
+     "$call": "Number",
+     "args": [
+      {
+       "minimum": 100000000000000000000,
+       "maximum": 100000000000000000000
+      }
+     ]
+    }
+   ],
+   "result": {
+    "json": "{\"type\":\"number\",\"minimum\":100000000000000000000,\"maximum\":100000000000000000000}",
+    "hidden": {
+     "~kind": "Number"
+    }
+   }
+  },
+  {
+   "name": "literal 100000000000000000000",
+   "args": [
+    {
+     "$call": "Literal",
+     "args": [
+      100000000000000000000
+     ]
+    }
+   ],
+   "result": {
+    "json": "{\"type\":\"number\",\"const\":100000000000000000000}",
+    "hidden": {
+     "~kind": "Literal"
+    }
+   }
+  },
+  {
+   "name": "record of literal 100000000000000000000",
+   "args": [
+    {
+     "$call": "Record",
+     "args": [
+      {
+       "$call": "Literal",
+       "args": [
+        100000000000000000000
+       ]
+      },
+      {
+       "$call": "String",
+       "args": []
+      }
+     ]
+    }
+   ],
+   "result": {
+    "json": "{\"type\":\"object\",\"required\":[\"100000000000000000000\"],\"properties\":{\"100000000000000000000\":{\"type\":\"string\"}}}",
+    "hidden": {
+     "~kind": "Object"
+    }
+   }
+  },
+  {
+   "name": "number option 999999999999999900000",
+   "args": [
+    {
+     "$call": "Number",
+     "args": [
+      {
+       "minimum": 999999999999999900000,
+       "maximum": 999999999999999900000
+      }
+     ]
+    }
+   ],
+   "result": {
+    "json": "{\"type\":\"number\",\"minimum\":999999999999999900000,\"maximum\":999999999999999900000}",
+    "hidden": {
+     "~kind": "Number"
+    }
+   }
+  },
+  {
+   "name": "literal 999999999999999900000",
+   "args": [
+    {
+     "$call": "Literal",
+     "args": [
+      999999999999999900000
+     ]
+    }
+   ],
+   "result": {
+    "json": "{\"type\":\"number\",\"const\":999999999999999900000}",
+    "hidden": {
+     "~kind": "Literal"
+    }
+   }
+  },
+  {
+   "name": "record of literal 999999999999999900000",
+   "args": [
+    {
+     "$call": "Record",
+     "args": [
+      {
+       "$call": "Literal",
+       "args": [
+        999999999999999900000
+       ]
+      },
+      {
+       "$call": "String",
+       "args": []
+      }
+     ]
+    }
+   ],
+   "result": {
+    "json": "{\"type\":\"object\",\"required\":[\"999999999999999900000\"],\"properties\":{\"999999999999999900000\":{\"type\":\"string\"}}}",
+    "hidden": {
+     "~kind": "Object"
+    }
+   }
+  },
+  {
+   "name": "numbers in an enum list",
+   "args": [
+    {
+     "$call": "Enum",
+     "args": [
+      [
+       1e+21,
+       1e-7,
+       0.1,
+       100
+      ]
+     ]
+    }
+   ],
+   "result": {
+    "json": "{\"enum\":[1e+21,1e-7,0.1,100]}",
+    "hidden": {
+     "~kind": "Enum"
+    }
+   }
+  },
+  {
+   "name": "integer option array of numbers",
+   "args": [
+    {
+     "$call": "Array",
+     "args": [
+      {
+       "$call": "Integer",
+       "args": []
+      },
+      {
+       "examples": [
+        1e+21,
+        1e-7,
+        0.5,
+        1
+       ]
+      }
+     ]
+    }
+   ],
+   "result": {
+    "json": "{\"type\":\"array\",\"items\":{\"type\":\"integer\"},\"examples\":[1e+21,1e-7,0.5,1]}",
+    "hidden": {
+     "~kind": "Array"
+    }
+   }
+  },
+  {
+   "name": "string with HTML characters",
+   "args": [
+    {
+     "$call": "String",
+     "args": [
+      {
+       "description": "a<b>&c"
+      }
+     ]
+    }
+   ],
+   "result": {
+    "json": "{\"type\":\"string\",\"description\":\"a<b>&c\"}",
+    "hidden": {
+     "~kind": "String"
+    }
+   }
+  },
+  {
+   "name": "string with line separators",
+   "args": [
+    {
+     "$call": "String",
+     "args": [
+      {
+       "description": "a b c"
+      }
+     ]
+    }
+   ],
+   "result": {
+    "json": "{\"type\":\"string\",\"description\":\"a b c\"}",
+    "hidden": {
+     "~kind": "String"
+    }
+   }
+  },
+  {
+   "name": "string with control characters",
+   "args": [
+    {
+     "$call": "String",
+     "args": [
+      {
+       "description": "a\u0007b\u001fc\td\ne\rf\bg\fh"
+      }
+     ]
+    }
+   ],
+   "result": {
+    "json": "{\"type\":\"string\",\"description\":\"a\\u0007b\\u001fc\\td\\ne\\rf\\bg\\fh\"}",
+    "hidden": {
+     "~kind": "String"
+    }
+   }
+  },
+  {
+   "name": "string with quotes and backslash",
+   "args": [
+    {
+     "$call": "String",
+     "args": [
+      {
+       "description": "q\"b\\s/"
+      }
+     ]
+    }
+   ],
+   "result": {
+    "json": "{\"type\":\"string\",\"description\":\"q\\\"b\\\\s/\"}",
+    "hidden": {
+     "~kind": "String"
+    }
+   }
+  },
+  {
+   "name": "string with unicode",
+   "args": [
+    {
+     "$call": "String",
+     "args": [
+      {
+       "description": "héllo wörld 中文 😀"
+      }
+     ]
+    }
+   ],
+   "result": {
+    "json": "{\"type\":\"string\",\"description\":\"héllo wörld 中文 😀\"}",
+    "hidden": {
+     "~kind": "String"
+    }
+   }
+  },
+  {
+   "name": "string with DEL",
+   "args": [
+    {
+     "$call": "String",
+     "args": [
+      {
+       "description": "ab"
+      }
+     ]
+    }
+   ],
+   "result": {
+    "json": "{\"type\":\"string\",\"description\":\"ab\"}",
+    "hidden": {
+     "~kind": "String"
+    }
+   }
+  },
+  {
+   "name": "property names that need escapes",
+   "args": [
+    {
+     "$call": "Object",
+     "args": [
+      {
+       "a\"b": {
+        "$call": "String",
+        "args": []
+       },
+       "c\\d": {
+        "$call": "Number",
+        "args": []
+       },
+       "e\nf": {
+        "$call": "Boolean",
+        "args": []
+       },
+       "<>": {
+        "$call": "String",
+        "args": []
+       }
+      }
+     ]
+    }
+   ],
+   "result": {
+    "json": "{\"type\":\"object\",\"required\":[\"a\\\"b\",\"c\\\\d\",\"e\\nf\",\"<>\"],\"properties\":{\"a\\\"b\":{\"type\":\"string\"},\"c\\\\d\":{\"type\":\"number\"},\"e\\nf\":{\"type\":\"boolean\"},\"<>\":{\"type\":\"string\"}}}",
+    "hidden": {
+     "~kind": "Object"
+    }
+   }
+  },
+  {
    "name": "conformance tool parameters",
    "args": [
     {

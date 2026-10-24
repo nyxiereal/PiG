@@ -98,6 +98,33 @@ add("record of a ref key is deferred", t("Record", t("Ref", "K"), S));
 add("record of a ref key with options is deferred", t("Record", t("Ref", "K"), S, { description: "d" }));
 add("record of optional value", t("Record", S, opt(N)));
 add("record value that is an object", t("Record", S, t("Object", { a: S })));
+// An array as a "schema" (Pi's Memory.Update clones it and adds the hidden member), numbers JavaScript writes in other ways than a plain print, and strings with the characters
+// JSON.stringify escapes or leaves raw.
+add("unsafe of an array", t("Unsafe", [1, "a", null]));
+add("unsafe of an empty array", t("Unsafe", []));
+add("unsafe of nested arrays", t("Unsafe", [[1], { a: 2 }]));
+add("optional of an array", opt([1, 2]));
+add("readonly of an array", t("Readonly", ["x"]));
+add("with options on an array", t("With", [1], { description: "d" }));
+add("IsUnsafe of an unsafe array", t("IsUnsafe", t("Unsafe", [1])));
+add("IsSchema of an unsafe array", t("IsSchema", t("Unsafe", [1])));
+add("IsOptional of an optional array", t("IsOptional", opt([1])));
+const numbers = [1e21, 1e-7, 1e-6, 1.5e-10, 123456789012345680000, 12345678901234567890, 5e-324, 1.7976931348623157e308, 0.1 + 0.2, 4.35, 2 ** 53, 2 ** 53 + 2, 100, 0.000001234, 1e300, -1e21, -1e-7, 1.5, 0, 123456789, 0.5, 1e20, 999999999999999900000];
+for (const n of numbers) {
+  add(`number option ${n}`, t("Number", { minimum: n, maximum: n }));
+  add(`literal ${n}`, t("Literal", n));
+  add(`record of literal ${n}`, t("Record", t("Literal", n), S));
+}
+add("numbers in an enum list", t("Enum", [1e21, 1e-7, 0.1, 100]));
+add("integer option array of numbers", t("Array", I, { examples: [1e21, 1e-7, 0.5, 1] }));
+add("string with HTML characters", t("String", { description: "a<b>&c" }));
+add("string with line separators", t("String", { description: "a\u2028b\u2029c" }));
+add("string with control characters", t("String", { description: "a\u0007b\u001fc\td\ne\rf\bg\fh" }));
+add("string with quotes and backslash", t("String", { description: 'q"b\\s/' }));
+add("string with unicode", t("String", { description: "héllo wörld \u4e2d\u6587 \u{1F600}" }));
+add("string with DEL", t("String", { description: "a\u007fb" }));
+add("property names that need escapes", t("Object", { 'a"b': S, "c\\d": N, "e\nf": B, "<>": S }));
+
 // The tool parameters the conformance fixtures register in every SDK (TestConformance_TypeSchemaToolParametersAgreeAcrossSDKs): what the host holds must equal Pi's.
 add("conformance tool parameters", t("Object", {
   query: t("String", { description: "What to look up" }),

@@ -235,3 +235,27 @@ func TestTypeOmitsTheCodecFamily(t *testing.T) {
 		}
 	}
 }
+
+// TestTypeSchemaRootKeepsItsDeclaredOrderOnTheWire: a tool registered with TSchema.Schema() writes the root in the order Type wrote it, without the member that records it, where a plain
+// map writes its keys alphabetically.
+func TestTypeSchemaRootKeepsItsDeclaredOrderOnTheWire(t *testing.T) {
+	schema := Type.Object(NewOrderedObject("b", Type.String(), "a", Type.Optional(Type.Number())), NewOrderedObject("description", "d", "additionalProperties", false))
+	want, err := schema.MarshalJSON()
+	if err != nil {
+		t.Fatal(err)
+	}
+	got, err := schemaRoot(schema.Schema()).MarshalJSON()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !bytes.Equal(got, want) {
+		t.Errorf("root written as %s, want %s", got, want)
+	}
+	plain, err := schemaRoot(Schema{"type": "object", "properties": map[string]any{}}).MarshalJSON()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if string(plain) != `{"properties":{},"type":"object"}` {
+		t.Errorf("a plain map is written as %s", plain)
+	}
+}

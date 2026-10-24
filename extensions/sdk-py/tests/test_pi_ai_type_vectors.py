@@ -10,7 +10,7 @@ from typing import Any
 
 import pytest
 
-from pig_sdk import TSchema, Type
+from pig_sdk import TSchema, TSchemaArray, Type
 
 VECTORS = Path(__file__).resolve().parents[3] / "test" / "parity" / "sdk-vectors" / "pi-ai" / "Type.json"
 
@@ -46,9 +46,9 @@ def test_type_matches_pi(case):
         return
     got = _resolve(case["args"][0])
     want = case["result"]
-    if isinstance(got, TSchema):
+    if isinstance(got, (TSchema, TSchemaArray)):
         assert isinstance(want, dict) and "json" in want, f"the SDK answers a schema, Pi {want}"
-        assert json.dumps(got, separators=(",", ":"), ensure_ascii=False) == want["json"]
+        assert got.to_json() == want["json"]
         assert got.hidden == want["hidden"]
     else:
         assert got == want

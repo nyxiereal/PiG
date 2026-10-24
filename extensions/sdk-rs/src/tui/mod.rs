@@ -6,6 +6,7 @@
 //! byte. Names are Pi's in snake case (`visibleWidth` is [`visible_width`]).
 
 mod colors;
+pub(crate) use colors::js_number_string;
 mod fuzzy;
 mod host;
 mod keybindings;

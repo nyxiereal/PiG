@@ -52,13 +52,6 @@ fn pairs(value: &TValue) -> Vec<(String, TValue)> {
     }
 }
 
-fn schema_arg(value: &TValue) -> Result<TSchema, String> {
-    match value {
-        TValue::Schema(schema) => Ok(schema.clone()),
-        _ => Err("TypeError: a schema is an object".to_string()),
-    }
-}
-
 fn call(name: &str, a: &[TValue]) -> Result<TValue, String> {
     let opts = |index: usize| options(a, index);
     let first = || a.first().cloned().unwrap_or(TValue::Json(Value::Null));
@@ -82,9 +75,9 @@ fn call(name: &str, a: &[TValue]) -> Result<TValue, String> {
         "Literal" => schema(Type::literal(literal_of(&first())?, opts(1).as_ref())),
         "Enum" => schema(Type::enum_(&first().to_value(), opts(1).as_ref())),
         "Object" => schema(Ok(Type::object(pairs(&first()), opts(1).as_ref()))),
-        "Optional" => schema(Ok(Type::optional(schema_arg(&first())?))),
-        "Readonly" => schema(Ok(Type::readonly(schema_arg(&first())?))),
-        "Immutable" => schema(Ok(Type::immutable(schema_arg(&first())?))),
+        "Optional" => schema(Type::optional_value(first())),
+        "Readonly" => schema(Type::readonly_value(first())),
+        "Immutable" => schema(Type::immutable_value(first())),
         "Unsafe" => schema(Type::unsafe_(first())),
         "With" => schema(Type::with(first(), opts(1).as_ref())),
         "Record" => schema(Type::record(first(), a[1].clone(), opts(2).as_ref())),
@@ -148,7 +141,7 @@ fn type_matches_pi() {
         match got {
             Err(message) => failures.push(format!("{name}: {message}, Pi answers {want}")),
             Ok(TValue::Schema(schema)) => {
-                let text = serde_json::to_string(&schema).expect("serializes");
+                let text = schema.to_json();
                 if want["json"].as_str() != Some(text.as_str()) {
                     failures.push(format!("{name}:\n got {text}\n Pi  {}", want["json"]));
                 }

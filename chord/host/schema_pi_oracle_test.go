@@ -14,6 +14,12 @@ import (
 )
 
 type piSchemaOracle struct {
+	OrderCases []struct {
+		Schema json.RawMessage `json:"schema"`
+		Value  json.RawMessage `json:"value"`
+		Expect json.RawMessage `json:"expect"`
+	} `json:"orderCases"`
+	Encodings  []string `json:"encodings"`
 	Assertions []struct {
 		Schema  json.RawMessage `json:"schema"`
 		Value   json.RawMessage `json:"value"`
@@ -211,5 +217,51 @@ func TestAssertValidOverADecodedDescriptionKeepsTheDeclaredOrderLikePi(t *testin
 	}
 	if checked < 60 {
 		t.Fatalf("checked %d decoded schemas", checked)
+	}
+}
+
+// A decoded description is written back as Pi's JSON.stringify wrote the schema: every member, nested or top-level, in
+// the order it was declared in.
+func TestADecodedDescriptionIsWrittenBackInDeclaredOrderLikePi(t *testing.T) {
+	oracle := loadPiSchemaOracle(t)
+	if len(oracle.Encodings) < 3 {
+		t.Fatalf("Pi oracle has %d encodings", len(oracle.Encodings))
+	}
+	for _, encoding := range oracle.Encodings {
+		var description Description
+		text := `{"name":"t","scope":"local","version":1,"input":` + encoding + `,"variants":{"":{"m":{"kind":"method","args":` + encoding + `,"result":` + encoding + `},"s":{"kind":"state","schema":` + encoding + `}}}}`
+		if err := json.Unmarshal([]byte(text), &description); err != nil {
+			t.Fatal(err)
+		}
+		written, err := json.Marshal(description)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if string(written) != text {
+			t.Errorf("description written back as\n  go %s\n  pi %s", written, text)
+		}
+	}
+}
+
+// Normalize returns the input's members in the order they arrived in, then the defaults the schema adds in its declared
+// order, as Pi's does (Value.Clone, Value.Default, Value.Clean).
+func TestNormalizeOverADecodedDescriptionKeepsPiMemberOrder(t *testing.T) {
+	oracle := loadPiSchemaOracle(t)
+	if len(oracle.OrderCases) < 5 {
+		t.Fatalf("Pi oracle has %d order cases", len(oracle.OrderCases))
+	}
+	for _, item := range oracle.OrderCases {
+		var description Description
+		text := `{"name":"t","scope":"local","version":1,"input":` + string(item.Schema) + `,"variants":{"":{}}}`
+		if err := json.Unmarshal([]byte(text), &description); err != nil {
+			t.Fatal(err)
+		}
+		got, err := Normalize(description.Input, decodeChordJSON(t, item.Value), "input of thing")
+		if err != nil {
+			t.Fatalf("normalize(%s): %v", item.Value, err)
+		}
+		if gotText, want := OrderedJSON(got), OrderedJSON(decodeChordJSON(t, item.Expect)); gotText != want {
+			t.Errorf("normalize(%s)\n  go %s\n  pi %s", item.Value, gotText, want)
+		}
 	}
 }

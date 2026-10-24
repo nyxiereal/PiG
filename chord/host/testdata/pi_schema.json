@@ -1,4 +1,272 @@
 {
+	"orderCases": [
+		{
+			"schema": {
+				"type": "object",
+				"required": [
+					"zed",
+					"mid",
+					"alpha"
+				],
+				"properties": {
+					"zed": {
+						"type": "integer",
+						"default": 1
+					},
+					"mid": {
+						"type": "string",
+						"default": "d"
+					},
+					"alpha": {
+						"type": "string"
+					},
+					"nest": {
+						"type": "object",
+						"required": [
+							"yy",
+							"bb"
+						],
+						"properties": {
+							"yy": {
+								"type": "integer",
+								"default": 2
+							},
+							"bb": {
+								"type": "integer",
+								"default": 3
+							}
+						}
+					}
+				}
+			},
+			"value": {
+				"alpha": "x"
+			},
+			"expect": {
+				"alpha": "x",
+				"zed": 1,
+				"mid": "d"
+			}
+		},
+		{
+			"schema": {
+				"type": "object",
+				"required": [
+					"zed",
+					"mid",
+					"alpha"
+				],
+				"properties": {
+					"zed": {
+						"type": "integer",
+						"default": 1
+					},
+					"mid": {
+						"type": "string",
+						"default": "d"
+					},
+					"alpha": {
+						"type": "string"
+					},
+					"nest": {
+						"type": "object",
+						"required": [
+							"yy",
+							"bb"
+						],
+						"properties": {
+							"yy": {
+								"type": "integer",
+								"default": 2
+							},
+							"bb": {
+								"type": "integer",
+								"default": 3
+							}
+						}
+					}
+				}
+			},
+			"value": {
+				"mid": "m",
+				"alpha": "x"
+			},
+			"expect": {
+				"mid": "m",
+				"alpha": "x",
+				"zed": 1
+			}
+		},
+		{
+			"schema": {
+				"type": "object",
+				"required": [
+					"zed",
+					"mid",
+					"alpha"
+				],
+				"properties": {
+					"zed": {
+						"type": "integer",
+						"default": 1
+					},
+					"mid": {
+						"type": "string",
+						"default": "d"
+					},
+					"alpha": {
+						"type": "string"
+					},
+					"nest": {
+						"type": "object",
+						"required": [
+							"yy",
+							"bb"
+						],
+						"properties": {
+							"yy": {
+								"type": "integer",
+								"default": 2
+							},
+							"bb": {
+								"type": "integer",
+								"default": 3
+							}
+						}
+					}
+				}
+			},
+			"value": {
+				"alpha": "x",
+				"nest": {}
+			},
+			"expect": {
+				"alpha": "x",
+				"nest": {
+					"yy": 2,
+					"bb": 3
+				},
+				"zed": 1,
+				"mid": "d"
+			}
+		},
+		{
+			"schema": {
+				"type": "object",
+				"required": [
+					"zed",
+					"mid",
+					"alpha"
+				],
+				"properties": {
+					"zed": {
+						"type": "integer",
+						"default": 1
+					},
+					"mid": {
+						"type": "string",
+						"default": "d"
+					},
+					"alpha": {
+						"type": "string"
+					},
+					"nest": {
+						"type": "object",
+						"required": [
+							"yy",
+							"bb"
+						],
+						"properties": {
+							"yy": {
+								"type": "integer",
+								"default": 2
+							},
+							"bb": {
+								"type": "integer",
+								"default": 3
+							}
+						}
+					}
+				}
+			},
+			"value": {
+				"alpha": "x",
+				"nest": {
+					"bb": 9
+				}
+			},
+			"expect": {
+				"alpha": "x",
+				"nest": {
+					"bb": 9,
+					"yy": 2
+				},
+				"zed": 1,
+				"mid": "d"
+			}
+		},
+		{
+			"schema": {
+				"type": "object",
+				"required": [
+					"zed",
+					"mid",
+					"alpha"
+				],
+				"properties": {
+					"zed": {
+						"type": "integer",
+						"default": 1
+					},
+					"mid": {
+						"type": "string",
+						"default": "d"
+					},
+					"alpha": {
+						"type": "string"
+					},
+					"nest": {
+						"type": "object",
+						"required": [
+							"yy",
+							"bb"
+						],
+						"properties": {
+							"yy": {
+								"type": "integer",
+								"default": 2
+							},
+							"bb": {
+								"type": "integer",
+								"default": 3
+							}
+						}
+					}
+				}
+			},
+			"value": {
+				"nest": {
+					"bb": 9
+				},
+				"alpha": "x",
+				"zed": 5
+			},
+			"expect": {
+				"nest": {
+					"bb": 9,
+					"yy": 2
+				},
+				"alpha": "x",
+				"zed": 5,
+				"mid": "d"
+			}
+		}
+	],
+	"encodings": [
+		"{\"type\":\"object\",\"required\":[\"zed\",\"mid\",\"alpha\"],\"properties\":{\"zed\":{\"type\":\"integer\",\"default\":1},\"mid\":{\"type\":\"string\",\"default\":\"d\"},\"alpha\":{\"type\":\"string\"},\"nest\":{\"type\":\"object\",\"required\":[\"yy\",\"bb\"],\"properties\":{\"yy\":{\"type\":\"integer\",\"default\":2},\"bb\":{\"type\":\"integer\",\"default\":3}}}}}",
+		"{\"type\":\"object\",\"required\":[\"a\",\"m\"],\"properties\":{\"z\":{\"type\":\"number\"},\"a\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"required\":[\"q\",\"c\"],\"properties\":{\"q\":{\"type\":\"string\"},\"c\":{\"type\":\"boolean\"}}}},\"m\":{\"anyOf\":[{\"type\":\"string\"},{\"type\":\"null\"}]}},\"additionalProperties\":false}",
+		"{\"type\":\"object\",\"patternProperties\":{\"^.*$\":{\"type\":\"object\",\"required\":[\"w\",\"k\"],\"properties\":{\"w\":{\"type\":\"number\",\"default\":4},\"k\":{\"type\":\"string\",\"default\":\"v\"}}}}}"
+	],
 	"assertions": [
 		{
 			"schema": {

@@ -270,4 +270,18 @@ const assertions = assertSchemas.flatMap(([schema, values]) =>
 	}),
 );
 
-process.stdout.write(`${JSON.stringify({ assertions, canonical, hashes, fits: fitsCases, identities, normalizes }, null, "\t")}\n`);
+
+// Declared order: schemas whose members are not declared in sorted order. orderCases are what Pi's normalize returns for
+// them (the input's members in its own order, then the defaults it adds in schema order); encodings are the text
+// JSON.stringify writes for each schema, which a decoded description must write back byte for byte.
+const unsortedSchemas = [
+	Type.Object({ zed: Type.Integer({ default: 1 }), mid: Type.String({ default: "d" }), alpha: Type.String(), nest: Type.Optional(Type.Object({ yy: Type.Integer({ default: 2 }), bb: Type.Integer({ default: 3 }) })) }),
+	Type.Object({ z: Type.Optional(Type.Number()), a: Type.Array(Type.Object({ q: Type.String(), c: Type.Boolean() })), m: Type.Union([Type.String(), Type.Null()]) }, { additionalProperties: false }),
+	Type.Record(Type.String(), Type.Object({ w: Type.Number({ default: 4 }), k: Type.String({ default: "v" }) })),
+];
+const orderInputs = [{ alpha: "x" }, { mid: "m", alpha: "x" }, { alpha: "x", nest: {} }, { alpha: "x", nest: { bb: 9 } }, { nest: { bb: 9 }, alpha: "x", zed: 5 }];
+const orderCases = unsortedSchemas.slice(0, 1).flatMap((schema) =>
+	orderInputs.map((value) => ({ schema: JSON.parse(JSON.stringify(schema)), value, expect: normalize(schema, value, "input of thing") })),
+);
+const encodings = unsortedSchemas.map((schema) => JSON.stringify(schema));
+process.stdout.write(`${JSON.stringify({ orderCases, encodings, assertions, canonical, hashes, fits: fitsCases, identities, normalizes }, null, "\t")}\n`);

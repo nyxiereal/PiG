@@ -182,12 +182,15 @@ func sortedKeys(keys []string) bool {
 type node struct {
 	plain   map[string]any
 	ordered *chordjson.Object
+	decl    *Ordered
 }
 
 func asNode(schema any) (node, bool) {
 	switch typed := schema.(type) {
 	case map[string]any:
 		return node{plain: typed}, true
+	case *Ordered:
+		return node{decl: typed}, typed != nil
 	case *chordjson.Object:
 		return node{ordered: typed}, typed != nil
 	}
@@ -195,6 +198,9 @@ func asNode(schema any) (node, bool) {
 }
 
 func (n node) get(key string) (any, bool) {
+	if n.decl != nil {
+		return n.decl.Get(key)
+	}
 	if n.ordered != nil {
 		return n.ordered.Get(key)
 	}
@@ -203,6 +209,9 @@ func (n node) get(key string) (any, bool) {
 }
 
 func (n node) keys() []string {
+	if n.decl != nil {
+		return n.decl.Keys()
+	}
 	if n.ordered != nil {
 		return n.ordered.Keys()
 	}

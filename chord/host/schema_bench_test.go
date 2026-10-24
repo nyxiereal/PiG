@@ -72,3 +72,16 @@ func BenchmarkSchemaPaths(b *testing.B) {
 		})
 	}
 }
+
+// BenchmarkDecodeDescription is what a decoded description costs once, and what it keeps: the allocated bytes and objects of
+// one UnmarshalJSON are, within a few container headers, what the decoded schemas retain for the contract's lifetime.
+func BenchmarkDecodeDescription(b *testing.B) {
+	text := []byte(`{"name":"t","scope":"local","version":1,"input":` + benchSchemaText + `,"variants":{"":{"m":{"kind":"method","args":` + benchSchemaText + `,"result":` + benchSchemaText + `},"s":{"kind":"state","schema":` + benchSchemaText + `}}}}`)
+	b.ReportAllocs()
+	for b.Loop() {
+		var description Description
+		if err := json.Unmarshal(text, &description); err != nil {
+			b.Fatal(err)
+		}
+	}
+}

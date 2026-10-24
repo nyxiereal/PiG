@@ -22,9 +22,13 @@ func asSchema(schema any) Schema {
 	switch typed := schema.(type) {
 	case map[string]any:
 		return typed
+	case *typebox.Ordered:
+		// A decoded schema node: its members are the map it was built with, so a step down copies nothing.
+		if typed != nil {
+			return typed.Map()
+		}
 	case *chordjson.Object:
-		// An ordered schema (a decoded description keeps its declared order): the members are copied to a map, the
-		// nested nodes stay as they are, so every step down calls asSchema again.
+		// An ordered schema written with chordjson: the members are copied to a map, the nested nodes stay as they are.
 		if typed != nil {
 			out := make(Schema, typed.Len())
 			for key, item := range typed.All() {
@@ -43,7 +47,7 @@ func asSchema(schema any) Schema {
 // schemaNode is a schema node that is an object of either kind, as a map.
 func schemaNode(value any) (Schema, bool) {
 	switch value.(type) {
-	case map[string]any, *chordjson.Object:
+	case map[string]any, *chordjson.Object, *typebox.Ordered:
 		return asSchema(value), true
 	}
 	return nil, false
@@ -59,6 +63,11 @@ func compareUTF16(left, right string) int {
 // non-object.
 func objectEntries(value any) (keys []string, get func(string) any, ok bool) {
 	switch typed := value.(type) {
+	case *typebox.Ordered:
+		if typed == nil {
+			return nil, nil, false
+		}
+		return typed.Keys(), func(key string) any { return typed.Map()[key] }, true
 	case *chordjson.Object:
 		if typed == nil {
 			return nil, nil, false
@@ -93,6 +102,15 @@ func OrderedJSON(value any) string {
 	var out strings.Builder
 	writeCanonical(&out, value, true)
 	return out.String()
+}
+
+// keepsDeclaredOrder reports whether value is an object that carries the order of its members.
+func keepsDeclaredOrder(value any) bool {
+	switch value.(type) {
+	case *chordjson.Object, *typebox.Ordered:
+		return true
+	}
+	return false
 }
 
 func writeCanonical(out *strings.Builder, value any, ordered bool) {
@@ -146,7 +164,7 @@ func writeCanonical(out *strings.Builder, value any, ordered bool) {
 				present = append(present, key)
 			}
 		}
-		if _, keepsOrder := value.(*chordjson.Object); !ordered || !keepsOrder {
+		if !ordered || !keepsDeclaredOrder(value) {
 			slices.SortFunc(present, compareUTF16)
 		}
 		out.WriteByte('{')

@@ -131,6 +131,15 @@ func Check(schema, value any) bool {
 // validator reads. Other values are returned as they are.
 func Plain(value any) any {
 	switch typed := value.(type) {
+	case *Ordered:
+		if typed == nil {
+			return nil
+		}
+		out := make(map[string]any, len(typed.members))
+		for key, item := range typed.members {
+			out[key] = Plain(item)
+		}
+		return out
 	case *chordjson.Object:
 		if typed == nil {
 			return nil
@@ -264,6 +273,11 @@ func objectMap(value any) (map[string]any, bool) {
 	switch typed := value.(type) {
 	case map[string]any:
 		return typed, true
+	case *Ordered:
+		if typed == nil {
+			return nil, false
+		}
+		return typed.members, true
 	case *chordjson.Object:
 		if typed == nil {
 			return nil, false
@@ -312,6 +326,9 @@ func recordEntry(schema map[string]any) (*regexp.Regexp, any) {
 }
 
 func properties(schema map[string]any) (map[string]any, []string) {
+	if ordered, ok := schema["properties"].(*Ordered); ok && ordered != nil {
+		return ordered.members, ordered.keys
+	}
 	if ordered, ok := schema["properties"].(*chordjson.Object); ok && ordered != nil {
 		// Members are visited in the order the schema declared them, as TypeBox's Object.keys does.
 		props, _ := objectMap(ordered)

@@ -282,3 +282,44 @@ func TestStreamingToolArgumentsLeaveNoStreamStateOnTheErrorMessageOfAStreamCutOf
 		t.Fatalf("content = %#v", message.Content)
 	}
 }
+
+// faux.ts streamWithDeltas feeds each chunk of a tool call's arguments to a ToolCallArgumentsStream, so consumers see the partial arguments grow.
+func TestFauxToolCallStreamsGrowingPartialArguments(t *testing.T) {
+	arguments, _ := streamingWriteCall(t, 5_000)
+	provider := NewFauxProvider(FauxConfig{TokenSize: &FauxTokenSize{Min: new(8), Max: new(8)}})
+	provider.SetResponses([]FauxResponseStep{FauxStaticStep(FauxResponse{
+		Content:    []FauxContentBlock{FauxToolCall("write", map[string]any(arguments), &FauxToolCallOptions{ID: "call_1"})},
+		StopReason: "toolUse",
+	})})
+	stream, err := provider.Stream(t.Context(), NormalizeContext(Context{Messages: []Message{UserMessage{Content: UserText("write")}}}), StreamOptions{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	shown, partials := -1, 0
+	for event := range stream.Events(t.Context()) {
+		partial := eventPartial(event)
+		if partial == nil {
+			continue
+		}
+		expectNoStreamState(t, partial, string(event.EventType()))
+		delta, ok := event.(ToolCallDeltaEvent)
+		if !ok {
+			continue
+		}
+		call, ok := partial.Observe().Content[delta.ContentIndex].(ToolCall)
+		if content, isString := call.Arguments["content"].(string); ok && isString {
+			partials++
+			if !strings.HasPrefix(arguments["content"].(string), content) || len(content) < shown {
+				t.Fatalf("shown content of %d bytes is not a growing prefix of the file", len(content))
+			}
+			shown = len(content)
+		}
+	}
+	message := stream.Result()
+	if message.StopReason != StopReasonToolUse || partials < 10 {
+		t.Fatalf("stop reason %s, %d partials showed the content", message.StopReason, partials)
+	}
+	if call, ok := message.Content[0].(ToolCall); !ok || !equalArguments(call.Arguments, arguments) {
+		t.Fatalf("content = %#v", message.Content)
+	}
+}

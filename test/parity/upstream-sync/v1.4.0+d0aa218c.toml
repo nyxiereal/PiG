@@ -25,9 +25,9 @@ rationale = "PORT_MAP records this file n/a with the reason: (Go has no barrel e
 [[files]]
 path = "packages/agent/src/proxy.ts"
 change = "added"
-disposition = "pending"
-evidence = []
-rationale = ""
+disposition = "ported"
+evidence = ["test:agent/proxy_partial_arguments_upstream_test.go#TestStreamProxyShowsGrowingPartialArgumentsWithoutKeepingTheRawTextOnTheBlockInLinearTime", "test:agent/proxy_sparse_oracle_test.go#TestStreamProxyMatchesPi"]
+rationale = "Pi f715a15c1 gives processProxyEvent a toolArguments Map of ToolCallArgumentsStream by contentIndex (a string index and a number index are different keys): toolcall_start creates one, toolcall_delta appends to it and shows the partial arguments on a new block object, toolcall_end drops it, and no partialJson member exists any more. Ported in agent/proxy.go (proxyEventConverter.toolArguments keyed by proxyArgumentsKey, ToolCall.AppendStreamedArguments); the new test streams 520 KB of arguments in 32-byte deltas and checks the blocks carry only arguments, id, name and type and the time is linear, and TestStreamProxyMatchesPi compares the converter with Pi's streamProxy over the sparse and string-index scripts."
 
 [[files]]
 path = "packages/agent/src/stream-fn.ts"
@@ -53,9 +53,9 @@ rationale = "PORT_MAP records this file n/a with the reason: (lazy dynamic-impor
 [[files]]
 path = "packages/ai/src/api/anthropic-messages.ts"
 change = "added"
-disposition = "pending"
-evidence = []
-rationale = ""
+disposition = "ported"
+evidence = ["test:ai/streaming_tool_arguments_upstream_test.go#TestStreamingToolArgumentsShowGrowingPartialsKeepStreamStateOffEveryPartialAndFinishWithTheExactArguments", "test:ai/anthropic_delta_member_type_oracle_test.go#TestAnthropicDeltaMistypedMembersMatchPi", "test:ai/anthropic_stream_test.go#TestAnthropicOpenBlocksCarryNoProviderScratch"]
+rationale = "Pi f715a15c1 keeps each open block's event index and its ToolCallArgumentsStream in an openBlocks Map instead of on the content block (index, partialJson) and appends every input_json_delta to the stream; a null or absent partial_json throws at the stream's text.length. Ported in ai/anthropic.go (anthropicOpenBlock.args, NoPartialJSON); the streaming test runs the anthropic path, the member-type oracle compares mistyped deltas with Pi's stream, and the open-blocks test checks no block carries index or partialJson."
 
 [[files]]
 path = "packages/ai/src/api/azure-openai-config.ts"
@@ -74,9 +74,9 @@ rationale = "PORT_MAP records this file n/a with the reason: (lazy dynamic-impor
 [[files]]
 path = "packages/ai/src/api/azure-openai-responses.ts"
 change = "added"
-disposition = "pending"
+disposition = "designed-out"
 evidence = []
-rationale = ""
+rationale = "Pi f715a15c1 only deletes the error-path loop that removed the index, partialJson and customInput scratch members from the blocks. No Go block carries such a member since the scratch was removed (76f780d05d), so there is nothing to clean; the azure-openai-responses stream shares processResponsesStream, covered by ai/openai_responses_partial_json_cleanup_upstream_test.go."
 
 [[files]]
 path = "packages/ai/src/api/bedrock-converse-stream.lazy.ts"
@@ -88,9 +88,9 @@ rationale = "PORT_MAP records this file n/a with the reason: (lazy dynamic-impor
 [[files]]
 path = "packages/ai/src/api/bedrock-converse-stream.ts"
 change = "added"
-disposition = "pending"
-evidence = []
-rationale = ""
+disposition = "ported"
+evidence = ["test:ai/bedrock_stream_state_upstream_test.go#TestBedrockStreamStateStaysOffPartialBlocksAndTheToolCallFinishesWithItsExactArguments", "test:ai/streaming_tool_arguments_norace_test.go#TestBedrockStreamingToolArgumentsAllocateLinearlyInTheArgumentText"]
+rationale = "Pi f715a15c1 keeps the open blocks (content index, ToolCallArgumentsStream, encrypted reasoning bytes) in an OpenBlocks Map and finalizes them from it, so the content blocks carry no index, partialJson or reasoning bytes. Ported in ai/bedrock.go and ai/bedrock_stream_state.go (activeBlock holds the reasoning bytes and the builder holds the argument stream); the ported bedrock-stream-state tests check no partial block carries stream state, the redacted reasoning signature and the exact tool arguments, and linear allocation."
 
 [[files]]
 path = "packages/ai/src/api/classifier-shared.ts"
@@ -130,9 +130,9 @@ rationale = "PORT_MAP row is ✅ ported (ai/cloudflare.go). coverage.md reports 
 [[files]]
 path = "packages/ai/src/api/constrained-sampling.ts"
 change = "added"
-disposition = "pending"
-evidence = []
-rationale = ""
+disposition = "ported"
+evidence = ["test:ai/constrained_sampling_oracle_test.go#TestConstrainedSamplingMatchesPi", "test:ai/constrained_sampling_test.go#TestAppendGrammarToolInputJSONDelta", "test:ai/constrained_sampling_test.go#TestAppendGrammarToolInputJSONDelta_NonMonotonic"]
+rationale = "Pi f715a15c1 makes appendGrammarToolInputJsonDelta append a delta (cost linear in the delta, undefined for an empty one) and adds closeGrammarToolInputJson(buffer, property, finalInput) for the complete input, which must continue the input streamed so far and closes idempotently. Ported in ai/constrained_sampling.go (appendGrammarToolInputJSONDelta, closeGrammarToolInputJSON, a strings.Builder input); the oracle probes now append deltas and close with and without a final input against Pi's module."
 
 [[files]]
 path = "packages/ai/src/api/github-copilot-headers.ts"
@@ -151,9 +151,9 @@ rationale = "PORT_MAP records this file n/a with the reason: (lazy dynamic-impor
 [[files]]
 path = "packages/ai/src/api/google-generative-ai.ts"
 change = "added"
-disposition = "pending"
+disposition = "designed-out"
 evidence = []
-rationale = ""
+rationale = "Pi f715a15c1 only deletes the error-path loop that removed the internal index property from the blocks. A Go Google block never carries an index, so there is nothing to remove; the call is built whole (Pi's google stream builds the arguments from the part, never from deltas)."
 
 [[files]]
 path = "packages/ai/src/api/google-shared.ts"
@@ -172,9 +172,9 @@ rationale = "PORT_MAP records this file n/a with the reason: (lazy dynamic-impor
 [[files]]
 path = "packages/ai/src/api/google-vertex.ts"
 change = "added"
-disposition = "pending"
+disposition = "designed-out"
 evidence = []
-rationale = ""
+rationale = "Pi f715a15c1 only deletes the error-path loop that removed the internal index property from the blocks. A Go Vertex block never carries an index (it shares the Google stream), so there is nothing to remove."
 
 [[files]]
 path = "packages/ai/src/api/lazy.ts"
@@ -207,9 +207,9 @@ rationale = "PORT_MAP records this file n/a with the reason: (lazy dynamic-impor
 [[files]]
 path = "packages/ai/src/api/mistral-conversations.ts"
 change = "added"
-disposition = "pending"
-evidence = []
-rationale = ""
+disposition = "ported"
+evidence = ["test:ai/streaming_tool_arguments_upstream_test.go#TestStreamingToolArgumentsShowGrowingPartialsKeepStreamStateOffEveryPartialAndFinishWithTheExactArguments", "test:ai/mistral_chunk_member_type_oracle_test.go"]
+rationale = "Pi f715a15c1 reads each tool-call delta into a ToolCallArgumentsStream kept off the block (no partialArgs member) and finalizes the call with Object.assign(block, args.finish()). Ported in ai/mistral.go (the builder's tool-call state, mistral.fail without scratch cleanup); the streaming test runs the mistral path and the chunk member-type oracle compares mistyped chunks with Pi."
 
 [[files]]
 path = "packages/ai/src/api/openai-codex-responses.lazy.ts"
@@ -221,9 +221,9 @@ rationale = "PORT_MAP records this file n/a with the reason: (lazy dynamic-impor
 [[files]]
 path = "packages/ai/src/api/openai-codex-responses.ts"
 change = "added"
-disposition = "pending"
+disposition = "designed-out"
 evidence = []
-rationale = ""
+rationale = "Pi f715a15c1 only deletes the error-path loop that removed the scratch members from the blocks; the Codex stream shares processResponsesStream, which keeps tool-call state in the output slot. No Go block carries scratch, so there is nothing to clean (ai/openai_responses_partial_json_cleanup_upstream_test.go)."
 
 [[files]]
 path = "packages/ai/src/api/openai-completions.lazy.ts"
@@ -235,9 +235,9 @@ rationale = "PORT_MAP records this file n/a with the reason: (lazy dynamic-impor
 [[files]]
 path = "packages/ai/src/api/openai-completions.ts"
 change = "added"
-disposition = "pending"
-evidence = []
-rationale = ""
+disposition = "ported"
+evidence = ["test:ai/streaming_tool_arguments_upstream_test.go#TestStreamingToolArgumentsShowGrowingPartialsKeepStreamStateOffEveryPartialAndFinishWithTheExactArguments", "test:ai/rpc33_provider_scratch_test.go#TestProviderScratchFunctionLifecycle", "test:ai/rpc33_provider_scratch_test.go#TestProviderScratchCustomLifecycle"]
+rationale = "Pi f715a15c1 keeps a ToolCallState per tool-call block (stream index, JSON arguments stream or custom grammar buffer) in a Map, appends each function-arguments delta to the stream and each custom input to the grammar buffer, and finishes custom calls with closeGrammarToolInputJson. Ported in ai/openai.go (partialTool for the wire identity, the builder's streamToolCall state, convertToCustomToolCall); the streaming test runs the completions path and the lifecycle tests step through function and custom calls checking the partial arguments and that no scratch member shows."
 
 [[files]]
 path = "packages/ai/src/api/openai-decisions.lazy.ts"
@@ -263,9 +263,9 @@ rationale = "PORT_MAP row is ✅ ported (ai/openai_prompt_cache.go). coverage.md
 [[files]]
 path = "packages/ai/src/api/openai-responses-shared.ts"
 change = "added"
-disposition = "pending"
-evidence = []
-rationale = ""
+disposition = "ported"
+evidence = ["test:ai/openai_responses_member_type_oracle_test.go#TestOpenAIResponsesMistypedMembersMatchPi", "test:ai/openai_responses_item_throws_test.go#TestOpenAIResponsesOutputItemTypeErrorsMatchPi", "test:ai/rpc33_provider_scratch_test.go#TestProviderScratchCustomLifecycle"]
+rationale = "Pi f715a15c1 keeps each tool-call slot's input (a ToolCallArgumentsStream or a custom buffer with the unsent initial input) in the output slot instead of partialJson/customInput on the block: a function_call item appends its arguments, a delta appends, arguments.done replaces (a non-string throws text.startsWith), output_item.done replaces with a truthy item.arguments and finishes from the stream, and unfinished calls are the slots not yet done. Ported in processResponsesStream (ai/openai_responses.go) over the builder's tool-call state; the member-type oracle runs added, delta and done arguments of every JSON type against Pi's stream, and the item-throws test pins the TypeErrors."
 
 [[files]]
 path = "packages/ai/src/api/openai-responses.lazy.ts"
@@ -277,9 +277,9 @@ rationale = "PORT_MAP records this file n/a with the reason: (lazy dynamic-impor
 [[files]]
 path = "packages/ai/src/api/openai-responses.ts"
 change = "added"
-disposition = "pending"
+disposition = "designed-out"
 evidence = []
-rationale = ""
+rationale = "Pi f715a15c1 only deletes the error-path loop that removed the index, partialJson and customInput members from the blocks. No Go block carries them since the scratch was removed (76f780d05d), so there is nothing to clean (ai/openai_responses_partial_json_cleanup_upstream_test.go)."
 
 [[files]]
 path = "packages/ai/src/api/openrouter-images.lazy.ts"
@@ -305,9 +305,9 @@ rationale = "PORT_MAP records this file n/a with the reason: (lazy dynamic-impor
 [[files]]
 path = "packages/ai/src/api/pi-messages.ts"
 change = "added"
-disposition = "pending"
-evidence = []
-rationale = ""
+disposition = "ported"
+evidence = ["test:ai/streaming_tool_arguments_upstream_test.go#TestStreamingToolArgumentsShowGrowingPartialsKeepStreamStateOffEveryPartialAndFinishWithTheExactArguments"]
+rationale = "Pi f715a15c1 keeps a ToolCallArgumentsStream per open tool call (toolArguments Map by content index) and shows each delta's partial arguments, instead of re-parsing a partialJson member. Ported in ai/pi_messages_events.go (piMessagesEventConverter.toolArguments); the streaming test runs the pi-messages path against a server that streams a write call."
 
 [[files]]
 path = "packages/ai/src/api/simple-options.ts"
@@ -536,9 +536,9 @@ rationale = "PORT_MAP row is ✅ ported (ai/images.go). coverage.md reports 6 be
 [[files]]
 path = "packages/ai/src/index.ts"
 change = "added"
-disposition = "pending"
-evidence = []
-rationale = ""
+disposition = "ported"
+evidence = ["test:ai/streaming_json_parser_oracle_test.go"]
+rationale = "Pi f715a15c1 exports utils/streaming-json.ts. Go exports StreamingJSONParser, JSONChange, JSONPath and ToolCallArgumentsStream from the ai package (ai/streaming_json_parser.go)."
 
 [[files]]
 path = "packages/ai/src/legacy-api-aliases.ts"
@@ -746,9 +746,9 @@ rationale = "PORT_MAP row is ✅ ported (ai/models_generated.go + internal/codin
 [[files]]
 path = "packages/ai/src/providers/faux.ts"
 change = "added"
-disposition = "pending"
-evidence = []
-rationale = ""
+disposition = "ported"
+evidence = ["test:ai/streaming_tool_arguments_upstream_test.go#TestFauxToolCallStreamsGrowingPartialArguments"]
+rationale = "Pi f715a15c1 gives streamWithDeltas a ToolCallArgumentsStream per tool call and sets the partial block's arguments from it before each toolcall_delta. Ported in ai/faux.go (the builder's argument stream); the test streams a write call through the faux provider and checks the partial arguments grow."
 
 [[files]]
 path = "packages/ai/src/providers/fireworks.models.ts"
@@ -1089,9 +1089,9 @@ rationale = "PORT_MAP row is ✅ ported (ai/models_generated.go + internal/codin
 [[files]]
 path = "packages/ai/src/providers/radius-config.ts"
 change = "added"
-disposition = "pending"
+disposition = "designed-out"
 evidence = []
-rationale = ""
+rationale = "Pi f715a15c1 wraps the 512-character truncation of a gateway error body in ownedSlice, a V8 workaround that copies the slice so it does not keep the whole body alive; the string value is unchanged. The Go truncation is a substring of the same text and observable output is identical; ai/radius_config_oracle_test.go compares truncateHttpBody with Pi's through the new function."
 
 [[files]]
 path = "packages/ai/src/providers/radius.models.ts"
@@ -1257,9 +1257,9 @@ rationale = "PORT_MAP row is ✅ ported (ai/session_resources.go + coding/sessio
 [[files]]
 path = "packages/ai/src/telemetry.ts"
 change = "added"
-disposition = "pending"
+disposition = "designed-out"
 evidence = []
-rationale = ""
+rationale = "Pi f715a15c1 wraps the 500-character span error message in ownedSlice: a V8 workaround that copies the slice so a span does not keep the provider's whole message alive; the value is unchanged. Go reports the same text (ai/telemetry.go truncates the message the same way)."
 
 [[files]]
 path = "packages/ai/src/types.ts"
@@ -1292,9 +1292,9 @@ rationale = "PORT_MAP row is ✅ ported (ai/diagnostics.go (FormatThrownValue, E
 [[files]]
 path = "packages/ai/src/utils/error-body.ts"
 change = "added"
-disposition = "pending"
+disposition = "designed-out"
 evidence = []
-rationale = ""
+rationale = "Pi f715a15c1 wraps truncateErrorText's excerpt in ownedSlice (a V8 string-view workaround); the truncated text, its marker and every caller's output are unchanged. The Go excerpt is the same prefix and marker."
 
 [[files]]
 path = "packages/ai/src/utils/estimate.ts"
@@ -1418,16 +1418,16 @@ rationale = "PORT_MAP row is ✅ ported (ai/provider_retry.go abortableSleep (co
 [[files]]
 path = "packages/ai/src/utils/streaming-json.ts"
 change = "added"
-disposition = "pending"
-evidence = []
-rationale = ""
+disposition = "ported"
+evidence = ["test:ai/streaming_json_parser_oracle_test.go", "test:ai/streaming_tool_arguments_upstream_test.go#TestStreamingToolArgumentsShowGrowingPartialsKeepStreamStateOffEveryPartialAndFinishWithTheExactArguments", "test:ai/streaming_tool_arguments_norace_test.go#TestStreamingToolArgumentsAllocateLinearlyInTheArgumentText"]
+rationale = "Pi f715a15c1 adds StreamingJsonParser (an incremental, tolerant JSON reader with immutable snapshots, change reports and copy credit) and ToolCallArgumentsStream (the raw text, the parser, replace and finish). Ported as ai/streaming_json_parser.go (StreamingJSONParser, ToolCallArgumentsStream, JSONChange); the oracle test drives Pi's parser and the Go parser through generated documents and chunkings and compares snapshots, changes, member order and number text, and the provider tests check linear cost."
 
 [[files]]
 path = "packages/ai/src/utils/text.ts"
 change = "added"
-disposition = "pending"
+disposition = "designed-out"
 evidence = []
-rationale = ""
+rationale = "Pi f715a15c1 adds ownedSlice, which copies a short slice of a long string so V8 does not keep the long string alive; it returns the same string value. Go strings.Clone is the equivalent where a Go value keeps a cut of a larger string (chord/delta AppendText clones its text); no observable behavior differs."
 
 [[files]]
 path = "packages/ai/src/utils/transcript.ts"
@@ -1509,16 +1509,16 @@ rationale = "aa9cf15b: the initial value of `self.state` is a StateInit for a ce
 [[files]]
 path = "packages/chord/src/delta/apply-immutable-trusted.ts"
 change = "added"
-disposition = "pending"
+disposition = "designed-out"
 evidence = []
-rationale = ""
+rationale = "Pi d0aa218cb copies a container on a changed path with spread or Object.assign onto a null-prototype object instead of one defineProperty per key: a JavaScript performance change that keeps the same own data properties, prototype and own __proto__ member. Go copies an ordered JsonObject, which has no prototype; ApplyImmutable and the tracker already keep a __proto__ key as data (chord/delta/own_key_order_test.go)."
 
 [[files]]
 path = "packages/chord/src/delta/diff.ts"
 change = "added"
-disposition = "pending"
+disposition = "designed-out"
 evidence = []
-rationale = ""
+rationale = "Pi f715a15c1 wraps the append op text of emitString in ownedSlice and da412b039 adds a comment: a V8 string-view workaround; the ops are unchanged. Go DiffRevisions emits the same ops (chord/delta/diff_upstream_test.go)."
 
 [[files]]
 path = "packages/chord/src/delta/draft.ts"
@@ -1530,16 +1530,16 @@ rationale = "PORT_MAP records this file n/a with the reason: TypeScript mapped t
 [[files]]
 path = "packages/chord/src/delta/index.ts"
 change = "added"
-disposition = "pending"
-evidence = []
-rationale = ""
+disposition = "ported"
+evidence = ["test:chord/delta/pending_test.go#TestPendingOpsCapKeepsMaxPendingOpsPendingOpsAndReplacesPastThem", "test:chord/delta/append_text_test.go#TestAppendTextRecordsAnAppendOpAndTheAppendedValue"]
+rationale = "Pi f715a15c1, da412b039, d8d99950a and d0aa218cb add the ownedSlice export (a V8 workaround, strings.Clone in Go), the appendText and StringKeys exports (delta.Object.AppendText; StringKeys is a TypeScript type), the PendingOps and PendingTake exports (chord/delta/pending.go) and spread-based container copies (a JavaScript performance change)."
 
 [[files]]
 path = "packages/chord/src/delta/pending.ts"
 change = "added"
-disposition = "pending"
-evidence = []
-rationale = ""
+disposition = "ported"
+evidence = ["test:chord/delta/pending_test.go#TestPendingOpsFoldingIsInvisibleToAReplicaTrackerEditsAnywhereAppendTextSplicesAndReorders", "test:chord/delta/pending_test.go#TestPendingOpsCapKeepsMaxPendingOpsPendingOpsAndReplacesPastThem"]
+rationale = "Pi d8d99950a adds PendingOps: one batch kept by reference, folding that merges appends and primitive sets per path in a leaf index cleared by any other op, r drops everything before it, and only replace stays past 10,000 ops. Ported as chord/delta/pending.go (PendingOps, PendingTake, MaxPendingOps); the ported delta-pending tests run the tracker, appendText, splice and reorder, list, root-array and diffRevisions fuzzers against a replica and the wire codec, the adversarial sequences, the cap, ownership and size."
 
 [[files]]
 path = "packages/chord/src/delta/revision-validator.ts"
@@ -1551,9 +1551,9 @@ rationale = "PORT_MAP records this file n/a with the reason: WeakSet memo of val
 [[files]]
 path = "packages/chord/src/delta/tracker.ts"
 change = "added"
-disposition = "pending"
-evidence = []
-rationale = ""
+disposition = "ported"
+evidence = ["test:chord/delta/append_text_test.go#TestAppendTextJoinsSeveralAppendsToOneKeyIntoOneOpNextToOtherChanges", "test:chord/delta/append_text_test.go#TestAppendTextFallsBackToTheStringComparisonWhenTheSameKeyIsAlsoAssignedOrDeleted"]
+rationale = "Pi f715a15c1 copies append op text with ownedSlice (V8 workaround) and da412b039 adds appendText(draft, key, text): an append recorded in an appends map per object node without the prefix comparison, joined per key, dropped by a set or delete of the key, and rejected for a non-string; the draft key type is StringKeys. Ported as delta.Object.AppendText (chord/delta/handles.go, tracker.go node.appends) with the append ops joining a lone surrogate pair as JavaScript concatenation does; the ported delta-append-text tests check the op, the joins, the fallbacks, blocks inserted in the same change and the errors."
 
 [[files]]
 path = "packages/chord/src/errors.ts"
@@ -1733,9 +1733,9 @@ rationale = "PORT_MAP row is ✅ ported (chord/host/types.go (Context is context
 [[files]]
 path = "packages/chord/src/watch.ts"
 change = "added"
-disposition = "pending"
-evidence = []
-rationale = ""
+disposition = "ported"
+evidence = ["test:chord/watch_upstream_test.go#TestWatchAwaitsEachCallbackAndFoldsFramesAdvancedWhileOneIsInFlightIntoTheNextCall", "test:chord/watch_upstream_test.go#TestWatchKeepsMaxPendingOpsPendingOpsAfterFoldingAndReplacesTheRootPastThem", "test:chord/watch_upstream_test.go#TestNativeWatchCollapses101PendingValuesToTheValueOfReplace"]
+rationale = "Pi d8d99950a makes Watch queue frames in one PendingOps while its listener is busy or not started and deliver one call with the newest value, the folded ops (or [[r, newest]] after an overflow) and the newest frame's context; the constructor loses replace, and NativeWatch keeps its own queue of values (one call each, collapsing past 100 to replace() or the newest). Ported in chord/watch_impl.go (Watch.ops, watchNewest, NativeWatch.values; NewWatch drops replace, NewNativeWatch takes it); the ported watch tests cover folding, the context, the cap, retirement over pending commits and the native queue."
 
 [[files]]
 path = "packages/chord/src/websocket.ts"
@@ -3210,9 +3210,9 @@ rationale = "PORT_MAP row is ✅ ported (internal/codingagent/thinking_selector.
 [[files]]
 path = "packages/coding-agent/src/modes/interactive/components/tool-execution.ts"
 change = "added"
-disposition = "pending"
-evidence = []
-rationale = ""
+disposition = "ported"
+evidence = ["test:tui/tool_execution_streamed_frame_test.go#TestToolCardRendersStreamedPartialArgumentsOncePerFrameWithTheLatestArguments"]
+rationale = "Pi f715a15c1 makes updateArgs record the arguments and request a render, applying them (updateDisplay) at the next render, so a call streaming many deltas between frames runs its renderer once. The Go card already applies streamed arguments when it is drawn (SetStreamedArgs invalidates, Render updates the definition and the header once); the ported test streams 200 argument updates, draws one frame and counts one renderer run, then two updates and one more run, and none without new arguments."
 
 [[files]]
 path = "packages/coding-agent/src/modes/interactive/components/tree-selector.ts"
@@ -3651,9 +3651,9 @@ rationale = "PORT_MAP records this file n/a with the reason: (Go archive/zip, us
 [[files]]
 path = "packages/durable/src/codemode/codemode.ts"
 change = "added"
-disposition = "pending"
+disposition = "designed-out"
 evidence = []
-rationale = ""
+rationale = "Pi f715a15c1 wraps the call preview's cut in ownedSlice (a V8 string-view workaround); the preview text is unchanged. Go's cut() slices the same characters (durable/codemode/call_test.go)."
 
 [[files]]
 path = "packages/durable/src/codemode/describe.ts"
@@ -3770,16 +3770,16 @@ rationale = "PORT_MAP row is ✅ ported (durable/harness/define.go). coverage.md
 [[files]]
 path = "packages/durable/src/harness/events.ts"
 change = "added"
-disposition = "pending"
-evidence = []
-rationale = ""
+disposition = "ported"
+evidence = ["test:durable/harness/harness_events_test.go#TestAgentEvents"]
+rationale = "Pi d8d99950a makes watchEvents build a NativeWatch (every batch delivered in order, overflow replaced by a snapshot) instead of a Watch with empty ops, because folding would drop events. Ported in durable/harness/events.go (session.NewSessionNativeWatch, AgentEventStream over chord.NativeWatch) and the driver's WatchEvents; the ported test commits 100 batches and checks each arrives in its own call in order, and the existing test checks the 101st batch collapses to one snapshot."
 
 [[files]]
 path = "packages/durable/src/harness/generation.ts"
 change = "added"
-disposition = "pending"
-evidence = []
-rationale = ""
+disposition = "ported"
+evidence = ["test:durable/harness/partial_changes_upstream_test.go#TestPartialChangesAppendGrowingArgumentAndTextStringsInsteadOfReassigningThem"]
+rationale = "Pi da412b039 makes streamResponse feed each event to a PartialChanges, take what changed at each flush and commit it with changes.commit (restoring it when the commit fails). Ported in durable/harness/generation.go (partialThrottle.changes, Observe, Take, Commit, Restore) with the state under a mutex because the event consumer and the commit run on different goroutines."
 
 [[files]]
 path = "packages/durable/src/harness/harness.ts"
@@ -3798,9 +3798,9 @@ rationale = "PORT_MAP row is ✅ ported (durable/harness/inbox.go). coverage.md 
 [[files]]
 path = "packages/durable/src/harness/json.ts"
 change = "added"
-disposition = "pending"
-evidence = []
-rationale = ""
+disposition = "ported"
+evidence = ["test:durable/harness/json_pi_test.go#TestAssignJsonWritesLeafByLeafLikePi", "test:durable/harness/partial_changes_upstream_test.go#TestPartialChangesAppendGrowingArgumentAndTextStringsInsteadOfReassigningThem"]
+rationale = "Pi da412b039 gives assignJson an optional AssignPlan (append text, keep, or fields) and appends with appendText where the committed string plus the planned text has the new string's length. Ported as AssignJson(target, key, value, plan) with AssignPlan in durable/harness/json.go; the length check compares bytes, or the joined length when a lone surrogate pair joins."
 
 [[files]]
 path = "packages/durable/src/harness/live.ts"
@@ -3812,9 +3812,9 @@ rationale = "PORT_MAP row is ✅ ported (durable/harness/live.go). coverage.md r
 [[files]]
 path = "packages/durable/src/harness/partial-changes.ts"
 change = "added"
-disposition = "pending"
-evidence = []
-rationale = ""
+disposition = "ported"
+evidence = ["test:durable/harness/partial_changes_upstream_test.go#TestPartialChangesCommitArgumentsEqualToTheFinalParseAtEveryPieceSizeAndCommitRhythm", "test:durable/harness/partial_changes_upstream_test.go#TestPartialChangesApplyTheChangesOfAFailedCommitInTheNextOne", "test:durable/harness/partial_changes_upstream_test.go#TestPartialChangesFallBackToTheSnapshotWhenTheCommittedMessageLostACallWhoseChangesWereCommitted"]
+rationale = "Pi da412b039 adds PartialChanges: text and thinking deltas recorded per block, a StreamingJsonParser per tool call whose reported changes are applied to the committed arguments in order, restore for a failed commit and the snapshot fallback when the committed message lost a call. Ported as durable/harness/partial_changes.go (PartialChanges, PartialCommit, NewPartialChanges); the ported tests check the committed arguments equal the final parse at every piece size and rhythm, escapes and surrogates split across pieces, appends instead of reassignment, failed commits, the lost call, and the final assignment after the block ends."
 
 [[files]]
 path = "packages/durable/src/harness/prompt.ts"
@@ -3840,9 +3840,9 @@ rationale = "PORT_MAP row is ✅ ported (durable/harness/registry.go). coverage.
 [[files]]
 path = "packages/durable/src/harness/scheduler.ts"
 change = "added"
-disposition = "pending"
+disposition = "designed-out"
 evidence = []
-rationale = ""
+rationale = "Pi f715a15c1 wraps the task span error message in ownedSlice (a V8 string-view workaround); the message is unchanged. Go reports the same truncated message."
 
 [[files]]
 path = "packages/durable/src/harness/submissions.ts"
@@ -3854,9 +3854,9 @@ rationale = "Pi 2ec55d80 opens a pi.durable.submit span around each admission co
 [[files]]
 path = "packages/durable/src/harness/task-graph.ts"
 change = "added"
-disposition = "pending"
-evidence = []
-rationale = ""
+disposition = "ported"
+evidence = ["test:durable/session/session_watches_test.go#TestSessionDocumentWatches"]
+rationale = "Pi d8d99950a only changes the doc comment of the task-graph watch: a serialized watch (not an exact-frame one). The Go TaskGraphWatch is a chord.Watch, which now folds (durable/harness/task_graph.go); the watch tests cover the folding."
 
 [[files]]
 path = "packages/durable/src/harness/telemetry.ts"
@@ -3868,16 +3868,16 @@ rationale = "Pi 2ec55d80 adds the pi.durable.submit and pi.durable.phase span em
 [[files]]
 path = "packages/durable/src/harness/tool.ts"
 change = "added"
-disposition = "pending"
+disposition = "designed-out"
 evidence = []
-rationale = ""
+rationale = "Pi f715a15c1 wraps the 500-character nested-call error summary in ownedSlice (a V8 string-view workaround); the summary is unchanged. Go's bounded summary is the same text (durable/harness/tool.go)."
 
 [[files]]
 path = "packages/durable/src/harness/types.ts"
 change = "added"
-disposition = "pending"
-evidence = []
-rationale = ""
+disposition = "ported"
+evidence = ["test:durable/harness/harness_view_test.go#TestConversationView"]
+rationale = "Pi d8d99950a only changes the doc comments of Conversation.watch and Harness.watchTaskGraph: a serialized watch whose commits made while the listener runs arrive folded. Ported as the matching comments in durable/harness/types.go; the view test checks 101 pending commits arrive as one call of folded ops."
 
 [[files]]
 path = "packages/durable/src/harness/usage.ts"
@@ -3896,9 +3896,9 @@ rationale = "PORT_MAP row is ✅ ported (durable/harness/util.go). coverage.md r
 [[files]]
 path = "packages/durable/src/harness/view.ts"
 change = "added"
-disposition = "pending"
-evidence = []
-rationale = ""
+disposition = "ported"
+evidence = ["test:durable/harness/harness_view_test.go#TestConversationView"]
+rationale = "Pi d8d99950a only changes the doc comment of the view watch (a serialized watch). The Go view watch is a chord.Watch, which now folds undelivered commits into one call (durable/harness/view.go); the view test checks it."
 
 [[files]]
 path = "packages/durable/src/ids.ts"
@@ -4449,9 +4449,9 @@ rationale = "PORT_MAP row is ✅ ported (mcp/stdio.go; mcp/stdio_unix.go; mcp/st
 [[files]]
 path = "packages/mcp/src/transports/streamable-http.ts"
 change = "added"
-disposition = "pending"
+disposition = "designed-out"
 evidence = []
-rationale = ""
+rationale = "Pi f715a15c1 copies the 4,096-character error body excerpt (slice, append a character, slice it off) so V8 does not keep the whole body alive; the text is unchanged. Go reads the same excerpt (mcp transport tests)."
 
 [[files]]
 path = "packages/mcp/src/transports/transport.ts"

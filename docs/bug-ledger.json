@@ -27168,6 +27168,75 @@
       ]
     },
     {
+      "id": "BF-d1af7ae",
+      "title": "The crash message of a deterministic code mode VM that is told a result number it cannot take now reads as…",
+      "symptom": "The crash message of a deterministic code mode VM that is told a result number it cannot take now reads as Pi's does, `Error: Result 2 has sequence number 5, expected 1 or later, once`, and names `undefined` for a result that carries no number, where it read `Result 2 has sequence number 0, ...`.",
+      "rootCause": "A new test drives Pi's own serveCodemodeRemote, RemoteCodemodeSandbox, InlineCodemodeSandbox and CodemodeSandboxBase.start (the vendored pi-dist) and PiG with the same cases and compares the frames of the remote exchange, the requests, the events of a deterministic run, what deliver refuses and the outcomes. It found three differences, all fixed here:",
+      "rootCauseSource": "commit",
+      "userImpact": "Crash, hang or runaway process",
+      "platform": "All platforms",
+      "class": "own",
+      "fixedIn": "Unreleased",
+      "releaseNote": "The crash message of a deterministic code mode VM that is told a result number it cannot take now reads as Pi's does, `Error: Result 2 has sequence number 5, expected 1 or later, once`, and names `undefined` for a result that carries no number, where it read `Result 2 has sequence number 0, ...`.",
+      "origin": "release note",
+      "commits": [
+        {
+          "hash": "d1af7aece3",
+          "date": "2026-10-24"
+        }
+      ],
+      "tests": [
+        "codemode/deterministic_test.go::TestAVMThatIsToldTheSameResultNumberTwiceCrashes",
+        "codemode/wire_oracle_test.go::TestWireBehaviorMatchesPi"
+      ]
+    },
+    {
+      "id": "BF-d1af7ae-2",
+      "title": "The errors that name a code mode tool or global (`Tool \"x\" is already registered`, `Invalid global name \"x\"`…",
+      "symptom": "The errors that name a code mode tool or global (`Tool \"x\" is already registered`, `Invalid global name \"x\"`, `Global \"x\" is already registered`, `Global \"x\" conflicts with the namespace \"x\"`) write the name as it was given, as Pi does, instead of Go-escaped (`\"we\\\"ird\"`).",
+      "rootCause": "A new test drives Pi's own serveCodemodeRemote, RemoteCodemodeSandbox, InlineCodemodeSandbox and CodemodeSandboxBase.start (the vendored pi-dist) and PiG with the same cases and compares the frames of the remote exchange, the requests, the events of a deterministic run, what deliver refuses and the outcomes. It found three differences, all fixed here:",
+      "rootCauseSource": "commit",
+      "userImpact": "An operation failed or was rejected",
+      "platform": "All platforms",
+      "class": "own",
+      "fixedIn": "Unreleased",
+      "releaseNote": "The errors that name a code mode tool or global (`Tool \"x\" is already registered`, `Invalid global name \"x\"`, `Global \"x\" is already registered`, `Global \"x\" conflicts with the namespace \"x\"`) write the name as it was given, as Pi does, instead of Go-escaped (`\"we\\\"ird\"`).",
+      "origin": "release note",
+      "commits": [
+        {
+          "hash": "d1af7aece3",
+          "date": "2026-10-24"
+        }
+      ],
+      "tests": [
+        "codemode/deterministic_test.go::TestAVMThatIsToldTheSameResultNumberTwiceCrashes",
+        "codemode/wire_oracle_test.go::TestWireBehaviorMatchesPi"
+      ]
+    },
+    {
+      "id": "BF-d1af7ae-3",
+      "title": "A code mode `done` message that carries no store writes now fails the execution with Pi's `store writes is…",
+      "symptom": "A code mode `done` message that carries no store writes now fails the execution with Pi's `store writes is not valid JSON` instead of `unknown message from the worker`.",
+      "rootCause": "A new test drives Pi's own serveCodemodeRemote, RemoteCodemodeSandbox, InlineCodemodeSandbox and CodemodeSandboxBase.start (the vendored pi-dist) and PiG with the same cases and compares the frames of the remote exchange, the requests, the events of a deterministic run, what deliver refuses and the outcomes. It found three differences, all fixed here:",
+      "rootCauseSource": "commit",
+      "userImpact": "An operation failed or was rejected",
+      "platform": "All platforms",
+      "class": "own",
+      "fixedIn": "Unreleased",
+      "releaseNote": "A code mode `done` message that carries no store writes now fails the execution with Pi's `store writes is not valid JSON` instead of `unknown message from the worker`.",
+      "origin": "release note",
+      "commits": [
+        {
+          "hash": "d1af7aece3",
+          "date": "2026-10-24"
+        }
+      ],
+      "tests": [
+        "codemode/deterministic_test.go::TestAVMThatIsToldTheSameResultNumberTwiceCrashes",
+        "codemode/wire_oracle_test.go::TestWireBehaviorMatchesPi"
+      ]
+    },
+    {
       "id": "BF-d1cbde3",
       "title": "The pi-messages, Cloudflare Workers AI and TypeSafe System One, and OpenAI decisions request URLs are built…",
       "symptom": "The pi-messages, Cloudflare Workers AI and TypeSafe System One, and OpenAI decisions request URLs are built with the WHATWG URL parser, as Pi's `new URL` does: hosts are normalized, a base URL with a query or fragment resolves against its path, and `debug=1` is added to an existing query in order and in form encoding instead of with sorted keys.",

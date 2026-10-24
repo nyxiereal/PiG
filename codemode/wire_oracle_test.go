@@ -21,7 +21,9 @@ import (
 // The pinned Pi runtime (serveCodemodeRemote, RemoteCodemodeSandbox, InlineCodemodeSandbox, CodemodeSandboxBase.start) and PiG run
 // the same cases, and what each does at its seams must be equal: the frames of the remote exchange (the VM's messages and the
 // client's replies, protocol.ts and remote.ts), the requests a remote sandbox sends, the events and refusals of a deterministic
-// run (execution.ts), and the outcomes. testdata/wire_oracle.mjs is the Pi side; it holds the same tool table as wireTools below.
+// run (execution.ts), and the outcomes. testdata/wire_oracle.mjs is the Pi side; its toolBehavior and replyFor hold the same tool
+// table as newWireTool and replyFor below. Every case runs twice: on PiG's prelude, whose fingerprint differs from Pi's by the prelude
+// hash alone (divergence D145 patches the prelude), and on Pi's own prelude, which the oracle returns, where nothing may differ.
 
 // wireTool is a tool or global of a case: its behavior is named by Kind, as in testdata/wire_oracle.mjs toolBehavior.
 type wireTool struct {
@@ -435,7 +437,7 @@ func (c wireCase) runClient(t *testing.T) wireRecord {
 				for _, message := range messages {
 					if message.Type == MessageCall {
 						// Close waits for this very Execute to return, so it runs beside it.
-						go sandbox.Close()
+						go func() { _ = sandbox.Close() }()
 						break
 					}
 				}
@@ -513,7 +515,7 @@ func (c wireCase) runInline(t *testing.T) wireRecord {
 	ctx, cancel := wireContext(t)
 	defer cancel()
 	sandbox := c.inlineSandbox(t)
-	defer sandbox.Close()
+	defer func() { _ = sandbox.Close() }()
 	result, err := sandbox.Execute(ctx, c.Code, ExecuteOptions{Store: c.Store})
 	if err != nil {
 		t.Fatal(err)
@@ -546,7 +548,7 @@ func (c wireCase) runStart(t *testing.T) wireRecord {
 	} else {
 		sandbox = c.inlineSandbox(t)
 	}
-	defer sandbox.Close()
+	defer func() { _ = sandbox.Close() }()
 	var mu sync.Mutex
 	events := []any{}
 	attempts := []any{}
@@ -555,10 +557,10 @@ func (c wireCase) runStart(t *testing.T) wireRecord {
 	seq := 0
 	options := RunOptions{StartedAt: c.StartedAt, Seed: c.Seed, Store: c.Store}
 	for _, tool := range c.DeclTools {
-		options.Tools = append(options.Tools, DeclaredTool{Name: tool.Name, JSName: tool.JSName, Description: tool.Description})
+		options.Tools = append(options.Tools, DeclaredTool(tool))
 	}
 	for _, global := range c.DeclGlobals {
-		options.Globals = append(options.Globals, DeclaredGlobal{Name: global.Name, Spread: global.Spread})
+		options.Globals = append(options.Globals, DeclaredGlobal(global))
 	}
 	started := make(chan struct{})
 	options.OnStarted = func(fingerprint string) {
@@ -663,13 +665,13 @@ func (c wireCase) runValidate(t *testing.T) wireRecord {
 	sandbox, err := NewSandbox(SandboxOptions{Globals: globals})
 	record["globals"] = message(err)
 	if sandbox != nil {
-		sandbox.Close()
+		_ = sandbox.Close()
 	}
 	plain, err := NewSandbox(SandboxOptions{})
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer plain.Close()
+	defer func() { _ = plain.Close() }()
 	toolName := c.ToolName
 	if toolName == "" {
 		toolName = "echo"
@@ -681,10 +683,10 @@ func (c wireCase) runValidate(t *testing.T) wireRecord {
 	record["reRegister"] = message(plain.RegisterTool(echo))
 	options := RunOptions{StartedAt: c.StartedAt, Seed: c.Seed, OnCall: func(HostCall) {}}
 	for _, tool := range c.DeclTools {
-		options.Tools = append(options.Tools, DeclaredTool{Name: tool.Name, JSName: tool.JSName, Description: tool.Description})
+		options.Tools = append(options.Tools, DeclaredTool(tool))
 	}
 	for _, global := range c.DeclGlobals {
-		options.Globals = append(options.Globals, DeclaredGlobal{Name: global.Name, Spread: global.Spread})
+		options.Globals = append(options.Globals, DeclaredGlobal(global))
 	}
 	run, err := plain.Start(t.Context(), "return 1", options)
 	record["start"] = message(err)
@@ -818,12 +820,12 @@ func (c wireCase) runBridge(t *testing.T) wireRecord {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer sandbox.Close()
+	defer func() { _ = sandbox.Close() }()
 	var result Result
 	if c.Control {
 		options := RunOptions{OnCall: func(HostCall) {}}
 		for _, tool := range c.DeclTools {
-			options.Tools = append(options.Tools, DeclaredTool{Name: tool.Name, JSName: tool.JSName, Description: tool.Description})
+			options.Tools = append(options.Tools, DeclaredTool(tool))
 		}
 		run, err := sandbox.Start(ctx, c.Code, options)
 		if err != nil {

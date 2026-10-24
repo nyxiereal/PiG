@@ -278,3 +278,17 @@ commit = "fdbd6ca4f0e1f86affb014d2d6e1f2c87126f177"
 class = "CITE"
 cite = "packages/coding-agent/src/utils/tools-manager.ts:33"
 reason = "Pi c8ec752cf (#11209) replaces getAssetName's per-platform arm64-or-x86_64 choice with getReleaseTarget (tools-manager.ts:33-41), which maps only x64 and arm64 and returns undefined for any other architecture or platform. TestArchStr, which asserted that riscv64 and 386 select the x86_64 archive, becomes TestReleaseTarget, which asserts that they select nothing."
+
+[[entry]]
+path = "codemode/deterministic_test.go"
+commit = "d1af7aece304c704c75b1bc32e8690dbeedf0d8f"
+class = "CITE"
+cite = "packages/codemode/src/runtime/vm.ts:212"
+reason = "A deterministic VM that is told a result number it cannot take crashes with crashMessage of the Error vm.ts:212 throws, `Error: Result 2 has sequence number 5, expected 1 or later, once` (crashMessage, vm.ts:156-158, names the error). The test expected the message without `Error: `; Pi's own frames, recorded by TestWireBehaviorMatchesPi, carry the prefix."
+
+[[entry]]
+path = "codemode/seam_test.go"
+commit = "724580d2eb2b1c9ae0997f7c164c4fecb5da024c"
+class = "CITE"
+cite = "packages/codemode/src/runtime/execution.ts:112"
+reason = "A done message without store writes: Pi's parseStoreWrites(message.writes) runs JSON.parse on the missing text (execution.ts:104-112), so the execution fails with `store writes is not valid JSON`, not as an unknown message. The test expected the old PiG message; the Pi frames in TestWireBehaviorMatchesPi (`no store writes`) show Pi's."

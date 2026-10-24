@@ -182,7 +182,7 @@ func TestCreateInlineSandboxResultsAreThoseOfPisCreateInlineCodemodeSandbox(t *t
 			if err != nil {
 				t.Fatal(err)
 			}
-			defer sandbox.Close()
+			defer func() { _ = sandbox.Close() }()
 			result, err := sandbox.Execute(t.Context(), c.Code, codemode.ExecuteOptions{})
 			if err != nil {
 				t.Fatal(err)

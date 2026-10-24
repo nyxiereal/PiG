@@ -23,7 +23,7 @@ func filetimeDuration(ft windows.Filetime) time.Duration {
 	return time.Duration(int64(ft.HighDateTime)<<32|int64(ft.LowDateTime)) * 100
 }
 
-// A Windows pipe handle is signalled from the moment the pipe exists, and again after every read, whether or not input is queued. Waiting on the handle therefore reported every pipe ready, and the reader went into a ReadFile that only input or the end of the pipe could return. The waiter polls a pipe for queued input instead.
+// A Windows pipe handle is signalled from the moment the pipe exists, and again after every read, whether or not input is queued. Waiting on the handle therefore reported every pipe ready, and the reader went into a ReadFile that only input or the end of the pipe could return. The waiter blocks on a pipe in a zero-byte read instead.
 func TestWindowsInputWaiterWaitsOnAPipeForInput(t *testing.T) {
 	r, w, err := os.Pipe()
 	if err != nil {
@@ -101,10 +101,82 @@ func TestWindowsInputWaiterCancelsAWaitOnAnEmptyPipe(t *testing.T) {
 	}
 }
 
-// An idle wait on a pipe polls, so it must stay a light sleep: a poll loop without its pause would use a whole core. The wait runs on a locked thread so the thread's CPU time is the wait's alone.
+// Input that arrives while the wait is blocked in the pipe wakes it, and the wait takes none of the input.
+func TestWindowsInputWaiterWakesOnPipeInput(t *testing.T) {
+	r, w, err := os.Pipe()
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer func() { _ = r.Close(); _ = w.Close() }()
+	waiter, err := newTerminalInputWaiter(t.Context(), r)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer waiter.close()
+
+	for range 100 {
+		started, done := make(chan struct{}), make(chan bool, 1)
+		go func() {
+			close(started)
+			ready, err := waiter.wait(r, -1)
+			if err != nil {
+				t.Errorf("wait: %v", err)
+			}
+			done <- ready
+		}()
+		<-started
+		if _, err := w.WriteString("k"); err != nil {
+			t.Fatal(err)
+		}
+		select {
+		case ready := <-done:
+			if !ready {
+				t.Fatal("wait did not report the pipe readable after input arrived")
+			}
+		case <-time.After(10 * time.Second):
+			t.Fatal("input did not wake a wait on the pipe")
+		}
+		var one [1]byte
+		if _, err := io.ReadFull(r, one[:]); err != nil || one[0] != 'k' {
+			t.Fatalf("the wait took the input: read %q, %v", one[:], err)
+		}
+	}
+}
+
+// A wait that timed out must not leave an abort that ends a later wait on the same pipe.
+func TestWindowsInputWaiterTimeoutDoesNotAbortALaterWait(t *testing.T) {
+	r, w, err := os.Pipe()
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer func() { _ = r.Close(); _ = w.Close() }()
+	waiter, err := newTerminalInputWaiter(t.Context(), r)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer waiter.close()
+
+	for i := range 300 {
+		if ready, err := waiter.wait(r, 1); err != nil || ready {
+			t.Fatalf("round %d: wait on an empty pipe = %v, %v; want a timeout", i, ready, err)
+		}
+		if _, err := w.WriteString("t"); err != nil {
+			t.Fatal(err)
+		}
+		if ready, err := waiter.wait(r, 10_000); err != nil || !ready {
+			t.Fatalf("round %d: wait on a pipe with input = %v, %v; want ready", i, ready, err)
+		}
+		var one [1]byte
+		if _, err := io.ReadFull(r, one[:]); err != nil {
+			t.Fatal(err)
+		}
+	}
+}
+
+// An idle wait on a pipe blocks in the kernel, so it costs no CPU: a wait that polled without a pause would use a whole core. The wait runs on a locked thread so the thread's CPU time is the wait's alone.
 func TestWindowsInputWaiterIdlePipeWaitStaysIdle(t *testing.T) {
 	const idle = 500 * time.Millisecond
-	const budget = 50 * time.Millisecond // a poll every 5 ms costs about 1 ms; a loop without the pause costs the whole 500 ms
+	const budget = 50 * time.Millisecond // the wait costs a few milliseconds at most; a loop without a pause costs the whole 500 ms
 	r, w, err := os.Pipe()
 	if err != nil {
 		t.Fatal(err)

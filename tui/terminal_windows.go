@@ -5,8 +5,10 @@ package tui
 import (
 	"context"
 	"encoding/binary"
+	"errors"
 	"io"
 	"os"
+	"runtime"
 	"sync"
 	"time"
 	"unicode/utf16"
@@ -31,16 +33,19 @@ const resizePollInterval = 120 * time.Millisecond
 // console read that could block.
 func pollReadable(_ uintptr, _ int) (int, error) { return 0, nil }
 
-// pipePollInterval is how often waiting on a pipe looks for queued input. A pipe handle is signalled from the moment it exists, and again after every read, so waiting on the handle cannot tell an empty pipe from one with input.
-const pipePollInterval = 5 * time.Millisecond
-
 type terminalInputWaiter struct {
 	ctx         context.Context
 	cancelEvent windows.Handle
-	// pipe: the input is a pipe, which wait polls; any other input signals its handle when it has input.
+	// pipe: the input is a pipe, whose handle signals whether or not input is queued, so wait blocks in a zero-byte read instead (waitPipe). Any other input signals its handle when it has input.
 	pipe         bool
 	stopCallback func() bool
 	callbackDone chan struct{}
+
+	// mu orders a pipe wait's start and end against abortPipeWait, so an abort reaches only the zero-byte read it was made for.
+	mu       sync.Mutex
+	handle   windows.Handle // the pipe the wait numbered waitID blocks on
+	waitID   uint64
+	blocking bool // a pipe wait is between setting up its zero-byte read and leaving it
 }
 
 func newTerminalInputWaiter(ctx context.Context, file *os.File) (*terminalInputWaiter, error) {
@@ -57,6 +62,7 @@ func newTerminalInputWaiter(ctx context.Context, file *os.File) (*terminalInputW
 	}
 	w.stopCallback = context.AfterFunc(ctx, func() {
 		_ = windows.SetEvent(cancelEvent)
+		w.abortPipeWait(0)
 		//portlint:allow doubleclose context.AfterFunc runs this function at most once, and only it closes callbackDone
 		close(w.callbackDone)
 	})
@@ -65,7 +71,7 @@ func newTerminalInputWaiter(ctx context.Context, file *os.File) (*terminalInputW
 
 // wait waits for either console input or cancellation before issuing ReadFile.
 // Stop therefore cannot leave an old reader blocked inside the read that
-// belongs to the next terminal owner. A pipe is polled for input instead.
+// belongs to the next terminal owner.
 func (w *terminalInputWaiter) wait(file *os.File, ms int) (bool, error) {
 	handle := windows.Handle(file.Fd())
 	if w.pipe {
@@ -89,31 +95,46 @@ func (w *terminalInputWaiter) wait(file *os.File, ms int) (bool, error) {
 	return event == windows.WAIT_OBJECT_0, nil
 }
 
-// waitPipe polls the pipe until it has input or has ended, ms milliseconds pass (never when ms is negative) or the terminal is cancelled; the cancel event ends each pause between polls.
+// waitPipe waits for a pipe to have input or to end, for ms milliseconds (without limit when ms is negative) or until the terminal is cancelled, and reports whether the pipe is readable. A pipe handle is signalled from the moment the pipe exists and again after every read, so waiting on it cannot tell an empty pipe from one with input, and a reader sent into ReadFile on an empty pipe could not be stopped. A zero-byte ReadFile instead blocks until the pipe has input or ends and takes no input; CancelIoEx ends it (libuv's uv_pipe_zero_readfile_thread_proc and uv__pipe_interrupt_read).
 func (w *terminalInputWaiter) waitPipe(handle windows.Handle, ms int) bool {
-	const pollMs = int64(pipePollInterval / time.Millisecond)
-	var deadline time.Time
-	if ms >= 0 {
-		deadline = time.Now().Add(time.Duration(ms) * time.Millisecond)
+	if pipeReadable(handle) {
+		return true
 	}
+	if ms == 0 {
+		return false
+	}
+	w.mu.Lock()
+	if w.ctx.Err() != nil {
+		w.mu.Unlock()
+		return false
+	}
+	w.waitID++
+	id := w.waitID
+	w.handle, w.blocking = handle, true
+	w.mu.Unlock()
+	if ms > 0 {
+		timer := time.AfterFunc(time.Duration(ms)*time.Millisecond, func() { w.abortPipeWait(id) })
+		defer timer.Stop()
+	}
+	var read uint32
+	err := windows.ReadFile(handle, nil, &read, nil)
+	w.mu.Lock()
+	w.blocking = false
+	w.mu.Unlock()
+	return !errors.Is(err, windows.ERROR_OPERATION_ABORTED) && w.ctx.Err() == nil
+}
+
+// abortPipeWait ends the pipe wait numbered id, or the current one when id is zero. CancelIoEx finds nothing while the wait has yet to enter ReadFile, so it repeats until the wait has left, which takes a few turns of the scheduler.
+func (w *terminalInputWaiter) abortPipeWait(id uint64) {
 	for {
-		if w.ctx.Err() != nil {
-			return false
+		w.mu.Lock()
+		if !w.blocking || id != 0 && w.waitID != id {
+			w.mu.Unlock()
+			return
 		}
-		if pipeReadable(handle) {
-			return true
-		}
-		pause := pollMs
-		if !deadline.IsZero() {
-			remaining := time.Until(deadline)
-			if remaining <= 0 {
-				return false
-			}
-			pause = min(pause, remaining.Milliseconds()+1)
-		}
-		if event, _ := windows.WaitForSingleObject(w.cancelEvent, uint32(pause)); event == windows.WAIT_OBJECT_0 {
-			return false
-		}
+		_ = windows.CancelIoEx(w.handle, nil)
+		w.mu.Unlock()
+		runtime.Gosched()
 	}
 }
 

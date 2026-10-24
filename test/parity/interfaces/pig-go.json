@@ -195880,6 +195880,39 @@
       "shapeHash": "sha256:c89c4e413f6ec54bc48c93ba6b3c0b27b4955ad6d17b6b21693c71a170b482a5"
     },
     {
+      "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#isoDaysFromCivil",
+      "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
+      "name": "isoDaysFromCivil",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func(year int, month int, day int) int"
+      },
+      "shapeHash": "sha256:f099d8a28e47c87bcad420489d6e2c504ebf51efec735ea37ff8f49dc2d4163d"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#isoDaysInMonth",
+      "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
+      "name": "isoDaysInMonth",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func(year int, month int) int"
+      },
+      "shapeHash": "sha256:549ffee8ad7f2aec7d2828846f103a86a321ac94f3f1906488fbab302e49dd2e"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#isoDigits",
+      "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
+      "name": "isoDigits",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func(text string) (int, bool)"
+      },
+      "shapeHash": "sha256:ab45e01b46e2feb530e11b08282f8489afedd6f8193d05f6d6ac6a15f136afd4"
+    },
+    {
       "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#joinTextBlocks",
       "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
       "name": "joinTextBlocks",
@@ -197286,6 +197319,17 @@
         "type": "func(s string) (size int, width int)"
       },
       "shapeHash": "sha256:a9093a1ce81ad9332b49b79314d4ed6248d0883f488378e10a74612c1b0f5193"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#parseISODate",
+      "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
+      "name": "parseISODate",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func(text string) (float64, bool)"
+      },
+      "shapeHash": "sha256:dc189f7fc123384f3ffb800af2db2c2c77eb4aaf122fa3d49edf94c7357f88b3"
     },
     {
       "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#parseObject",

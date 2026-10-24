@@ -12777,13 +12777,13 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 
 - **Source:** PiG's own defect
 - **Symptom:** Previously, reconnect still started a replacement connection after the caller had canceled.
-- **Root cause:** Return the caller's cancellation cause after closing the previous client, before GetClient can start a replacement owned by the connection lifetime. Keep cleanup joined and shared connection cancellation unchanged.
+- **Root cause:** Reconnect did not check caller cancellation after closing the previous client, so it could still start a replacement connection.
 - **User impact:** Wrong output or ordering
 - **Platform:** All platforms
 - **Fixed in:** Unreleased
 - **Fix commits:** `c3501172ab` (2026-10-23)
 - **Tests:** `coding/mcpext/reconnect_cancel_test.go::TestMCPReconnectDoesNotOpenAfterCancellationDuringCleanup`
-- **Release note:** Fixed incorrect MCP reconnect behavior after cancellation during transport cleanup. Previously, reconnect still started a replacement connection after the caller had canceled. Reconnect now completes cleanup and returns the original cancellation cause before starting a replacement.
+- **Release note:** Fixed incorrect MCP reconnect behavior after cancellation during transport cleanup. Previously, reconnect still started a replacement connection after the caller had canceled. Reconnect did not check caller cancellation after closing the previous client, so it could still start a replacement connection. Reconnect now completes cleanup and returns the original cancellation cause before starting a replacement.
 
 ### BF-c3a6eca
 

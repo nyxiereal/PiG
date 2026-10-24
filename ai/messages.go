@@ -245,7 +245,7 @@ func (record NestedToolCallRecord) MarshalJSON() ([]byte, error) {
 		}
 		wire.Arguments = arguments
 	}
-	return sdkjson.MarshalStringify(wire)
+	return sdkjson.Marshal(wire)
 }
 
 // UnmarshalJSON decodes the record and keeps the member order of its arguments.
@@ -342,8 +342,9 @@ func cloneNestedToolCalls(calls *NestedToolCalls) *NestedToolCalls {
 }
 
 func marshalMessage(role string, value any) ([]byte, error) {
-	// JSON.stringify: a lone surrogate in a string (Details, an id, a name) is written as its escape, as the content blocks write it.
-	body, err := sdkjson.MarshalStringify(value)
+	// A lone surrogate in a string (Details, an id, a name) is written as its escape, as the content blocks write it. Marshal, not
+	// MarshalStringify: a value that is not JSON (NaN in Details) stays an error, as it was with encoding/json.
+	body, err := sdkjson.Marshal(value)
 	if err != nil {
 		return nil, err
 	}

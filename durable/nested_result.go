@@ -31,7 +31,7 @@ func (result NestedToolExecutionResult) MarshalJSON() ([]byte, error) {
 	if result.HasDetails {
 		wire.Details = &result.Details
 	}
-	return sdkjson.MarshalStringify(wire) //perf:ok once per nested tool call result encoded; the members a result lacks are left out, so the Marshaler encodes its wire struct
+	return sdkjson.Marshal(wire) //perf:ok once per nested tool call result encoded; the members a result lacks are left out, so the Marshaler encodes its wire struct
 }
 
 // UnmarshalJSON reads a result written by MarshalJSON; a present null member is a value.

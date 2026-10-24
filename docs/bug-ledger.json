@@ -196,6 +196,28 @@
       "tests": []
     },
     {
+      "id": "BF-02887e3",
+      "title": "fix(release): carry main's PigVersion 0.5.3 and the post-bump goldens and pins",
+      "symptom": "fix(release): carry main's PigVersion 0.5.3 and the post-bump goldens and pins",
+      "rootCause": "The merge of main kept next's generated pigversion.go, which dropped main's PigVersion 0.5.3: the fused-extension cell then required extensions/sdk v0.5.2 against go.mod's v0.5.3 and every packed Go conformance cell failed to build, and TestParseChangelog_RealFile saw 0.5.3 as newer than the release line. PigVersion is back at 0.5.3 and the README example follows it.",
+      "rootCauseSource": "commit",
+      "userImpact": "Behavior differed from Pi",
+      "platform": "All platforms",
+      "class": "own",
+      "fixedIn": "Unreleased",
+      "origin": "commit",
+      "commits": [
+        {
+          "hash": "02887e3ea4",
+          "date": "2026-10-23"
+        }
+      ],
+      "tests": [
+        "bench/k8s/cmd/k8sbench/pireference_test.go::TestCommittedPinHasAgentPins",
+        "internal/codingagent/changelog_test.go::TestParseChangelog_RealFile"
+      ]
+    },
+    {
       "id": "BF-037b2e3",
       "title": "A session message whose members are in another order than Pi writes them, or that holds members PiG does not…",
       "symptom": "PiG rewrote such a message in its own member order and dropped unknown members.",
@@ -8512,6 +8534,25 @@
         "test/extension-conformance/truncation_helpers_test.go::TestConformance_TruncationHelpersAgreeAcrossSDKs",
         "test/extension-conformance/ui_forwarding_test.go::TestConformance_UIForwardingAgreesAcrossSDKs"
       ]
+    },
+    {
+      "id": "BF-530bf3e",
+      "title": "Fix in shipped code",
+      "symptom": "Fix in shipped code",
+      "rootCause": "",
+      "rootCauseSource": "",
+      "userImpact": "Behavior differed from Pi",
+      "platform": "All platforms",
+      "class": "own",
+      "fixedIn": "Unreleased",
+      "origin": "commit",
+      "commits": [
+        {
+          "hash": "530bf3e26f",
+          "date": "2026-10-23"
+        }
+      ],
+      "tests": []
     },
     {
       "id": "BF-53385a3",

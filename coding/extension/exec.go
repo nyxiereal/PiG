@@ -128,7 +128,7 @@ func ExecCommand(ctx context.Context, cwd, command string, args []string, opts *
 
 	// Only a test installs drain hooks (export_test.go); every other call
 	// measures the grace on the wall clock.
-	hooks, _ := ctx.Value(execDrainHooksKey{}).(childwait.Hooks)
+	hooks, _ := ctx.Value(execDrainHooksKey{}).(*childwait.Hooks)
 	var stdout, stderr strings.Builder
 	pipes := childwait.Start([]*os.File{stdoutRead, stderrRead}, func(index int, chunk []byte) {
 		if index == 0 {

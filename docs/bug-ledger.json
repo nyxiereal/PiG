@@ -21944,6 +21944,31 @@
       ]
     },
     {
+      "id": "BF-D200",
+      "title": "With no home directory PiG still runs the commands that load no resources, where Pi crashes at import, and…",
+      "symptom": "none claimed; Pi's behaviour is a crash at load rather than a reported error, and is kept for the paths that need a home directory.",
+      "rootCause": "",
+      "rootCauseSource": "divergence record",
+      "userImpact": "Crash, hang or runaway process",
+      "platform": "All platforms",
+      "class": "ahead-of-pi",
+      "divergence": "D200",
+      "removeWhen": "Pi stops resolving the home directory at import (so `--version` and `list` run there without one), or an owner decision reverses this one; then PiG's startup fails at the same point as Pi's, the markers, the allowance test and this record go.",
+      "fixedIn": "Unreleased",
+      "origin": "divergence",
+      "commits": [
+        {
+          "hash": "99f0027ef1",
+          "date": "2026-10-24"
+        }
+      ],
+      "tests": [
+        "coding/cli/no_home_directory_test.go::TestNoHomeDirectoryPiCrashesAtImportWherePiGRunsResourceFreeCommands",
+        "coding/cli/no_home_directory_test.go::TestStartupFailsWhereNoHomeDirectoryExists",
+        "coding/cli/no_home_directory_test.go::TestStartupFollowsNodeWhenThereIsNoHomeDirectory"
+      ]
+    },
+    {
       "id": "BF-a076a50",
       "title": "A model request on a reused connection gets the full HTTP idle timeout to receive its first response bytes…",
       "symptom": "The time the connection had spent idle in the pool was deducted from the next request's timeout.",
@@ -36005,6 +36030,11 @@
       "id": "D190",
       "title": "The built-in file mutation queue also orders mutations of one existing file reached through a hard link or a…",
       "entry": "BF-648ff3e-13"
+    },
+    {
+      "id": "D200",
+      "title": "With no home directory PiG still runs the commands that load no resources, where Pi crashes at import, and…",
+      "entry": "BF-D200"
     }
   ],
   "exemptCommits": {

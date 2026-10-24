@@ -437,11 +437,11 @@ func walkDirSources(root string, exts []string, visit func(path, rel string) err
 	if err != nil {
 		return err
 	}
-	// WalkDir does not traverse a symlink used as its root. Resolve only the
-	// admitted root; nested symlink entries remain excluded by WalkDir.
+	// WalkDirShared, like filepath.WalkDir, does not traverse a symlink used as its root. Resolve only the
+	// admitted root; nested symlink entries remain excluded by the walk.
 	root = physicalRoot
 	vanish := runtimecell.NewVanishTracker()
-	if err := filepath.WalkDir(root, func(path string, d fs.DirEntry, err error) error {
+	if err := runtimecell.WalkDirShared(root, func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
 			// A directory deleted after its parent listed it held no source of this build, as in runtimecell's hashGoModuleDir
 			// (on Windows one still being deleted fails to open instead of reporting not-exist; see VanishTracker). A directory

@@ -93,8 +93,6 @@ type streamingFrame struct {
 	path          JSONPath
 	hasPath       bool
 	reportsInside bool
-	// orderPath is the container's path in a schemaObjectOrder.
-	orderPath string
 	// size is the member or element count: what a copy of the container costs.
 	size   int
 	key    string
@@ -537,9 +535,6 @@ func (p *StreamingJSONParser) openContainer(isArray bool) {
 	} else {
 		frame.object = map[string]any{}
 	}
-	if slot != nil {
-		frame.orderPath = p.orderPathOf(slot)
-	}
 	if isArray {
 		p.place(slot, &frame.array)
 	} else {
@@ -558,16 +553,35 @@ func (p *StreamingJSONParser) openContainer(isArray bool) {
 	}
 }
 
-// orderPathOf is the schemaObjectOrder path of a container about to open at slot in the innermost open container.
-func (p *StreamingJSONParser) orderPathOf(slot *streamingSlot) string {
-	if slot.kind == slotRoot {
+// orderPathOf is the schemaObjectOrder path of frame, which sits above the frames of the stack that are open: the paths of its
+// ancestors, read from their slots. It is built when an object closes with keys out of order, never per level while opening, so
+// nesting costs time linear in its depth.
+func (p *StreamingJSONParser) orderPathOf(frame *streamingFrame) string {
+	path := ""
+	for _, ancestor := range p.stack {
+		path = frameSlotPath(path, ancestor.slot)
+	}
+	return frameSlotPath(path, frame.slot)
+}
+
+// orderPathAt is orderPathOf for the open frame at depth in the stack.
+func (p *StreamingJSONParser) orderPathAt(depth int) string {
+	path := ""
+	for _, ancestor := range p.stack[:depth+1] {
+		path = frameSlotPath(path, ancestor.slot)
+	}
+	return path
+}
+
+// frameSlotPath is the path of a container at slot inside a container at parent; "" for a container in an invalid position.
+func frameSlotPath(parent string, slot *streamingSlot) string {
+	switch {
+	case slot == nil, slot.kind == slotRoot:
 		return ""
+	case slot.kind == slotMember:
+		return schemaPath(parent, slot.key)
 	}
-	parent := p.top()
-	if slot.kind == slotMember {
-		return schemaPath(parent.orderPath, slot.key)
-	}
-	return schemaPath(parent.orderPath, strconv.Itoa(slot.index))
+	return schemaPath(parent, strconv.Itoa(slot.index))
 }
 
 func (p *StreamingJSONParser) closeContainer() {
@@ -587,7 +601,7 @@ func (p *StreamingJSONParser) closeContainer() {
 			if p.order == nil {
 				p.order = schemaObjectOrder{}
 			}
-			p.order[frame.orderPath] = keys
+			p.order[p.orderPathOf(frame)] = keys
 		}
 	}
 	// Too deep to report inside: the whole value, final now that it is closed.
@@ -641,7 +655,7 @@ func (p *StreamingJSONParser) place(slot *streamingSlot, value any) {
 		frame.keys = append(frame.keys, slot.key)
 	} else if p.order != nil {
 		// A repeated key keeps its position but takes the last value, whose own member order replaces the earlier value's.
-		p.order.dropSubtree(schemaPath(frame.orderPath, slot.key))
+		p.order.dropSubtree(schemaPath(p.orderPathAt(len(p.stack)-1), slot.key))
 	}
 	frame.object[slot.key] = value
 }
@@ -701,13 +715,14 @@ func (p *StreamingJSONParser) copyOpenPath(pending *streamingPending) (any, bool
 				keys = setSlotObject(members, keys, childSlot, child)
 			}
 			if frame.slot != nil {
+				// The path is built only when this object's order matters: it costs its depth, which nested objects would pay at every level.
 				if unsorted := unsortedKeyOrder(keys); unsorted != nil {
 					if order == nil {
 						order = schemaObjectOrder{}
 					}
-					order[frame.orderPath] = unsorted
-				} else if order != nil {
-					delete(order, frame.orderPath)
+					order[p.orderPathAt(depth)] = unsorted
+				} else if len(order) > 0 {
+					delete(order, p.orderPathAt(depth))
 				}
 			}
 			copyValue = members

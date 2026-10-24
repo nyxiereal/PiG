@@ -113,7 +113,7 @@ func assignSlot(slot jsonSlot, value durable.JsonValue, plan *AssignPlan) error 
 		if member, isMember := slot.(objectSlot); isMember {
 			if before, isString := current.(string); isString {
 				if after, isString := value.(string); isString && appendsTo(before, plan.Text, after) {
-					return member.object.AppendText(member.key, plan.Text)
+					return delta.AppendText(member.object, member.key, plan.Text)
 				}
 			}
 		}

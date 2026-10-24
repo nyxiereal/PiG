@@ -305,6 +305,23 @@ func TestAppendGrammarToolInputJSONDelta(t *testing.T) {
 		!strings.Contains(err.Error(), `grammar tool input for property "payload" changed after it was closed`) {
 		t.Fatalf("post-close change err = %v", err)
 	}
+	if _, _, err := appendGrammarToolInputJSONDelta(buf, "payload", "x"); err == nil ||
+		!strings.Contains(err.Error(), `grammar tool input for property "payload" changed after it was closed`) {
+		t.Fatalf("post-close append err = %v", err)
+	}
+}
+
+// upstream: constrained-sampling.test.ts "rejects a final grammar input that does not continue the streamed input".
+func TestCloseGrammarToolInputJSONRejectsAFinalInputThatDoesNotContinueTheStreamedInput(t *testing.T) {
+	buf := &grammarToolInputJSONBuffer{}
+	if _, _, err := appendGrammarToolInputJSONDelta(buf, "payload", "abc"); err != nil {
+		t.Fatal(err)
+	}
+	final := "abd"
+	if _, _, err := closeGrammarToolInputJSON(buf, "payload", &final); err == nil ||
+		!strings.Contains(err.Error(), `grammar tool input for property "payload" changed non-monotonically`) {
+		t.Fatalf("err = %v", err)
+	}
 }
 
 // TestAppendGrammarToolInputJSONDelta_NonMonotonic pins the monotonicity guard.

@@ -45,7 +45,7 @@ func appendTextBlockText(t *testing.T, tracker *Tracker, index int) string {
 
 func mustAppend(t *testing.T, object *Object, key, text string) {
 	t.Helper()
-	if err := object.AppendText(key, text); err != nil {
+	if err := AppendText(object, key, text); err != nil {
 		t.Fatal(err)
 	}
 }
@@ -168,7 +168,7 @@ func TestAppendTextRejectsWhatACallerCanGetWrong(t *testing.T) {
 	change := tracker.BeginChange()
 	state := change.State()
 	for _, key := range []string{"content", "missing", "meta"} {
-		if err := state.AppendText(key, "x"); err == nil || !strings.HasPrefix(err.Error(), "appendText() needs a string at \""+key+"\"") {
+		if err := AppendText(state, key, "x"); err == nil || !strings.HasPrefix(err.Error(), "appendText() needs a string at \""+key+"\"") {
 			t.Fatalf("AppendText(%q) = %v", key, err)
 		}
 	}
@@ -176,11 +176,11 @@ func TestAppendTextRejectsWhatACallerCanGetWrong(t *testing.T) {
 	if _, err := change.Prepare(); err != nil {
 		t.Fatal(err)
 	}
-	expectPanic(t, ErrRevoked, func() { _ = block.AppendText("text", "x") })
+	expectPanic(t, ErrRevoked, func() { _ = AppendText(block, "text", "x") })
 	aborted := tracker.BeginChange()
 	abortedState := aborted.State()
 	aborted.Abort()
-	expectPanic(t, ErrRevoked, func() { _ = abortedState.AppendText("title", "x") })
+	expectPanic(t, ErrRevoked, func() { _ = AppendText(abortedState, "title", "x") })
 }
 
 func expectPanic(t *testing.T, want error, run func()) {

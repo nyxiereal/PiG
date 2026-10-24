@@ -177,11 +177,11 @@ func (object *Object) Set(key string, value any) error {
 	return nil
 }
 
-// AppendText appends text to the string at key, costing the text and not the string: the change is recorded as one append op (several
-// appends to a key in one change join into one op) without comparing the old and new strings, which a plain Set of the longer string
-// makes the tracker do when it prepares the change. A Set or Delete of the key in the same change falls back to that comparison. A
+// AppendText appends text to the string at key. The change is recorded as one append op (several appends to a key in one change join
+// into one op) without comparing the old and new strings, which a plain Set of the longer string makes the tracker do when it prepares
+// the change. Go strings are immutable, so the new revision still holds its own copy of the whole string. A Set or Delete of the key in the same change falls back to that comparison. A
 // key that holds no string is an error and leaves the draft unchanged (tracker.ts appendText).
-func (object *Object) AppendText(key, text string) error {
+func AppendText(object *Object, key, text string) error {
 	n, mu := object.ref.lock()
 	defer mu.Unlock()
 	if !n.attached() {

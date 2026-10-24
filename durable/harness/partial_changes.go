@@ -222,7 +222,7 @@ func applyArgumentChange(block *delta.Object, change ai.JSONChange) error {
 		if change.Kind == "set" {
 			return container.Set(name, change.Value)
 		}
-		return container.AppendText(name, change.Text)
+		return delta.AppendText(container, name, change.Text)
 	case *delta.Array:
 		index, ok := key.(int)
 		if !ok {

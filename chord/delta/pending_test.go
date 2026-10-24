@@ -127,7 +127,7 @@ func mutateAnywhere(t *testing.T, draft *Object, r *pendingRandom, viaAppendText
 		switch {
 		case roll < 0.3 && isObject:
 			if viaAppendText {
-				must(t, parent.AppendText(slot.key.(string), r.text()))
+				must(t, AppendText(parent, slot.key.(string), r.text()))
 			} else {
 				slot.write(t, jsConcat(current, r.text()))
 			}
@@ -198,7 +198,7 @@ func mutateList(t *testing.T, draft *Object, r *pendingRandom) {
 		if item := list.Object(index); item != nil {
 			switch {
 			case r.Float64() < 0.3:
-				must(t, item.AppendText("x", r.text()))
+				must(t, AppendText(item, "x", r.text()))
 			case r.Float64() < 0.5:
 				must(t, item.Set("x", jsConcat(item.Get("x").(string), r.text())))
 			default:

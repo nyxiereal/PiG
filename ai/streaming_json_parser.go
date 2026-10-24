@@ -436,17 +436,6 @@ func (p *StreamingJSONParser) flushHigh(open *streamingOpenString) {
 	open.high = 0
 }
 
-// joinJavaScriptStrings is a+b as JavaScript strings: a lone high surrogate at the end of a and a lone low surrogate at the start of
-// b (both held in their three-byte forms) make one character.
-func joinJavaScriptStrings(a, b string) string {
-	if len(a) >= 3 && len(b) >= 3 && a[len(a)-3] == 0xED && a[len(a)-2] >= 0xA0 && a[len(a)-2] <= 0xAF && b[0] == 0xED && b[1] >= 0xB0 && b[1] <= 0xBF {
-		high := rune(a[len(a)-3]&0x0F)<<12 | rune(a[len(a)-2]&0x3F)<<6 | rune(a[len(a)-1]&0x3F)
-		low := rune(b[0]&0x0F)<<12 | rune(b[1]&0x3F)<<6 | rune(b[2]&0x3F)
-		return a[:len(a)-3] + string(0x10000+(high-0xD800)<<10+(low-0xDC00)) + b[3:]
-	}
-	return a + b
-}
-
 // wtf8Surrogate is the three-byte form of a lone UTF-16 surrogate, the way a Go string holds a JavaScript string that has one.
 func wtf8Surrogate(code rune) string {
 	return string([]byte{0xE0 | byte(code>>12), 0x80 | byte(code>>6)&0x3F, 0x80 | byte(code)&0x3F})
@@ -485,9 +474,9 @@ func (p *StreamingJSONParser) placeString(open *streamingOpenString, text string
 	change := open.change
 	if change != nil && len(p.changes) > 0 && p.changes[len(p.changes)-1] == change {
 		if change.kind == jsonChangeSet {
-			change.value = joinJavaScriptStrings(change.value.(string), text)
+			change.value = jsstring.Concat(change.value.(string), text)
 		} else {
-			change.text = joinJavaScriptStrings(change.text, text)
+			change.text = jsstring.Concat(change.text, text)
 		}
 		return
 	}

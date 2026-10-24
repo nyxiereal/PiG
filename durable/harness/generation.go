@@ -659,7 +659,7 @@ func ConvertPartial(tx durable.Tx, live *delta.Object, conversationId durable.Co
 // trailing writes at most every Settings.Progress.PartialIntervalMs (default 100 ms) with one commit in flight; stopping the throttle waits for that commit, so no
 // stale partial lands after the outcome.
 func streamResponse(ctx context.Context, runtime generationRuntime, model *ai.Model, messages []ai.Message, frozen bool, options ai.StreamOptions, attempt int) (ai.AssistantMessage, error) {
-	throttle := &partialThrottle{runtime: runtime, ctx: ctx, attempt: attempt, interval: runtime.Settings().Progress.PartialIntervalMs}
+	throttle := &partialThrottle{runtime: runtime, ctx: ctx, attempt: attempt, interval: runtime.Settings().Progress.PartialIntervalMs, changes: NewPartialChanges()}
 	defer throttle.stop()
 	signal := runtime.Signal()
 	if !frozen {
@@ -677,6 +677,7 @@ func streamResponse(ctx context.Context, runtime generationRuntime, model *ai.Mo
 		if partial == nil || len(partial.Content) == 0 {
 			continue
 		}
+		throttle.changes.Observe(event)
 		throttle.offer(partial)
 	}
 	result, err := stream.ResultContext(signal)
@@ -721,6 +722,8 @@ type partialThrottle struct {
 	ctx      context.Context
 	attempt  int
 	interval float64
+	// changes is what the response's events changed in the partial since the last commit.
+	changes  *PartialChanges
 	mu       sync.Mutex
 	pending  *ai.AssistantMessage
 	disarm   func()
@@ -756,7 +759,10 @@ func (throttle *partialThrottle) flush() {
 		defer close(done)
 		runtime := throttle.runtime
 		message, err := durable.ToJsonObject(partial)
+		var taken *PartialCommit
 		if err == nil {
+			// The changes since the last commit belong to this one.
+			taken = throttle.changes.Take(message)
 			err = runtime.Commit(throttle.ctx, func(tx durable.Tx, _ durable.RunningTask[GenerationInput, GenerationCheckpoint, GenerationResult]) (*generationNext, error) {
 				live, err := docDraft(tx, LiveDoc, runtime.ConversationId())
 				if err != nil {
@@ -769,8 +775,11 @@ func (throttle *partialThrottle) flush() {
 					}
 					generation = live.Object("generation")
 				}
-				return nil, AssignJson(generation, "message", message)
+				return nil, throttle.changes.Commit(generation, message, taken)
 			})
+			if err != nil {
+				throttle.changes.Restore(taken)
+			}
 		}
 		// Rejections after an abort mark or close are expected; the committed state stays consistent.
 		if err != nil && runtime.Signal().Err() == nil {

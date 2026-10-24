@@ -885,7 +885,7 @@ func publishProgress(ctx context.Context, runtime toolRuntime, reported *toolRep
 			}
 			// Diff details leaf by leaf and append new diagnostics, so each commit writes only what changed.
 			if detailsChanged && hasDetails {
-				if err := AssignJson(slot, "details", details); err != nil {
+				if err := AssignJson(slot, "details", details, nil); err != nil {
 					return nil, err
 				}
 			}

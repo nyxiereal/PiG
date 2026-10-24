@@ -1532,7 +1532,7 @@ path = "packages/chord/src/delta/index.ts"
 change = "added"
 disposition = "ported"
 evidence = ["test:chord/delta/pending_test.go#TestPendingOpsCapKeepsMaxPendingOpsPendingOpsAndReplacesPastThem", "test:chord/delta/append_text_test.go#TestAppendTextRecordsAnAppendOpAndTheAppendedValue"]
-rationale = "Pi f715a15c1, da412b039, d8d99950a and d0aa218cb add the ownedSlice export (a V8 workaround, strings.Clone in Go), the appendText and StringKeys exports (delta.Object.AppendText; StringKeys is a TypeScript type), the PendingOps and PendingTake exports (chord/delta/pending.go) and spread-based container copies (a JavaScript performance change)."
+rationale = "Pi f715a15c1, da412b039, d8d99950a and d0aa218cb add the ownedSlice export (a V8 workaround, strings.Clone in Go), the appendText and StringKeys exports (delta.AppendText; StringKeys is a TypeScript type), the PendingOps and PendingTake exports (chord/delta/pending.go) and spread-based container copies (a JavaScript performance change)."
 
 [[files]]
 path = "packages/chord/src/delta/pending.ts"
@@ -1553,7 +1553,7 @@ path = "packages/chord/src/delta/tracker.ts"
 change = "added"
 disposition = "ported"
 evidence = ["test:chord/delta/append_text_test.go#TestAppendTextJoinsSeveralAppendsToOneKeyIntoOneOpNextToOtherChanges", "test:chord/delta/append_text_test.go#TestAppendTextFallsBackToTheStringComparisonWhenTheSameKeyIsAlsoAssignedOrDeleted"]
-rationale = "Pi f715a15c1 copies append op text with ownedSlice (V8 workaround) and da412b039 adds appendText(draft, key, text): an append recorded in an appends map per object node without the prefix comparison, joined per key, dropped by a set or delete of the key, and rejected for a non-string; the draft key type is StringKeys. Ported as delta.Object.AppendText (chord/delta/handles.go, tracker.go node.appends) with the append ops joining a lone surrogate pair as JavaScript concatenation does; the ported delta-append-text tests check the op, the joins, the fallbacks, blocks inserted in the same change and the errors."
+rationale = "Pi f715a15c1 copies append op text with ownedSlice (V8 workaround) and da412b039 adds appendText(draft, key, text): an append recorded in an appends map per object node without the prefix comparison, joined per key, dropped by a set or delete of the key, and rejected for a non-string; the draft key type is StringKeys. Ported as delta.AppendText (chord/delta/handles.go, tracker.go node.appends) with the append ops joining a lone surrogate pair as JavaScript concatenation does; the ported delta-append-text tests check the op, the joins, the fallbacks, blocks inserted in the same change and the errors."
 
 [[files]]
 path = "packages/chord/src/errors.ts"

@@ -271,7 +271,6 @@
         "agent/transform_custom_user_boundary_test.go::TestConvertToLLMCustomMessageWithoutWireOutputKeepsToolFlow",
         "agent/transform_custom_user_boundary_test.go::TestConvertToLLMCustomUserMessageInterruptsToolFlow",
         "agent/transform_custom_user_boundary_test.go::TestConvertToLLMHoldsSystemMessageUntilToolFlowCloses",
-        "ai/streaming_json_resume_oracle_test.go::TestStreamingArgumentsParserMatchesPiAtEveryChunk",
         "chord/delta/own_key_order_test.go::TestDiffRevisionsVisitsArrayIndexKeysFirstInNumericOrder",
         "coding/cli/rpc_get_messages_source_test.go::TestRPCGetMessagesWritesEachMessageAsItWasParsed",
         "coding/session_message_source_test.go::TestMessageEndReplacementKeepsItsMemberOrder",
@@ -768,7 +767,6 @@
         "agent/transform_custom_user_boundary_test.go::TestConvertToLLMCustomMessageWithoutWireOutputKeepsToolFlow",
         "agent/transform_custom_user_boundary_test.go::TestConvertToLLMCustomUserMessageInterruptsToolFlow",
         "agent/transform_custom_user_boundary_test.go::TestConvertToLLMHoldsSystemMessageUntilToolFlowCloses",
-        "ai/streaming_json_resume_oracle_test.go::TestStreamingArgumentsParserMatchesPiAtEveryChunk",
         "coding/cli/strip_app_features_test.go::TestStripExportHTMLBuildOmitsExportPackage",
         "coding/session_tree_wire_oracle_test.go::TestNavigateTreeEveryPointSendsValidToolFlow",
         "internal/codingagent/markdown_theme_settings_test.go::TestMarkdownCodeBlockIndentSettingReachesChatComponents",
@@ -2837,7 +2835,6 @@
         "agent/transform_custom_user_boundary_test.go::TestConvertToLLMCustomMessageWithoutWireOutputKeepsToolFlow",
         "agent/transform_custom_user_boundary_test.go::TestConvertToLLMCustomUserMessageInterruptsToolFlow",
         "agent/transform_custom_user_boundary_test.go::TestConvertToLLMHoldsSystemMessageUntilToolFlowCloses",
-        "ai/streaming_json_resume_oracle_test.go::TestStreamingArgumentsParserMatchesPiAtEveryChunk",
         "coding/session_tree_wire_oracle_test.go::TestNavigateTreeEveryPointSendsValidToolFlow",
         "internal/codingagent/file_bytes_test.go::TestCLIFileTextDecodesInvalidUTF8LikePi",
         "internal/codingagent/file_processor_oracle_test.go::TestProcessCLIFileArgumentsMatchesPi"
@@ -3333,7 +3330,6 @@
         "ai/anthropic_messages_payload_oracle_test.go::TestAnthropicMessagesPayloadMatchesPi",
         "ai/api_streams_module_failure_upstream_test.go::TestLazyAPIEntryPointFailuresMatchPi",
         "ai/api_streams_module_failure_upstream_test.go::TestLazyAPIEntryPointsEndModuleFailuresLikeTheModuleUpstream",
-        "ai/streaming_json_resume_oracle_test.go::TestStreamingArgumentsParserMatchesPiAtEveryChunk",
         "coding/session_tree_wire_oracle_test.go::TestNavigateTreeEveryPointSendsValidToolFlow"
       ]
     },
@@ -6004,7 +6000,6 @@
         "agent/transform_custom_user_boundary_test.go::TestConvertToLLMCustomUserMessageInterruptsToolFlow",
         "agent/transform_custom_user_boundary_test.go::TestConvertToLLMHoldsSystemMessageUntilToolFlowCloses",
         "ai/anthropic_messages_payload_oracle_test.go::TestAnthropicMessagesPayloadMatchesPi",
-        "ai/streaming_json_resume_oracle_test.go::TestStreamingArgumentsParserMatchesPiAtEveryChunk",
         "coding/discover_extensions_oracle_test.go::TestDiscoverExtensionPathsMatchPi",
         "coding/session_tree_wire_oracle_test.go::TestNavigateTreeEveryPointSendsValidToolFlow",
         "internal/codingagent/armin_test.go::TestArminFramesMatchPinnedPi",
@@ -6498,7 +6493,6 @@
         "agent/transform_custom_user_boundary_test.go::TestConvertToLLMCustomUserMessageInterruptsToolFlow",
         "agent/transform_custom_user_boundary_test.go::TestConvertToLLMHoldsSystemMessageUntilToolFlowCloses",
         "ai/auth_storage_file_oracle_test.go::TestAuthStorageFileMatchesPi",
-        "ai/streaming_json_resume_oracle_test.go::TestStreamingArgumentsParserMatchesPiAtEveryChunk",
         "chord/delta/own_key_order_test.go::TestDiffRevisionsVisitsArrayIndexKeysFirstInNumericOrder",
         "coding/session_tree_wire_oracle_test.go::TestNavigateTreeEveryPointSendsValidToolFlow",
         "internal/chord/chordjson/own_key_order_test.go::TestCopyFollowsPisKeyOrderAndMessages",
@@ -6693,7 +6687,6 @@
         "agent/transform_custom_user_boundary_test.go::TestConvertToLLMCustomMessageWithoutWireOutputKeepsToolFlow",
         "agent/transform_custom_user_boundary_test.go::TestConvertToLLMCustomUserMessageInterruptsToolFlow",
         "agent/transform_custom_user_boundary_test.go::TestConvertToLLMHoldsSystemMessageUntilToolFlowCloses",
-        "ai/streaming_json_resume_oracle_test.go::TestStreamingArgumentsParserMatchesPiAtEveryChunk",
         "coding/session_tree_wire_oracle_test.go::TestNavigateTreeEveryPointSendsValidToolFlow"
       ]
     },
@@ -6723,7 +6716,6 @@
         "agent/transform_custom_user_boundary_test.go::TestConvertToLLMCustomMessageWithoutWireOutputKeepsToolFlow",
         "agent/transform_custom_user_boundary_test.go::TestConvertToLLMCustomUserMessageInterruptsToolFlow",
         "agent/transform_custom_user_boundary_test.go::TestConvertToLLMHoldsSystemMessageUntilToolFlowCloses",
-        "ai/streaming_json_resume_oracle_test.go::TestStreamingArgumentsParserMatchesPiAtEveryChunk",
         "coding/session_tree_wire_oracle_test.go::TestNavigateTreeEveryPointSendsValidToolFlow"
       ]
     },
@@ -6762,7 +6754,6 @@
         "agent/transform_custom_user_boundary_test.go::TestConvertToLLMCustomUserMessageInterruptsToolFlow",
         "agent/transform_custom_user_boundary_test.go::TestConvertToLLMHoldsSystemMessageUntilToolFlowCloses",
         "ai/anthropic_messages_payload_oracle_test.go::TestAnthropicMessagesPayloadMatchesPi",
-        "ai/streaming_json_resume_oracle_test.go::TestStreamingArgumentsParserMatchesPiAtEveryChunk",
         "chord/delta/own_key_order_test.go::TestDiffRevisionsVisitsArrayIndexKeysFirstInNumericOrder",
         "coding/cli/strip_app_features_test.go::TestStripExportHTMLBuildOmitsExportPackage",
         "coding/resource_loader_reload_oracle_test.go::TestDefaultResourceLoaderReloadMatchesPi",
@@ -6810,7 +6801,6 @@
         "agent/transform_custom_user_boundary_test.go::TestConvertToLLMHoldsSystemMessageUntilToolFlowCloses",
         "ai/anthropic_messages_payload_oracle_test.go::TestAnthropicMessagesPayloadMatchesPi",
         "ai/auth_storage_readonly_oracle_test.go::TestReadOnlyAuthStorageMatchesPi",
-        "ai/streaming_json_resume_oracle_test.go::TestStreamingArgumentsParserMatchesPiAtEveryChunk",
         "chord/delta/own_key_order_test.go::TestDiffRevisionsVisitsArrayIndexKeysFirstInNumericOrder",
         "coding/cli/strip_app_features_test.go::TestStripExportHTMLBuildOmitsExportPackage",
         "coding/session_tree_wire_oracle_test.go::TestNavigateTreeEveryPointSendsValidToolFlow",
@@ -8724,7 +8714,6 @@
         "ai/registry_test.go::TestCatalogPin100",
         "ai/registry_test.go::TestRegistryHasModels",
         "ai/registry_test.go::TestRuntimeDiscoveryIncludesRadiusCatalog",
-        "ai/streaming_json_resume_oracle_test.go::TestStreamingArgumentsParserMatchesPiAtEveryChunk",
         "automation/pin/test_pin.py",
         "coding/session_tree_wire_oracle_test.go::TestNavigateTreeEveryPointSendsValidToolFlow",
         "durable/core/docs/addtools_test.go::TestAddToolsExtendsModelToolsAsWell",
@@ -9325,7 +9314,6 @@
         "agent/messages_projection_test.go::TestAssistantMessageProjectionEqualsObserve",
         "ai/assistant_observation_projection_norace_test.go::TestObserveProjectionAllocatesNothing",
         "ai/assistant_observation_projection_test.go::TestObserveProjectionEqualsObserve",
-        "ai/stream_builder_deferred_arguments_test.go::TestDeferredToolArgumentsReadAsTheEagerParse",
         "internal/codingagent/reload_allocs_norace_test.go::TestInteractiveSessionReloadAllocatesPerRetainedMessageWithinBudget"
       ]
     },
@@ -9653,6 +9641,74 @@
       ]
     },
     {
+      "id": "BF-5bf0d4a",
+      "title": "Durable partial commits of a streamed answer no longer compare every growing text, thinking and tool-call…",
+      "symptom": "Durable partial commits of a streamed answer no longer compare every growing text, thinking and tool-call argument string in full on each commit and re-assign the arguments snapshot: they append new text with `AppendText` and apply the argument changes of their own parse of the streamed argument text.",
+      "rootCause": "delta.Object.AppendText records an append op without the comparison of the old and new string that Set of the longer string costs when the change is prepared; several appends to a key join into one op, and a Set or Delete of the key falls back to the comparison. Durable partial commits (PartialChanges) append the text and thinking deltas of a streamed answer and apply the argument changes of their own StreamingJSONParser of the raw toolcall_delta text. Append ops join a lone surrogate pair across their boundary as JavaScript string concatenation does (jsstring.Concat).",
+      "rootCauseSource": "commit",
+      "userImpact": "Behavior differed from Pi",
+      "platform": "All platforms",
+      "class": "own",
+      "fixedIn": "Unreleased",
+      "releaseNote": "Durable partial commits of a streamed answer no longer compare every growing text, thinking and tool-call argument string in full on each commit and re-assign the arguments snapshot: they append new text with `AppendText` and apply the argument changes of their own parse of the streamed argument text.",
+      "origin": "release note",
+      "commits": [
+        {
+          "hash": "5bf0d4a2ad",
+          "date": "2026-10-24"
+        }
+      ],
+      "tests": [
+        "chord/delta/append_text_test.go::TestAppendTextAppendsInsideABlockTheSameChangeInsertedOrReplaced",
+        "chord/delta/append_text_test.go::TestAppendTextFallsBackToTheStringComparisonWhenTheSameKeyIsAlsoAssignedOrDeleted",
+        "chord/delta/append_text_test.go::TestAppendTextJoinsSeveralAppendsToOneKeyIntoOneOpNextToOtherChanges",
+        "chord/delta/append_text_test.go::TestAppendTextOwnsTheTextItKeeps",
+        "chord/delta/append_text_test.go::TestAppendTextRecordsAnAppendOpAndTheAppendedValue",
+        "chord/delta/append_text_test.go::TestAppendTextRejectsWhatACallerCanGetWrong",
+        "durable/harness/partial_changes_upstream_test.go::TestPartialChangesAppendGrowingArgumentAndTextStringsInsteadOfReassigningThem",
+        "durable/harness/partial_changes_upstream_test.go::TestPartialChangesApplyTheChangesOfAFailedCommitInTheNextOne",
+        "durable/harness/partial_changes_upstream_test.go::TestPartialChangesCommitArgumentsEqualToTheFinalParseAtEveryPieceSizeAndCommitRhythm",
+        "durable/harness/partial_changes_upstream_test.go::TestPartialChangesCommitTheFinalArgumentsAfterTheCallEndsAndDropTextAppendsWhenABlockEnds",
+        "durable/harness/partial_changes_upstream_test.go::TestPartialChangesFallBackToTheSnapshotWhenTheCommittedMessageLostACallWhoseChangesWereCommitted",
+        "durable/harness/partial_changes_upstream_test.go::TestPartialChangesHandleANumberEndingAndAStringStartingInOnePieceAndEscapesSplitAcrossPieces",
+        "durable/harness/partial_changes_upstream_test.go::TestPartialChangesReApplyAFailedCommitsChangesEvenWhenItWouldHaveAddedTheCall"
+      ]
+    },
+    {
+      "id": "BF-5bf0d4a-2",
+      "title": "An append op whose text starts with the low half of a surrogate pair joins the high half that ends the string…",
+      "symptom": "An append op whose text starts with the low half of a surrogate pair joins the high half that ends the string it appends to, as JavaScript string concatenation does.",
+      "rootCause": "delta.Object.AppendText records an append op without the comparison of the old and new string that Set of the longer string costs when the change is prepared; several appends to a key join into one op, and a Set or Delete of the key falls back to the comparison. Durable partial commits (PartialChanges) append the text and thinking deltas of a streamed answer and apply the argument changes of their own StreamingJSONParser of the raw toolcall_delta text. Append ops join a lone surrogate pair across their boundary as JavaScript string concatenation does (jsstring.Concat).",
+      "rootCauseSource": "commit",
+      "userImpact": "Behavior differed from Pi",
+      "platform": "All platforms",
+      "class": "own",
+      "fixedIn": "Unreleased",
+      "releaseNote": "An append op whose text starts with the low half of a surrogate pair joins the high half that ends the string it appends to, as JavaScript string concatenation does.",
+      "origin": "release note",
+      "commits": [
+        {
+          "hash": "5bf0d4a2ad",
+          "date": "2026-10-24"
+        }
+      ],
+      "tests": [
+        "chord/delta/append_text_test.go::TestAppendTextAppendsInsideABlockTheSameChangeInsertedOrReplaced",
+        "chord/delta/append_text_test.go::TestAppendTextFallsBackToTheStringComparisonWhenTheSameKeyIsAlsoAssignedOrDeleted",
+        "chord/delta/append_text_test.go::TestAppendTextJoinsSeveralAppendsToOneKeyIntoOneOpNextToOtherChanges",
+        "chord/delta/append_text_test.go::TestAppendTextOwnsTheTextItKeeps",
+        "chord/delta/append_text_test.go::TestAppendTextRecordsAnAppendOpAndTheAppendedValue",
+        "chord/delta/append_text_test.go::TestAppendTextRejectsWhatACallerCanGetWrong",
+        "durable/harness/partial_changes_upstream_test.go::TestPartialChangesAppendGrowingArgumentAndTextStringsInsteadOfReassigningThem",
+        "durable/harness/partial_changes_upstream_test.go::TestPartialChangesApplyTheChangesOfAFailedCommitInTheNextOne",
+        "durable/harness/partial_changes_upstream_test.go::TestPartialChangesCommitArgumentsEqualToTheFinalParseAtEveryPieceSizeAndCommitRhythm",
+        "durable/harness/partial_changes_upstream_test.go::TestPartialChangesCommitTheFinalArgumentsAfterTheCallEndsAndDropTextAppendsWhenABlockEnds",
+        "durable/harness/partial_changes_upstream_test.go::TestPartialChangesFallBackToTheSnapshotWhenTheCommittedMessageLostACallWhoseChangesWereCommitted",
+        "durable/harness/partial_changes_upstream_test.go::TestPartialChangesHandleANumberEndingAndAStringStartingInOnePieceAndEscapesSplitAcrossPieces",
+        "durable/harness/partial_changes_upstream_test.go::TestPartialChangesReApplyAFailedCommitsChangesEvenWhenItWouldHaveAddedTheCall"
+      ]
+    },
+    {
       "id": "BF-5c4167a",
       "title": "fix(extension): hold the theme colors map the wire palette memo is keyed on",
       "symptom": "fix(extension): hold the theme colors map the wire palette memo is keyed on",
@@ -9920,7 +9976,6 @@
         "agent/transform_custom_user_boundary_test.go::TestConvertToLLMCustomUserMessageInterruptsToolFlow",
         "agent/transform_custom_user_boundary_test.go::TestConvertToLLMHoldsSystemMessageUntilToolFlowCloses",
         "ai/anthropic_messages_payload_oracle_test.go::TestAnthropicMessagesPayloadMatchesPi",
-        "ai/streaming_json_resume_oracle_test.go::TestStreamingArgumentsParserMatchesPiAtEveryChunk",
         "coding/discover_extensions_oracle_test.go::TestDiscoverExtensionPathsMatchPi",
         "coding/session_tree_wire_oracle_test.go::TestNavigateTreeEveryPointSendsValidToolFlow",
         "internal/codingagent/armin_test.go::TestArminFramesMatchPinnedPi",
@@ -10057,7 +10112,6 @@
         "ai/rpc33_provider_abort_test.go::TestOpenAIProviderAbortAfterAdmission",
         "ai/rpc33_provider_abort_test.go::TestOpenAIProviderAbortAtParserReadBoundaries",
         "ai/rpc33_provider_scratch_test.go::TestProviderScratchInterleavedTools",
-        "ai/stream_builder_deferred_arguments_test.go::TestDeferredToolArgumentsReadAsTheEagerParse",
         "ai/validate_upstream_test.go::TestValidateToolArgumentsReportsArgumentsError"
       ]
     },
@@ -10202,7 +10256,6 @@
         "agent/transform_custom_user_boundary_test.go::TestConvertToLLMCustomMessageWithoutWireOutputKeepsToolFlow",
         "agent/transform_custom_user_boundary_test.go::TestConvertToLLMCustomUserMessageInterruptsToolFlow",
         "agent/transform_custom_user_boundary_test.go::TestConvertToLLMHoldsSystemMessageUntilToolFlowCloses",
-        "ai/streaming_json_resume_oracle_test.go::TestStreamingArgumentsParserMatchesPiAtEveryChunk",
         "coding/session_tree_wire_oracle_test.go::TestNavigateTreeEveryPointSendsValidToolFlow",
         "internal/codingagent/interactive_native_login_test.go::TestLoginListsARegisteredNativeAPIKeyProviderInNameOrder",
         "internal/codingagent/session_listing_race_test.go::TestSessionListingSortsConcurrentlyWithoutARace",
@@ -16206,6 +16259,54 @@
       ]
     },
     {
+      "id": "BF-76f780d",
+      "title": "A tool call that streams many argument deltas no longer costs time and memory that grow with the square of…",
+      "symptom": "A tool call that streams many argument deltas no longer costs time and memory that grow with the square of its text: every provider (Anthropic Messages, Bedrock Converse Stream, Mistral, OpenAI Completions and Responses, Pi messages), the faux provider and the proxy stream read each delta once.",
+      "rootCause": "ai.StreamingJSONParser and ai.ToolCallArgumentsStream read each argument delta once (tolerant parse, immutable snapshots, linear cost). Every provider, pi-messages, the faux provider and the proxy stream keep stream state (argument text, event index, custom input, Bedrock reasoning bytes) beside the content block and never on it, so partial messages carry no parser scratch. Grammar tool input appends per delta and closes with the provider's complete input. The deferred-argument machinery, the resumable parser and the scratch members of ToolCall are gone.",
+      "rootCauseSource": "commit",
+      "userImpact": "Behavior differed from Pi",
+      "platform": "All platforms",
+      "class": "own",
+      "fixedIn": "Unreleased",
+      "releaseNote": "A tool call that streams many argument deltas no longer costs time and memory that grow with the square of its text: every provider (Anthropic Messages, Bedrock Converse Stream, Mistral, OpenAI Completions and Responses, Pi messages), the faux provider and the proxy stream read each delta once. A 500 KB `write` call streams in well under a second.",
+      "origin": "release note",
+      "commits": [
+        {
+          "hash": "76f780d05d",
+          "date": "2026-10-24"
+        }
+      ],
+      "tests": [
+        "ai/anthropic_stream_test.go::TestAnthropicFailureLeavesNoScratchAndNoEndEvents",
+        "ai/anthropic_stream_test.go::TestAnthropicOpenBlocksCarryNoProviderScratch",
+        "ai/streaming_json_parser_oracle_test.go::TestStreamingJSONParserMatchesPi"
+      ]
+    },
+    {
+      "id": "BF-76f780d-2",
+      "title": "A grammar (custom) tool input no longer copies the whole input so far on every delta",
+      "symptom": "A grammar (custom) tool input no longer copies the whole input so far on every delta.",
+      "rootCause": "ai.StreamingJSONParser and ai.ToolCallArgumentsStream read each argument delta once (tolerant parse, immutable snapshots, linear cost). Every provider, pi-messages, the faux provider and the proxy stream keep stream state (argument text, event index, custom input, Bedrock reasoning bytes) beside the content block and never on it, so partial messages carry no parser scratch. Grammar tool input appends per delta and closes with the provider's complete input. The deferred-argument machinery, the resumable parser and the scratch members of ToolCall are gone.",
+      "rootCauseSource": "commit",
+      "userImpact": "Behavior differed from Pi",
+      "platform": "All platforms",
+      "class": "own",
+      "fixedIn": "Unreleased",
+      "releaseNote": "A grammar (custom) tool input no longer copies the whole input so far on every delta.",
+      "origin": "release note",
+      "commits": [
+        {
+          "hash": "76f780d05d",
+          "date": "2026-10-24"
+        }
+      ],
+      "tests": [
+        "ai/anthropic_stream_test.go::TestAnthropicFailureLeavesNoScratchAndNoEndEvents",
+        "ai/anthropic_stream_test.go::TestAnthropicOpenBlocksCarryNoProviderScratch",
+        "ai/streaming_json_parser_oracle_test.go::TestStreamingJSONParserMatchesPi"
+      ]
+    },
+    {
       "id": "BF-773a868",
       "title": "RPC mode no longer hangs when a Node extension command calls `pi.sendMessage(..., { triggerTurn: true })`…",
       "symptom": "RPC mode no longer hangs when a Node extension command calls `pi.sendMessage(..., { triggerTurn: true })` while a `before_agent_start` handler is subscribed: the handler runs inside the call, as in Pi, and the run starts after the command's response.",
@@ -16284,7 +16385,6 @@
       "tests": [
         "agent/lone_surrogate_message_test.go::TestAgentMessageRoundTripKeepsALoneSurrogate",
         "ai/streaming_json_oracle_test.go::TestStreamingJSONMatchesPiOnSeededInput",
-        "ai/streaming_json_resume_oracle_test.go::TestStreamingArgumentsParserMatchesPiAtEveryChunk",
         "ai/tool_call_arguments_test.go::TestArgumentsJSONIsJSONStringifyWithoutARecordedOrder",
         "ai/tool_call_arguments_test.go::TestIsWTF8",
         "ai/tool_call_arguments_test.go::TestOpenAIRequestReplaysArgumentsAsJSONStringify",
@@ -16786,7 +16886,6 @@
         "ai/constrained_sampling_oracle_test.go::TestConstrainedSamplingMatchesPi",
         "ai/openai_request_key_order_oracle_test.go::TestOpenAICompletionsRequestKeysFollowPiAssignmentOrder",
         "ai/openai_responses_request_key_order_oracle_test.go::TestOpenAIResponsesRequestKeysFollowPiAssignmentOrder",
-        "ai/streaming_json_resume_oracle_test.go::TestStreamingArgumentsParserMatchesPiAtEveryChunk",
         "coding/cli/rpc_assistant_member_order_test.go::TestRPCAssistantMessageMembersMatchTheSessionLineOrder",
         "coding/cli/rpc_combined_usage_order_test.go::TestRPCCombinedUsageKeepsTheLiteralOrder",
         "coding/cli/rpc_model_type_binary_test.go::TestRPCModelObjectsCarryTheRegistryModelType",
@@ -16914,7 +17013,6 @@
         "agent/transform_custom_user_boundary_test.go::TestConvertToLLMCustomMessageWithoutWireOutputKeepsToolFlow",
         "agent/transform_custom_user_boundary_test.go::TestConvertToLLMCustomUserMessageInterruptsToolFlow",
         "agent/transform_custom_user_boundary_test.go::TestConvertToLLMHoldsSystemMessageUntilToolFlowCloses",
-        "ai/streaming_json_resume_oracle_test.go::TestStreamingArgumentsParserMatchesPiAtEveryChunk",
         "chord/delta/own_key_order_test.go::TestDiffRevisionsVisitsArrayIndexKeysFirstInNumericOrder",
         "coding/session_tree_wire_oracle_test.go::TestNavigateTreeEveryPointSendsValidToolFlow",
         "internal/chord/chordjson/own_key_order_test.go::TestCopyFollowsPisKeyOrderAndMessages",
@@ -16961,7 +17059,6 @@
         "agent/transform_custom_user_boundary_test.go::TestConvertToLLMCustomMessageWithoutWireOutputKeepsToolFlow",
         "agent/transform_custom_user_boundary_test.go::TestConvertToLLMCustomUserMessageInterruptsToolFlow",
         "agent/transform_custom_user_boundary_test.go::TestConvertToLLMHoldsSystemMessageUntilToolFlowCloses",
-        "ai/streaming_json_resume_oracle_test.go::TestStreamingArgumentsParserMatchesPiAtEveryChunk",
         "chord/delta/own_key_order_test.go::TestDiffRevisionsVisitsArrayIndexKeysFirstInNumericOrder",
         "coding/session_tree_wire_oracle_test.go::TestNavigateTreeEveryPointSendsValidToolFlow",
         "internal/chord/chordjson/own_key_order_test.go::TestCopyFollowsPisKeyOrderAndMessages",
@@ -17250,6 +17347,27 @@
       ]
     },
     {
+      "id": "BF-8153bc7",
+      "title": "Fix in shipped code",
+      "symptom": "Fix in shipped code",
+      "rootCause": "",
+      "rootCauseSource": "",
+      "userImpact": "Behavior differed from Pi",
+      "platform": "All platforms",
+      "class": "own",
+      "fixedIn": "Unreleased",
+      "origin": "commit",
+      "commits": [
+        {
+          "hash": "8153bc7a9e",
+          "date": "2026-10-24"
+        }
+      ],
+      "tests": [
+        "durable/harness/harness_inbox_test.go::TestInbox"
+      ]
+    },
+    {
       "id": "BF-81e584b",
       "title": "anthropic-messages payload now matches Pi for four cases found by the new live-Pi oracle…",
       "symptom": "anthropic-messages payload now matches Pi for four cases found by the new live-Pi oracle `TestAnthropicMessagesCompatAndOptionsPayloadMatchesPi` (`ai/anthropic.go`, anthropic-messages.ts:1132, 949-990, 1154-1164; 1,500 probes over `supportsMidConvoEffort`/`supportsMidConvoSystemMessages`/`supportsMidConvoToolChanges`/`allowedFallbackModels`/`forceAdaptiveThinking`, `interleavedThinking`, `thinkingBudgets`, env cache retention, object tool choices, odd metadata, model `maxTokens`, `thinkingLevelMap`, and mid-conversation system messages with sections and tool changes): (1) the initial system message is the transcript's first message as given, so a mid-conversation system message after a dropped errored/aborted assistant turn is no longer taken for the prompt; (2) a managed-effort request without `forceAdaptiveThinking` takes the effort `high` (streamSimple derives it only for adaptive models); (3) an unmapped `xhigh`/`max` level is `high` (mapThinkingLevelToEffort has no such case); (4) a managed-effort simple request still gets the budget-adjusted `max_tokens`. openai-codex-responses now picks the instruction role of a mid-conversation system message from the selected model's `reasoning` flag instead of always `developer`; the bedrock, google and responses payload oracles now draw mid-conversation system messages too.",
@@ -17509,8 +17627,7 @@
         }
       ],
       "tests": [
-        "ai/streaming_json_oracle_test.go::TestStreamingJSONMatchesPiOnSeededInput",
-        "ai/streaming_json_resume_test.go::TestStreamingArgumentsParserMatchesWholeTextParser"
+        "ai/streaming_json_oracle_test.go::TestStreamingJSONMatchesPiOnSeededInput"
       ]
     },
     {
@@ -17780,7 +17897,6 @@
         "agent/transform_custom_user_boundary_test.go::TestConvertToLLMHoldsSystemMessageUntilToolFlowCloses",
         "ai/google_same_model_signature_test.go::TestGoogleProviderKeepsItsOwnThinkingSignaturesWithoutCatalogMetadata",
         "ai/provider_request_shape_test.go::TestGoogleRequestPreservesEmptyText",
-        "ai/streaming_json_resume_oracle_test.go::TestStreamingArgumentsParserMatchesPiAtEveryChunk",
         "coding/session_tree_wire_oracle_test.go::TestNavigateTreeEveryPointSendsValidToolFlow"
       ]
     },
@@ -21393,7 +21509,6 @@
         "ai/request_body_member_order_test.go::TestAnthropicReplacementBodyKeepsItsMemberOrder",
         "ai/request_body_member_order_test.go::TestCodexWebSocketMessageKeepsTheRequestBodyMemberOrder",
         "ai/request_body_member_order_test.go::TestCodexWebSocketMessageSpreadsBodiesWithoutInputAndNull",
-        "ai/streaming_json_resume_oracle_test.go::TestStreamingArgumentsParserMatchesPiAtEveryChunk",
         "chord/delta/own_key_order_test.go::TestDiffRevisionsVisitsArrayIndexKeysFirstInNumericOrder",
         "coding/session_tree_wire_oracle_test.go::TestNavigateTreeEveryPointSendsValidToolFlow",
         "internal/chord/chordjson/own_key_order_test.go::TestCopyFollowsPisKeyOrderAndMessages",
@@ -22834,7 +22949,6 @@
         "agent/transform_custom_user_boundary_test.go::TestConvertToLLMCustomMessageWithoutWireOutputKeepsToolFlow",
         "agent/transform_custom_user_boundary_test.go::TestConvertToLLMCustomUserMessageInterruptsToolFlow",
         "agent/transform_custom_user_boundary_test.go::TestConvertToLLMHoldsSystemMessageUntilToolFlowCloses",
-        "ai/streaming_json_resume_oracle_test.go::TestStreamingArgumentsParserMatchesPiAtEveryChunk",
         "coding/session_tree_wire_oracle_test.go::TestNavigateTreeEveryPointSendsValidToolFlow",
         "internal/codingagent/tool_render_preview_test.go::TestPreviewBodyRendererFooterUsesPisDurationFormat",
         "test/extension-conformance/extension_api_go_test.go::TestExtensionAPIToolResultPreviewGo",
@@ -23778,7 +23892,6 @@
       ],
       "tests": [
         "ai/streaming_json_oracle_test.go::TestStreamingJSONMatchesPiOnSeededInput",
-        "ai/streaming_json_resume_oracle_test.go::TestStreamingArgumentsParserMatchesPiAtEveryChunk",
         "ai/tool_call_argument_order_test.go::TestSetStreamingArgumentsKeepsMemberOrder",
         "ai/tool_call_non_object_arguments_test.go::TestStreamedToolArgumentsThatAreNotAnObjectAreKeptAsPiKeepsThem"
       ]
@@ -23850,7 +23963,6 @@
         "ai/bedrock_request_body_oracle_test.go::TestBedrockRequestBodyMatchesPi",
         "ai/bedrock_wire_metadata_order_test.go::TestBedrockStringMapEnumeratesLikeAJavaScriptObject",
         "ai/google_request_body_oracle_test.go::TestGoogleRequestBodyMatchesPi",
-        "ai/streaming_json_resume_oracle_test.go::TestStreamingArgumentsParserMatchesPiAtEveryChunk",
         "automation/ci/portlint/checks/checks_test.go::TestAnalyzers",
         "coding/extension/host/subprocess/native_stream_options_union_test.go::TestNativeProviderOptionsKeepRawValuesAndNumericPresence",
         "coding/extension/host/subprocess/request_metadata_order_test.go::TestCompleteRequestKeepsRequestMetadataOrder",
@@ -23950,6 +24062,34 @@
         "coding/extension/mcp_url_expansion_test.go::TestExpandMcpURL",
         "coding/extension/mcp_url_expansion_test.go::TestValidateMcpServerConfigChecksTheExpandedURL",
         "coding/mcpext/connection_test.go::TestMCPConnectionsExpandTheServerURLReferences"
+      ]
+    },
+    {
+      "id": "BF-b1642ac",
+      "title": "fix(ai,chord): AppendText is a function over a draft; the streaming JSON parser reads deep nesting in linear…",
+      "symptom": "fix(ai,chord): AppendText is a function over a draft; the streaming JSON parser reads deep nesting in linear time",
+      "rootCause": "delta.AppendText(draft, key, text) replaces the method of the same name, as Pi's appendText is a free function over a draft. The streaming JSON parser built an order path string per container it opened, which cost time and memory quadratic in nesting depth (25 s for 200,000 levels); the path is now built only when an object's member order matters. Adds the retention, __proto__, custom tool input, parser cost and tool-call argument benchmark tests of Pi and.",
+      "rootCauseSource": "commit",
+      "userImpact": "Behavior differed from Pi",
+      "platform": "All platforms",
+      "class": "own",
+      "fixedIn": "Unreleased",
+      "origin": "commit",
+      "commits": [
+        {
+          "hash": "b1642acea2",
+          "date": "2026-10-24"
+        }
+      ],
+      "tests": [
+        "ai/constrained_sampling_test.go::TestAppendGrammarToolInputJSONDelta",
+        "ai/constrained_sampling_test.go::TestCloseGrammarToolInputJSONRejectsAFinalInputThatDoesNotContinueTheStreamedInput",
+        "ai/streaming_json_parser_cost_test.go::TestStreamingJSONParserKeepsVeryLargeOpenArraysLinearByLettingThePreviewLag",
+        "ai/streaming_json_parser_cost_test.go::TestStreamingJSONParserReadsDeepNestingWithoutRecursionAndInLinearTime",
+        "ai/streaming_json_parser_cost_test.go::TestStreamingJSONParserReadsOneHugePieceInLinearTime",
+        "ai/streaming_tool_arguments_norace_test.go::TestCustomToolInputStreamsInMemoryLinearInItsLength",
+        "chord/delta/append_text_test.go::TestAppendTextRejectsWhatACallerCanGetWrong",
+        "chord/delta/apply_immutable_upstream_test.go::TestImmutableContainerCopiesKeepAnOwnProtoMemberAsData"
       ]
     },
     {
@@ -24151,7 +24291,6 @@
         "ai/perf_gate_norace_test.go::TestProviderRequestHistoryAllocationGate",
         "ai/request_body_escape_test.go::TestReplacementPayloadsWriteMarkupLiterally",
         "ai/request_body_escaping_test.go::TestProviderRequestBodiesWriteCharactersAsJSONStringifyDoes",
-        "ai/streaming_json_resume_oracle_test.go::TestStreamingArgumentsParserMatchesPiAtEveryChunk",
         "coding/cli/rpc_assistant_member_order_test.go::TestRPCAssistantMessageMembersMatchTheSessionLineOrder",
         "coding/cli/rpc_model_type_binary_test.go::TestRPCModelObjectsCarryTheRegistryModelType",
         "coding/cli/rpc_upstream_test.go::TestRPCModeUpstream",
@@ -24285,7 +24424,6 @@
         "ai/openai_responses_request_key_order_oracle_test.go::TestOpenAIResponsesRequestKeysFollowPiAssignmentOrder",
         "ai/perf_gate_norace_test.go::TestProviderRequestHistoryAllocationGate",
         "ai/request_body_escaping_test.go::TestProviderRequestBodiesWriteCharactersAsJSONStringifyDoes",
-        "ai/streaming_json_resume_oracle_test.go::TestStreamingArgumentsParserMatchesPiAtEveryChunk",
         "chord/delta/own_key_order_test.go::TestDiffRevisionsVisitsArrayIndexKeysFirstInNumericOrder",
         "coding/cli/rpc_upstream_test.go::TestRPCModeUpstream",
         "coding/session_tree_wire_oracle_test.go::TestNavigateTreeEveryPointSendsValidToolFlow",
@@ -25109,7 +25247,6 @@
         "agent/transform_custom_user_boundary_test.go::TestConvertToLLMHoldsSystemMessageUntilToolFlowCloses",
         "ai/models_store_file_oracle_test.go::TestFileModelsStoreNonObjectRootsAndIndexKeysMatchPi",
         "ai/models_store_test.go::TestFileModelsStoreRejectsInvalidJSONAndCancelledContexts",
-        "ai/streaming_json_resume_oracle_test.go::TestStreamingArgumentsParserMatchesPiAtEveryChunk",
         "coding/session_tree_wire_oracle_test.go::TestNavigateTreeEveryPointSendsValidToolFlow",
         "internal/codingagent/thinking_selector_oracle_test.go::TestThinkingSelectorInputMatchesPi",
         "internal/codingagent/tools/find_operations_port_test.go::TestFindGlobFailureIsReportedWithItsOwnMessage"
@@ -33679,8 +33816,7 @@
       "commitsFrom": "release note",
       "tests": [
         "ai/assistant_published_clone_test.go::TestCellObservationsCopyPublishedArgumentsUnread",
-        "ai/assistant_published_clone_test.go::TestObserveOfAnUnpublishedMessageStillChecksArgumentStrings",
-        "ai/streaming_json_resume_oracle_test.go::TestStreamingArgumentsParserMatchesPiAtEveryChunk"
+        "ai/assistant_published_clone_test.go::TestObserveOfAnUnpublishedMessageStillChecksArgumentStrings"
       ]
     },
     {
@@ -35821,7 +35957,6 @@
         "ai/perf_gate_norace_test.go::TestProviderRequestHistoryAllocationGate",
         "ai/request_body_escape_test.go::TestReplacementPayloadsWriteMarkupLiterally",
         "ai/request_body_escaping_test.go::TestProviderRequestBodiesWriteCharactersAsJSONStringifyDoes",
-        "ai/streaming_json_resume_oracle_test.go::TestStreamingArgumentsParserMatchesPiAtEveryChunk",
         "coding/cli/rpc_assistant_member_order_test.go::TestRPCAssistantMessageMembersMatchTheSessionLineOrder",
         "coding/cli/rpc_model_type_binary_test.go::TestRPCModelObjectsCarryTheRegistryModelType",
         "coding/cli/rpc_upstream_test.go::TestRPCModeUpstream",
@@ -36171,7 +36306,6 @@
         "ai/provider_ecmascript_whitespace_test.go::TestMistralAssistantBlankUsesECMAScriptTrim",
         "ai/provider_wire_defaults_test.go::TestMistralAssistantReplayPrefixAndToolIndex",
         "ai/raw_payload_replacement_oracle_test.go::TestRawPayloadReplacementsAreSentAsPiSendsThem",
-        "ai/streaming_json_resume_oracle_test.go::TestStreamingArgumentsParserMatchesPiAtEveryChunk",
         "coding/cli/rpc_event_bytes_test.go::TestRPCUsageWritesTheMemberOrderOfItsValue",
         "coding/extension/host/subprocess/native_stream_options_union_test.go::TestNativeProviderOptionsKeepRawValuesAndNumericPresence",
         "coding/extension/host/subprocess/request_metadata_order_test.go::TestCompleteRequestKeepsRequestMetadataOrder",
@@ -36234,7 +36368,6 @@
         "ai/provider_ecmascript_whitespace_test.go::TestMistralAssistantBlankUsesECMAScriptTrim",
         "ai/provider_wire_defaults_test.go::TestMistralAssistantReplayPrefixAndToolIndex",
         "ai/raw_payload_replacement_oracle_test.go::TestRawPayloadReplacementsAreSentAsPiSendsThem",
-        "ai/streaming_json_resume_oracle_test.go::TestStreamingArgumentsParserMatchesPiAtEveryChunk",
         "chord/delta/own_key_order_test.go::TestDiffRevisionsVisitsArrayIndexKeysFirstInNumericOrder",
         "coding/extension/host/subprocess/native_stream_options_union_test.go::TestNativeProviderOptionsKeepRawValuesAndNumericPresence",
         "coding/extension/host/subprocess/request_metadata_order_test.go::TestCompleteRequestKeepsRequestMetadataOrder",

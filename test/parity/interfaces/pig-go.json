@@ -23015,15 +23015,26 @@
       "shapeHash": "sha256:98bbae8aa22a493a3553a1d24fa1b636e02b5a13fc9155752ef3ece2343e9bb4"
     },
     {
+      "id": "go:github.com/MichaelKinsy/PiG/ai#StreamingJSONParser.orderPathAt",
+      "package": "github.com/MichaelKinsy/PiG/ai",
+      "name": "StreamingJSONParser.orderPathAt",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func(depth int) string"
+      },
+      "shapeHash": "sha256:61d1dc6222e14881b16baeaae70bb7e973d8feed4e3106111b00179384db93ea"
+    },
+    {
       "id": "go:github.com/MichaelKinsy/PiG/ai#StreamingJSONParser.orderPathOf",
       "package": "github.com/MichaelKinsy/PiG/ai",
       "name": "StreamingJSONParser.orderPathOf",
       "kind": "function",
       "exported": false,
       "shape": {
-        "type": "func(slot *streamingSlot) string"
+        "type": "func(frame *streamingFrame) string"
       },
-      "shapeHash": "sha256:f074648e3dc24c6700ce8572cc92491064279bcaebef91707f97ba9e77bcd8c9"
+      "shapeHash": "sha256:67ffb4732d7fd32d243b6aacd31d5edd334c92e1eb68f2d5ff12a84fc9a72672"
     },
     {
       "id": "go:github.com/MichaelKinsy/PiG/ai#StreamingJSONParser.pendingScalar",
@@ -41658,6 +41669,17 @@
         "type": "func(raw encoding/json.RawMessage) (piMessagesEndFields, error)"
       },
       "shapeHash": "sha256:fbae1e94a7a44ebe5dcc03bb6893c1c76898803b46273754e985e85e0db75f41"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/ai#frameSlotPath",
+      "package": "github.com/MichaelKinsy/PiG/ai",
+      "name": "frameSlotPath",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func(parent string, slot *streamingSlot) string"
+      },
+      "shapeHash": "sha256:746685c2c24ca8f9b67115f26980b9de7bba804007d9193228ccbda1efd07e0e"
     },
     {
       "id": "go:github.com/MichaelKinsy/PiG/ai#fromClaudeCodeName",

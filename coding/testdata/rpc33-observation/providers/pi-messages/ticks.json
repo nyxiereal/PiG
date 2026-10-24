@@ -1,5 +1,5 @@
 {
-  "piVersion": "1.4.0+d0aa218c",
+  "piVersion": "1.4.0+38ff9917",
   "node": "v24.19.0",
   "scenarios": [
     {
@@ -115,7 +115,7 @@
         },
         "stopReason": "toolUse",
         "responseId": "r1",
-        "durationMs": 27
+        "durationMs": 26
       }
     },
     {
@@ -1537,7 +1537,7 @@
         },
         "stopReason": "toolUse",
         "responseId": "r1",
-        "durationMs": 0
+        "durationMs": 1
       }
     },
     {

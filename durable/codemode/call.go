@@ -170,6 +170,11 @@ type call struct {
 	gateOpen    bool
 	gateWaiters []func()
 
+	// replayCalls are the replayed tool calls the VM issued whose nested call has not settled; pendingResult is the script's
+	// end, waiting for them (see onResult).
+	replayCalls   int
+	pendingResult *cm.Result
+
 	finished bool
 	out      durable.ToolExecutionResult
 	outErr   error
@@ -459,6 +464,13 @@ func (c *call) onResult(result cm.Result) {
 		})
 		return
 	}
+	// Pi's replayed callTool finishes the call's row before it resolves the result the VM is waiting for, and the script's end
+	// reaches the host after the calls it made were issued: a replayed call settles before the call decides the outcome
+	// and captures the rows. The VM here ends on its own goroutine, so the end waits for the replayed calls it issued.
+	if c.replayCalls > 0 {
+		c.pendingResult = &result
+		return
+	}
 	// A replay that ends where the live run went on is a divergence (design §4.3).
 	during := result.During
 	// Within the replayed part, the first run included: a rerun without journal entries replays that much too.
@@ -505,6 +517,18 @@ func (c *call) fail(err error) {
 	c.failure = err
 	c.markStopped()
 	c.abort(err)
+	c.resumeResult(true)
+}
+
+// resumeResult handles the script's end that waited for replayed calls, once they settled or the call's outcome is
+// decided and stored (stopped).
+func (c *call) resumeResult(stopped bool) {
+	if c.pendingResult == nil || (c.replayCalls > 0 && !stopped) {
+		return
+	}
+	result := *c.pendingResult
+	c.pendingResult = nil
+	c.onResult(result)
 }
 
 // resultWithDetails is a decided result with the call's details.
@@ -588,6 +612,7 @@ func (c *call) diverge(message string) {
 				return
 			}
 			c.abort(errors.New(message))
+			c.resumeResult(true)
 		})
 	})
 }
@@ -790,7 +815,9 @@ func (c *call) checkFingerprint(fingerprint string) {
 		c.fingerprintChecked()
 		return
 	}
-	c.spawn(func() {
+	// Pi's commit joins the Session's line in the order it is called: the fingerprint's before the commit the script's first
+	// acknowledgment starts, which the next event may start.
+	c.spawnEntered(func() {
 		_, err := c.api.Commit(c.ctx, func(tx durable.Tx) (any, error) {
 			run, err := durable.TxDoc[runState](tx, RunDoc, c.api.TaskId())
 			if err != nil {
@@ -865,12 +892,17 @@ func (c *call) onCall(made cm.HostCall) {
 		c.diverge(fmt.Sprintf("call %d is %s, but was a tool call", hostCall.ID, describe(hostCall)))
 		return
 	}
+	c.replayCalls++
 	c.afterGate(func() {
 		slot := c.reserveModelSlot(hostCall)
 		// pig divergence (D184): the call's goroutine has entered before the next event, but a stall of it between two steps of its task can still let the script end and abort it before its tool started; Pi's one thread always starts it first.
 		c.spawnEntered(func() {
 			done, err := c.callTool(hostCall, slot)
 			c.post(func() {
+				defer func() {
+					c.replayCalls--
+					c.resumeResult(false)
+				}()
 				if err != nil {
 					if c.stopped() {
 						return
@@ -1440,6 +1472,7 @@ func (c *call) commitQueued() {
 			for _, a := range acks {
 				c.durableIssued = max(c.durableIssued, a.issued)
 			}
+			delivered := false
 			for _, item := range batch {
 				c.journalLength++
 				if !c.run.Finished() {
@@ -1447,10 +1480,18 @@ func (c *call) commitQueued() {
 						c.fail(err)
 						return
 					}
+					delivered = true
 				}
 			}
 			c.launchCovered()
 			c.committing = false
+			// Pi's VM answers a delivery after the commit that follows it has begun, and reports every result of a batch before the
+			// next pump has acknowledgments to write: the batch's acknowledgments go in one commit, and none when the script ended
+			// on it. The VM here reports on its own goroutine, so with nothing queued to journal, the acknowledgments wait for the
+			// VM's report of the batch's last result (onIdle), which does not come when the script ends.
+			if delivered && len(c.queue) == 0 {
+				return
+			}
 			c.pump()
 		})
 	})

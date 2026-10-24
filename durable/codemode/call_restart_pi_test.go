@@ -10,6 +10,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"reflect"
+	"strconv"
 	"strings"
 	"sync"
 	"sync/atomic"
@@ -74,8 +75,8 @@ type queuedStorage struct {
 	queueing bool
 	marked   bool
 	entered  int
-	// pushes is, for each commit since the mark that appended journal entries, how many.
-	pushes  []int
+	// pushes is, for each commit since the mark that changed the journal, its journalChange.
+	pushes  []string
 	waiting []chan error
 	failure error
 }
@@ -114,9 +115,11 @@ func (s *queuedStorage) enteredCommits() int {
 	return s.entered
 }
 
-// journalEntriesAppended is how many entries a commit appends to a journal document.
-func journalEntriesAppended(writes []durable.StorageWrite) int {
+// journalChange describes how a commit changes a journal document: "entries appended|result numbers whose count it records"
+// (0: the script's first run), or "" when it does not touch the journal (the oracle's QueuedStorage.commit).
+func journalChange(writes []durable.StorageWrite) string {
 	appended := 0
+	var acks []string
 	for _, write := range writes {
 		change, ok := write.(durable.DocumentChangeWrite)
 		if !ok {
@@ -128,19 +131,32 @@ func journalEntriesAppended(writes []durable.StorageWrite) int {
 				panic(err)
 			}
 			var parts []json.RawMessage
-			if err := json.Unmarshal(encoded, &parts); err != nil || len(parts) < 5 {
+			if err := json.Unmarshal(encoded, &parts); err != nil || len(parts) < 3 {
 				continue
 			}
-			if string(parts[0]) == `"p"` && string(parts[1]) == `["entries"]` {
+			var path []any
+			if err := json.Unmarshal(parts[1], &path); err != nil {
+				continue
+			}
+			switch {
+			case string(parts[0]) == `"p"` && len(parts) >= 5 && string(parts[1]) == `["entries"]`:
 				var items []json.RawMessage
 				if err := json.Unmarshal(parts[4], &items); err != nil {
 					panic(err)
 				}
 				appended += len(items)
+			case string(parts[0]) == `"s"` && string(parts[1]) == `["firstIssued"]`:
+				acks = append(acks, "0")
+			case string(parts[0]) == `"s"` && len(path) == 3 && path[0] == "entries" && path[2] == "issuedAfter":
+				index, _ := path[1].(float64)
+				acks = append(acks, strconv.Itoa(int(index)+1))
 			}
 		}
 	}
-	return appended
+	if appended == 0 && len(acks) == 0 {
+		return ""
+	}
+	return strconv.Itoa(appended) + "|" + strings.Join(acks, ",")
 }
 
 // mark starts counting the commits that reach storage.
@@ -150,22 +166,22 @@ func (s *queuedStorage) mark() {
 	s.mu.Unlock()
 }
 
-// markedCommits is, for each commit that appended journal entries since mark, how many; nil before it, as the Harness's own commits are not what a scenario compares.
+// markedCommits is, for each commit that changed the journal since mark, its journalChange; nil before it, as the Harness's own commits are not what a scenario compares.
 func (s *queuedStorage) markedCommits() any {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	if !s.marked {
 		return nil
 	}
-	return append([]int{}, s.pushes...)
+	return append([]string{}, s.pushes...)
 }
 
 func (s *queuedStorage) Commit(ctx context.Context, writes []durable.StorageWrite, adopt func(durable.Seq)) (durable.Seq, error) {
 	s.mu.Lock()
 	s.entered++
 	if s.marked {
-		if appended := journalEntriesAppended(writes); appended > 0 {
-			s.pushes = append(s.pushes, appended)
+		if change := journalChange(writes); change != "" {
+			s.pushes = append(s.pushes, change)
 		}
 	}
 	var turn chan error

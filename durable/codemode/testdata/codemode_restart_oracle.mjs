@@ -45,7 +45,7 @@ class QueuedStorage extends ControlledStorage {
 	queueing = false;
 	marked = false;
 	entered = 0;
-	/** For each commit since the mark that appended journal entries, how many. */
+	/** For each commit since the mark that changed the journal, `entries appended|result numbers whose count it recorded` (0: the script's first run). */
 	pushes = [];
 	waiting = [];
 	failure;
@@ -75,13 +75,16 @@ class QueuedStorage extends ControlledStorage {
 		this.entered++;
 		if (this.marked) {
 			let appended = 0;
+			const acks = [];
 			for (const write of writes) {
 				if (write.type !== "document.change") continue;
 				for (const [verb, path, , , items] of write.content.ops ?? []) {
 					if (verb === "p" && path.length === 1 && path[0] === "entries") appended += items.length;
+					if (verb === "s" && path.length === 1 && path[0] === "firstIssued") acks.push(0);
+					if (verb === "s" && path.length === 3 && path[0] === "entries" && path[2] === "issuedAfter") acks.push(path[1] + 1);
 				}
 			}
-			if (appended > 0) this.pushes.push(appended);
+			if (appended > 0 || acks.length > 0) this.pushes.push(`${appended}|${acks.join(",")}`);
 		}
 		if (this.queueing) {
 			const entry = { gate: deferred(), failure: undefined };

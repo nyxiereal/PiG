@@ -639,7 +639,11 @@ func (p *FauxProviderHandle) streamWithDeltas(turn *continuationTurn, ctx contex
 					return
 				}
 				state := builder.toolCalls[index]
-				state.arguments.WriteString(chunk)
+				// Partial arguments come from the same parser real providers use, so consumers see them grow.
+				call := builder.partial.Content[state.contentIndex].(ToolCall)
+				arguments, order := state.args.Append(chunk)
+				call.setParsedArguments(arguments, order, nil)
+				builder.partial.Content[state.contentIndex] = call
 				builder.push(ToolCallDeltaEvent{ContentIndex: state.contentIndex, Delta: chunk, Partial: builder.partial})
 			}
 			contentIndex := builder.toolCalls[index].contentIndex

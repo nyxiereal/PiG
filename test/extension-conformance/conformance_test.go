@@ -1424,6 +1424,17 @@ func makeInprocFixture(ui extension.UIContext, actions *[]string) extension.Exte
 				},
 				Source: inprocFixtureName,
 			},
+			"type-schema-tool": {
+				Definition: extension.ToolDefinition{
+					Name:        "type-schema-tool",
+					Description: "Parameters built with Type",
+					Parameters:  typeSchemaToolParameters(),
+					Execute: func(context.Context, string, json.RawMessage, extension.AgentToolUpdateCallback) (extension.AgentToolResult, error) {
+						return agent.AgentToolResult{Content: []ai.ToolResultMessageContent{ai.TextContent{Text: "ok"}}}, nil
+					},
+				},
+				Source: inprocFixtureName,
+			},
 			"prepared_tool": {
 				Definition: extension.ToolDefinition{
 					Name:        "prepared_tool",

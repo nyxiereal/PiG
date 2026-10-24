@@ -4156,6 +4156,23 @@ fn host_helpers_probe(ctx: &pig_sdk::Context, args: &str) -> Result<Value, Strin
     for case in golden["entries"].as_array().ok_or("no entries")? {
         entries.push(json!(pig_sdk::session_entry_to_context_messages(&case["entry"]).map_err(io)?));
     }
+    let mut contexts = Vec::new();
+    for case in golden["contexts"].as_array().ok_or("no contexts")? {
+        let args = case["args"].as_array().ok_or("no args")?;
+        let entries: Vec<Value> = args[0].as_array().cloned().unwrap_or_default();
+        let leaf = match args.get(1) {
+            None => pig_sdk::SessionLeaf::Last,
+            Some(Value::Null) => pig_sdk::SessionLeaf::None,
+            Some(id) => pig_sdk::SessionLeaf::At(id.as_str().ok_or("leaf is not a string")?),
+        };
+        let by_id: Option<serde_json::Map<String, Value>> = args.get(2).map(|pairs| {
+            pairs.as_array().into_iter().flatten().filter_map(|pair| Some((pair[0].as_str()?.to_string(), pair[1].clone()))).collect()
+        });
+        contexts.push(match pig_sdk::build_session_context(&entries, leaf, by_id.as_ref()) {
+            Ok(result) => json!({"result": result}),
+            Err(error) => json!({"throws": error.to_string().trim_start_matches("TypeError: ")}),
+        });
+    }
     let mut images = Vec::new();
     for case in golden["images"].as_array().ok_or("no images")? {
         let (data, mime) = (case["data"].as_str().unwrap_or_default(), case["mimeType"].as_str().unwrap_or_default());
@@ -4184,7 +4201,7 @@ fn host_helpers_probe(ctx: &pig_sdk::Context, args: &str) -> Result<Value, Strin
         "missingFile": credential("anthropic", Some(&format!("{auth_path}.missing"))), "notJSON": credential("anthropic", Some(&format!("{auth_path}.bad"))),
     });
     ctx.copy_to_clipboard(text).map_err(io)?;
-    Ok(json!({"diffs": diffs, "entries": entries, "images": images, "creds": creds}))
+    Ok(json!({"diffs": diffs, "entries": entries, "contexts": contexts, "images": images, "creds": creds}))
 }
 
 fn decode_base64(text: &str) -> Vec<u8> {

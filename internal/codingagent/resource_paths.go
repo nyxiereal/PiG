@@ -23,6 +23,7 @@ import (
 
 // PackageManagerHomeDir is Pi's getHomeDir (package-manager.ts:233-235), `process.env.HOME || homedir()`: a nonempty HOME on every platform, else Node's os.homedir() (the platform home variable, an explicit empty value included, else the user database's home directory). Where Node's call throws, because no
 // home variable is set and the user database has no entry for the process's user, so does this, with *nodehome.Error: Pi's getHomeDir throws there, and a project that supplies a "user" skills directory through a path relative to the working directory must not be the answer.
+// pig divergence (D200): Pi never gets here without a home directory, because it crashes at import in every mode (tools-manager.ts:11 getBinDir -> getAgentDir -> normalizePath -> homedir(), utils/paths.ts:89); PiG, whose PIG_HOME needs no home directory, runs `--version`, `list` and the other commands that load no resources, and fails with Pi's error here, where Pi's home lookup would run.
 func PackageManagerHomeDir() (string, error) {
 	if home := os.Getenv("HOME"); home != "" {
 		return home, nil
@@ -146,6 +147,7 @@ func ValidateAutoDiscoveredOverrides(cwd, agentDir string, sm *SettingsManager, 
 	add := func(steps []step, dir string, paths func() []string, overrides []string, baseDir string, kind packagecontent.Kind) []step {
 		return append(steps, step{dir, paths, overrides, baseDir, kind})
 	}
+	// pig divergence (D200): the home lookup fails here, at Pi's resolve(), and not at load as in Pi; see PackageManagerHomeDir.
 	// package-manager.ts:2464 computes the user's ~/.agents/skills first, before any directory is checked, and getHomeDir throws there when no home directory can be found.
 	home, err := PackageManagerHomeDir()
 	if err != nil {

@@ -73,6 +73,10 @@ func TestStartupFailsWhereNoHomeDirectoryExists(t *testing.T) {
 		nodehome.Override(func() (string, error) { return "", &nodehome.Error{} })
 		Main([]string{"--mode", "rpc", "--model", "test-faux/faux-1", "--no-extensions"}, nil)
 		return
+	case "version", "list":
+		nodehome.Override(func() (string, error) { return "", &nodehome.Error{} })
+		Main([]string{map[string]string{"version": "--version", "list": "list"}[os.Getenv(noHomeChildEnv)]}, nil)
+		return
 	}
 	if testing.Short() {
 		t.Skip("runs the command line in a child process")
@@ -137,5 +141,61 @@ func TestStartupFollowsNodeWhenThereIsNoHomeDirectory(t *testing.T) {
 	}
 	if !strings.Contains(stderr.String(), noHomeDirectoryMessage) || stdout.Len() != 0 {
 		t.Errorf("stdout %q, stderr %q; want Node's message %q and no output", &stdout, &stderr, noHomeDirectoryMessage)
+	}
+}
+
+// piHomedirThrows is a Node preload that makes os.homedir() throw the SystemError Node throws where no HOME is set and the user database has no entry for the process's user, so Pi's behavior there can
+// be run on any host: no environment variable can remove the user database's entry for the test's user.
+const piHomedirThrows = `const os = require("node:os");
+os.homedir = () => {
+  const error = new Error("` + noHomeDirectoryMessage + `");
+  error.name = "SystemError";
+  error.code = "ERR_SYSTEM_ERROR";
+  throw error;
+};
+`
+
+// TestNoHomeDirectoryPiCrashesAtImportWherePiGRunsResourceFreeCommands pins both sides of D200 (docs/parity/divergences/D200.md). With no home directory Pi's load fails in every mode, `--version` and `list`
+// included, with Node's uncaught SystemError and exit status 1: tools-manager.ts:11 evaluates getBinDir() at import, which expands the agent directory through normalizePath, and normalizePath asks for the
+// home directory before it looks at its input (utils/paths.ts:89). PiG, whose PIG_HOME needs no home directory, runs those commands and fails with the same error only where Pi's home lookup would run: the
+// resource loading of TestStartupFailsWhereNoHomeDirectoryExists.
+func TestNoHomeDirectoryPiCrashesAtImportWherePiGRunsResourceFreeCommands(t *testing.T) {
+	if testing.Short() {
+		t.Skip("runs Pi and the command line in child processes")
+	}
+	piCLI, err := filepath.Abs("../../extensions/sdk-ts/node_modules/@earendil-works/pi-coding-agent/dist/cli.js")
+	if err != nil {
+		t.Fatal(err)
+	}
+	preload := filepath.Join(t.TempDir(), "homedir-throws.cjs")
+	if err := os.WriteFile(preload, []byte(piHomedirThrows), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	for _, args := range [][]string{{"--version"}, {"list"}} {
+		t.Run(args[0], func(t *testing.T) {
+			pi := exec.CommandContext(t.Context(), "node", append([]string{"--require", preload, piCLI}, args...)...)
+			pi.Env = noHomeDirectoryEnvironment(t)
+			pi.Env = append(pi.Env, "PI_CODING_AGENT_DIR="+filepath.Join(t.TempDir(), "agent"))
+			pi.Dir = t.TempDir()
+			var piStdout, piStderr bytes.Buffer
+			pi.Stdout, pi.Stderr = &piStdout, &piStderr
+			err := pi.Run()
+			var exit *exec.ExitError
+			if !errors.As(err, &exit) || exit.ExitCode() != 1 || !strings.Contains(piStderr.String(), noHomeDirectoryMessage) || piStdout.Len() != 0 {
+				t.Fatalf("Pi %v with no home directory: %v\nstdout: %s\nstderr: %s\nwant exit status 1, Node's message on stderr and nothing on stdout", args, err, &piStdout, &piStderr)
+			}
+			mode := map[string]string{"--version": "version", "list": "list"}[args[0]]
+			child := exec.CommandContext(t.Context(), os.Args[0], "-test.run=^TestStartupFailsWhereNoHomeDirectoryExists$")
+			child.Env = append(noHomeDirectoryEnvironment(t), noHomeChildEnv+"="+mode)
+			child.Dir = t.TempDir()
+			var stdout, stderr bytes.Buffer
+			child.Stdout, child.Stderr = &stdout, &stderr
+			if err := child.Run(); err != nil {
+				t.Fatalf("PiG %v with no home directory (D200: Pi crashes at import, PiG runs it): %v\nstdout: %s\nstderr: %s", args, err, &stdout, &stderr)
+			}
+			if strings.Contains(stderr.String(), noHomeDirectoryMessage) {
+				t.Errorf("PiG %v reports %q on stderr:\n%s", args, noHomeDirectoryMessage, &stderr)
+			}
+		})
 	}
 }

@@ -1,6 +1,7 @@
 package durable
 
 import (
+	stdjson "encoding/json"
 	"errors"
 	"fmt"
 	"reflect"
@@ -122,7 +123,11 @@ func holdsDynamicJSON[T any]() bool {
 // marshalStrict is json.Marshal with a non-finite number reported as chord's strict JSON error.
 func marshalStrict(value any) ([]byte, error) {
 	encoded, err := sdkjson.Marshal(value)
+	// A value's own MarshalJSON may use either package, so the non-finite number can arrive as either package's error.
 	if unsupported, ok := errors.AsType[*sdkjson.UnsupportedValueError](err); ok && isNonFinite(unsupported.Str) {
+		return nil, nonFiniteError{}
+	}
+	if unsupported, ok := errors.AsType[*stdjson.UnsupportedValueError](err); ok && isNonFinite(unsupported.Str) {
 		return nil, nonFiniteError{}
 	}
 	return encoded, err

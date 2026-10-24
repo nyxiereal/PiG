@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	sdkjson "github.com/MichaelKinsy/PiG/extensions/sdk/json"
 )
 
 // Message is the closed provider-facing transcript union.
@@ -244,7 +245,7 @@ func (record NestedToolCallRecord) MarshalJSON() ([]byte, error) {
 		}
 		wire.Arguments = arguments
 	}
-	return json.Marshal(wire)
+	return sdkjson.MarshalStringify(wire)
 }
 
 // UnmarshalJSON decodes the record and keeps the member order of its arguments.
@@ -254,13 +255,13 @@ func (record *NestedToolCallRecord) UnmarshalJSON(data []byte) error {
 	}
 	type plain NestedToolCallRecord
 	var decoded plain
-	if err := json.Unmarshal(data, &decoded); err != nil {
+	if err := sdkjson.Unmarshal(data, &decoded); err != nil {
 		return err
 	}
 	var members struct {
 		Arguments json.RawMessage `json:"arguments"`
 	}
-	if err := json.Unmarshal(data, &members); err != nil {
+	if err := sdkjson.Unmarshal(data, &members); err != nil {
 		return err
 	}
 	if len(members.Arguments) > 0 {
@@ -341,7 +342,8 @@ func cloneNestedToolCalls(calls *NestedToolCalls) *NestedToolCalls {
 }
 
 func marshalMessage(role string, value any) ([]byte, error) {
-	body, err := json.Marshal(value)
+	// JSON.stringify: a lone surrogate in a string (Details, an id, a name) is written as its escape, as the content blocks write it.
+	body, err := sdkjson.MarshalStringify(value)
 	if err != nil {
 		return nil, err
 	}
@@ -434,7 +436,7 @@ func (message *ToolResultMessage) UnmarshalJSON(data []byte) error {
 		Content []json.RawMessage `json:"content"`
 		Details json.RawMessage   `json:"details"`
 	}
-	if err := json.Unmarshal(data, &wire); err != nil {
+	if err := sdkjson.Unmarshal(data, &wire); err != nil {
 		return err
 	}
 	decoded := ToolResultMessage(wire.plain)
@@ -453,7 +455,7 @@ func (message *ToolResultMessage) UnmarshalJSON(data []byte) error {
 		}
 	}
 	if wire.Details != nil {
-		if err := json.Unmarshal(wire.Details, &decoded.Details); err != nil {
+		if err := sdkjson.Unmarshal(wire.Details, &decoded.Details); err != nil {
 			return fmt.Errorf("tool result details: %w", err)
 		}
 		decoded.DetailsNull = decoded.Details == nil

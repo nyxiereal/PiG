@@ -114,7 +114,11 @@ type TaskGraphView struct {
 // NewTaskGraphView subscribes the mount to the Session's commits and close.
 func NewTaskGraphView(sessionImpl *session.SessionImpl, storage durable.Storage, blocking TaskGraphBlocking) *TaskGraphView {
 	view := &TaskGraphView{session: sessionImpl, storage: storage, blocking: blocking}
-	sessionImpl.ObserveCommits(func(ctx context.Context, publication durable.CommitPublication) {
+	sessionImpl.ObserveCommits(func(ctx context.Context, publication session.ObservedCommit) {
+		// A commit held in memory changes documents only, which the graph does not show.
+		if publication.Memory {
+			return
+		}
 		view.mu.Lock()
 		mount := view.mount
 		var observers []taskGraphObserver
@@ -286,7 +290,7 @@ func (view *TaskGraphView) build(ctx context.Context) (*taskGraphMount, error) {
 func taskKey(id durable.TaskId) string { return strconv.FormatInt(int64(id), 10) }
 
 // advanceTaskGraph derives the mount's operations from one publication, applies them, and hands the revision to every observer.
-func advanceTaskGraph(ctx context.Context, mount *taskGraphMount, observers []taskGraphObserver, publication durable.CommitPublication, blocked func(BlockedSubject) durable.BlockedReason, report func(error)) {
+func advanceTaskGraph(ctx context.Context, mount *taskGraphMount, observers []taskGraphObserver, publication session.ObservedCommit, blocked func(BlockedSubject) durable.BlockedReason, report func(error)) {
 	var ops []durable.Op
 	// Nodes this publication set (non-nil) or deleted (nil), over the mount's value.
 	changed := map[string]*TaskGraphNode{}

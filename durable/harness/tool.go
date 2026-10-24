@@ -727,13 +727,13 @@ func (api *toolApi) Details(ctx context.Context, value durable.JsonValue) error 
 	return waiter.Wait(ctx)
 }
 
-func (api *toolApi) Commit(ctx context.Context, change func(tx durable.Tx) (any, error)) (any, error) {
+func (api *toolApi) Commit(ctx context.Context, change func(tx durable.Tx) (any, error), options ...durable.CommitOptions) (any, error) {
 	var result any
 	err := api.runtime.Commit(ctx, func(tx durable.Tx, _ toolRecord) (*toolNext, error) {
 		var err error
 		result, err = change(tx)
 		return nil, err
-	})
+	}, options...)
 	return result, err
 }
 
@@ -904,7 +904,7 @@ func publishProgress(ctx context.Context, runtime toolRuntime, reported *toolRep
 				}
 			}
 			return nil, nil
-		}); err != nil {
+		}, ProgressCommit); err != nil {
 			return 0, err
 		}
 		written.text, written.detailsVersion, written.diagnostics = snapshot.Text, detailsVersion, diagnostics

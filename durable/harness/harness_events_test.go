@@ -15,6 +15,7 @@ import (
 	"github.com/MichaelKinsy/PiG/ai"
 	"github.com/MichaelKinsy/PiG/chord/delta"
 	"github.com/MichaelKinsy/PiG/durable"
+	"github.com/MichaelKinsy/PiG/durable/session"
 	"github.com/MichaelKinsy/PiG/durable/storage"
 )
 
@@ -175,8 +176,8 @@ func livePartial(change durable.DocumentChange) (any, bool) {
 // partialsOf records the committed partials of the generation, one per commit that has one (harness-events.test.ts:94).
 func partialsOf(harness Harness) *partialLog {
 	log := &partialLog{}
-	harness.SubscribeCommits(func(_ context.Context, publication durable.CommitPublication) {
-		for _, change := range documentChanges(publication) {
+	observeCommits(harness, func(_ context.Context, publication session.ObservedCommit) {
+		for _, change := range documentChanges(publication.Changes) {
 			if message, ok := livePartial(change); ok {
 				log.mu.Lock()
 				log.partials = append(log.partials, message)
@@ -571,8 +572,8 @@ func TestAgentEvents(t *testing.T) {
 		harness, root := openChat(t, storage.NewMemoryStorage(), setup)
 		var mu sync.Mutex
 		var outputs []string
-		harness.SubscribeCommits(func(_ context.Context, publication durable.CommitPublication) {
-			for _, change := range documentChanges(publication) {
+		observeCommits(harness, func(_ context.Context, publication session.ObservedCommit) {
+			for _, change := range documentChanges(publication.Changes) {
 				if change.Record.Kind != "pi.live" || change.Value == nil {
 					continue
 				}

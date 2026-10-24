@@ -444,7 +444,7 @@ func (s *TaskScheduler) liveValuesLocked() []anyTaskRecord {
 // task that reaches the restart limit this way is parked and reported. Read-only, it only loads them: a running task stays
 // as committed, running in another process.
 func (s *TaskScheduler) Open(ctx context.Context) error {
-	s.options.Session.ObserveCommits(func(_ context.Context, publication durable.CommitPublication) { s.observe(publication) })
+	s.options.Session.ObserveCommits(func(_ context.Context, publication session.ObservedCommit) { s.observe(publication) })
 	s.options.Session.SubscribeClose(s.seal)
 	s.unsubscribeRegistry = s.options.Registry.Subscribe(func() {
 		s.notifyBlocked()
@@ -988,7 +988,11 @@ func (s *TaskScheduler) AbortConversation(ctx context.Context, conversationId du
 
 // ─── Scheduling ────────────────────────────────────────────────────────
 
-func (s *TaskScheduler) observe(publication durable.CommitPublication) {
+func (s *TaskScheduler) observe(publication session.ObservedCommit) {
+	// A commit held in memory changes documents only.
+	if publication.Memory {
+		return
+	}
 	s.mu.Lock()
 	var failed []durable.TaskId
 	changed := false
@@ -2862,7 +2866,7 @@ func (hold *lineHold) release() {
 	}
 }
 
-func (runtime *taskRuntime) Commit(ctx context.Context, change func(tx durable.Tx, current durable.ErasedRunningTask) (*durable.NextTaskState[durable.JsonValue, durable.JsonValue], error)) error {
+func (runtime *taskRuntime) Commit(ctx context.Context, change func(tx durable.Tx, current durable.ErasedRunningTask) (*durable.NextTaskState[durable.JsonValue, durable.JsonValue], error), options ...durable.CommitOptions) error {
 	var checkpoint string
 	var committed bool
 	_, err := gated(ctx, runtime, func(tx *session.Transaction, current anyTaskRecord) (struct{}, error) {
@@ -2886,7 +2890,7 @@ func (runtime *taskRuntime) Commit(ctx context.Context, change func(tx durable.T
 			}
 		}
 		return struct{}{}, nil
-	})
+	}, options...)
 	if err == nil && committed {
 		if span := runtime.invocation.currentSpan(); span != telemetry.NoopTelemetryContext {
 			span.AddEvent("pi.durable.checkpoint", telemetry.SpanAttributes{telemetry.Attr("phase", checkpoint)})
@@ -3239,7 +3243,7 @@ func (runtime *taskRuntime) WatchDocErased(ctx context.Context, token durable.An
 }
 
 // gated commits after rereading the task on the line and gating the invocation.
-func gated[T any](ctx context.Context, runtime *taskRuntime, change func(tx *session.Transaction, current anyTaskRecord) (T, error)) (T, error) {
+func gated[T any](ctx context.Context, runtime *taskRuntime, change func(tx *session.Transaction, current anyTaskRecord) (T, error), options ...durable.CommitOptions) (T, error) {
 	var zero T
 	if err := runtime.check(); err != nil {
 		return zero, err
@@ -3268,7 +3272,7 @@ func gated[T any](ctx context.Context, runtime *taskRuntime, change func(tx *ses
 			return zero, fmt.Errorf("Task %d has a durable abort mark", taskId)
 		}
 		return change(tx, found)
-	})
+	}, options...)
 }
 
 // linkSignal returns ctx also cancelled by signal; stop releases the link.

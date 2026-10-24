@@ -576,7 +576,7 @@ func TestAFailedStorageCall(t *testing.T) {
 	t.Run("fails it for a throw in its own commit listeners, which would leave memory behind storage", func(t *testing.T) {
 		harness, root, reports := sfStarted(t, newControlledStorage(), &signalLog{})
 		bug := errors.New("listener bug")
-		harness.(*harnessImpl).ObserveCommits(func(context.Context, durable.CommitPublication) { panic(bug) })
+		harness.(*harnessImpl).ObserveCommits(func(context.Context, session.ObservedCommit) { panic(bug) })
 		// The commit itself is durable and returns; the Session fails behind it.
 		if err := sfAppendNote(root); err != nil {
 			t.Fatalf("the commit returned %v, want success", err)

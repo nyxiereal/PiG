@@ -6,6 +6,7 @@ import (
 
 	"github.com/MichaelKinsy/PiG/chord/delta"
 	"github.com/MichaelKinsy/PiG/durable"
+	"github.com/MichaelKinsy/PiG/durable/session"
 )
 
 // TestAdvanceViewFollowsOnlyTheMountedIncarnation pins view.ts:196-210 for publications the harness itself never
@@ -24,9 +25,9 @@ func TestAdvanceViewFollowsOnlyTheMountedIncarnation(t *testing.T) {
 			docs:  map[string]docIncarnation{kind: {id: mountedID, version: 1}},
 		}
 	}
-	change := func(id durable.DocumentId, v *int, value durable.JsonObject, ops ...durable.Op) durable.CommitPublication {
+	change := func(id durable.DocumentId, v *int, value durable.JsonObject, ops ...durable.Op) session.ObservedCommit {
 		owner := conversation
-		return durable.CommitPublication{Seq: 2, Changes: []durable.CommitChange{durable.DocumentChange{
+		return session.ObservedCommit{Seq: 2, Changes: []durable.CommitChange{durable.DocumentChange{
 			Record:         durable.DocumentRecord{Id: id, Kind: kind},
 			ConversationId: &owner,
 			Version:        v,
@@ -37,7 +38,7 @@ func TestAdvanceViewFollowsOnlyTheMountedIncarnation(t *testing.T) {
 	setTools := durable.Op{"s", []any{"tools"}, []any{"b"}}
 	cases := []struct {
 		name        string
-		publication durable.CommitPublication
+		publication session.ObservedCommit
 		ops         any
 		docs        any
 		incarnation *docIncarnation

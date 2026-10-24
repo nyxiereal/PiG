@@ -248,8 +248,8 @@ type Conversation interface {
 	Reset(ctx context.Context, handoff *string) error
 	// Compact admits a manual compaction task and returns its ID (spec §8.7).
 	Compact(ctx context.Context, instructions *string) (durable.TaskId, error)
-	// Commit runs a Session commit whose tx.CreateTask defaults to this conversation.
-	Commit(ctx context.Context, change func(tx durable.Tx) (any, error)) (any, error)
+	// Commit runs a Session commit whose tx.CreateTask defaults to this conversation; options are as for Session.Commit.
+	Commit(ctx context.Context, change func(tx durable.Tx) (any, error), options ...durable.CommitOptions) (any, error)
 	// Context returns the committed raw active transcript and model context. With options.At, it returns the context as
 	// of that visible entry: the same view Fork(at) would start with, without creating a conversation.
 	Context(ctx context.Context, options *durable.ContextOptions) (durable.ContextView, error)

@@ -7,6 +7,7 @@ import (
 	"sync"
 
 	"github.com/MichaelKinsy/PiG/durable"
+	"github.com/MichaelKinsy/PiG/durable/session"
 	"github.com/MichaelKinsy/PiG/durable/storage"
 )
 
@@ -116,13 +117,19 @@ func (s *controlledStorage) Close(ctx context.Context) error {
 	return s.closeFailure
 }
 
-// documentChanges returns the document changes of a publication.
-func documentChanges(publication durable.CommitPublication) []durable.DocumentChange {
+// documentChanges returns the document changes among the changes of a publication.
+func documentChanges(publication []durable.CommitChange) []durable.DocumentChange {
 	var changes []durable.DocumentChange
-	for _, change := range publication.Changes {
+	for _, change := range publication {
 		if document, ok := change.(durable.DocumentChange); ok {
 			changes = append(changes, document)
 		}
 	}
 	return changes
+}
+
+// observeCommits observes every commit as memory adopts it, deferred ones before they are stored, as views and document
+// watches do; SubscribeCommits sees only what was stored (session-support.ts observeCommits).
+func observeCommits(harness Harness, listener func(context.Context, session.ObservedCommit)) func() {
+	return harness.(*harnessImpl).ObserveCommits(listener)
 }

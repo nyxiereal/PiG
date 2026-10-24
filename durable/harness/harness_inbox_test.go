@@ -551,7 +551,7 @@ func TestInbox(t *testing.T) {
 		var mu sync.Mutex
 		ops := [][]durable.Op{}
 		harness.SubscribeCommits(func(_ context.Context, publication durable.CommitPublication) {
-			for _, change := range documentChanges(publication) {
+			for _, change := range documentChanges(publication.Changes) {
 				if change.Record.Kind == "pi.inbox" && len(change.Ops) > 0 {
 					mu.Lock()
 					ops = append(ops, slices.Clone(change.Ops))
@@ -817,7 +817,7 @@ func TestInbox(t *testing.T) {
 		var mu sync.Mutex
 		ops := [][]durable.Op{}
 		harness.SubscribeCommits(func(_ context.Context, publication durable.CommitPublication) {
-			for _, change := range documentChanges(publication) {
+			for _, change := range documentChanges(publication.Changes) {
 				if change.Record.Kind == "pi.inbox" && len(change.Ops) > 0 {
 					mu.Lock()
 					ops = append(ops, slices.Clone(change.Ops))
@@ -840,7 +840,7 @@ func TestInbox(t *testing.T) {
 		setup.Faux.SetResponses([]ai.FauxResponseStep{first.step, fauxAnswer("second")})
 		harness, root := openChat(t, store, setup)
 		harness.SubscribeCommits(func(_ context.Context, publication durable.CommitPublication) {
-			for _, change := range documentChanges(publication) {
+			for _, change := range documentChanges(publication.Changes) {
 				if change.Record.Kind == "pi.inbox" {
 					store.setInbox(change.Record.Id)
 				}
@@ -1021,7 +1021,7 @@ func TestUsage(t *testing.T) {
 		var mu sync.Mutex
 		commits := []usageCommit{}
 		harness.SubscribeCommits(func(_ context.Context, publication durable.CommitPublication) {
-			for _, change := range documentChanges(publication) {
+			for _, change := range documentChanges(publication.Changes) {
 				if change.Record.Kind != "pi.usage" {
 					continue
 				}

@@ -2,6 +2,8 @@ package durable
 
 import (
 	"context"
+	"errors"
+	"fmt"
 
 	"github.com/MichaelKinsy/PiG/ai"
 	"github.com/MichaelKinsy/PiG/chord"
@@ -254,8 +256,9 @@ type TaskRuntime[I, S, R any, H any] interface {
 	// Commit commits on the Session line after rereading the task. It fails when the task is terminal, the
 	// invocation ended, the Harness is closing, or, in a run invocation, the task carries an abort mark. A returned
 	// state replaces the task's state in the same commit; nil leaves it unchanged. tx.CreateTask defaults to the task's
-	// conversation.
-	Commit(ctx context.Context, change func(tx Tx, current RunningTask[I, S, R]) (*NextTaskState[S, R], error)) error
+	// conversation. options.Persistence may defer storing a commit that changes only documents (CommitPersistence); one
+	// that returns a state is stored at once.
+	Commit(ctx context.Context, change func(tx Tx, current RunningTask[I, S, R]) (*NextTaskState[S, R], error), options ...CommitOptions) error
 	// Memo reads a durable memo of this task; ok is false when absent.
 	Memo(ctx context.Context, name string) (value JsonValue, ok bool, err error)
 	// MemoCandidate stores candidate unless a memo already exists and returns the durable winner.
@@ -1039,7 +1042,10 @@ func (DocumentCopyChange) documentCommitChange() {}
 // CommitChangeType returns the upstream `type` discriminator of a change.
 func CommitChangeType(change CommitChange) string { return change.commitChangeType() }
 
-// CommitPublication holds every immutable change from one successful Session commit.
+// CommitPublication holds every immutable change one Session storage transaction stored, with its Seq. Change order is
+// unspecified. A commit held in memory (CommitPersistence) is published once it is stored: by the next commit that reads
+// or writes its document, alone (the Seq of its own), or with that commit, whose document change then carries the held
+// operations followed by its own.
 type CommitPublication struct {
 	Seq     Seq
 	Changes []CommitChange
@@ -1153,16 +1159,64 @@ type SessionEnd struct {
 	Error  error
 }
 
+// CommitPersistenceKind is when a commit reaches Storage.
+type CommitPersistenceKind string
+
+const (
+	// CommitImmediate, the default, stores a commit before Commit returns.
+	CommitImmediate CommitPersistenceKind = "immediate"
+	// CommitDeferred lets the Session adopt a commit in memory, show it to watches and views, and return, but store it
+	// later (CommitPersistence).
+	CommitDeferred CommitPersistenceKind = "deferred"
+)
+
+// CommitPersistence is when a commit reaches Storage. Immediate, the default: before the commit returns. Deferred: when
+// every write of the commit changes an existing conversation document with History latest and Fork initial (no
+// creation, migration, or retirement), the Session adopts it in memory, shows it to watches and views, and returns, but
+// stores it later: with the next commit that reads (tx.Doc) or writes that document, before the document leaves memory or
+// retires, at Close, and at the latest about WithinMs after the commit (default Settings.Progress.PersistWithinMs,
+// 1,000 ms; +Inf waits for one of the others). A commit that writes anything else is immediate. A crash loses what is
+// held, so only state whose loss is acceptable, such as streamed progress, should be deferred, and nothing durable may
+// depend on it without reading it in a commit.
+type CommitPersistence struct {
+	Kind CommitPersistenceKind
+	// WithinMs is how long a deferred commit may stay in memory, a number of milliseconds, 0 or more; nil selects the
+	// default. Anything else makes the commit return an error (upstream rejects with a TypeError).
+	WithinMs *float64
+}
+
+// CommitOptions are the options of one Session commit; the zero value is an immediate commit.
+type CommitOptions struct {
+	Persistence *CommitPersistence
+}
+
+// SingleCommitOptions is the options value of a Commit call, which takes at most one: upstream's optional argument,
+// variadic in Go so that a call without it is unchanged. More than one is an error, as is a deferred commit whose WithinMs
+// is not a number of milliseconds, 0 or more (upstream rejects with a TypeError).
+func SingleCommitOptions(options []CommitOptions) (CommitOptions, error) {
+	if len(options) > 1 {
+		return CommitOptions{}, fmt.Errorf("Commit takes at most one CommitOptions, got %d", len(options))
+	}
+	if len(options) == 0 {
+		return CommitOptions{}, nil
+	}
+	if persistence := options[0].Persistence; persistence != nil && persistence.Kind == CommitDeferred && persistence.WithinMs != nil && !(*persistence.WithinMs >= 0) {
+		return CommitOptions{}, errors.New("CommitPersistence.withinMs must be a number of milliseconds, 0 or more")
+	}
+	return options[0], nil
+}
+
 // Session owns one mutation line, its records, and its tracked documents.
 type Session interface {
 	DocumentObserver
 	DocumentReader
-	// Commit runs one atomic transaction on the Session mutation line. Inside the callback read only through tx: Snapshot, WatchDoc, GetTask and the other Session and runtime reads may queue on the line the callback holds, and then never return.
-	Commit(ctx context.Context, change func(tx Tx) (any, error)) (any, error)
+	// Commit runs one atomic transaction on the Session mutation line. Inside the callback read only through tx: Snapshot, WatchDoc, GetTask and the other Session and runtime reads may queue on the line the callback holds, and then never return. At most one options value may follow; Persistence may defer storing it (CommitPersistence).
+	Commit(ctx context.Context, change func(tx Tx) (any, error), options ...CommitOptions) (any, error)
 	// Close seals admission, settles admitted commits, then closes storage.
 	Close(ctx context.Context) error
-	// SubscribeCommits observes complete commits synchronously after adoption. The listener must not panic, block,
-	// or call Session APIs.
+	// SubscribeCommits observes stored commits synchronously after adoption, each with exactly what it stored; a commit
+	// held in memory is published when it is stored (CommitPublication). The listener must not panic, block, or call
+	// Session APIs.
 	SubscribeCommits(listener func(ctx context.Context, publication CommitPublication)) func()
 	// SubscribeClose observes close synchronously when it begins. The listener must not panic, block, or call
 	// Session APIs.
@@ -1175,12 +1229,12 @@ type Session interface {
 
 // Committer runs one atomic Session commit: a Session, a Conversation, or a tool's ToolExecutionApi.
 type Committer interface {
-	Commit(ctx context.Context, change func(tx Tx) (any, error)) (any, error)
+	Commit(ctx context.Context, change func(tx Tx) (any, error), options ...CommitOptions) (any, error)
 }
 
 // Commit runs change in one commit and returns its typed result.
-func Commit[T any](ctx context.Context, committer Committer, change func(tx Tx) (T, error)) (T, error) {
-	result, err := committer.Commit(ctx, func(tx Tx) (any, error) { return change(tx) })
+func Commit[T any](ctx context.Context, committer Committer, change func(tx Tx) (T, error), options ...CommitOptions) (T, error) {
+	result, err := committer.Commit(ctx, func(tx Tx) (any, error) { return change(tx) }, options...)
 	if err != nil {
 		var zero T
 		return zero, err

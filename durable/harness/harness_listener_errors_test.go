@@ -10,6 +10,7 @@ import (
 
 	"github.com/MichaelKinsy/PiG/ai"
 	"github.com/MichaelKinsy/PiG/durable"
+	"github.com/MichaelKinsy/PiG/durable/session"
 )
 
 // Ports the "listener and report errors" group of packages/durable/test/harness-storage-failure.test.ts (Pi 1.2.0). The
@@ -55,7 +56,7 @@ func TestListenerAndReportErrors(t *testing.T) {
 		failure := errors.New("observer broke")
 		if _, _, err := views.Attach(testContext, root.Id(), func(ConversationView, func(), durable.Storage) (*ViewObserver, error) {
 			return &ViewObserver{
-				Publication: func(context.Context, ConversationView, ConversationView, []durable.Op, durable.CommitPublication) {
+				Publication: func(context.Context, ConversationView, ConversationView, []durable.Op, session.ObservedCommit) {
 					panic(failure)
 				},
 				End: func(error) {},

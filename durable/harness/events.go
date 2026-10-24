@@ -487,7 +487,7 @@ func ViewSnapshotEvent(view ConversationView) SnapshotEvent { return snapshotOf(
 
 // TranslateViewEvents returns every event one commit causes, in the order of spec §9.4: before and after are the view around
 // the commit, ops its view operations, publication the records it wrote, and held the generations whose held outcome already ended their turn (updated here).
-func TranslateViewEvents(conversationId durable.ConversationId, before, after ConversationView, ops []durable.Op, publication durable.CommitPublication, held map[durable.TaskId]bool) []AgentEvent {
+func TranslateViewEvents(conversationId durable.ConversationId, before, after ConversationView, ops []durable.Op, publication session.ObservedCommit, held map[durable.TaskId]bool) []AgentEvent {
 	return translateEvents(conversationId, before, after, ops, publication, held)
 }
 
@@ -524,7 +524,7 @@ func WatchEvents(ctx context.Context, harness Harness, conversationId durable.Co
 		// Batches are the watch's values, each delivered (folding would drop events); an overflow delivers a snapshot of the newest view instead.
 		watch = session.NewSessionNativeWatch(impl.SessionImpl, []AgentEvent{}, release, func() []AgentEvent { return []AgentEvent{snapshotOf(current)} })
 		return &ViewObserver{
-			Publication: func(commitCtx context.Context, before, after ConversationView, ops []durable.Op, publication durable.CommitPublication) {
+			Publication: func(commitCtx context.Context, before, after ConversationView, ops []durable.Op, publication session.ObservedCommit) {
 				current = after
 				events := translateEvents(conversationId, before, after, ops, publication, held)
 				if len(events) > 0 {
@@ -634,7 +634,7 @@ func compactionTaskOf(status *delta.JsonObject) durable.TaskId {
 }
 
 // translateEvents returns every event one publication causes, in the order of spec §9.4.
-func translateEvents(conversationId durable.ConversationId, before, after ConversationView, viewOps []durable.Op, publication durable.CommitPublication, held map[durable.TaskId]bool) []AgentEvent {
+func translateEvents(conversationId durable.ConversationId, before, after ConversationView, viewOps []durable.Op, publication session.ObservedCommit, held map[durable.TaskId]bool) []AgentEvent {
 	var entries []durable.EntryRecord
 	tasks := map[durable.TaskId]durable.TaskRecord[durable.JsonValue, durable.JsonValue, durable.JsonValue]{}
 	var taskOrder []durable.TaskId

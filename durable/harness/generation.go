@@ -776,7 +776,7 @@ func (throttle *partialThrottle) flush() {
 					generation = live.Object("generation")
 				}
 				return nil, throttle.changes.Commit(generation, message, taken)
-			})
+			}, ProgressCommit)
 			if err != nil {
 				throttle.changes.Restore(taken)
 			}

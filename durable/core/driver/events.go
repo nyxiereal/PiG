@@ -13,6 +13,7 @@ import (
 	"github.com/MichaelKinsy/PiG/chord/delta"
 	"github.com/MichaelKinsy/PiG/durable"
 	"github.com/MichaelKinsy/PiG/durable/harness"
+	"github.com/MichaelKinsy/PiG/durable/session"
 )
 
 // WatchEvents attaches to one conversation's agent events (events.ts watchEvents) over a view watch of the core with
@@ -47,7 +48,7 @@ func (s *coreSession) WatchEvents(ctx context.Context, conversationId durable.Co
 			s.reportListener(err)
 			return
 		}
-		if events := harness.TranslateViewEvents(conversationId, before, after, f.ops, publication, held); len(events) > 0 {
+		if events := harness.TranslateViewEvents(conversationId, before, after, f.ops, session.ObservedCommit{Seq: publication.Seq, Changes: publication.Changes}, held); len(events) > 0 {
 			watch.Advance(m.hub.deliveryContext(), events)
 		}
 	}, func() { watch.SourceEnded(nil) })

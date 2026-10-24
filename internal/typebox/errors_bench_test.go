@@ -9,7 +9,7 @@ import (
 // BenchmarkErrors is the failing-validation path (Errors runs only after Check failed): a wrong type, an object of
 // members an additionalProperties:false schema refuses, and a nested value with several wrong members.
 func BenchmarkErrors(b *testing.B) {
-	object := func(pairs ...any) *chordjson.Object { return chordjson.ObjectOf(pairs...) }
+	object := chordjson.ObjectOf
 	cases := []struct {
 		name          string
 		schema, value any

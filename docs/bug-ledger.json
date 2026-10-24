@@ -3292,6 +3292,33 @@
       ]
     },
     {
+      "id": "BF-234316d",
+      "title": "On Windows, a Go extension's source hash no longer fails, or makes a build beside it fail, with `The process…",
+      "symptom": "On Windows, a Go extension's source hash no longer fails, or makes a build beside it fail, with `The process cannot access the file because it is being used by another process`.",
+      "rootCause": "both source hash walks (subprocess walkDirSources and runtimecell hashGoModuleDir) listed directories with os.ReadDir, whose open on Windows shares read and write but not delete. A handle without FILE_SHARE_DELETE has two effects on a build running beside the hash, which empties and fills the same trees: any delete or rename of the directory while the walk has it open fails with a sharing violation, and a directory that another process holds open for delete (os.RemoveAll does, for an instant) makes the walk's own open fail with one. A throwaway Windows run of the untagged churn tests failed 100 of 100 and 96 of 100 on that (\"open ...\\rmeta27: The process cannot access the file because it is…",
+      "rootCauseSource": "commit",
+      "userImpact": "An operation failed or was rejected",
+      "platform": "Windows",
+      "class": "own",
+      "fixedIn": "Unreleased",
+      "releaseNote": "On Windows, a Go extension's source hash no longer fails, or makes a build beside it fail, with `The process cannot access the file because it is being used by another process`. The hash listed every directory of the extension and of the modules its `go.mod` replaces through a handle that did not share delete, so a build that deleted or renamed a directory in those trees while the hash had it open (Cargo and rustc remove temp directories under a replaced repository root) failed with a sharing violation, and the hash failed in turn when it opened a directory that build was deleting. The hash now lists directories with every share mode. A directory that is there and denies the listing (an ACL deny) still fails the hash.",
+      "origin": "release note",
+      "commits": [
+        {
+          "hash": "234316d435",
+          "date": "2026-10-24"
+        }
+      ],
+      "tests": [
+        "coding/extension/host/runtimecell/hash_acl_windows_test.go::TestHashGoModuleFailsClosedOnALiveACLDeniedDirectory",
+        "coding/extension/host/runtimecell/readdir_shared_test.go::TestWalkDirSharedMatchesFilepathWalkDir",
+        "coding/extension/host/runtimecell/readdir_shared_test.go::TestWalkDirSharedReportsListingErrorsToFn",
+        "coding/extension/host/runtimecell/vanished_dir_test.go::TestHashGoModuleIgnoresConcurrentChurnOfUntaggedDirectories",
+        "coding/extension/host/subprocess/hash_acl_windows_test.go::TestHashSourceDirFailsClosedOnALiveACLDeniedDirectory",
+        "coding/extension/host/subprocess/hash_build_output_test.go::TestHashSourceDirIgnoresConcurrentChurnInReplacedModule"
+      ]
+    },
+    {
       "id": "BF-24872ab",
       "title": "Extensions receive each model (`ctx.model`, `model_select`, `ctx.modelRegistry` reads, scoped models…",
       "symptom": "Extensions receive each model (`ctx.model`, `model_select`, `ctx.modelRegistry` reads, scoped models, virtual-model routes and provider-object calls) as Pi's model object, with its members in Pi's order, instead of sorted by member name with `null` for members the model does not set.",

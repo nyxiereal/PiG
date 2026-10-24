@@ -84,22 +84,31 @@ func buildSessionPath(entries []map[string]any, leaf SessionLeaf, byID map[strin
 	if leaf.none {
 		return []map[string]any{}
 	}
-	lookup := func(key any) (map[string]any, bool) {
-		if key, ok := idKey(key); ok {
-			if byID != nil {
-				if id, isString := key.(string); isString {
-					entry, found := byID[id]
-					return entry, found
-				}
-				return nil, false
-			}
-			for i := len(entries) - 1; i >= 0; i-- {
-				if id, ok := idKey(entries[i]["id"]); ok && id == key {
-					return entries[i], true
-				}
+	// Pi indexes the entries once (later duplicates win) unless it is handed an index.
+	var index map[any]map[string]any
+	if byID == nil {
+		index = make(map[any]map[string]any, len(entries))
+		for _, entry := range entries {
+			if id, ok := idKey(entry["id"]); ok {
+				index[id] = entry
 			}
 		}
-		return nil, false
+	}
+	lookup := func(key any) (map[string]any, bool) {
+		key, ok := idKey(key)
+		if !ok {
+			return nil, false
+		}
+		if byID != nil {
+			id, isString := key.(string)
+			if !isString {
+				return nil, false
+			}
+			entry, found := byID[id]
+			return entry, found
+		}
+		entry, found := index[key]
+		return entry, found
 	}
 	var current map[string]any
 	if leaf.id != "" {

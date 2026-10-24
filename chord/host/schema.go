@@ -22,12 +22,31 @@ func asSchema(schema any) Schema {
 	switch typed := schema.(type) {
 	case map[string]any:
 		return typed
+	case *chordjson.Object:
+		// An ordered schema (a decoded description keeps its declared order): the members are copied to a map, the
+		// nested nodes stay as they are, so every step down calls asSchema again.
+		if typed != nil {
+			out := make(Schema, typed.Len())
+			for key, item := range typed.All() {
+				out[key] = item
+			}
+			return out
+		}
 	case bool:
 		if !typed {
 			return Schema{"not": Schema{}}
 		}
 	}
 	return Schema{}
+}
+
+// schemaNode is a schema node that is an object of either kind, as a map.
+func schemaNode(value any) (Schema, bool) {
+	switch value.(type) {
+	case map[string]any, *chordjson.Object:
+		return asSchema(value), true
+	}
+	return nil, false
 }
 
 // compareUTF16 orders strings as JavaScript's default sort does: by UTF-16 code units.
@@ -64,11 +83,19 @@ type absent struct{}
 // CanonicalJSON is schema.ts canonicalJson: sorted object keys, undefined members dropped.
 func CanonicalJSON(value any) string {
 	var out strings.Builder
-	writeCanonical(&out, value)
+	writeCanonical(&out, value, false)
 	return out.String()
 }
 
-func writeCanonical(out *strings.Builder, value any) {
+// OrderedJSON is canonicalJson except that the members of an ordered object (*chordjson.Object) keep the order they were
+// declared in, as JSON.stringify writes a schema; Go maps are written sorted, as CanonicalJSON writes them.
+func OrderedJSON(value any) string {
+	var out strings.Builder
+	writeCanonical(&out, value, true)
+	return out.String()
+}
+
+func writeCanonical(out *strings.Builder, value any, ordered bool) {
 	switch typed := value.(type) {
 	case nil, absent:
 		out.WriteString("null")
@@ -86,11 +113,11 @@ func writeCanonical(out *strings.Builder, value any) {
 			if index > 0 {
 				out.WriteByte(',')
 			}
-			writeCanonical(out, item)
+			writeCanonical(out, item, ordered)
 		}
 		out.WriteByte(']')
 	case jsonMarshaler:
-		writeCanonical(out, typed.jsonValue())
+		writeCanonical(out, typed.jsonValue(), ordered)
 	default:
 		if number, ok := toFloat(value); ok {
 			if math.IsNaN(number) || math.IsInf(number, 0) {
@@ -105,7 +132,7 @@ func writeCanonical(out *strings.Builder, value any) {
 			for index := range items {
 				items[index] = list.Index(index).Interface()
 			}
-			writeCanonical(out, items)
+			writeCanonical(out, items, ordered)
 			return
 		}
 		keys, get, ok := objectEntries(value)
@@ -119,7 +146,9 @@ func writeCanonical(out *strings.Builder, value any) {
 				present = append(present, key)
 			}
 		}
-		slices.SortFunc(present, compareUTF16)
+		if _, keepsOrder := value.(*chordjson.Object); !(ordered && keepsOrder) {
+			slices.SortFunc(present, compareUTF16)
+		}
 		out.WriteByte('{')
 		for index, key := range present {
 			if index > 0 {
@@ -127,7 +156,7 @@ func writeCanonical(out *strings.Builder, value any) {
 			}
 			out.WriteString(quoteJSON(key))
 			out.WriteByte(':')
-			writeCanonical(out, get(key))
+			writeCanonical(out, get(key), ordered)
 		}
 		out.WriteByte('}')
 	}
@@ -425,7 +454,7 @@ func objectFits(sub, sup Schema) bool {
 			return false
 		}
 	}
-	subAdditional, subAdditionalSchema := sub["additionalProperties"].(map[string]any)
+	subAdditional, subAdditionalSchema := schemaNode(sub["additionalProperties"])
 	for key, property := range supProperties {
 		if subProperty, ok := subProperties[key]; ok {
 			if !Fits(subProperty, property) {

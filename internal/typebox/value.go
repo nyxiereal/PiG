@@ -253,19 +253,39 @@ func (o object) remove(key string) {
 }
 
 func schemaMap(schema any) map[string]any {
-	typed, _ := schema.(map[string]any)
+	typed, _ := objectMap(schema)
 	return typed
+}
+
+// objectMap reads a schema node held as a Go map or as an ordered *chordjson.Object (members kept as they are: a nested
+// node of either kind stays one). An ordered node is copied to a map; callers that need its member order read it from the
+// *chordjson.Object (properties).
+func objectMap(value any) (map[string]any, bool) {
+	switch typed := value.(type) {
+	case map[string]any:
+		return typed, true
+	case *chordjson.Object:
+		if typed == nil {
+			return nil, false
+		}
+		out := make(map[string]any, typed.Len())
+		for key, item := range typed.All() {
+			out[key] = item
+		}
+		return out, true
+	}
+	return nil, false
 }
 
 func typeIs(schema map[string]any, name string) bool { return schema["type"] == name }
 
 func isObjectKind(schema map[string]any) bool {
-	_, ok := schema["properties"].(map[string]any)
+	_, ok := objectMap(schema["properties"])
 	return typeIs(schema, "object") && ok
 }
 
 func isRecordKind(schema map[string]any) bool {
-	patterns, ok := schema["patternProperties"].(map[string]any)
+	patterns, ok := objectMap(schema["patternProperties"])
 	return typeIs(schema, "object") && ok && len(patterns) == 1 && !isObjectKind(schema)
 }
 
@@ -275,12 +295,13 @@ func isTupleKind(schema map[string]any) bool {
 }
 
 func isArrayKind(schema map[string]any) bool {
-	_, ok := schema["items"].(map[string]any)
+	_, ok := objectMap(schema["items"])
 	return typeIs(schema, "array") && ok
 }
 
 func recordEntry(schema map[string]any) (*regexp.Regexp, any) {
-	for pattern, value := range schema["patternProperties"].(map[string]any) {
+	patterns, _ := objectMap(schema["patternProperties"])
+	for pattern, value := range patterns {
 		expression, err := CompilePattern(pattern)
 		if err != nil {
 			return nil, value
@@ -291,6 +312,11 @@ func recordEntry(schema map[string]any) (*regexp.Regexp, any) {
 }
 
 func properties(schema map[string]any) (map[string]any, []string) {
+	if ordered, ok := schema["properties"].(*chordjson.Object); ok && ordered != nil {
+		// Members are visited in the order the schema declared them, as TypeBox's Object.keys does.
+		props, _ := objectMap(ordered)
+		return props, ordered.Keys()
+	}
 	props, _ := schema["properties"].(map[string]any)
 	keys := make([]string, 0, len(props))
 	for key := range props {
@@ -396,7 +422,8 @@ func evaluateIntersect(schema map[string]any) map[string]any {
 		if m == nil || !isObjectKind(m) {
 			return nil
 		}
-		maps.Copy(props, m["properties"].(map[string]any))
+		inner, _ := objectMap(m["properties"])
+		maps.Copy(props, inner)
 		if names, ok := m["required"].([]any); ok {
 			required = append(required, names...)
 		}

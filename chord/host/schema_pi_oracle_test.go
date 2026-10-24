@@ -182,3 +182,34 @@ func TestAssertValidMatchesPi(t *testing.T) {
 		}
 	}
 }
+
+// A schema that arrives in a wire description, from a Node child or in a hold token, is decoded by Description's
+// UnmarshalJSON: the errors of its properties must come in the order it declared them, as TypeBox's do. The details are
+// compared in order: errors are a list, and each error's members keep Pi's order.
+func TestAssertValidOverADecodedDescriptionKeepsTheDeclaredOrderLikePi(t *testing.T) {
+	oracle := loadPiSchemaOracle(t)
+	checked := 0
+	for _, item := range oracle.Assertions {
+		if item.OK || len(item.Schema) == 0 || item.Schema[0] != '{' {
+			continue
+		}
+		var description Description
+		text := `{"name":"t","scope":"local","version":1,"input":` + string(item.Schema) + `,"variants":{"":{}}}`
+		if err := json.Unmarshal([]byte(text), &description); err != nil {
+			t.Fatal(err)
+		}
+		err := assertValid("state", "state thing", description.Input, decodeChordJSON(t, item.Value))
+		chordError, ok := err.(*ChordError) //nolint:errorlint // assertValid returns the ChordError itself
+		if !ok {
+			t.Errorf("assertValid(%s, %s) = %v, Pi threw %q", item.Schema, item.Value, err, item.Message)
+			continue
+		}
+		if got, want := OrderedJSON(chordError.Details), OrderedJSON(decodeChordJSON(t, item.Details)); got != want || chordError.Message != item.Message {
+			t.Errorf("assertValid(%s, %s) over a decoded description\n  go %s %q\n  pi %s %q", item.Schema, item.Value, got, chordError.Message, want, item.Message)
+		}
+		checked++
+	}
+	if checked < 60 {
+		t.Fatalf("checked %d decoded schemas", checked)
+	}
+}

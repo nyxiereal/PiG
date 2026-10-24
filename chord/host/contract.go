@@ -577,7 +577,8 @@ func (description Description) jsonValue() any {
 // wireValue is the description as Pi's JSON.stringify writes it on a link (connection.ts:324 sends the description
 // object): name, scope, version, input, then variants and members in their own-key order, each member as
 // { kind, args, result }, { kind, schema } or { kind, id }; an undefined schema is left out. A schema's own keys are
-// written sorted: Schema is a Go map.
+// written in their declared order when the schema was decoded from a wire description (nested ordered objects) and sorted
+// for a Go map.
 func (description Description) wireValue() *chordjson.Object {
 	out := chordjson.ObjectOf("name", description.Name, "scope", string(description.Scope), "version", float64(description.Version))
 	setSchema(out, "input", description.Input)
@@ -614,7 +615,7 @@ func setSchema(object *chordjson.Object, key string, schema Schema) {
 	if schema == nil {
 		return
 	}
-	value, err := chordjson.Decode([]byte(CanonicalJSON(schema)))
+	value, err := chordjson.Decode([]byte(OrderedJSON(schema)))
 	if err != nil {
 		panic(err)
 	}
@@ -629,10 +630,10 @@ func (description Description) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON reads a wire description, keeping the order of its variants and members.
 func (description *Description) UnmarshalJSON(data []byte) error {
 	var wire struct {
-		Name    string `json:"name"`
-		Scope   string `json:"scope"`
-		Version int    `json:"version"`
-		Input   Schema `json:"input"`
+		Name    string          `json:"name"`
+		Scope   string          `json:"scope"`
+		Version int             `json:"version"`
+		Input   json.RawMessage `json:"input"`
 		Host    *struct {
 			Name   *string `json:"name"`
 			Prefix *string `json:"prefix"`
@@ -646,7 +647,11 @@ func (description *Description) UnmarshalJSON(data []byte) error {
 	if err != nil {
 		return err
 	}
-	*description = Description{Name: wire.Name, Scope: ContractScope(wire.Scope), Version: wire.Version, Input: wire.Input}
+	input, err := decodeSchema(wire.Input)
+	if err != nil {
+		return err
+	}
+	*description = Description{Name: wire.Name, Scope: ContractScope(wire.Scope), Version: wire.Version, Input: input}
 	if wire.Host != nil {
 		switch {
 		case wire.Host.Name != nil:
@@ -684,18 +689,48 @@ func (description *Description) UnmarshalJSON(data []byte) error {
 		var out Fields[MemberDescription]
 		for name := range members.All() {
 			var member struct {
-				Kind   string `json:"kind"`
-				Args   Schema `json:"args"`
-				Result Schema `json:"result"`
-				Schema Schema `json:"schema"`
-				ID     string `json:"id"`
+				Kind   string          `json:"kind"`
+				Args   json.RawMessage `json:"args"`
+				Result json.RawMessage `json:"result"`
+				Schema json.RawMessage `json:"schema"`
+				ID     string          `json:"id"`
 			}
 			if err := json.Unmarshal(membersRaw[name], &member); err != nil {
 				return err
 			}
-			out = append(out, Field[MemberDescription]{Name: name, Value: MemberDescription{Kind: member.Kind, Args: member.Args, Result: member.Result, Schema: member.Schema, ID: member.ID}})
+			args, err := decodeSchema(member.Args)
+			if err != nil {
+				return err
+			}
+			result, err := decodeSchema(member.Result)
+			if err != nil {
+				return err
+			}
+			state, err := decodeSchema(member.Schema)
+			if err != nil {
+				return err
+			}
+			out = append(out, Field[MemberDescription]{Name: name, Value: MemberDescription{Kind: member.Kind, Args: args, Result: result, Schema: state, ID: member.ID}})
 		}
 		description.Variants = append(description.Variants, Field[Fields[MemberDescription]]{Name: kind, Value: out})
 	}
 	return nil
+}
+
+// decodeSchema reads a schema from its JSON text. The result is a Schema (a Go map) whose members stay as decoded: nested
+// objects are ordered *chordjson.Object values, so the declared order of properties survives to the validator, which
+// reports errors in it as TypeBox does. An absent or null schema is nil, as the wire writes an undefined one.
+func decodeSchema(data json.RawMessage) (Schema, error) {
+	if len(data) == 0 {
+		return nil, nil
+	}
+	value, err := chordjson.Decode(data)
+	if err != nil {
+		return nil, err
+	}
+	object, ok := value.(*chordjson.Object)
+	if !ok || object == nil {
+		return nil, nil
+	}
+	return asSchema(object), nil
 }

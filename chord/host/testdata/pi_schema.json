@@ -2567,6 +2567,215 @@
 			]
 		},
 		{
+			"schema": {
+				"type": "object",
+				"properties": {
+					"z": {
+						"type": "string"
+					},
+					"m": {
+						"type": "string"
+					},
+					"a": {
+						"type": "string"
+					}
+				}
+			},
+			"value": {
+				"a": 1,
+				"m": 2,
+				"z": 3
+			},
+			"ok": false,
+			"message": "invalid/state: state thing: /z must be string; /m must be string; /a must be string",
+			"details": [
+				{
+					"keyword": "type",
+					"schemaPath": "#/properties/z",
+					"instancePath": "/z",
+					"params": {
+						"type": "string"
+					},
+					"message": "must be string"
+				},
+				{
+					"keyword": "type",
+					"schemaPath": "#/properties/m",
+					"instancePath": "/m",
+					"params": {
+						"type": "string"
+					},
+					"message": "must be string"
+				},
+				{
+					"keyword": "type",
+					"schemaPath": "#/properties/a",
+					"instancePath": "/a",
+					"params": {
+						"type": "string"
+					},
+					"message": "must be string"
+				}
+			]
+		},
+		{
+			"schema": {
+				"type": "object",
+				"properties": {
+					"z": {
+						"type": "object",
+						"properties": {
+							"y": {
+								"type": "integer"
+							},
+							"b": {
+								"type": "integer"
+							}
+						}
+					},
+					"a": {
+						"type": "array",
+						"items": {
+							"type": "string"
+						}
+					}
+				},
+				"required": [
+					"z",
+					"a",
+					"c"
+				]
+			},
+			"value": {
+				"z": {
+					"b": "x",
+					"y": "y"
+				},
+				"a": [
+					1
+				]
+			},
+			"ok": false,
+			"message": "invalid/state: state thing: / must have required properties c; /z/y must be integer; /z/b must be integer",
+			"details": [
+				{
+					"keyword": "required",
+					"schemaPath": "#",
+					"instancePath": "",
+					"params": {
+						"requiredProperties": [
+							"c"
+						]
+					},
+					"message": "must have required properties c"
+				},
+				{
+					"keyword": "type",
+					"schemaPath": "#/properties/z/properties/y",
+					"instancePath": "/z/y",
+					"params": {
+						"type": "integer"
+					},
+					"message": "must be integer"
+				},
+				{
+					"keyword": "type",
+					"schemaPath": "#/properties/z/properties/b",
+					"instancePath": "/z/b",
+					"params": {
+						"type": "integer"
+					},
+					"message": "must be integer"
+				}
+			]
+		},
+		{
+			"schema": {
+				"type": "object",
+				"properties": {
+					"z": {
+						"type": "object",
+						"properties": {
+							"y": {
+								"type": "integer"
+							},
+							"b": {
+								"type": "integer"
+							}
+						}
+					},
+					"a": {
+						"type": "array",
+						"items": {
+							"type": "string"
+						}
+					}
+				},
+				"required": [
+					"z",
+					"a",
+					"c"
+				]
+			},
+			"value": {},
+			"ok": false,
+			"message": "invalid/state: state thing: / must have required properties z, a, c",
+			"details": [
+				{
+					"keyword": "required",
+					"schemaPath": "#",
+					"instancePath": "",
+					"params": {
+						"requiredProperties": [
+							"z",
+							"a",
+							"c"
+						]
+					},
+					"message": "must have required properties z, a, c"
+				}
+			]
+		},
+		{
+			"schema": {
+				"type": "object",
+				"patternProperties": {
+					"^z": {
+						"type": "integer"
+					},
+					"^a": {
+						"type": "integer"
+					}
+				}
+			},
+			"value": {
+				"a1": "x",
+				"z1": "y"
+			},
+			"ok": false,
+			"message": "invalid/state: state thing: /z1 must be integer; /a1 must be integer",
+			"details": [
+				{
+					"keyword": "type",
+					"schemaPath": "#/patternProperties/^z",
+					"instancePath": "/z1",
+					"params": {
+						"type": "integer"
+					},
+					"message": "must be integer"
+				},
+				{
+					"keyword": "type",
+					"schemaPath": "#/patternProperties/^a",
+					"instancePath": "/a1",
+					"params": {
+						"type": "integer"
+					},
+					"message": "must be integer"
+				}
+			]
+		},
+		{
 			"schema": false,
 			"value": 1,
 			"ok": false,

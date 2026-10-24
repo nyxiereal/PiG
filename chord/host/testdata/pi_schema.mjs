@@ -253,6 +253,9 @@ const assertSchemas = [
 	[{ type: "object", patternProperties: { "^x": { type: "integer" } }, additionalProperties: false }, [{ y: 1, x2: "a", x1: "b", w: 2 }]],
 	[{ type: "object", properties: { b: { type: "string" }, a: { type: "string" } } }, [{ a: 1, b: 2 }]],
 	[{ type: "object", properties: { o: { type: "object", additionalProperties: false }, l: { type: "array", items: { type: "object", additionalProperties: false } } } }, [{ o: { z: 1, a: 2, m: 3 }, l: [{ q: 1, b: 2 }] }]],
+	[{ type: "object", properties: { z: { type: "string" }, m: { type: "string" }, a: { type: "string" } } }, [{ a: 1, m: 2, z: 3 }]],
+	[{ type: "object", properties: { z: { type: "object", properties: { y: { type: "integer" }, b: { type: "integer" } } }, a: { type: "array", items: { type: "string" } } }, required: ["z", "a", "c"] }, [{ z: { b: "x", y: "y" }, a: [1] }, {}]],
+	[{ type: "object", patternProperties: { "^z": { type: "integer" }, "^a": { type: "integer" } } }, [{ a1: "x", z1: "y" }]],
 	[false, [1]],
 	[{ type: "object", properties: { a: { type: "string" }, b: { type: "string" }, c: { type: "string" }, d: { type: "string" } } }, [{ a: 1, b: 1, c: 1, d: 1 }]],
 ];

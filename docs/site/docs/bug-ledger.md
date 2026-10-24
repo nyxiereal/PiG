@@ -548,6 +548,7 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 | [BF-773a868-2](#bf-773a868-2) | RPC mode no longer hangs when a Node extension command calls `pi.appendEntry` and then `pi.setSessionName`… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-7768bea](#bf-7768bea) | fix(ai): tool-call arguments are written as JSON.stringify writes them, and keep a lone surrogate | PiG's own defect | All platforms | Unreleased |
 | [BF-779318a](#bf-779318a) | OpenAI-compatible streams where one chunk carries reasoning and content (LiteLLM and similar proxies) now… | PiG's own defect | All platforms | 0.5.0 |
+| [BF-7809364](#bf-7809364) | Schema errors of a `ChordError` of code `invalid` list their members in the order the value arrived in, as… | PiG's own defect | All platforms | Unreleased |
 | [BF-78c4c6c](#bf-78c4c6c) | `pig piglet add` now names the offending bundled path and where it came from (for example `Package herdr… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-78f2d55](#bf-78f2d55) | `pig mcp login --help` described `--timeout` as only the wait for the browser; it limits the whole sign-in… | A fix Pi shipped that PiG ported | All platforms | 0.5.0 |
 | [BF-79eadcf](#bf-79eadcf) | Long sessions no longer slow down each streamed frame in the main screen: a frame redraws from the first line… | PiG's own defect | All platforms | 0.5.0 |
@@ -8508,6 +8509,20 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 - **Fix commits:** `779318a6ea` (2026-10-14, #10926)
 - **Tests:** `ai/openai_completions_member_type_oracle_test.go::TestOpenAICompletionsMistypedMembersMatchPi`, `ai/openai_reasoning_pending_test.go::TestParseSSE_ReasoningDetailsApplyBeforeNonIterableToolCalls`, `ai/openai_reasoning_pending_test.go::TestParseSSE_ThinkingBeforeTextWhenOneDeltaCarriesBoth`, `ai/openai_tool_choice_stream_upstream_test.go::TestOpenAICompletionsToolChoiceStreamUpstream`
 - **Release note:** OpenAI-compatible streams where one chunk carries reasoning and content (LiteLLM and similar proxies) now place the thinking block before the text. Carried forward from Pi 63035734 (earendil-works/pi#10926), past the 1.2.0+3daa2028 pin.
+
+### BF-7809364
+
+**Schema errors of a `ChordError` of code `invalid` list their members in the order the value arrived in, as…**
+
+- **Source:** PiG's own defect
+- **Symptom:** Schema errors of a `ChordError` of code `invalid` list their members in the order the value arrived in, as Pi's do (the `additionalProperties`, `propertyNames` and `unevaluatedProperties` lists and the order of the errors); they came out in sorted key order.
+- **Root cause:** TypeBox lists errors and params (additionalProperties, propertyNames, unevaluatedProperties) in the instance's insertion order. internal/typebox.Errors turned the value into Go maps and visited them sorted, so a value with unsorted keys got its errors in another order than Pi. Errors now records the member order of every *chordjson.Object it converts (the form values arrive in over the wire and through Normalize) and the walker visits members in it; a plain Go map has no order and stays sorted. A schema held as a Go map likewise keeps no property order.
+- **User impact:** An operation failed or was rejected
+- **Platform:** All platforms
+- **Fixed in:** Unreleased
+- **Fix commits:** `78093645cf` (2026-10-24)
+- **Tests:** `chord/host/schema_pi_oracle_test.go::TestAssertValidMatchesPi`
+- **Release note:** Schema errors of a `ChordError` of code `invalid` list their members in the order the value arrived in, as Pi's do (the `additionalProperties`, `propertyNames` and `unevaluatedProperties` lists and the order of the errors); they came out in sorted key order.
 
 ### BF-78c4c6c
 

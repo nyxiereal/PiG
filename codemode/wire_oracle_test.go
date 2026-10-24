@@ -1154,7 +1154,7 @@ func wireCases() []wireCase {
 	remoteCase("an exchange after the client stopped is answered with a stop", afterStop, false)
 	remoteCase("a call is answered with its result", exchanges([]string{`{"type":"output","item":{"type":"text","text":"o"}}`, `{"type":"call","id":1,"target":"tool","name":"echo","args":"[1]"}`}, []string{done}), false)
 	remoteCase("output without a call is answered with nothing", exchanges([]string{`{"type":"output","item":{"type":"text","text":"o"}}`}, []string{done}), false)
-	remoteCase("only the first call of a batch is awaited", exchanges([]string{`{"type":"call","id":1,"target":"tool","name":"echo"}`, `{"type":"call","id":2,"target":"tool","name":"fail"}`}, []string{done}), false)
+	remoteCase("only the first call of a batch is awaited", exchanges([]string{`{"type":"call","id":1,"target":"tool","name":"echo"}`, `{"type":"call","id":2,"target":"tool","name":"hold"}`}, []string{done}), false)
 	remoteCase("a failure message ends the execution", exchanges([]string{`{"type":"output","item":{"type":"text","text":"o"}}`, `{"type":"failure","error":{"kind":"timeout","message":"late"}}`}), false)
 	remoteCase("a script error from the remote", exchanges([]string{`{"type":"done","ok":false,"error":"{\"name\":\"TypeError\",\"message\":\"m\",\"stack\":\"s\"}"}`}), false)
 	remoteCase("a crash", exchanges([]string{`{"type":"crash","message":"trap"}`}), false)

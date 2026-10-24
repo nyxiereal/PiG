@@ -108,8 +108,8 @@ func hasPointers(t reflect.Type) bool {
 	case reflect.Array:
 		has = t.Len() > 0 && hasPointers(t.Elem())
 	case reflect.Struct:
-		for i := range t.NumField() {
-			if hasPointers(t.Field(i).Type) {
+		for field := range t.Fields() {
+			if hasPointers(field.Type) {
 				has = true
 				break
 			}
@@ -175,8 +175,7 @@ func (g *reachableBytes) walk(v reflect.Value) {
 		g.addSpan(uintptr(data), dynamic.Size())
 		g.walk(reflect.NewAt(dynamic, data).Elem())
 	case reflect.Struct:
-		for i := range v.NumField() {
-			field := v.Field(i)
+		for _, field := range v.Fields() {
 			if hasPointers(field.Type()) {
 				g.walk(unlock(field))
 			}

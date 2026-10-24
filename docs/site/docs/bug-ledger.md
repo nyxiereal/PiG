@@ -265,6 +265,7 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 | [BF-4ac21c8](#bf-4ac21c8) | fix(jsloop): run a tick whose tool call already ended at once, though no wait is open | PiG's own defect | All platforms | Unreleased |
 | [BF-4afdbac](#bf-4afdbac) | `ProjectTrustStore` reads entries in JavaScript order: `readTrustFile` named whichever invalid value Go's map… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-4bcc7da](#bf-4bcc7da) | `StreamProxy` merges the final tool call and reports abort and timeout as Pi does, and it no longer changes a… | PiG's own defect | All platforms | 0.5.0 |
+| [BF-4c032a0](#bf-4c032a0) | A description decoded from the wire is written back with every schema member in the order it was declared in… | PiG's own defect | All platforms | Unreleased |
 | [BF-4c45afa](#bf-4c45afa) | fix(sdk-py): stage pig_sdk.tui with the package, which pig_sdk imports at load; keep the pi-ai patterns… | PiG's own defect | All platforms | Unreleased |
 | [BF-4c7ccf2](#bf-4c7ccf2) | A classifier response that reports more than 2,147,483,647 input or output tokens keeps the reported count… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-4d04134](#bf-4d04134) | The cancel hint of extension loaders (`/share`, `/bug`) shows the key bound to `tui.select.cancel` instead of… | PiG's own defect | All platforms | 0.5.0 |
@@ -4574,6 +4575,20 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 - **Fix commits:** `53dccd580f` (2026-10-05), `e2e8d50d71` (2026-10-05), `f38ab7ac87` (2026-10-05), `18fb7dd7d4` (2026-10-06), `4bcc7da691` (2026-10-06), `9c8d8439aa` (2026-10-06), `e2cde42910` (2026-10-06)
 - **Tests:** `agent/new_agent_stream_error_test.go::TestNewAgentAcceptsEachStreamFunctionSource`, `agent/new_agent_stream_error_test.go::TestNewAgentFailsWithoutAStreamFunction`, `agent/new_agent_stream_error_test.go::TestSendWithoutAStreamFunctionReportsTheFailure`, `agent/proxy_oracle_test.go::TestStreamProxyEventAfterDoneIsNotDelivered`, `agent/proxy_oracle_test.go::TestStreamProxyMalformedLineAfterDoneLeavesTheResult`, `internal/nativeplatform/clipboard_native_roundtrip_test.go::TestNativeClipboardTextRoundTrip`, `tui/editor_oracle_test.go::TestEditorMatchesPiOracle`, `tui/main_screen_image_row_test.go::TestMainScreenEditBelowImageRowDoesNotClear` and 19 more in docs/bug-ledger.json
 - **Release note:** `StreamProxy` merges the final tool call and reports abort and timeout as Pi does, and it no longer changes a delivered message when the server sends more after the terminal event. The stdin buffer drops an incomplete sequence before a bracketed paste, the editor calls `onChange` as Pi does, and overlays hide the cursor and request a frame as Pi does.
+
+### BF-4c032a0
+
+**A description decoded from the wire is written back with every schema member in the order it was declared in…**
+
+- **Source:** PiG's own defect
+- **Symptom:** A description decoded from the wire is written back with every schema member in the order it was declared in, as Pi writes it, and `normalize` returns the input's members in their own order followed by the defaults in the schema's declared order; the top-level members of a decoded schema came out sorted and a normalized value's defaults in sorted order.
+- **Root cause:** Go-map schemas are still written sorted: a map has no order. CanonicalJSON, CanonicalIdentity and the fingerprint still sort keys.
+- **User impact:** Wrong output or ordering
+- **Platform:** All platforms
+- **Fixed in:** Unreleased
+- **Fix commits:** `4c032a0900` (2026-10-24)
+- **Tests:** `chord/host/schema_pi_oracle_test.go::TestADecodedDescriptionIsWrittenBackInDeclaredOrderLikePi`, `chord/host/schema_pi_oracle_test.go::TestNormalizeOverADecodedDescriptionKeepsPiMemberOrder`
+- **Release note:** A description decoded from the wire is written back with every schema member in the order it was declared in, as Pi writes it, and `normalize` returns the input's members in their own order followed by the defaults in the schema's declared order; the top-level members of a decoded schema came out sorted and a normalized value's defaults in sorted order.
 
 ### BF-4c45afa
 

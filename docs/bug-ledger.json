@@ -34206,6 +34206,28 @@
       ]
     },
     {
+      "id": "BF-f6e4695",
+      "title": "Schemas decoded from a wire description (a Node child's contracts, a hold token) keep their declared property…",
+      "symptom": "Schemas decoded from a wire description (a Node child's contracts, a hold token) keep their declared property order, so a failed args, result, state or input check lists its errors in that order as Pi does, and a description is written back in the declared order; they were sorted by name.",
+      "rootCause": "A schema that arrives in a description (from a Node child or in a hold token) was decoded into Go maps, so its properties lost the order they were declared in, and the validator listed their errors sorted by name where Pi's TypeBox lists them in declaration order. Description.UnmarshalJSON now decodes each schema with ordered nested objects (*chordjson.Object, the one ordered form the validator already reads); asSchema, the typebox Clean/Default helpers and Fits read both forms, and a description is written back in the declared order (Pi's JSON.stringify), while Go-map schemas are written sorted as before. CanonicalJSON, CanonicalIdentity and the fingerprint still sort keys, as Pi's…",
+      "rootCauseSource": "commit",
+      "userImpact": "An operation failed or was rejected",
+      "platform": "All platforms",
+      "class": "own",
+      "fixedIn": "Unreleased",
+      "releaseNote": "Schemas decoded from a wire description (a Node child's contracts, a hold token) keep their declared property order, so a failed args, result, state or input check lists its errors in that order as Pi does, and a description is written back in the declared order; they were sorted by name.",
+      "origin": "release note",
+      "commits": [
+        {
+          "hash": "f6e46951d1",
+          "date": "2026-10-24"
+        }
+      ],
+      "tests": [
+        "chord/host/schema_pi_oracle_test.go::TestAssertValidOverADecodedDescriptionKeepsTheDeclaredOrderLikePi"
+      ]
+    },
+    {
       "id": "BF-f6e7d49",
       "title": "`/tree` opens and searches a 300 MB session faster than Pi: it reads the session's index and each message's…",
       "symptom": "`/tree` opens and searches a 300 MB session faster than Pi: it reads the session's index and each message's search text instead of decoding every entry.",

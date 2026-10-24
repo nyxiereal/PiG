@@ -146,7 +146,7 @@ func writeCanonical(out *strings.Builder, value any, ordered bool) {
 				present = append(present, key)
 			}
 		}
-		if _, keepsOrder := value.(*chordjson.Object); !(ordered && keepsOrder) {
+		if _, keepsOrder := value.(*chordjson.Object); !ordered || !keepsOrder {
 			slices.SortFunc(present, compareUTF16)
 		}
 		out.WriteByte('{')

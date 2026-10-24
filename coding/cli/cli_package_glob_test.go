@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"runtime"
 	"slices"
+	"strconv"
 	"strings"
 	"testing"
 
@@ -223,12 +224,7 @@ func TestCLIGitSourceRefreshesOncePerLoad(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			t.Cleanup(func() {
-				if build.Host != nil {
-					build.Host.Shutdown("test")
-				}
-				build.Services.Close()
-			})
+			releaseCLIBuildAtCleanup(t, build)
 			manager, err := coding.NewInMemorySessionManager(f.cwd)
 			if err != nil {
 				t.Fatal(err)
@@ -250,6 +246,48 @@ func TestCLIGitSourceRefreshesOncePerLoad(t *testing.T) {
 		if n := refreshes(t, f); n != 1 {
 			t.Fatalf("the snapshot refreshed the checkout %d times, want 1; calls %+v", n, f.calls(t))
 		}
+	})
+}
+
+// A startup that went on past a failed -e install runs the -e extension in a host process of the build. Pi's extensions end with its process; here the build's Host.Shutdown must stop that process and wait until it has exited, so none outlives the build (a Windows process still ending holds its files open, and the test's temporary directories could not be removed).
+func TestCLIPackageSourceInstallFailureHostProcessEndsWithShutdown(t *testing.T) {
+	f := newPackageProcessFixture(t, "process.exit(1);")
+	pidFile := filepath.Join(t.TempDir(), "host-pid")
+	quoted, err := json.Marshal(pidFile)
+	if err != nil {
+		t.Fatal(err)
+	}
+	writeResourceLoaderFixture(t, filepath.Join(f.agent, "extensions", "probe.js"), `import {writeFileSync} from "node:fs"; export default function() { writeFileSync(`+string(quoted)+`, String(process.pid)); }`)
+	build, err := newCLIGlobTestBuilder(t, f, "--print", "-e", "npm:eprobe-missing").buildResources(t.Context(), cliBuildInput{CWD: f.cwd})
+	if err != nil {
+		t.Fatalf("startup error = %v, want startup to go on after the failed npm command", err)
+	}
+	defer build.Services.Close()
+	data, err := os.ReadFile(pidFile)
+	if err != nil {
+		t.Fatalf("the extension factory did not run: %v", err)
+	}
+	pid, err := strconv.Atoi(string(data))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !extensionProcessAlive(pid) {
+		t.Fatalf("the extension host process %d ended before the build was released, so the test does not show Shutdown waiting for it", pid)
+	}
+	build.Host.Shutdown("test")
+	if extensionProcessAlive(pid) {
+		t.Fatalf("the extension host process %d outlived Host.Shutdown", pid)
+	}
+}
+
+// releaseCLIBuildAtCleanup shuts build's extension host down and closes its services before the test's temporary directories are removed (cleanups run last-in first-out, and the directories were made before the build). A build whose startup went on past a failed install runs the -e extension in a host process; the test context's end only starts killing that process, and Host.Shutdown is what waits until it has exited. Without the wait, RemoveAll of the agent directory failed with "The directory is not empty" on Windows in 80 of 80 runs.
+func releaseCLIBuildAtCleanup(t *testing.T, build *cliBuild) {
+	t.Helper()
+	t.Cleanup(func() {
+		if build.Host != nil {
+			build.Host.Shutdown("test")
+		}
+		build.Services.Close()
 	})
 }
 
@@ -286,6 +324,7 @@ func TestCLIPackageSourceInstallFailureWarnsAndStartupContinues(t *testing.T) {
 			if err != nil {
 				t.Fatalf("startup error = %v, want startup to go on after the failed %s command", err, tc.command)
 			}
+			releaseCLIBuildAtCleanup(t, build)
 			if _, statErr := os.Stat(marker); statErr != nil {
 				t.Fatalf("the extension factory did not run: %v", statErr)
 			}

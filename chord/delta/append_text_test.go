@@ -1,6 +1,7 @@
 package delta
 
 import (
+	"errors"
 	"reflect"
 	"strings"
 	"testing"
@@ -186,7 +187,8 @@ func TestAppendTextRejectsWhatACallerCanGetWrong(t *testing.T) {
 func expectPanic(t *testing.T, want error, run func()) {
 	t.Helper()
 	defer func() {
-		if recovered := recover(); recovered != want {
+		recovered := recover()
+		if err, _ := recovered.(error); !errors.Is(err, want) {
 			t.Fatalf("panic = %v, want %v", recovered, want)
 		}
 	}()
@@ -197,7 +199,10 @@ func expectPanic(t *testing.T, want error, run func()) {
 func TestAppendTextOwnsTheTextItKeeps(t *testing.T) {
 	tracker := Track(appendTextDocument())
 	big := []byte(strings.Repeat("x", 1<<20))
-	got := appendTextCommit(t, tracker, func(root *Object) { mustAppend(t, root.Array("content").Object(0), "text", unsafe.String(&big[0], 40)) })
+	got := appendTextCommit(t, tracker, func(root *Object) {
+		//nolint:gosec // G103: the test cuts the text from a larger buffer on purpose, to prove AppendText copies it
+		mustAppend(t, root.Array("content").Object(0), "text", unsafe.String(&big[0], 40))
+	})
 	copy(big, strings.Repeat("y", 40))
 	if want := strings.Repeat("x", 40); got[0][2] != want {
 		t.Fatalf("the op text changed with the buffer it was cut from: %q", got[0][2])

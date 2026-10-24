@@ -380,8 +380,7 @@ func TestHoldingADeferredCommit(t *testing.T) {
 			}, deferredCommit)
 			return err
 		}()
-		var readOnly *durable.ReadOnlySession
-		if !errors.As(err, &readOnly) {
+		if _, ok := errors.AsType[*durable.ReadOnlySession](err); !ok {
 			t.Fatalf("a read-only Session returned %v, want ReadOnlySession", err)
 		}
 	})

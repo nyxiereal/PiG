@@ -86,7 +86,7 @@ type textContentWire struct {
 }
 
 func (content TextContent) wire() textContentWire {
-	return textContentWire{content.Text, content.TextSignature}
+	return textContentWire(content)
 }
 
 // ImageContent is a base64-encoded image in a message.

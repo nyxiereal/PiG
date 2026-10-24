@@ -2,6 +2,7 @@ package ai
 
 import (
 	"maps"
+	"slices"
 	"strconv"
 	"strings"
 	"unicode/utf8"
@@ -687,14 +688,12 @@ func (p *StreamingJSONParser) copyOpenPath(pending *streamingPending) (any, bool
 	order := maps.Clone(p.order)
 	var child any
 	var childSlot *streamingSlot
-	for depth := len(p.stack) - 1; depth >= 0; depth-- {
-		frame := p.stack[depth]
+	for depth, frame := range slices.Backward(p.stack) {
+
 		var copyValue any
 		if frame.isArray {
 			elements := make([]any, len(frame.array), len(frame.array)+1)
-			for i, element := range frame.array {
-				elements[i] = element
-			}
+			copy(elements, frame.array)
 			if depth == len(p.stack)-1 && pending != nil {
 				elements = setSlotArray(elements, pending.slot, pending.value)
 			}
@@ -704,9 +703,7 @@ func (p *StreamingJSONParser) copyOpenPath(pending *streamingPending) (any, bool
 			copyValue = elements
 		} else {
 			members := make(map[string]any, len(frame.object)+1)
-			for key, member := range frame.object {
-				members[key] = member
-			}
+			maps.Copy(members, frame.object)
 			keys := frame.keys
 			if depth == len(p.stack)-1 && pending != nil {
 				keys = setSlotObject(members, keys, pending.slot, pending.value)
@@ -801,13 +798,14 @@ func streamingNumber(token string) bool {
 	if i >= len(token) {
 		return false
 	}
-	if token[i] == '0' {
+	switch {
+	case token[i] == '0':
 		i++
-	} else if token[i] >= '1' && token[i] <= '9' {
+	case token[i] >= '1' && token[i] <= '9':
 		for i < len(token) && token[i] >= '0' && token[i] <= '9' {
 			i++
 		}
-	} else {
+	default:
 		return false
 	}
 	if i < len(token) && token[i] == '.' {

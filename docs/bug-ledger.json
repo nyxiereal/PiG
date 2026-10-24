@@ -34008,6 +34008,35 @@
       "tests": []
     },
     {
+      "id": "BF-f9648c6",
+      "title": "On Windows, stopping a terminal reader whose input is a pipe no longer hangs",
+      "symptom": "On Windows, stopping a terminal reader whose input is a pipe no longer hangs.",
+      "rootCause": "TestInteractiveShutdownLeavesTerminalFileForNextReader timed out after 30m in Windows native-3 (run 40075386948, job 120845797941; twice more on 2026-10-12 and 2026-10-24). The dump has the test goroutine in interactiveTerminalReader.pause waiting for the reader session, and the session in tui.ReadInputChunk -\u003e ReadFile on the pipe the test uses as its terminal.",
+      "rootCauseSource": "commit",
+      "userImpact": "Crash, hang or runaway process",
+      "platform": "Windows",
+      "class": "own",
+      "fixedIn": "Unreleased",
+      "releaseNote": "On Windows, stopping a terminal reader whose input is a pipe no longer hangs. The reader waited on the input handle for input, but a pipe handle reads as ready whether or not input is queued, so a reader over a pipe went into a read that cancellation could not end, and `Stop`, shutdown and an external-editor handoff waited on it for good (seen as a 30 minute `internal/codingagent` test timeout in Windows CI). A pipe is now polled for queued input, so cancelling a reader returns at once and leaves later input to the next reader. A console, which `pig` itself reads, is waited on as before.",
+      "origin": "release note",
+      "commits": [
+        {
+          "hash": "f9648c6fd5",
+          "date": "2026-10-24"
+        }
+      ],
+      "tests": [
+        "internal/codingagent/keystroke_hop_test.go::TestKeystrokeReachesTheOwnerInOneHandOff",
+        "internal/codingagent/shutdown_input_owner_test.go::TestInteractiveShutdownLeavesTerminalFileForNextReader",
+        "tui/terminal_native_windows_test.go::TestWindowsInputWaiterTimesOutSignalsAndCancels",
+        "tui/terminal_pipe_windows_test.go::TestReadInputStreamDeliversAPipeToItsEnd",
+        "tui/terminal_pipe_windows_test.go::TestReadInputStreamLeavesAPipeForTheNextReader",
+        "tui/terminal_pipe_windows_test.go::TestWindowsInputWaiterCancelsAWaitOnAnEmptyPipe",
+        "tui/terminal_pipe_windows_test.go::TestWindowsInputWaiterIdlePipeWaitStaysIdle",
+        "tui/terminal_pipe_windows_test.go::TestWindowsInputWaiterWaitsOnAPipeForInput"
+      ]
+    },
+    {
       "id": "BF-f98d129",
       "title": "Clearing the queued messages (RPC `clear_queue`, the SDK, the interactive restore-to-editor key) no longer…",
       "symptom": "Clearing the queued messages (RPC `clear_queue`, the SDK, the interactive restore-to-editor key) no longer destroys custom messages that an extension queued with `sendMessage({ deliverAs })`.",

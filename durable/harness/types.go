@@ -232,7 +232,7 @@ type HarnessInspection struct {
 	Submissions []durable.SubmissionRecord
 }
 
-// ConversationWatch is a serialized exact-frame watch of the structural view.
+// ConversationWatch is a serialized watch of the structural view.
 type ConversationWatch = durable.WatchHandle[ConversationView]
 
 // Conversation is a stateless handle for one conversation, bound to the Harness that returned it. Compare handles by Id.
@@ -261,7 +261,7 @@ type Conversation interface {
 	Abort(ctx context.Context, options *durable.ConversationAbortOptions) error
 	// WaitForIdle returns when the ordinary ownership scope has no live non-background task.
 	WaitForIdle(ctx context.Context) error
-	// Watch returns the structural view (spec §9.3) as a serialized exact-frame watch with bounded pending frames.
+	// Watch returns the structural view (spec §9.3) as a serialized watch; commits made while its listener runs arrive folded.
 	Watch(ctx context.Context) (ConversationWatch, error)
 }
 
@@ -301,7 +301,7 @@ type Harness interface {
 	// Usage is the Session total: every conversation's pi.usage summed.
 	Usage(ctx context.Context) (UsageState, error)
 	// WatchTaskGraph returns every live task with its owner edge, status, and owned conversations (spec §9.5), as a
-	// serialized exact-frame watch with bounded pending frames.
+	// serialized watch; commits made while its listener runs arrive folded.
 	WatchTaskGraph(ctx context.Context) (TaskGraphWatch, error)
 }
 

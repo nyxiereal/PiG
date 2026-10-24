@@ -83,12 +83,13 @@ func quiet(t *testing.T, frames chan frame) {
 
 func isRoot(op durable.Op) bool { return len(op) > 0 && op[0] == "r" }
 
-func isRootReplacement(f frame, value int) bool {
-	return len(f.ops) == 1 && f.value == value && isRoot(f.ops[0])
+// isValueSet reports whether f is one set of the value field to value.
+func isValueSet(f frame, value int) bool {
+	return len(f.ops) == 1 && f.value == value && reflect.DeepEqual(f.ops[0], durable.Op{"s", []any{"value"}, float64(value)})
 }
 
-// session-watches.test.ts:142 "collapses 101 pending commits to one root replacement".
-func TestCoreWatchCollapsesPendingCommitsToOneRootReplacement(t *testing.T) {
+// session-watches.test.ts "folds 101 pending commits of one field into one set".
+func TestCoreWatchFoldsPendingCommitsOfOneFieldIntoOneSet(t *testing.T) {
 	r := openCoreDB(t)
 	w := r.watchState(t)
 	for v := 1; v <= 101; v++ {
@@ -96,15 +97,15 @@ func TestCoreWatchCollapsesPendingCommitsToOneRootReplacement(t *testing.T) {
 	}
 	frames := collect(w, nil)
 	f := next(t, frames)
-	if !isRootReplacement(f, 101) {
-		t.Fatalf("delivery = %+v, want one root replacement to 101", f)
+	if !isValueSet(f, 101) {
+		t.Fatalf("delivery = %+v, want one set of value to 101", f)
 	}
 	quiet(t, frames)
 	_, _ = w.Stop()
 }
 
-// session-watches.test.ts:159 "never folds the in-flight frame into an overflow reset".
-func TestCoreWatchNeverFoldsTheInFlightFrameIntoAnOverflowReset(t *testing.T) {
+// session-watches.test.ts "never folds the in-flight frame into the next call".
+func TestCoreWatchNeverFoldsTheInFlightFrameIntoTheNextCall(t *testing.T) {
 	r := openCoreDB(t)
 	w := r.watchState(t)
 	release := make(chan struct{})
@@ -119,15 +120,15 @@ func TestCoreWatchNeverFoldsTheInFlightFrameIntoAnOverflowReset(t *testing.T) {
 	}
 	close(release)
 	second := next(t, frames)
-	if !isRootReplacement(second, 102) {
-		t.Fatalf("second = %+v, want one root replacement to 102", second)
+	if !isValueSet(second, 102) {
+		t.Fatalf("second = %+v, want one set of value to 102", second)
 	}
 	quiet(t, frames)
 	_, _ = w.Stop()
 }
 
-// session-watches.test.ts:189 "folds retirement into an overflow reset and then closes".
-func TestCoreWatchFoldsRetirementIntoAnOverflowResetThenCloses(t *testing.T) {
+// session-watches.test.ts "folds retirement over pending commits and then closes".
+func TestCoreWatchFoldsRetirementOverPendingCommitsThenCloses(t *testing.T) {
 	r := openCoreDB(t)
 	w := r.watchState(t)
 	for v := 1; v <= 100; v++ {

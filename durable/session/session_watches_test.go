@@ -3,6 +3,7 @@ package session_test
 import (
 	"context"
 	"errors"
+	"fmt"
 	"sync"
 	"testing"
 
@@ -15,6 +16,10 @@ import (
 
 var watchStateDoc = defineDoc("watch.state", 1, sessionScope, func() obj {
 	return delta.JsonObjectOf("value", 0, "items", []any{"a", "b"}, "retained", delta.JsonObjectOf("label", "stable"))
+})
+
+var watchKeysDoc = defineDoc("watch.keys", 1, sessionScope, func() obj {
+	return delta.JsonObjectOf("keys", delta.JsonObjectOf())
 })
 
 func createWatchHarness(t *testing.T) sessiontest.Harness {
@@ -98,7 +103,7 @@ func TestSessionDocumentWatches(t *testing.T) {
 		}
 	})
 
-	t.Run("keeps the acquisition revision until start and delivers exact committed frames", func(t *testing.T) {
+	t.Run("keeps the acquisition revision until start, then delivers the commits since in one call", func(t *testing.T) {
 		harness := createWatchHarness(t)
 		watch := watchDoc(t, harness, ctx, watchStateDoc)
 		initial := watch.Value()
@@ -132,28 +137,41 @@ func TestSessionDocumentWatches(t *testing.T) {
 		mu.Unlock()
 		flush(harness)
 		deliveries := recorder.all()
-		expectEqual(t, recorder.values(), []any{1, 2})
-		if !same(deliveries[0].value, firstPublished.Value) || !same(deliveries[0].ops, firstPublished.Ops) ||
-			!same(deliveries[1].value, secondPublished.Value) || !same(deliveries[1].ops, secondPublished.Ops) {
-			t.Fatal("deliveries are the exact published frames")
+		// Both commits set value: folded, the second set replaces the first.
+		expectEqual(t, firstPublished.Ops, []any{[]any{"s", []any{"value"}, 1}})
+		expectEqual(t, recorder.values(), []any{2})
+		if len(deliveries) != 1 || !same(deliveries[0].value, secondPublished.Value) {
+			t.Fatal("the delivery is the newest published value")
 		}
+		expectEqual(t, deliveries[0].ops, secondPublished.Ops)
 		expectEqual(t, initial.Value("value"), 0)
+
+		// A listener that keeps up gets each commit's ops as published.
+		setWatchValue(t, harness, 3)
+		flush(harness)
+		thirdPublished := lastPublishedDocument(harness)
+		deliveries = recorder.all()
+		if len(deliveries) != 2 || !same(deliveries[1].value, thirdPublished.Value) || !same(deliveries[1].ops, thirdPublished.Ops) {
+			t.Fatalf("deliveries %v", recorder.values())
+		}
 		_, _ = watch.Stop()
 	})
 
-	t.Run("serializes callbacks and buffers exact frames committed while one is in flight", func(t *testing.T) {
+	t.Run("serializes callbacks and folds the commits made while one is in flight into the next", func(t *testing.T) {
 		harness := createWatchHarness(t)
 		watch := watchDoc(t, harness, ctx, watchStateDoc)
 		entered := make(chan struct{})
 		release := make(chan struct{})
 		var mu sync.Mutex
 		var values []any
+		var batches []any
 		active, maxActive := 0, 0
-		watch.Start(func(_ context.Context, value obj, _ []durable.Op) error {
+		watch.Start(func(_ context.Context, value obj, ops []durable.Op) error {
 			mu.Lock()
 			active++
 			maxActive = max(maxActive, active)
 			values = append(values, value.Value("value"))
+			batches = append(batches, ops)
 			first := len(values) == 1
 			mu.Unlock()
 			if first {
@@ -177,14 +195,11 @@ func TestSessionDocumentWatches(t *testing.T) {
 		flush(harness)
 		mu.Lock()
 		defer mu.Unlock()
-		want := make([]any, 20)
-		for index := range want {
-			want[index] = index + 1
-		}
 		if maxActive != 1 {
 			t.Fatal("callbacks are serialized")
 		}
-		expectEqual(t, values, want)
+		expectEqual(t, values, []any{1, 20})
+		expectEqual(t, batches[1], []durable.Op{{"s", []any{"value"}, 20}})
 		_, _ = watch.Stop()
 	})
 
@@ -208,7 +223,7 @@ func TestSessionDocumentWatches(t *testing.T) {
 		_, _ = watch.Stop()
 	})
 
-	t.Run("collapses 101 pending commits to one root replacement", func(t *testing.T) {
+	t.Run("folds 101 pending commits of one field into one set", func(t *testing.T) {
 		harness := createWatchHarness(t)
 		watch := watchDoc(t, harness, ctx, watchStateDoc)
 		for value := 1; value <= 101; value++ {
@@ -224,11 +239,47 @@ func TestSessionDocumentWatches(t *testing.T) {
 		if len(deliveries) != 1 || num(deliveries[0].value.Value("value")) != 101 {
 			t.Fatalf("deliveries %v", recorder.values())
 		}
-		expectEqual(t, deliveries[0].ops, []any{[]any{"r", watch.Value()}})
+		expectEqual(t, deliveries[0].ops, []durable.Op{{"s", []any{"value"}, 101}})
 		_, _ = watch.Stop()
 	})
 
-	t.Run("never folds the in-flight frame into an overflow reset", func(t *testing.T) {
+	t.Run("replaces the root once more than 10,000 ops are pending after folding", func(t *testing.T) {
+		harness := open()
+		commit(t, harness.Session, func(tx durable.Tx) error {
+			_, err := tx.Doc(watchKeysDoc)
+			return err
+		})
+		watch := watchDoc(t, harness, ctx, watchKeysDoc)
+		// Sets of distinct keys, in commits small enough to stay ops: 4,000 + 4,000 + 2,001 pending ops.
+		for _, span := range [][2]int{{0, 4_000}, {4_000, 8_000}, {8_000, 10_001}} {
+			commit(t, harness.Session, func(tx durable.Tx) error {
+				keys := mustDoc(t, tx, watchKeysDoc).Object("keys")
+				for index := span[0]; index < span[1]; index++ {
+					if err := keys.Set(fmt.Sprintf("k%d", index), index); err != nil {
+						return err
+					}
+				}
+				return nil
+			})
+		}
+		recorder := &watchRecorder{}
+		watch.Start(func(_ context.Context, value obj, ops []durable.Op) error {
+			recorder.record(value, ops)
+			return nil
+		})
+		flush(harness)
+		deliveries := recorder.all()
+		if len(deliveries) != 1 || !same(deliveries[0].value, watch.Value()) {
+			t.Fatalf("deliveries %d", len(deliveries))
+		}
+		expectEqual(t, deliveries[0].ops, []any{[]any{"r", watch.Value()}})
+		if keys, _ := watch.Value().Value("keys").(*delta.JsonObject); keys == nil || keys.Len() != 10_001 {
+			t.Fatal("the newest value holds all 10,001 keys")
+		}
+		_, _ = watch.Stop()
+	})
+
+	t.Run("never folds the in-flight frame into the next call", func(t *testing.T) {
 		harness := createWatchHarness(t)
 		watch := watchDoc(t, harness, ctx, watchStateDoc)
 		entered := make(chan struct{})
@@ -253,11 +304,11 @@ func TestSessionDocumentWatches(t *testing.T) {
 		if len(deliveries) != 2 || num(deliveries[0].value.Value("value")) != 1 || num(deliveries[1].value.Value("value")) != 102 {
 			t.Fatalf("deliveries %v", recorder.values())
 		}
-		expectEqual(t, deliveries[1].ops, []any{[]any{"r", watch.Value()}})
+		expectEqual(t, deliveries[1].ops, []durable.Op{{"s", []any{"value"}, 102}})
 		_, _ = watch.Stop()
 	})
 
-	t.Run("folds retirement into an overflow reset and then closes", func(t *testing.T) {
+	t.Run("folds retirement over pending commits and then closes", func(t *testing.T) {
 		harness := createWatchHarness(t)
 		watch := watchDoc(t, harness, ctx, watchStateDoc)
 		for value := 1; value <= 100; value++ {

@@ -1060,7 +1060,7 @@ func (session *SessionImpl) attachDocument(definition *durable.AnyDocDefinition,
 		closer()
 		unpin()
 	}
-	watch := NewSessionWatch(session, loaded.Tracker.Value(), detach, nil)
+	watch := NewSessionWatch(session, loaded.Tracker.Value(), detach)
 	observed := loaded.ValueVersion
 	recordId := loaded.Record.Id
 	commit, err := session.subscribeCommits(func(ctx context.Context, publication durable.CommitPublication) {

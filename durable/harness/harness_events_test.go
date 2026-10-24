@@ -424,6 +424,44 @@ func TestAgentEvents(t *testing.T) {
 		closeHarness(t, harness)
 	})
 
+	// harness-events.test.ts it("delivers each of 100 pending batches in its own call, in order, unlike state watches")
+	t.Run("delivers each of 100 pending batches in its own call, in order, unlike state watches", func(t *testing.T) {
+		harness, root := openChat(t, storage.NewMemoryStorage(), chatSetup(t))
+		stream := must(WatchEvents(testContext, harness, root.Id()))
+		for index := range 100 {
+			commitValue(t, root, func(tx durable.Tx) (durable.EntryRecord, error) {
+				return tx.AppendEntry(root.Id(), durable.EntryDraft{Kind: "note", Data: delta.JsonObjectOf("index", float64(index))})
+			})
+		}
+		var mu sync.Mutex
+		var batches [][]AgentEvent
+		stream.Start(func(_ context.Context, events []AgentEvent) error {
+			mu.Lock()
+			defer mu.Unlock()
+			batches = append(batches, slices.Clone(events))
+			return nil
+		})
+		drained(harness)
+		mu.Lock()
+		got := slices.Clone(batches)
+		mu.Unlock()
+		if len(got) != 100 {
+			t.Fatalf("%d batches, want 100", len(got))
+		}
+		for index, batch := range got {
+			if len(batch) != 1 {
+				t.Fatalf("batch %d = %v", index, batch)
+			}
+			appended, ok := batch[0].(EntryAppendedEvent)
+			data, _ := appended.Entry.Data.(*delta.JsonObject)
+			if !ok || data == nil || data.Value("index") != float64(index) {
+				t.Fatalf("batch %d = %+v", index, batch[0])
+			}
+		}
+		must(stream.Stop())
+		closeHarness(t, harness)
+	})
+
 	// harness-events.test.ts:253 it("replaces undelivered batches with one snapshot after 100 pending batches")
 	t.Run("replaces undelivered batches with one snapshot after 100 pending batches", func(t *testing.T) {
 		harness, root := openChat(t, storage.NewMemoryStorage(), chatSetup(t))

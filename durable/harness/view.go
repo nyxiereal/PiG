@@ -186,11 +186,11 @@ func NewConversationViews(sessionImpl *session.SessionImpl, storage durable.Stor
 	return views
 }
 
-// Watch returns a serialized exact-frame watch of the view; cancelling ctx stops it.
+// Watch returns a serialized watch of the view; cancelling ctx stops it.
 func (views *ConversationViews) Watch(ctx context.Context, id durable.ConversationId) (ConversationWatch, error) {
 	var watch *chord.Watch[ConversationView]
 	_, _, err := views.Attach(ctx, id, func(value ConversationView, release func(), _ durable.Storage) (*ViewObserver, error) {
-		watch = session.NewSessionWatch(views.session, value, release, nil)
+		watch = session.NewSessionWatch(views.session, value, release)
 		return &ViewObserver{
 			Advance: func(ctx context.Context, value ConversationView, ops []durable.Op) { watch.Advance(ctx, value, ops) },
 			End:     watch.SourceEnded,

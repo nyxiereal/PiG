@@ -72,7 +72,7 @@ type TaskGraph struct {
 	Tasks map[string]TaskGraphNode `json:"tasks"`
 }
 
-// TaskGraphWatch is a serialized exact-frame watch of the task graph.
+// TaskGraphWatch is a serialized watch of the task graph.
 type TaskGraphWatch = durable.WatchHandle[TaskGraph]
 
 // taskGraphObserver is a chord.Watch of the graph.
@@ -144,11 +144,11 @@ func NewTaskGraphView(sessionImpl *session.SessionImpl, storage durable.Storage,
 	return view
 }
 
-// Watch returns a serialized exact-frame watch of the graph; cancelling ctx stops it.
+// Watch returns a serialized watch of the graph; cancelling ctx stops it.
 func (view *TaskGraphView) Watch(ctx context.Context) (TaskGraphWatch, error) {
 	var watch *chord.Watch[TaskGraph]
 	if _, err := view.attach(ctx, func(value TaskGraph, release func()) taskGraphObserver {
-		watch = session.NewSessionWatch(view.session, value, release, nil)
+		watch = session.NewSessionWatch(view.session, value, release)
 		return watch
 	}); err != nil {
 		return nil, err

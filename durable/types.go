@@ -1115,7 +1115,7 @@ const (
 // WatchEnd is the terminal result of one watch.
 type WatchEnd = chord.WatchEnd
 
-// WatchHandle is a serialized exact-frame observation of an immutable value with bounded pending delivery.
+// WatchHandle is a serialized observation of an immutable value: one listener call at a time; changes made meanwhile arrive folded into the next call.
 type WatchHandle[T any] = chord.WatchHandle[T]
 
 // DocumentWatch is a watch of one committed document incarnation. A retirement delivers [["r", null]] with a nil value,

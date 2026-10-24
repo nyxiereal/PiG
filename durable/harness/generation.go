@@ -1080,9 +1080,9 @@ func startToolRound(ctx context.Context, runtime generationRuntime, request gene
 	})
 }
 
-// finishToolRound applies the controls of a round whose tools are terminal and either ends the run at the final
-// boundary (terminate, handoff, or a queued reset) or hands it to the next generation at the postTools boundary (spec
-// §8.5, generation.ts:584-635).
+// finishToolRound applies the controls of a round whose tools are terminal, appends a handoff's reset, and then ends the
+// run at the final boundary (terminate), ends it at a queued reset, or hands it to the next generation at the postTools
+// boundary, in the handoff's new context when there is one (spec §8.5, generation.ts finishToolRound).
 func finishToolRound(ctx context.Context, runtime generationRuntime, assistant durable.EntryId, tools []durable.TaskId) error {
 	conversationId := runtime.ConversationId()
 	controls := make(map[durable.TaskId]*durable.ToolControl, len(tools))
@@ -1166,16 +1166,17 @@ func finishToolRound(ctx context.Context, runtime generationRuntime, assistant d
 		}
 		now := runtime.Now()
 		taskId := runtime.TaskId()
-		if terminate || handoff != nil {
-			if handoff != nil {
-				message := ai.UserMessage{Content: ai.UserText(*handoff), Timestamp: int64(now)}
-				entry, err := durable.TxAppendEntry(tx, durable.ResetEntry, conversationId, durable.TypedEntryDraft[durable.Never]{HeadSelf: true, Model: []ai.Message{message}})
-				if err != nil {
-					return nil, err
-				}
-				head := entry.Id
-				boundary.Head = &head
+		if handoff != nil {
+			// The handoff's reset precedes every queued item, so queued writes and selected steers land in its context.
+			message := ai.UserMessage{Content: ai.UserText(*handoff), Timestamp: int64(now)}
+			entry, err := durable.TxAppendEntry(tx, durable.ResetEntry, conversationId, durable.TypedEntryDraft[durable.Never]{HeadSelf: true, Model: []ai.Message{message}})
+			if err != nil {
+				return nil, err
 			}
+			head := entry.Id
+			boundary.Head = &head
+		}
+		if terminate {
 			placed, err := ApplyBoundary(tx, boundary, BoundaryFinal, now)
 			if err != nil {
 				return nil, err

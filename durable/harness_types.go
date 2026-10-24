@@ -109,7 +109,8 @@ type ToolControl struct {
 	AddTools []string `json:"addTools,omitempty"`
 	// Terminate is Pi's `terminate?: true`: false is absent.
 	Terminate bool `json:"terminate,omitempty"`
-	// Handoff is nil when absent.
+	// Handoff, when set, starts a new context with this text as its user message, as Reset(handoff) writes, and continues the
+	// run there. The last handoff in call order wins. Nil when absent.
 	Handoff *string `json:"handoff,omitempty"`
 }
 

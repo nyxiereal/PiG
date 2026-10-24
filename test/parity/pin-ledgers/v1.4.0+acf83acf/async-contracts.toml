@@ -86,11 +86,10 @@ rationale = "async/Promise source; PORT_MAP marks this file ✅ ported (`ai/goog
 
 [[files]]
 path = "packages/ai/src/api/google-shared.ts"
-disposition = "pending"
-contracts = []
-evidence = []
-rationale = ""
-
+disposition = "translated"
+contracts = ["awaited", "cancellable"]
+evidence = ["test:ai/google_retry_request_test.go#TestRetryGoogleRequestRetriesAHeaderlessSDKErrorWithARetryableStatus", "test:ai/google_retry_request_test.go#TestRetryGoogleRequestDoesNotRetryWhenMaxRetriesIsUnset", "test:ai/google_retry_request_test.go#TestRetryGoogleRequestPassesTheDelayCapOn", "test:ai/google_retry_owner_test.go#TestGoogleRetryGoogleRequestIsTheOnlyRetryLayer", "test:ai/provider_retry_request_upstream_test.go#TestRetryProviderRequestAbortsTheRetryDelay", "test:ai/google_sdk_pipeline_test.go#TestGoogleSDKPipelineMatchesNodeTickOrder"]
+rationale = "The only async code is retryGoogleRequest (google-shared.ts:496-514): an async wrapper that awaits request() inside retryProviderRequest, adds the missing headers property to a status-only SDK error and rethrows it, passing maxRetries, maxRetryDelayMs and the AbortSignal on. Go: RetryGoogleRequest (ai/google.go:1483) calls RetryProviderRequest with the same options (the context is the signal) and hands the caller the original status error back; the call waits for every attempt and backoff sleep (awaited), a cancelled context ends the backoff with Pi's 'Request aborted' (TestRetryProviderRequestAbortsTheRetryDelay, the shared retry core), and the request-resolution microtask depth of the two async wrappers is modelled by googleRetryGoogleRequest (ai/google_sdk_pipeline.go:128) and replayed against Pi's Node tick oracle by TestGoogleSDKPipelineMatchesNodeTickOrder. The retry cases are the ports of packages/ai/test/google-shared-retry.test.ts. Only the SDK request-resolution path is replayed against Pi's Node ticks; the provider's other goroutine hand-offs are not claimed to preserve microtask order, so microtask-ordering is not listed as a contract of this row. Re-reviewed for Pi 7314819f0 and a7b94a03f: they add the synchronous rewriteConstAsEnum to convertTools (ai/google.go rewriteConstAsEnum is a pure function too); no added or removed line contains async, await, Promise or .then, so the reviewed contract is unchanged."
 [[files]]
 path = "packages/ai/src/api/google-vertex.ts"
 disposition = "deferred"
@@ -415,11 +414,10 @@ rationale = "async/Promise source; PORT_MAP marks this file ✅ ported (`ai/mode
 
 [[files]]
 path = "packages/ai/src/providers/faux.ts"
-disposition = "pending"
+disposition = "deferred"
 contracts = []
 evidence = []
-rationale = ""
-
+rationale = "async/Promise source; PORT_MAP marks this file ✅ ported (`ai/faux.go`), but a per-file cross-language ordering/cancellation/error contract has not yet been reviewed for 0.87.1; delivery/unresolved.tsv row 'Review the v0.87.1 denominators'"
 [[files]]
 path = "packages/ai/src/providers/google-vertex.ts"
 disposition = "deferred"
@@ -667,11 +665,10 @@ rationale = "Type declarations only (no exported function, const or class in the
 
 [[files]]
 path = "packages/chord/src/watch.ts"
-disposition = "pending"
-contracts = []
-evidence = []
-rationale = ""
-
+disposition = "translated"
+contracts = ["awaited", "cancellable", "detached-owned", "microtask-ordering"]
+evidence = ["test:chord/watch_upstream_test.go#TestWatchAwaitsEachCallbackAndBuffersFramesAdvancedWhileOneIsInFlight", "test:chord/watch_upstream_test.go#TestWatchNeverInvokesTheListenerInline", "test:chord/watch_upstream_test.go#TestWatchStopsFutureDeliveryWithoutAbortingOrAwaitingAnInFlightCallback", "test:chord/watch_upstream_test.go#TestWatchEndsCancelledWhenItsAcquisitionContextEndsAlsoWhenAlreadyDone", "test:chord/watch_upstream_test.go#TestWatchEndsListenerErrorOnAFailureReportsItAndDeliversNothingMore", "test:chord/watch_upstream_test.go#TestWatchNeverFoldsTheInFlightFrameIntoAnOverflow", "test:chord/watch_upstream_test.go#TestNativeWatchEndsWithEveryReasonOfItsLifecycle", "test:chord/watch_upstream_test.go#TestWatchableWatchHoldsTheCurrentValueThenOneFramePerChangeAndEndsWithItsContext", "test:chord/watch_upstream_test.go#TestNativeWatchableWatchHoldsTheCurrentValueThenOneFramePerNewValueAndEndsWithItsContext"]
+rationale = "WatchLifecycle (the base of Watch and NativeWatch). start installs the sole listener and queues one drain microtask when frames are already pending; advance and retire queue frames and, once started, a drain: #schedule queues at most one microtask, #drain runs one frame at a time, awaits the listener's promise, sets value to the frame's value before the call and hands it a context without the frame's abort signal. A listener that rejects reports the error, ends the watch listener_error (a non-Error wrapped in an Error) and stops delivery; the retirement frame ends it retired once delivered; stop ends it stopped at once without aborting or awaiting the callback in flight, and drops the pending frames and every reference into the source. observeCancellation ends it cancelled when the signal aborts, also when already aborted, and is installed once. Go chord/watch_impl.go keeps the sequence: Start installs the listener, a frame is taken into delivery under the lock in publish order and its listener runs on a delivery goroutine of the DeliveryScheduler (never inline, one at a time, joined by DeliveryScheduler.Wait), a returned error or panic is reported and ends the watch listener_error, Stop closes the watch without joining the running callback, ObserveCancellation uses context.AfterFunc, and the end drops detach, report, replace, listener, scheduler and pending frames. A started watch with no callback in flight takes a committed frame into delivery before Advance returns, as the drain microtask enters the listener before the publishing commit's caller resumes. The tests assert in-order awaited delivery with buffering, the goroutine hop, stop with a callback in flight, the cancelled and listener_error ends and the overflow that never folds the in-flight frame; the NativeWatch end reasons are covered the same way. Pi a2fd25f56 adds the Watchable interface, whose watch(context) returns Promise<WatchHandle<T>>: Go's Watch(ctx) is a blocking call that returns the handle or an error; the lifecycle contract of the file is unchanged. Re-reviewed for Pi 5e106ab1c: NativeWatchable declares watch(context): Promise<NativeWatchHandle<T>> beside Watchable's, with no implementation, so no new async behavior; Go declares Watch(ctx) (NativeWatchHandle[T], error) as it does for Watchable, and the test shows the acquired watch holds the current value, delivers one frame per new value in order and ends with the context's cancellation."
 [[files]]
 path = "packages/chord/src/websocket.ts"
 disposition = "translated"
@@ -1031,11 +1028,10 @@ rationale = "Reviewed streamFn/buildRequestOptions: request presence overrides s
 
 [[files]]
 path = "packages/coding-agent/src/core/session-manager.ts"
-disposition = "pending"
+disposition = "deferred"
 contracts = []
 evidence = []
-rationale = ""
-
+rationale = "async/Promise source; PORT_MAP marks this file ✅ ported (`internal/codingagent/session_manager.go`), but a per-file cross-language ordering/cancellation/error contract has not yet been reviewed for 0.87.1; delivery/unresolved.tsv row 'Review the v0.87.1 denominators'"
 [[files]]
 path = "packages/coding-agent/src/core/settings-manager.ts"
 disposition = "deferred"
@@ -1311,18 +1307,16 @@ rationale = "showPrompt and showManualInput return a Promise settled only by the
 
 [[files]]
 path = "packages/coding-agent/src/modes/interactive/components/model-selector.ts"
-disposition = "pending"
+disposition = "deferred"
 contracts = []
 evidence = []
-rationale = ""
-
+rationale = "async/Promise source; PORT_MAP marks this file ✅ ported (`tui/model_select.go`), but a per-file cross-language ordering/cancellation/error contract has not yet been reviewed for 0.87.1; delivery/unresolved.tsv row 'Review the v0.87.1 denominators'"
 [[files]]
 path = "packages/coding-agent/src/modes/interactive/components/scoped-models-selector.ts"
-disposition = "pending"
+disposition = "deferred"
 contracts = []
 evidence = []
-rationale = ""
-
+rationale = "async/Promise source; PORT_MAP marks this file ✅ ported (`tui/scoped_models_list.go + internal/codingagent/interactive.go`), but a per-file cross-language ordering/cancellation/error contract has not yet been reviewed for 0.87.1; delivery/unresolved.tsv row 'Review the v0.87.1 denominators'"
 [[files]]
 path = "packages/coding-agent/src/modes/interactive/components/session-selector.ts"
 disposition = "deferred"
@@ -1521,11 +1515,10 @@ rationale = "The Session awaits normalization after tool_result hooks and before
 
 [[files]]
 path = "packages/coding-agent/src/utils/tools-manager.ts"
-disposition = "pending"
+disposition = "deferred"
 contracts = []
 evidence = []
-rationale = ""
-
+rationale = "PORT_MAP marks this file 🟡 partial: `internal/codingagent/tools/tools.go + tools_manager.go (asset table, releases/latest redirect version lookup, fetchWithRetry downloads, extraction per D14; tools_manager_test.go, tools_manager_latest_test.go ports the getLatestVersion cases); missing: ensureTool reports through an onStatus ToolStatus callback that interactive mode shows via showManagedToolStatus and grep/find keep silent, where PiG prints to stderr unless silent, and the failure message does not join the error cause chain`; delivery/unresolved.tsv row 'Review the v0.87.1 denominators' Delta at Pi bd3c9b82: adc5fa9f sends the identity User-Agent from getLatestVersion; no added or removed line contains async, await, Promise or .then, so the reviewed contract is unchanged."
 [[files]]
 path = "packages/coding-agent/src/utils/version-check.ts"
 disposition = "designed-out"
@@ -2123,11 +2116,10 @@ rationale = "Input callbacks settle in order before later negotiation effects. T
 
 [[files]]
 path = "packages/tui/src/tui-alt-screen.ts"
-disposition = "pending"
+disposition = "deferred"
 contracts = []
 evidence = []
-rationale = ""
-
+rationale = "async/Promise source; PORT_MAP marks this file ✅ ported (`tui/tui_alt_screen.go`), but a per-file cross-language ordering/cancellation/error contract has not yet been reviewed for 0.87.1; delivery/unresolved.tsv row 'Review the v0.87.1 denominators'"
 [[files]]
 path = "packages/tui/src/tui.ts"
 disposition = "deferred"

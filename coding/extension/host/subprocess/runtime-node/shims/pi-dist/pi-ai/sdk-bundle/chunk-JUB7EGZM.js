@@ -5,7 +5,7 @@ import {
 import {
   createProvider,
   isModelType
-} from "./chunk-SS4XPEIJ.js";
+} from "./chunk-QGCG6AEG.js";
 import {
   __name
 } from "./chunk-SHUYVCID.js";
@@ -25,7 +25,7 @@ var openrouterImagesApi = /* @__PURE__ */ __name(() => ({
 
 // pi-dist/pi-ai/api/typesafe-system-one.lazy.js
 var typesafeSystemOneApi = /* @__PURE__ */ __name(() => ({
-  classify: /* @__PURE__ */ __name(async (model, context, options) => (await import("./chunk-WNYRI5AZ.js")).classify(model, context, options), "classify")
+  classify: /* @__PURE__ */ __name(async (model, context, options) => (await import("./chunk-STMVP73N.js")).classify(model, context, options), "classify")
 }), "typesafeSystemOneApi");
 
 // pi-dist/pi-ai/providers/openrouter.js

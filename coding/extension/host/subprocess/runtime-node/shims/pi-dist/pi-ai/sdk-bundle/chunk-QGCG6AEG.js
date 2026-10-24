@@ -327,6 +327,42 @@ var InMemoryModelsStore = class {
 
 // pi-dist/pi-ai/telemetry.js
 import { createTypedMetrics, createTypedSpanStarter, defineTelemetrySchema, NOOP_TELEMETRY_CONTEXT, NOOP_TELEMETRY_METRICS } from "../../pi-telemetry/index.js";
+
+// pi-dist/pi-ai/utils/text.js
+function contentText(content, separator = "\n") {
+  if (typeof content === "string")
+    return content;
+  return content.filter((block) => block.type === "text").map((block) => block.text).join(separator);
+}
+__name(contentText, "contentText");
+function getSystemMessageText(message) {
+  const parts = [contentText(message.content)];
+  for (const text of Object.values(message.sections ?? {})) {
+    if (text !== null)
+      parts.push(text);
+  }
+  return parts.filter((part) => part.length > 0).join("\n\n");
+}
+__name(getSystemMessageText, "getSystemMessageText");
+function renderSystemMessageUpdate(message) {
+  const parts = [];
+  const text = contentText(message.content);
+  if (text.length > 0)
+    parts.push(text);
+  for (const [name, value] of Object.entries(message.sections ?? {})) {
+    parts.push(value === null ? `Removed system prompt section "${name}".` : `Updated system prompt section "${name}":
+
+${value}`);
+  }
+  return parts.join("\n\n");
+}
+__name(renderSystemMessageUpdate, "renderSystemMessageUpdate");
+function ownedSlice(text, start, end = text.length) {
+  return `${text.slice(start, end)} `.slice(0, -1);
+}
+__name(ownedSlice, "ownedSlice");
+
+// pi-dist/pi-ai/telemetry.js
 var provider = { type: "string", description: "Provider identifier.", required: true };
 var model = { type: "string", description: "Requested model identifier.", required: true };
 var stop = {
@@ -498,7 +534,7 @@ function observeModelRequest(requestedModel, options, poll) {
         if (message.stopReason === "error") {
           span.setStatus({
             status: "error",
-            error: { name: "provider_error", message: message.errorMessage?.slice(0, 500) ?? "" }
+            error: { name: "provider_error", message: ownedSlice(message.errorMessage ?? "", 0, 500) }
           });
         }
         requestDuration.record(performance.now() - started, { ...attributes, stop: message.stopReason }, span);
@@ -701,36 +737,6 @@ function classifierErrorResult(model2, error, aborted = false) {
   };
 }
 __name(classifierErrorResult, "classifierErrorResult");
-
-// pi-dist/pi-ai/utils/text.js
-function contentText(content, separator = "\n") {
-  if (typeof content === "string")
-    return content;
-  return content.filter((block) => block.type === "text").map((block) => block.text).join(separator);
-}
-__name(contentText, "contentText");
-function getSystemMessageText(message) {
-  const parts = [contentText(message.content)];
-  for (const text of Object.values(message.sections ?? {})) {
-    if (text !== null)
-      parts.push(text);
-  }
-  return parts.filter((part) => part.length > 0).join("\n\n");
-}
-__name(getSystemMessageText, "getSystemMessageText");
-function renderSystemMessageUpdate(message) {
-  const parts = [];
-  const text = contentText(message.content);
-  if (text.length > 0)
-    parts.push(text);
-  for (const [name, value] of Object.entries(message.sections ?? {})) {
-    parts.push(value === null ? `Removed system prompt section "${name}".` : `Updated system prompt section "${name}":
-
-${value}`);
-  }
-  return parts.join("\n\n");
-}
-__name(renderSystemMessageUpdate, "renderSystemMessageUpdate");
 
 // pi-dist/pi-ai/utils/transcript.js
 function createInitialSystemMessage(systemPrompt, tools) {
@@ -1598,6 +1604,10 @@ export {
   appendAssistantMessageDiagnostic,
   ModelsError,
   InMemoryModelsStore,
+  contentText,
+  getSystemMessageText,
+  renderSystemMessageUpdate,
+  ownedSlice,
   AI_TELEMETRY_SCHEMA,
   PI_AI_VERSION,
   PI_ATTRIBUTION,
@@ -1610,9 +1620,6 @@ export {
   withClientIdentity,
   getModelType,
   isModelType,
-  contentText,
-  getSystemMessageText,
-  renderSystemMessageUpdate,
   createInitialSystemMessage,
   normalizeContext,
   getInitialSystemMessage,

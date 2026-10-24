@@ -1,7 +1,8 @@
 import {
   calculateCost,
-  getIdentityHeaders
-} from "./chunk-SS4XPEIJ.js";
+  getIdentityHeaders,
+  ownedSlice
+} from "./chunk-QGCG6AEG.js";
 import {
   __name
 } from "./chunk-SHUYVCID.js";
@@ -289,7 +290,7 @@ __name(formatProviderError, "formatProviderError");
 function truncateErrorText(text, maxChars) {
   if (text.length <= maxChars)
     return text;
-  return `${text.slice(0, maxChars)}... [truncated ${text.length - maxChars} chars]`;
+  return `${ownedSlice(text, 0, maxChars)}... [truncated ${text.length - maxChars} chars]`;
 }
 __name(truncateErrorText, "truncateErrorText");
 function safeJsonStringify(value) {

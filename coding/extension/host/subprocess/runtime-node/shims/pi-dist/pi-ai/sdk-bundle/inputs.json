@@ -159,7 +159,7 @@
     },
     {
       "path": "pi-dist/pi-ai/index.js",
-      "sha256": "c667d65655ab3c913f67dc37e2c60094a73ba35371a7ce897c5ff1dbae34c767"
+      "sha256": "6b77a8aabb92daec5c7a3eb45a6d52eb9e94e2031585459afa7cf9c2c7b7ef90"
     },
     {
       "path": "pi-dist/pi-ai/legacy-api-aliases.js",
@@ -439,7 +439,7 @@
     },
     {
       "path": "pi-dist/pi-ai/providers/faux.js",
-      "sha256": "8128fe7916e8ebd5f778d6ad3a1bcb1594a9121fc771ba8bb3f4366503ac517b"
+      "sha256": "f9ec087321994cf3ffe15165a5745dc66caf1b1c29197817b82e6dba32148320"
     },
     {
       "path": "pi-dist/pi-ai/providers/fireworks.js",
@@ -723,7 +723,7 @@
     },
     {
       "path": "pi-dist/pi-ai/telemetry.js",
-      "sha256": "7801d48bd529bd3299575e06a2f39a3db2cba9b8a23127701de2d37d4444a3ac"
+      "sha256": "a87e563c2bcee7157f99e107722a5e4da45b2ec7f0d50954175a24c1e66ed6de"
     },
     {
       "path": "pi-dist/pi-ai/types.js",
@@ -739,7 +739,7 @@
     },
     {
       "path": "pi-dist/pi-ai/utils/error-body.js",
-      "sha256": "3fbe4d7fdaa35ef2a65bd8d84f83317d774ad49db9403b00ef663a09ce1d454b"
+      "sha256": "83fbbb0d910bbc8b39aa200159382a99e2822952b4baf1972674159d96885936"
     },
     {
       "path": "pi-dist/pi-ai/utils/headers.js",
@@ -774,8 +774,12 @@
       "sha256": "b9b2e6914d6f99f921ddc1b680d24430ec608e26b29a9b1ab9683f8a889d4df0"
     },
     {
+      "path": "pi-dist/pi-ai/utils/streaming-json.js",
+      "sha256": "3691cb5d87570a0f3491cb58df90ad6d6e345066d70d4bda89c986b5ec646baf"
+    },
+    {
       "path": "pi-dist/pi-ai/utils/text.js",
-      "sha256": "95037d5b787075ffb951cdeaf3b93aeb89735d10b31b82e19d2921f505ac2b04"
+      "sha256": "f27664e8761b986b64adc7c5aedf98449f68aa6b6b94e9fae43aa05b0a73aa52"
     },
     {
       "path": "pi-dist/pi-ai/utils/transcript.js",

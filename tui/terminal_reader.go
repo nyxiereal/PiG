@@ -75,6 +75,11 @@ func (r *terminalReader) read(ms int) ([]byte, error) {
 	if err := r.ctx.Err(); err != nil {
 		return nil, err
 	}
+	if r.file != nil {
+		if data, isPipe, err := r.waiter.readPipe(r.file, ms); isPipe {
+			return data, err
+		}
+	}
 	if r.file != nil && !terminalInputBuffered(r.file) {
 		ready, err := r.waiter.wait(r.file, ms)
 		if err != nil {

@@ -23,171 +23,116 @@ func filetimeDuration(ft windows.Filetime) time.Duration {
 	return time.Duration(int64(ft.HighDateTime)<<32|int64(ft.LowDateTime)) * 100
 }
 
-// A Windows pipe handle is signalled from the moment the pipe exists, and again after every read, whether or not input is queued. Waiting on the handle therefore reported every pipe ready, and the reader went into a ReadFile that only input or the end of the pipe could return. The waiter blocks on a pipe in a zero-byte read instead.
-func TestWindowsInputWaiterWaitsOnAPipeForInput(t *testing.T) {
+func pipeReader(t testing.TB) (reader *terminalReader, r, w *os.File, cancel context.CancelFunc) {
+	t.Helper()
 	r, w, err := os.Pipe()
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer func() { _ = r.Close(); _ = w.Close() }()
-	ctx, cancel := context.WithCancel(t.Context())
-	defer cancel()
-	waiter, err := newTerminalInputWaiter(ctx, r)
+	ctx, cancel := context.WithCancel(context.Background())
+	reader, err = newTerminalReader(ctx, r)
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer waiter.close()
+	t.Cleanup(func() { cancel(); reader.close(); _ = r.Close(); _ = w.Close() })
+	return reader, r, w, cancel
+}
 
-	if ready, err := waiter.wait(r, 20); err != nil || ready {
-		t.Fatalf("wait on an empty pipe = %v, %v; want a timeout", ready, err)
+// A Windows pipe handle is signalled from the moment the pipe exists, and again after every read, whether or not input is queued. Waiting on the handle therefore reported every pipe ready, and the reader went into a ReadFile that only input or the end of the pipe could return. The reader now makes the read itself the cancellable wait.
+func TestWindowsPipeReadWaitsForInput(t *testing.T) {
+	reader, _, w, _ := pipeReader(t)
+	if data, err := reader.read(20); err != nil || data != nil {
+		t.Fatalf("read on an empty pipe = %q, %v; want a timeout", data, err)
 	}
 	if _, err := w.WriteString("x"); err != nil {
 		t.Fatal(err)
 	}
-	if ready, err := waiter.wait(r, 10_000); err != nil || !ready {
-		t.Fatalf("wait on a pipe with input = %v, %v; want ready", ready, err)
+	if data, err := reader.read(10_000); err != nil || string(data) != "x" {
+		t.Fatalf("read on a pipe with input = %q, %v; want x", data, err)
 	}
-	var one [1]byte
-	if _, err := io.ReadFull(r, one[:]); err != nil {
-		t.Fatal(err)
-	}
-	if ready, err := waiter.wait(r, 20); err != nil || ready {
-		t.Fatalf("wait on a pipe its reader emptied = %v, %v; want a timeout", ready, err)
+	if data, err := reader.read(20); err != nil || data != nil {
+		t.Fatalf("read on a pipe its reader emptied = %q, %v; want a timeout", data, err)
 	}
 	if err := w.Close(); err != nil {
 		t.Fatal(err)
 	}
-	if ready, err := waiter.wait(r, 10_000); err != nil || !ready {
-		t.Fatalf("wait on a pipe whose writer closed = %v, %v; want ready, so the read reports the end of input", ready, err)
-	}
-	if _, err := r.Read(one[:]); !errors.Is(err, io.EOF) {
-		t.Fatalf("read after the writer closed = %v, want io.EOF", err)
+	if data, err := reader.read(10_000); !errors.Is(err, io.EOF) || len(data) != 0 {
+		t.Fatalf("read on a pipe whose writer closed = %q, %v; want the end of input", data, err)
 	}
 }
 
-func TestWindowsInputWaiterCancelsAWaitOnAnEmptyPipe(t *testing.T) {
-	r, w, err := os.Pipe()
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer func() { _ = r.Close(); _ = w.Close() }()
-	ctx, cancel := context.WithCancel(t.Context())
-	defer cancel()
-	waiter, err := newTerminalInputWaiter(ctx, r)
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer waiter.close()
-
-	type result struct {
-		ready bool
-		err   error
-	}
-	started, done := make(chan struct{}), make(chan result, 1)
+func TestWindowsPipeReadCancelsOnAnEmptyPipe(t *testing.T) {
+	reader, _, _, cancel := pipeReader(t)
+	started, done := make(chan struct{}), make(chan error, 1)
 	go func() {
 		close(started)
-		ready, err := waiter.wait(r, -1)
-		done <- result{ready, err}
+		data, err := reader.read(-1)
+		if len(data) != 0 {
+			t.Errorf("cancelled read took %q", data)
+		}
+		done <- err
 	}()
 	<-started
 	cancel()
 	select {
-	case got := <-done:
-		if got.ready || got.err != nil {
-			t.Fatalf("cancelled wait = %v, %v; want neither", got.ready, got.err)
+	case err := <-done:
+		if !errors.Is(err, context.Canceled) {
+			t.Fatalf("cancelled read = %v, want context.Canceled", err)
 		}
 	case <-time.After(10 * time.Second):
-		t.Fatal("cancellation did not end an unbounded wait on an empty pipe")
+		t.Fatal("cancellation did not end an unbounded read on an empty pipe")
 	}
 }
 
-// Input that arrives while the wait is blocked in the pipe wakes it, and the wait takes none of the input.
-func TestWindowsInputWaiterWakesOnPipeInput(t *testing.T) {
-	r, w, err := os.Pipe()
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer func() { _ = r.Close(); _ = w.Close() }()
-	waiter, err := newTerminalInputWaiter(t.Context(), r)
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer waiter.close()
-
+// Input that arrives while the reader is blocked in the pipe is the read's own result.
+func TestWindowsPipeReadWakesOnInput(t *testing.T) {
+	reader, _, w, _ := pipeReader(t)
 	for range 100 {
-		started, done := make(chan struct{}), make(chan bool, 1)
+		started, done := make(chan struct{}), make(chan string, 1)
 		go func() {
 			close(started)
-			ready, err := waiter.wait(r, -1)
+			data, err := reader.read(-1)
 			if err != nil {
-				t.Errorf("wait: %v", err)
+				t.Errorf("read: %v", err)
 			}
-			done <- ready
+			done <- string(data)
 		}()
 		<-started
 		if _, err := w.WriteString("k"); err != nil {
 			t.Fatal(err)
 		}
 		select {
-		case ready := <-done:
-			if !ready {
-				t.Fatal("wait did not report the pipe readable after input arrived")
+		case got := <-done:
+			if got != "k" {
+				t.Fatalf("read = %q, want k", got)
 			}
 		case <-time.After(10 * time.Second):
-			t.Fatal("input did not wake a wait on the pipe")
-		}
-		var one [1]byte
-		if _, err := io.ReadFull(r, one[:]); err != nil || one[0] != 'k' {
-			t.Fatalf("the wait took the input: read %q, %v", one[:], err)
+			t.Fatal("input did not wake a read on the pipe")
 		}
 	}
 }
 
-// A wait that timed out must not leave an abort that ends a later wait on the same pipe.
-func TestWindowsInputWaiterTimeoutDoesNotAbortALaterWait(t *testing.T) {
-	r, w, err := os.Pipe()
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer func() { _ = r.Close(); _ = w.Close() }()
-	waiter, err := newTerminalInputWaiter(t.Context(), r)
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer waiter.close()
-
+// A read that timed out must not leave an abort that ends a later read of the same pipe.
+func TestWindowsPipeReadTimeoutDoesNotAbortALaterRead(t *testing.T) {
+	reader, _, w, _ := pipeReader(t)
 	for i := range 300 {
-		if ready, err := waiter.wait(r, 1); err != nil || ready {
-			t.Fatalf("round %d: wait on an empty pipe = %v, %v; want a timeout", i, ready, err)
+		if data, err := reader.read(1); err != nil || data != nil {
+			t.Fatalf("round %d: read on an empty pipe = %q, %v; want a timeout", i, data, err)
 		}
 		if _, err := w.WriteString("t"); err != nil {
 			t.Fatal(err)
 		}
-		if ready, err := waiter.wait(r, 10_000); err != nil || !ready {
-			t.Fatalf("round %d: wait on a pipe with input = %v, %v; want ready", i, ready, err)
-		}
-		var one [1]byte
-		if _, err := io.ReadFull(r, one[:]); err != nil {
-			t.Fatal(err)
+		if data, err := reader.read(10_000); err != nil || string(data) != "t" {
+			t.Fatalf("round %d: read on a pipe with input = %q, %v; want t", i, data, err)
 		}
 	}
 }
 
-// An idle wait on a pipe blocks in the kernel, so it costs no CPU: a wait that polled without a pause would use a whole core. The wait runs on a locked thread so the thread's CPU time is the wait's alone.
-func TestWindowsInputWaiterIdlePipeWaitStaysIdle(t *testing.T) {
+// An idle read on a pipe blocks in the kernel, so it costs no CPU: a read that polled without a pause would use a whole core. The read runs on a locked thread so the thread's CPU time is the read's alone.
+func TestWindowsPipeReadIdleStaysIdle(t *testing.T) {
 	const idle = 500 * time.Millisecond
-	const budget = 50 * time.Millisecond // the wait costs a few milliseconds at most; a loop without a pause costs the whole 500 ms
-	r, w, err := os.Pipe()
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer func() { _ = r.Close(); _ = w.Close() }()
-	waiter, err := newTerminalInputWaiter(t.Context(), r)
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer waiter.close()
-
+	const budget = 50 * time.Millisecond // the read costs a few milliseconds at most; a loop without a pause costs the whole 500 ms
+	reader, _, _, _ := pipeReader(t)
 	runtime.LockOSThread()
 	defer runtime.UnlockOSThread()
 	cpu := func() time.Duration {
@@ -198,15 +143,51 @@ func TestWindowsInputWaiterIdlePipeWaitStaysIdle(t *testing.T) {
 		return filetimeDuration(kernel) + filetimeDuration(user)
 	}
 	before := cpu()
-	if ready, err := waiter.wait(r, int(idle/time.Millisecond)); err != nil || ready {
-		t.Fatalf("idle wait = %v, %v; want a timeout", ready, err)
+	if data, err := reader.read(int(idle / time.Millisecond)); err != nil || data != nil {
+		t.Fatalf("idle read = %q, %v; want a timeout", data, err)
 	}
 	if used := cpu() - before; used > budget {
-		t.Fatalf("a %v idle wait on a pipe used %v of CPU, want at most %v", idle, used, budget)
+		t.Fatalf("a %v idle read on a pipe used %v of CPU, want at most %v", idle, used, budget)
 	}
 }
 
-// Cancelling a reader that waits on an empty pipe ends it without taking input that arrives afterwards: the next reader of the pipe gets it. The framing deadline ends the reader's first wait, which proves the wait is not parked in a read.
+// A byte that arrives as the reader is cancelled is delivered or left in the pipe, never lost: a cancelled ReadFile takes nothing, and one that completed as the cancel landed returns its byte.
+func TestWindowsPipeReadLosesNoByteAtCancel(t *testing.T) {
+	for i := range 300 {
+		r, w, err := os.Pipe()
+		if err != nil {
+			t.Fatal(err)
+		}
+		ctx, cancel := context.WithCancel(context.Background())
+		var mu sync.Mutex
+		var delivered []byte
+		done := make(chan error, 1)
+		go func() {
+			done <- ReadInputStream(ctx, r, func(data []byte) { mu.Lock(); delivered = append(delivered, data...); mu.Unlock() })
+		}()
+		go cancel()
+		if _, err := w.WriteString("x"); err != nil {
+			t.Fatal(err)
+		}
+		if err := <-done; !errors.Is(err, context.Canceled) {
+			t.Fatalf("round %d: reader ended with %v, want context.Canceled", i, err)
+		}
+		_ = w.Close()
+		rest, err := io.ReadAll(r)
+		if err != nil {
+			t.Fatal(err)
+		}
+		mu.Lock()
+		got := string(delivered) + string(rest)
+		mu.Unlock()
+		if got != "x" {
+			t.Fatalf("round %d: the byte written as the reader was cancelled came out as %q (delivered %q, left in the pipe %q), want exactly x", i, got, delivered, rest)
+		}
+		_ = r.Close()
+	}
+}
+
+// Cancelling a reader that waits on an empty pipe ends it without taking input that arrives afterwards: the next reader of the pipe gets it. The framing deadline ends the reader's first wait, which proves the wait is not parked in a read it cannot leave.
 func TestReadInputStreamLeavesAPipeForTheNextReader(t *testing.T) {
 	r, w, err := os.Pipe()
 	if err != nil {
@@ -270,29 +251,17 @@ func TestReadInputStreamDeliversAPipeToItsEnd(t *testing.T) {
 	}
 }
 
-// A byte that arrives while the reader waits is delivered at once, and the wait costs a few microseconds when the byte is already queued.
-func BenchmarkWindowsInputWaiterPipeQueuedInput(b *testing.B) {
-	r, w, err := os.Pipe()
-	if err != nil {
-		b.Fatal(err)
-	}
-	defer func() { _ = r.Close(); _ = w.Close() }()
-	waiter, err := newTerminalInputWaiter(b.Context(), r)
-	if err != nil {
-		b.Fatal(err)
-	}
-	defer waiter.close()
+// A byte queued before the read is returned by the one ReadFile that waits for it.
+func BenchmarkWindowsPipeReadQueuedInput(b *testing.B) {
+	reader, _, w, _ := pipeReader(b)
 	var one [1]byte
 	b.ReportAllocs()
 	for b.Loop() {
 		if _, err := w.Write(one[:]); err != nil {
 			b.Fatal(err)
 		}
-		if ready, err := waiter.wait(r, -1); err != nil || !ready {
-			b.Fatalf("wait = %v, %v", ready, err)
-		}
-		if _, err := io.ReadFull(r, one[:]); err != nil {
-			b.Fatal(err)
+		if data, err := reader.read(-1); err != nil || len(data) != 1 {
+			b.Fatalf("read = %q, %v", data, err)
 		}
 	}
 }

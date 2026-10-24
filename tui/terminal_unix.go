@@ -103,6 +103,9 @@ func (w *terminalInputWaiter) wait(file *os.File, ms int) (bool, error) {
 	}
 }
 
+// readPipe reports no pipe: a pipe is waited on by wait like any other file, since poll answers for it.
+func (w *terminalInputWaiter) readPipe(*os.File, int) ([]byte, bool, error) { return nil, false, nil }
+
 func (w *terminalInputWaiter) close() {
 	if !w.stopCallback() {
 		<-w.callbackDone

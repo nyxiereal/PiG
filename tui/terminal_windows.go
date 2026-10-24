@@ -37,7 +37,7 @@ func pollReadable(_ uintptr, _ int) (int, error) { return 0, nil }
 type terminalInputWaiter struct {
 	ctx         context.Context
 	cancelEvent windows.Handle
-	// pipe: the input is a pipe, whose handle signals whether or not input is queued, so wait blocks in a zero-byte read instead (waitPipe). Any other input signals its handle when it has input.
+	// pipe: the input is a pipe, whose handle signals whether or not input is queued, so it is read in a cancellable ReadFile instead of waited on (readPipe). Any other input signals its handle when it has input.
 	pipe         bool
 	stopCallback func() bool
 	callbackDone chan struct{}
@@ -72,12 +72,9 @@ func newTerminalInputWaiter(ctx context.Context, file *os.File) (*terminalInputW
 
 // wait waits for either console input or cancellation before issuing ReadFile.
 // Stop therefore cannot leave an old reader blocked inside the read that
-// belongs to the next terminal owner.
+// belongs to the next terminal owner. A pipe is not waited on but read (readPipe).
 func (w *terminalInputWaiter) wait(file *os.File, ms int) (bool, error) {
 	handle := windows.Handle(file.Fd())
-	if w.pipe {
-		return w.waitPipe(handle, ms), nil
-	}
 	timeout := uint32(windows.INFINITE)
 	if ms >= 0 {
 		timeout = uint32(min(int64(ms), int64(windows.INFINITE)-1))
@@ -96,36 +93,42 @@ func (w *terminalInputWaiter) wait(file *os.File, ms int) (bool, error) {
 	return event == windows.WAIT_OBJECT_0, nil
 }
 
-// waitPipe waits for a pipe to have input or to end, for ms milliseconds (without limit when ms is negative) or until the terminal is cancelled, and reports whether the pipe is readable. A pipe handle is signalled from the moment the pipe exists and again after every read, so waiting on it cannot tell an empty pipe from one with input, and a reader sent into ReadFile on an empty pipe could not be stopped. A zero-byte ReadFile instead blocks until the pipe has input or ends and takes no input, and returns at once when input is queued; CancelIoEx ends it (libuv's uv_pipe_zero_readfile_thread_proc and uv__pipe_interrupt_read).
-func (w *terminalInputWaiter) waitPipe(handle windows.Handle, ms int) bool {
-	// A bounded wait looks first, so queued input arms no timer. An unbounded one goes straight to the zero-byte read, which is the one system call that both checks and blocks.
-	if ms >= 0 {
-		if pipeReadable(handle) {
-			return true
-		}
-		if ms == 0 {
-			return false
-		}
+// readPipe reads a pipe in one cancellable system call and reports whether file is a pipe at all; any other input is waited on by wait and read by the caller. A pipe handle is signalled from the moment the pipe exists and again after every read, so waiting on it cannot tell an empty pipe from one with input, and a reader sent into ReadFile on an empty pipe could not be stopped. So the read is the wait: CancelIoEx aborts a ReadFile blocked on an empty pipe with ERROR_OPERATION_ABORTED and no byte taken, and a read that completes as the cancel lands returns its bytes to the caller (libuv's uv_pipe_zero_readfile_thread_proc and uv__pipe_interrupt_read cancel their blocking read the same way). ms bounds the read as the framing deadline does (without limit when negative; zero only takes what is queued); a read that is cancelled or runs out of time returns no data, with the context's error if it was cancelled. A bounded read looks at the pipe first, so queued input arms no timer.
+func (w *terminalInputWaiter) readPipe(file *os.File, ms int) (data []byte, isPipe bool, err error) {
+	if !w.pipe {
+		return nil, false, nil
+	}
+	handle := windows.Handle(file.Fd())
+	queued := ms >= 0 && pipeReadable(handle)
+	if ms == 0 && !queued {
+		return nil, true, nil
 	}
 	w.mu.Lock()
-	if w.ctx.Err() != nil {
+	if err := w.ctx.Err(); err != nil {
 		w.mu.Unlock()
-		return false
+		return nil, true, err
 	}
 	w.waitID++
 	id := w.waitID
 	w.handle, w.blocking = handle, true
 	w.mu.Unlock()
-	if ms > 0 {
+	if ms > 0 && !queued {
 		timer := time.AfterFunc(time.Duration(ms)*time.Millisecond, func() { w.abortPipeWait(id) })
 		defer timer.Stop()
 	}
-	var read uint32
-	err := windows.ReadFile(handle, nil, &read, nil)
+	buf := make([]byte, 256)
+	var n uint32
+	err = windows.ReadFile(handle, buf, &n, nil)
 	w.mu.Lock()
 	w.blocking = false
 	w.mu.Unlock()
-	return !errors.Is(err, windows.ERROR_OPERATION_ABORTED) && w.ctx.Err() == nil
+	switch {
+	case errors.Is(err, windows.ERROR_OPERATION_ABORTED):
+		return nil, true, w.ctx.Err()
+	case errors.Is(err, windows.ERROR_BROKEN_PIPE):
+		return buf[:n], true, io.EOF
+	}
+	return buf[:n], true, err
 }
 
 // abortPipeWait ends the pipe wait numbered id, or the current one when id is zero. CancelIoEx finds nothing while the wait has yet to enter ReadFile, so it repeats until the wait has left, which takes a few turns of the scheduler.

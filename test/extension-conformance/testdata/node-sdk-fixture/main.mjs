@@ -17,6 +17,14 @@ export default function (pi) {
   let schemaRejected = false;
   try { pi.registerTool({ name: "schema-invalid", description: "Must not register", parameters: null, execute: async () => ({ content: [] }) }); }
   catch (error) { schemaRejected = error.message.endsWith('must define an object parameter schema.'); }
+  { const Type = piAi.Type;
+    pi.registerTool({ name: "type-schema-tool", description: "Parameters built with Type", parameters: Type.Object({
+      query: Type.String({ description: "What to look up" }),
+      limit: Type.Optional(Type.Integer({ minimum: 1, maximum: 50 })),
+      mode: Type.Union([Type.Literal("fast"), Type.Literal("deep")]),
+      tags: Type.Optional(Type.Array(Type.String())),
+      filter: Type.Optional(Type.Record(Type.String(), Type.Number())),
+    }, { additionalProperties: false }), execute: async () => ({ content: [{ type: "text", text: "ok" }] }) }); }
   pi.registerCommand("schema-probe", { description: "Report schema rejection", handler: async (_args, ctx) => ctx.ui.notify(`schema-rejected:${schemaRejected}`, "info") });
   for (const [name, type, value] of [["flag-true", "boolean", true], ["flag-false", "boolean", false], ["flag-string", "string", "default"], ["flag-empty", "string", ""], ["flag-unset", "string", undefined]]) {
     pi.registerFlag(name, { type, default: value });

@@ -29,7 +29,7 @@ def _load_golden():
     cases = []
     for path in sorted((VECTORS / "pi-ai").glob("*.json")):
         export = path.stem
-        if export in ("envApiKeyAuth", "createAssistantMessageEventStream"):
+        if export in ("envApiKeyAuth", "createAssistantMessageEventStream", "Type"):  # Type has its own vectors (test_pi_ai_type_vectors.py)
             continue
         for case in _read_vectors("pi-ai", export):
             entry = {"fn": export, "args": [None if _is_undefined(arg) else arg for arg in case["args"]]}

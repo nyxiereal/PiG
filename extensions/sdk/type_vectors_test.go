@@ -3,7 +3,10 @@ package sdk
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"maps"
+	"math"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -57,27 +60,109 @@ func readOrdered(decoder *json.Decoder) (any, error) {
 	return token, nil
 }
 
+// predicateSpec is a {"$fn": name, ...} node of a vector case: the predicate or message function the case names, which every SDK's test builds from the same spec (the generator's
+// predicateFor is the same table). Its calls are appended to log, as "check:tag" and "error:tag", where there is one.
+type predicateSpec struct {
+	name string
+	spec *OrderedObject
+	log  *[]string
+}
+
+func (p predicateSpec) number(key string) float64 { v, _ := p.spec.values[key].(float64); return v }
+func (p predicateSpec) text(key string) string    { v, _ := p.spec.values[key].(string); return v }
+func (p predicateSpec) record(kind string) {
+	if p.log == nil {
+		return
+	}
+	tag := p.text("tag")
+	if tag == "" {
+		tag = p.name
+	}
+	*p.log = append(*p.log, kind+":"+tag)
+}
+
+func (p predicateSpec) check() func(any) (bool, error) {
+	return func(value any) (bool, error) {
+		p.record("check")
+		switch p.name {
+		case "always":
+			return true, nil
+		case "never":
+			return false, nil
+		case "lengthAtLeast":
+			text, _ := value.(string)
+			return float64(len(text)) >= p.number("n"), nil
+		case "equals":
+			return value == p.spec.values["value"], nil
+		case "even":
+			number, _ := value.(float64)
+			return math.Mod(number, 2) == 0, nil
+		case "greaterThan":
+			number, _ := value.(float64)
+			return number > p.number("n"), nil
+		case "throws", "throwsText":
+			return false, errors.New(p.text("message"))
+		}
+		return false, fmt.Errorf("no predicate %s", p.name)
+	}
+}
+
+func (p predicateSpec) message() func(any) (string, error) {
+	return func(value any) (string, error) {
+		p.record("error")
+		switch p.name {
+		case "text":
+			return p.text("text"), nil
+		case "textWithValue":
+			return p.text("prefix") + jsString(value), nil
+		case "errorThrows":
+			return "", errors.New(p.text("message"))
+		}
+		return "", fmt.Errorf("no message function %s", p.name)
+	}
+}
+
+// jsString is String(value) for the numbers and strings the cases use.
+func jsString(value any) string {
+	if text, ok := value.(string); ok {
+		return text
+	}
+	if number, ok := value.(float64); ok {
+		return jsNumberKey(number)
+	}
+	return fmt.Sprint(value)
+}
+
 // typeMembers is Type's members by the names Pi gives them, for the vector calls.
 var typeMembers = map[string]func(args []any) any{
-	"Any":        func(a []any) any { return Type.Any(typeOptions(a, 0)) },
-	"Unknown":    func(a []any) any { return Type.Unknown(typeOptions(a, 0)) },
-	"String":     func(a []any) any { return Type.String(typeOptions(a, 0)) },
-	"Number":     func(a []any) any { return Type.Number(typeOptions(a, 0)) },
-	"Integer":    func(a []any) any { return Type.Integer(typeOptions(a, 0)) },
-	"Boolean":    func(a []any) any { return Type.Boolean(typeOptions(a, 0)) },
-	"Null":       func(a []any) any { return Type.Null(typeOptions(a, 0)) },
-	"Never":      func(a []any) any { return Type.Never(typeOptions(a, 0)) },
-	"Undefined":  func(a []any) any { return Type.Undefined(typeOptions(a, 0)) },
-	"Void":       func(a []any) any { return Type.Void(typeOptions(a, 0)) },
-	"Symbol":     func(a []any) any { return Type.Symbol(typeOptions(a, 0)) },
-	"BigInt":     func(a []any) any { return Type.BigInt(typeOptions(a, 0)) },
-	"Ref":        func(a []any) any { return Type.Ref(a[0].(string), typeOptions(a, 1)) },
-	"Array":      func(a []any) any { return Type.Array(a[0], typeOptions(a, 1)) },
-	"Union":      func(a []any) any { return Type.Union(a[0].([]any), typeOptions(a, 1)) },
-	"Intersect":  func(a []any) any { return Type.Intersect(a[0].([]any), typeOptions(a, 1)) },
-	"Literal":    func(a []any) any { return Type.Literal(a[0], typeOptions(a, 1)) },
-	"Enum":       func(a []any) any { return Type.Enum(a[0], typeOptions(a, 1)) },
-	"Object":     func(a []any) any { return Type.Object(a[0].(*OrderedObject), typeOptions(a, 1)) },
+	"Any":       func(a []any) any { return Type.Any(typeOptions(a, 0)) },
+	"Unknown":   func(a []any) any { return Type.Unknown(typeOptions(a, 0)) },
+	"String":    func(a []any) any { return Type.String(typeOptions(a, 0)) },
+	"Number":    func(a []any) any { return Type.Number(typeOptions(a, 0)) },
+	"Integer":   func(a []any) any { return Type.Integer(typeOptions(a, 0)) },
+	"Boolean":   func(a []any) any { return Type.Boolean(typeOptions(a, 0)) },
+	"Null":      func(a []any) any { return Type.Null(typeOptions(a, 0)) },
+	"Never":     func(a []any) any { return Type.Never(typeOptions(a, 0)) },
+	"Undefined": func(a []any) any { return Type.Undefined(typeOptions(a, 0)) },
+	"Void":      func(a []any) any { return Type.Void(typeOptions(a, 0)) },
+	"Symbol":    func(a []any) any { return Type.Symbol(typeOptions(a, 0)) },
+	"BigInt":    func(a []any) any { return Type.BigInt(typeOptions(a, 0)) },
+	"Ref":       func(a []any) any { return Type.Ref(a[0].(string), typeOptions(a, 1)) },
+	"Array":     func(a []any) any { return Type.Array(a[0], typeOptions(a, 1)) },
+	"Union":     func(a []any) any { return Type.Union(a[0].([]any), typeOptions(a, 1)) },
+	"Intersect": func(a []any) any { return Type.Intersect(a[0].([]any), typeOptions(a, 1)) },
+	"Literal":   func(a []any) any { return Type.Literal(a[0], typeOptions(a, 1)) },
+	"Enum":      func(a []any) any { return Type.Enum(a[0], typeOptions(a, 1)) },
+	"Object":    func(a []any) any { return Type.Object(a[0].(*OrderedObject), typeOptions(a, 1)) },
+	"Refine": func(a []any) any {
+		check, _ := a[1].(predicateSpec)
+		if len(a) > 2 {
+			message, _ := a[2].(predicateSpec)
+			return Type.Refine(a[0], check.check(), message.message())
+		}
+		return Type.Refine(a[0], check.check())
+	},
+	"IsRefine":   func(a []any) any { return Type.IsRefine(a[0]) },
 	"Optional":   func(a []any) any { return Type.Optional(a[0]) },
 	"Readonly":   func(a []any) any { return Type.Readonly(a[0]) },
 	"Immutable":  func(a []any) any { return Type.Immutable(a[0]) },
@@ -123,6 +208,9 @@ func resolveType(node any) (any, error) {
 		}
 		return out, nil
 	case *OrderedObject:
+		if name, isFn := node.values["$fn"].(string); isFn {
+			return predicateSpec{name: name, spec: node}, nil
+		}
 		if name, isCall := node.values["$call"].(string); isCall {
 			rawArgs, _ := node.values["args"].([]any)
 			args, err := resolveType(rawArgs)
@@ -211,8 +299,12 @@ func TestTypeMatchesPi(t *testing.T) {
 			if string(text) != *want.JSON {
 				t.Errorf("%s:\n got  %s\n Pi   %s", c.Name, text, *want.JSON)
 			}
-			if !reflect.DeepEqual(schema.hidden, want.Hidden) {
-				t.Errorf("%s: hidden members %v, Pi %v", c.Name, schema.hidden, want.Hidden)
+			have := maps.Clone(schema.hidden)
+			if list, isList := have["~refine"].([]Refinement); isList {
+				have["~refine"] = map[string]any{"count": float64(len(list))} // functions have no JSON form: the vector records how many there are
+			}
+			if !reflect.DeepEqual(have, want.Hidden) {
+				t.Errorf("%s: hidden members %v, Pi %v", c.Name, have, want.Hidden)
 			}
 			continue
 		}

@@ -61,11 +61,27 @@ func (s *TSchema) Schema() Schema {
 		out[key] = s.object.values[key]
 	}
 	out[schemaOrderKey] = slices.Clone(s.object.keys)
+	if list, ok := s.hidden["~refine"].([]Refinement); ok && len(list) > 0 {
+		out[schemaRefineKey] = list
+	}
+	if _, ok := s.hidden["~kind"].(string); ok && s.items == nil {
+		// The host validates with TypeBox's kinds, as it does for a Node tool; the map carries that form of the schema (see validationSchema).
+		if encoded, err := json.MarshalStringify(validationSchema(s)); err == nil {
+			out[schemaValidationKey] = json.RawMessage(encoded)
+		}
+	}
 	return out
 }
 
 // schemaOrderKey is the member of a [Schema] that lists its root keys in the order they were declared in; see [TSchema.Schema].
 const schemaOrderKey = "~order"
+
+// schemaValidationKey is the member of a [Schema] that carries the validation form of the schema (the JSON with TypeBox's `~kind` on its nodes) as raw JSON; registration sends it as
+// validation_parameters and leaves it out of the parameters.
+const schemaValidationKey = "~validation"
+
+// schemaRefineKey is the member of a [Schema] that carries the refinements of the root node, which a plain map cannot hold as hidden members; see [TSchema.Schema].
+const schemaRefineKey = "~refine"
 
 // schemaRoot is the root of a tool's parameter schema as it goes on the wire: a map, written with the key order [TSchema.Schema] recorded when there is one and in
 // alphabetical order otherwise (a Go map's own).
@@ -77,12 +93,12 @@ func (r schemaRoot) MarshalJSON() ([]byte, error) {
 	declared, _ := r[schemaOrderKey].([]string)
 	object := &OrderedObject{values: map[string]any{}}
 	for _, key := range declared {
-		if value, present := r[key]; present && key != schemaOrderKey {
+		if value, present := r[key]; present && key != schemaOrderKey && key != schemaRefineKey && key != schemaValidationKey {
 			object.set(key, value)
 		}
 	}
 	for _, key := range sortedKeys(r) {
-		if _, written := object.values[key]; !written && key != schemaOrderKey {
+		if _, written := object.values[key]; !written && key != schemaOrderKey && key != schemaRefineKey && key != schemaValidationKey {
 			object.set(key, r[key])
 		}
 	}
@@ -179,12 +195,13 @@ func update(current any, hidden map[string]any, enumerable TypeOptions) *TSchema
 		result = &TSchema{object: object, hidden: map[string]any{}}
 	case []any:
 		// A copy of the array, whose own `length` is a hidden member, as JavaScript's is. TypeBox's Clone of an array is `map`, which drops every non-index member, so a marker
-		// set by one update is gone after the next: Type.Optional, Readonly and Immutable (two updates) leave an array with only its length, and Type.Unsafe (one) keeps `~unsafe`.
+		// set by one update is gone after the next: Type.Optional, Readonly and Immutable (two updates) leave an array with only its length, and Type.Unsafe and Type.Refine (one) keep `~unsafe` and `~refine`.
 		result = &TSchema{object: &OrderedObject{}, hidden: map[string]any{"length": float64(len(current))}, items: slices.Clone(current)}
 		if current == nil {
 			result.items = []any{}
 		}
-		if _, unsafe := hidden["~unsafe"]; !unsafe {
+		_, unsafe := hidden["~unsafe"]
+		if _, refine := hidden["~refine"]; !unsafe && !refine {
 			hidden = nil
 		}
 	default:

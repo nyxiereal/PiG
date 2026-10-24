@@ -2,7 +2,7 @@
 //! guards return, as the JSON text (so key order and number text are compared), the hidden members and the guards' booleans. Every case is run.
 
 use crate::{TSchema, TValue, Type};
-use serde_json::{Map, Value};
+use serde_json::{Map, Value, json};
 
 /// A resolved argument: JSON, or a schema that a `$call` node returned.
 fn resolve(node: &Value) -> Result<TValue, String> {
@@ -52,6 +52,44 @@ fn pairs(value: &TValue) -> Vec<(String, TValue)> {
     }
 }
 
+/// The spec of a `{"$fn": name, ...}` argument, as the member map of its JSON.
+fn spec(value: &TValue) -> Result<Map<String, Value>, String> {
+    match value.to_value() {
+        Value::Object(map) if map.contains_key("$fn") => Ok(map),
+        other => Err(format!("{other} is not a function spec")),
+    }
+}
+
+fn number(spec: &Map<String, Value>, key: &str) -> f64 {
+    spec.get(key).and_then(Value::as_f64).unwrap_or(0.0)
+}
+
+/// The predicate a case names (the generator's `predicateFor` builds the same from the same spec).
+fn check_of(spec: Map<String, Value>) -> impl Fn(&Value) -> Result<bool, String> + Send + Sync + 'static {
+    move |value| {
+        let name = spec["$fn"].as_str().unwrap_or("");
+        match name {
+            "always" => Ok(true),
+            "never" => Ok(false),
+            "lengthAtLeast" => Ok(value.as_str().map_or(0, |text| text.len()) as f64 >= number(&spec, "n")),
+            "equals" => Ok(*value == spec["value"]),
+            "even" => Ok(value.as_f64().is_some_and(|n| n % 2.0 == 0.0)),
+            "greaterThan" => Ok(value.as_f64().is_some_and(|n| n > number(&spec, "n"))),
+            "throws" | "throwsText" => Err(spec["message"].as_str().unwrap_or("").to_string()),
+            other => Err(format!("no predicate {other}")),
+        }
+    }
+}
+
+fn message_of(spec: Map<String, Value>) -> Box<dyn Fn(&Value) -> Result<String, String> + Send + Sync> {
+    Box::new(move |value| match spec["$fn"].as_str().unwrap_or("") {
+        "text" => Ok(spec["text"].as_str().unwrap_or("").to_string()),
+        "textWithValue" => Ok(format!("{}{}", spec["prefix"].as_str().unwrap_or(""), value.as_str().map_or_else(|| value.to_string(), str::to_string))),
+        "errorThrows" => Err(spec["message"].as_str().unwrap_or("").to_string()),
+        other => Err(format!("no message function {other}")),
+    })
+}
+
 fn call(name: &str, a: &[TValue]) -> Result<TValue, String> {
     let opts = |index: usize| options(a, index);
     let first = || a.first().cloned().unwrap_or(TValue::Json(Value::Null));
@@ -75,6 +113,14 @@ fn call(name: &str, a: &[TValue]) -> Result<TValue, String> {
         "Literal" => schema(Type::literal(literal_of(&first())?, opts(1).as_ref())),
         "Enum" => schema(Type::enum_(&first().to_value(), opts(1).as_ref())),
         "Object" => schema(Ok(Type::object(pairs(&first()), opts(1).as_ref()))),
+        "Refine" => {
+            let message = a.get(2).map(spec).transpose()?.map(message_of);
+            schema(Type::refine_value(first(), check_of(spec(&a[1])?), message))
+        }
+        "IsRefine" => match first() {
+            TValue::Schema(schema) => flag(Type::is_refine(&schema)),
+            _ => flag(false),
+        },
         "Optional" => schema(Type::optional_value(first())),
         "Readonly" => schema(Type::readonly_value(first())),
         "Immutable" => schema(Type::immutable_value(first())),
@@ -146,7 +192,11 @@ fn type_matches_pi() {
                     failures.push(format!("{name}:\n got {text}\n Pi  {}", want["json"]));
                 }
                 let hidden: Map<String, Value> = want["hidden"].as_object().cloned().unwrap_or_default();
-                let have: Map<String, Value> = schema.hidden_members().iter().map(|(key, value)| (key.clone(), value.clone())).collect();
+                let mut have: Map<String, Value> = schema.hidden_members().iter().map(|(key, value)| (key.clone(), value.clone())).collect();
+                if !schema.refinements().is_empty() {
+                    // Functions have no JSON form: the vector records how many there are.
+                    have.insert("~refine".into(), json!({"count": schema.refinements().len()}));
+                }
                 if have != hidden {
                     failures.push(format!("{name}: hidden members {have:?}, Pi {hidden:?}"));
                 }

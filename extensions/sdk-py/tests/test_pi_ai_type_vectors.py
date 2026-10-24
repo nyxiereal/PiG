@@ -21,10 +21,38 @@ def _snake(name: str) -> str:
     return re.sub(r"(?<!^)(?=[A-Z])", "_", name).lower()
 
 
+def _predicate(spec: dict):
+    """The predicate or message function a case names (the generator's predicateFor builds the same from the same spec)."""
+    name = spec["$fn"]
+    if name == "always":
+        return lambda value: True
+    if name == "never":
+        return lambda value: False
+    if name == "lengthAtLeast":
+        return lambda value: len(str(value)) >= spec["n"]
+    if name == "equals":
+        return lambda value: value == spec["value"]
+    if name == "even":
+        return lambda value: value % 2 == 0
+    if name == "greaterThan":
+        return lambda value: value > spec["n"]
+    if name in ("throws", "throwsText", "errorThrows"):
+        def raises(value):
+            raise RuntimeError(spec["message"])
+        return raises
+    if name == "text":
+        return lambda value: spec["text"]
+    if name == "textWithValue":
+        return lambda value: spec["prefix"] + str(value)
+    raise AssertionError(f"no predicate {name}")
+
+
 def _resolve(node: Any) -> Any:
     if isinstance(node, list):
         return [_resolve(item) for item in node]
     if isinstance(node, dict):
+        if isinstance(node.get("$fn"), str):
+            return _predicate(node)
         if isinstance(node.get("$call"), str):
             return getattr(Type, _snake(node["$call"]))(*[_resolve(arg) for arg in node["args"]])
         return {key: _resolve(value) for key, value in node.items()}
@@ -49,7 +77,8 @@ def test_type_matches_pi(case):
     if isinstance(got, (TSchema, TSchemaArray)):
         assert isinstance(want, dict) and "json" in want, f"the SDK answers a schema, Pi {want}"
         assert got.to_json() == want["json"]
-        assert got.hidden == want["hidden"]
+        hidden = {key: ({"count": len(value)} if key == "~refine" else value) for key, value in got.hidden.items()}
+        assert hidden == want["hidden"]
     else:
         assert got == want
         assert type(got) is type(want)

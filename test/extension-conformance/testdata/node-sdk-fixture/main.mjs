@@ -25,6 +25,19 @@ export default function (pi) {
       tags: Type.Optional(Type.Array(Type.String())),
       filter: Type.Optional(Type.Record(Type.String(), Type.Number())),
     }, { additionalProperties: false }), execute: async () => ({ content: [{ type: "text", text: "ok" }] }) }); }
+  { // refine-probe (TestConformance_RefinedToolArgumentsAgreeAcrossSDKs): Pi's own Type.Refine; every predicate and message function logs its call.
+    const Type = piAi.Type, log = [];
+    const checked = (tag, check) => (value) => { log.push(`check:${tag}`); return check(value); };
+    const worded = (tag, message) => (value) => { log.push(`error:${tag}`); return message(value); };
+    const equals = (tag, want) => Type.Refine(Type.String(), checked(tag, (v) => v === want), worded(`${tag}m`, () => `not ${want}`));
+    pi.registerTool({ name: "refine-probe", description: "Arguments checked by refinements", parameters: Type.Refine(Type.Object({
+      name: Type.Refine(Type.String(), checked("len", (v) => v.length >= 3), worded("lenmsg", () => "name is too short")),
+      qty: Type.Optional(Type.Refine(Type.Integer(), checked("even", (v) => v % 2 === 0), worded("evenmsg", (v) => `qty must be even, got ${v}`))),
+      pick: Type.Union([equals("u1", "a"), equals("u2", "b")]),
+      boom: Type.Optional(Type.Refine(Type.String(), checked("boom", () => { throw new Error("kaboom"); }))),
+    }), checked("root", () => true), worded("rootmsg", () => "root refused")), execute: async () => ({ content: [{ type: "text", text: "ok" }] }) });
+    pi.registerCommand("refine_log", { description: "Report and clear the refinement call log", handler: async (_args, ctx) => { const calls = log.splice(0); ctx.ui.notify(`refine_log:${JSON.stringify(calls)}:end`, "info"); } });
+  }
   pi.registerCommand("schema-probe", { description: "Report schema rejection", handler: async (_args, ctx) => ctx.ui.notify(`schema-rejected:${schemaRejected}`, "info") });
   for (const [name, type, value] of [["flag-true", "boolean", true], ["flag-false", "boolean", false], ["flag-string", "string", "default"], ["flag-empty", "string", ""], ["flag-unset", "string", undefined]]) {
     pi.registerFlag(name, { type, default: value });

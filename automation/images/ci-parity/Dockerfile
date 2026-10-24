@@ -34,7 +34,7 @@ FROM toolchain-base AS pi-oracle
 # PI_VERSION must equal the pin's package version and PI_COMMIT the pin's commit when the pin is a commit
 # (empty for a release tag); `make pin-sync` writes both and make compliance checks them.
 ARG PI_VERSION=1.4.0
-ARG PI_COMMIT=f321e5bdd26b3624bfb2ab182a334d0a5edb698a
+ARG PI_COMMIT=d0aa218cb16c333c008f6aa3dcd670ac8b68383c
 COPY automation/images/ci-parity/package.json automation/images/ci-parity/package-lock.json /opt/pig/pi/
 RUN test -z "${PI_COMMIT}" || { echo "this image installs the published Pi ${PI_VERSION}; it cannot be the build of Pi commit ${PI_COMMIT} yet (a commit pin needs the oracle built from source, automation/pin/oracle.py)" >&2; exit 1; } \
   && npm ci --prefix /opt/pig/pi --omit=dev --ignore-scripts --no-audit --no-fund \

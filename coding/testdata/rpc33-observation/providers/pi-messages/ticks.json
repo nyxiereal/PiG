@@ -1,5 +1,5 @@
 {
-  "piVersion": "1.4.0+f321e5bd",
+  "piVersion": "1.4.0+d0aa218c",
   "node": "v24.19.0",
   "scenarios": [
     {
@@ -115,7 +115,7 @@
         },
         "stopReason": "toolUse",
         "responseId": "r1",
-        "durationMs": 29
+        "durationMs": 27
       }
     },
     {
@@ -1013,7 +1013,7 @@
         },
         "stopReason": "toolUse",
         "responseId": "r1",
-        "durationMs": 1
+        "durationMs": 0
       }
     },
     {
@@ -1129,7 +1129,7 @@
         },
         "stopReason": "toolUse",
         "responseId": "r1",
-        "durationMs": 1
+        "durationMs": 0
       }
     },
     {
@@ -1622,7 +1622,7 @@
         },
         "stopReason": "error",
         "errorMessage": "p stream ended without a terminal event",
-        "durationMs": 1
+        "durationMs": 0
       }
     },
     {
@@ -2234,7 +2234,7 @@
         },
         "stopReason": "error",
         "errorMessage": "body failed",
-        "durationMs": 1
+        "durationMs": 0
       }
     },
     {

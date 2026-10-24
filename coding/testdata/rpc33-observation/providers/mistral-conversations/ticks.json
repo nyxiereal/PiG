@@ -1,5 +1,5 @@
 {
-  "piVersion": "1.4.0+f321e5bd",
+  "piVersion": "1.4.0+d0aa218c",
   "node": "v24.19.0",
   "scenarios": [
     {
@@ -191,7 +191,7 @@
         "stopReason": "toolUse",
         "responseId": "r1",
         "rawStopReason": "tool_calls",
-        "durationMs": 33
+        "durationMs": 31
       }
     },
     {
@@ -2068,7 +2068,7 @@
         "stopReason": "toolUse",
         "responseId": "r1",
         "rawStopReason": "tool_calls",
-        "durationMs": 1
+        "durationMs": 0
       }
     },
     {
@@ -4605,7 +4605,7 @@
         "stopReason": "error",
         "responseId": "r1",
         "errorMessage": "body failed",
-        "durationMs": 1
+        "durationMs": 0
       }
     },
     {

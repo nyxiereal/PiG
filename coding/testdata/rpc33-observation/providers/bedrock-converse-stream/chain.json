@@ -1,5 +1,5 @@
 {
- "piVersion": "1.4.0+f321e5bd",
+ "piVersion": "1.4.0+d0aa218c",
  "awsSdkClientBedrockRuntime": "3.1127.0",
  "smithyCore": "3.36.2",
  "node": "v24.19.0",

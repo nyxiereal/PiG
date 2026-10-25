@@ -36,7 +36,7 @@ func TestEveryJobThatRunsNativeTestsInstallsThePackagesThroughTheSharedScript(t 
 				if strings.Contains(step.Run, shared) {
 					users[name+" "+jobName]++
 				}
-				for _, line := range strings.Split(step.Run, "\n") {
+				for line := range strings.SplitSeq(step.Run, "\n") {
 					if strings.Contains(line, "install-apt-packages.sh") && (strings.Contains(line, "xclip") || strings.Contains(line, "xvfb") || strings.Contains(line, "libxcb")) {
 						t.Errorf("%s job %s installs the native test packages itself (%q); call %s", name, jobName, strings.TrimSpace(line), shared)
 					}

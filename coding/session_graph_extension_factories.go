@@ -30,11 +30,6 @@ func (f graphExtensionFactory) factory(scope subprocess.SessionGraphScope, agent
 	return nil, fmt.Errorf("the host serves no compiled-in extension named %q", f.Builtin)
 }
 
-// strippedFactory is the answer of a build that compiled the named built-in out (the pig_strip_<name> tags).
-func (f graphExtensionFactory) strippedFactory() (extension.InlineExtension, error) {
-	return nil, fmt.Errorf("the compiled-in extension %q is not in this build", f.Builtin)
-}
-
 func (f graphExtensionFactory) hasOptions() bool {
 	return len(f.Options) != 0 && string(f.Options) != "null"
 }

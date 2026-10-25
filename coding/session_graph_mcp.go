@@ -56,6 +56,9 @@ func (f graphMcpFunctions) apply(scope subprocess.SessionGraphScope, options *mc
 }
 
 func mustMarshalArgs(args ...any) json.RawMessage {
+	if args == nil {
+		args = []any{}
+	}
 	//portlint:allow mapkeyorder the arguments are wire structs and strings the callers above build; members have a fixed order
 	data, err := json.Marshal(args)
 	if err != nil {
@@ -396,6 +399,7 @@ func (c *graphMcpCredentials) ForServer(name, serverURL string) (mcpext.McpOAuth
 	}
 	store := &graphMcpServerStore{credentials: c, id: made.Store}
 	runtime.AddCleanup(store, func(release graphMcpStoreRelease) {
+		//portlint:allow golifetime the release of a collected store is one call that ends with the connection
 		go func() {
 			//portlint:allow ctxbackground the release of a collected store has no caller
 			_, _ = release.credentials.call(context.Background(), "release", release.id)
@@ -484,7 +488,7 @@ func (s *graphMcpServerStore) WithRefreshLock(ctx context.Context, fn func(ctx c
 	if fnErr != nil {
 		failure = fnErr.Error()
 	}
-	//portlint:allow ctxbackground the lock is released whatever became of ctx: the extension's function waits for it
+	//portlint:allow ctxmapping the lock is released whatever became of ctx: the extension's function waits for it
 	_, err = s.credentials.call(context.Background(), "unlock", s.id, held.Lock, failure, fnErr != nil)
 	if fnErr != nil {
 		return fnErr

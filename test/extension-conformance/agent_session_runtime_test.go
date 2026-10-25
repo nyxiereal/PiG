@@ -26,12 +26,12 @@ func TestSessionGraphAgentSessionRuntimeAcrossSDKs(t *testing.T) {
 	agentDir := t.TempDir()
 	t.Setenv("PIG_CODING_AGENT_DIR", agentDir)
 	t.Setenv("PIG_USE_PI_DIRS", "")
-	newRig := func(t *testing.T) *sessionGraphRig {
+	newRig := func(t testing.TB) *sessionGraphRig {
 		r := newSessionGraphRigWithChildren(t)
 		r.host.SetHostInfo(subprocess.HostInfo{AgentDir: agentDir, ConfigDirName: ".pig", Version: coding.UpstreamPackageVersion})
 		return r
 	}
-	eachSessionGraphSDKWith(t, newRig, func(t *testing.T, r *sessionGraphRig, _ string) {
+	eachSessionGraphCellWith(t, newRig, true, func(t *testing.T, r *sessionGraphRig, _ string) {
 		report, root := r.script("agent_session_runtime")
 		got := normalizeSessionGraph(t, report, root)
 		if path := os.Getenv("SESSION_GRAPH_PRINT"); path != "" {

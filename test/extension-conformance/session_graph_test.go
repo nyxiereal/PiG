@@ -4,6 +4,7 @@ import (
 	_ "embed"
 	"encoding/json"
 	"fmt"
+	"maps"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -40,12 +41,12 @@ var sessionGraphPython string
 var sessionGraphSessionManagerWant string
 
 type sessionGraphRig struct {
-	t    *testing.T
+	t    testing.TB
 	host *subprocess.Host
 	ext  extension.Extension
 }
 
-func newSessionGraphRig(t *testing.T) *sessionGraphRig {
+func newSessionGraphRig(t testing.TB) *sessionGraphRig {
 	t.Helper()
 	r := &sessionGraphRig{t: t, host: subprocess.NewHostWithConfigRoot(t.TempDir(), t.TempDir())}
 	t.Cleanup(func() { r.host.Shutdown("test complete") })
@@ -54,7 +55,7 @@ func newSessionGraphRig(t *testing.T) *sessionGraphRig {
 }
 
 // newSessionGraphRigWithChildren is the rig of a script that creates child agent sessions: the host also serves createAgentSession over the model runtime of its own services.
-func newSessionGraphRigWithChildren(t *testing.T) *sessionGraphRig {
+func newSessionGraphRigWithChildren(t testing.TB) *sessionGraphRig {
 	t.Helper()
 	r := newSessionGraphRig(t)
 	services, err := coding.CreateAgentSessionServices(coding.CreateAgentSessionServicesOptions{CWD: t.TempDir(), AgentDir: t.TempDir()})
@@ -80,6 +81,12 @@ func (r *sessionGraphRig) finish(ext extension.Extension) {
 // script runs the fixture's tool in a directory tree this call owns and returns its report.
 func (r *sessionGraphRig) script(tool string) (map[string]any, string) {
 	r.t.Helper()
+	return r.scriptWith(tool, nil)
+}
+
+// scriptWith is script with the extra arguments added to the script's own.
+func (r *sessionGraphRig) scriptWith(tool string, extra map[string]any) (map[string]any, string) {
+	r.t.Helper()
 	root := r.t.TempDir()
 	// The real path: the host resolves symlinks of its working directories on some systems, and the report names them.
 	root, err := filepath.EvalSymlinks(root)
@@ -94,6 +101,7 @@ func (r *sessionGraphRig) script(tool string) (map[string]any, string) {
 		"probeExt": filepath.Join(root, "probe", "probe.mjs"), "runnerProbeA": filepath.Join(root, "probe", "runner-a.mjs"), "runnerProbeB": filepath.Join(root, "probe", "runner-b.mjs"), "servicesProbe": filepath.Join(root, "probe", "services.mjs"), "runtimeProbe": filepath.Join(root, "probe", "runtime.mjs"), "refsProbe": filepath.Join(root, "probe", "refs.mjs"), "servicesAgentDir": filepath.Join(root, "agent-services"),
 		"agentDir": filepath.Join(root, "agent"), "configDir": configDir, "root": root, "pmCwd": filepath.Join(root, "pm-project"), "pmAgentDir": filepath.Join(root, "pm-agent"), "loaderAgentDir": filepath.Join(root, "agent-loader"), "brokenCwd": filepath.Join(root, "broken"),
 	}
+	maps.Copy(args, extra)
 	files := map[string]string{
 		filepath.Join(root, "mr", "auth.json"):                                   `{"stored-prov":{"type":"api_key","key":"sk-stored"}}`,
 		filepath.Join(root, "mr", "models.json"):                                 `{"providers":{"mr-local":{"baseUrl":"` + modelServer + `","api":"openai-completions","apiKey":"mr-key","models":[{"id":"m1","name":"M One","reasoning":false,"input":["text"],"cost":{"input":1,"output":2,"cacheRead":0,"cacheWrite":0},"contextWindow":8000,"maxTokens":1000}]}}}`,
@@ -161,18 +169,18 @@ func (r *sessionGraphRig) script(tool string) (map[string]any, string) {
 	return report, root
 }
 
-type sessionGraphLoader func(t *testing.T, r *sessionGraphRig)
+type sessionGraphLoader func(t testing.TB, r *sessionGraphRig)
 
 func sessionGraphSDKs() map[string]sessionGraphLoader {
 	return map[string]sessionGraphLoader{
-		"go-fused": func(t *testing.T, r *sessionGraphRig) {
+		"go-fused": func(t testing.TB, r *sessionGraphRig) {
 			ext, err := r.host.LoadInProcess(t.Context(), subprocess.ExtConfig{Name: sessiongraph.Name, Path: "/ext/" + sessiongraph.Name + ".go", Enabled: true}, sessiongraph.Extension().RunWithConn)
 			if err != nil {
 				t.Fatal(err)
 			}
 			r.finish(*ext)
 		},
-		"go-strict": func(t *testing.T, r *sessionGraphRig) {
+		"go-strict": func(t testing.TB, r *sessionGraphRig) {
 			root := findModuleRoot(t)
 			cfg := subprocess.ExtConfig{
 				Name: sessiongraph.Name, Source: filepath.Join(root, "test/extension-conformance/testdata/session-graph-go"), Enabled: true, Isolation: "strict",
@@ -181,7 +189,7 @@ func sessionGraphSDKs() map[string]sessionGraphLoader {
 			}
 			r.load(t, cfg)
 		},
-		"rust": func(t *testing.T, r *sessionGraphRig) {
+		"rust": func(t testing.TB, r *sessionGraphRig) {
 			source, err := filepath.Abs("testdata/session-graph-rust")
 			if err != nil {
 				t.Fatal(err)
@@ -193,7 +201,7 @@ func sessionGraphSDKs() map[string]sessionGraphLoader {
 			cfg.Isolation = "isolated"
 			r.load(t, cfg)
 		},
-		"python": func(t *testing.T, r *sessionGraphRig) {
+		"python": func(t testing.TB, r *sessionGraphRig) {
 			cfg := packedFlagFactory(t, findModuleRoot(t), "python", sessiongraph.Name, false)
 			cfg.Isolation = "strict"
 			cfg.ContentHash = "python-session-graph-" + fmt.Sprint(len(sessionGraphPython))
@@ -202,7 +210,7 @@ func sessionGraphSDKs() map[string]sessionGraphLoader {
 			}
 			r.load(t, cfg)
 		},
-		"node": func(t *testing.T, r *sessionGraphRig) {
+		"node": func(t testing.TB, r *sessionGraphRig) {
 			source, err := filepath.Abs("testdata/session-graph.mjs")
 			if err != nil {
 				t.Fatal(err)
@@ -217,7 +225,7 @@ func sessionGraphSDKs() map[string]sessionGraphLoader {
 	}
 }
 
-func (r *sessionGraphRig) load(t *testing.T, cfg subprocess.ExtConfig) {
+func (r *sessionGraphRig) load(t testing.TB, cfg subprocess.ExtConfig) {
 	t.Helper()
 	loaded, failures := r.host.LoadAll(t.Context(), []subprocess.ExtConfig{cfg})
 	if len(failures) != 0 || len(loaded) != 1 {
@@ -232,12 +240,23 @@ func eachSessionGraphSDK(t *testing.T, body func(t *testing.T, r *sessionGraphRi
 }
 
 // eachSessionGraphSDKWith runs body for every SDK on the rig newRig builds.
-func eachSessionGraphSDKWith(t *testing.T, newRig func(*testing.T) *sessionGraphRig, body func(t *testing.T, r *sessionGraphRig, sdkName string)) {
+func eachSessionGraphSDKWith(t *testing.T, newRig func(testing.TB) *sessionGraphRig, body func(t *testing.T, r *sessionGraphRig, sdkName string)) {
+	t.Helper()
+	eachSessionGraphCellWith(t, newRig, false, body)
+}
+
+// eachSessionGraphCellWith is eachSessionGraphSDKWith that also runs the packed cells (a shared cell holding a second extension of the SDK's language) when packed is set: a packed cell must report what the isolated cell of the same SDK reports.
+func eachSessionGraphCellWith(t *testing.T, newRig func(testing.TB) *sessionGraphRig, packed bool, body func(t *testing.T, r *sessionGraphRig, sdkName string)) {
 	t.Helper()
 	if testing.Short() {
 		t.Skip("skipping conformance suite in short mode (starts SDK subprocesses)")
 	}
 	loaders := sessionGraphSDKs()
+	if packed {
+		for name, load := range sessionGraphPackedSDKs() {
+			loaders[name] = load
+		}
+	}
 	names := make([]string, 0, len(loaders))
 	for name := range loaders {
 		names = append(names, name)
@@ -453,7 +472,7 @@ func TestSessionGraphDefaultPackageManagerAcrossSDKs(t *testing.T) {
 var sessionGraphDefaultPackageManagerWant string
 
 // sessionGraphModelServer is an OpenAI-compatible chat completions endpoint that answers every request with the stream "hello".
-func sessionGraphModelServer(t *testing.T) string {
+func sessionGraphModelServer(t testing.TB) string {
 	t.Helper()
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
 		w.Header().Set("Content-Type", "text/event-stream")
@@ -534,7 +553,7 @@ func TestSessionGraphAgentSessionServicesAcrossSDKs(t *testing.T) {
 	agentDir := t.TempDir()
 	t.Setenv("PIG_CODING_AGENT_DIR", agentDir)
 	t.Setenv("PIG_USE_PI_DIRS", "")
-	newRig := func(t *testing.T) *sessionGraphRig {
+	newRig := func(t testing.TB) *sessionGraphRig {
 		r := newSessionGraphRigWithChildren(t)
 		r.host.SetHostInfo(subprocess.HostInfo{AgentDir: agentDir, ConfigDirName: ".pig", Version: coding.UpstreamPackageVersion})
 		return r

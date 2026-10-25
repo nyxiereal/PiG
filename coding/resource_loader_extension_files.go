@@ -78,7 +78,10 @@ func (l *DefaultResourceLoader) loadExtensionFiles(ctx context.Context, request 
 	// One runtime serves every extension of a reload: the Host adopts it and the factories register against it (resource-loader.ts passes
 	// preTrustExtensions.runtime on). A pass with no PreTrust starts a new reload.
 	if request.PreTrust == nil || l.factoryRuntime == nil {
-		l.factoryRuntime = extension.CreateExtensionRuntime()
+		l.factoryRuntime = l.options.Runtime
+		if l.factoryRuntime == nil {
+			l.factoryRuntime = extension.CreateExtensionRuntime()
+		}
 	}
 	if l.eventBus == nil {
 		l.eventBus = l.options.EventBus
@@ -183,6 +186,14 @@ func (l *DefaultResourceLoader) loadExtensionFiles(ctx context.Context, request 
 	var replacementWarnings []icodingagent.ExtensionWarning
 	result.Extensions = extensionset.OmitReplaced(append(ordered, inline...), &replacementWarnings)
 	result.Runtime = l.factoryRuntime
+	// loader.ts registerFlag sets a flag's default into the runtime's flagValues as the extension registers it.
+	for _, ext := range result.Extensions {
+		for _, flag := range ext.RegisteredFlags() {
+			if flag.Default != nil {
+				result.Runtime.SetFlagDefault(flag.Name, flag.Default)
+			}
+		}
+	}
 	var existing []icodingagent.ExtensionWarning
 	for _, warning := range result.Warnings {
 		existing = append(existing, icodingagent.ExtensionWarning{Path: warning.Path, Warning: warning.Warning})

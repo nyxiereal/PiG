@@ -30,6 +30,8 @@ type SessionGraphObject interface {
 type SessionGraphScope interface {
 	// Object returns the live object handle names on the connection, which an option that takes an object (a loader's settingsManager) names by handle.
 	Object(handle string) (SessionGraphObject, bool)
+	// Retain adds a holder to the live object handle names, and returns the object and the function that ends that hold, which is idempotent; the object is released when its last holder lets go. An object that uses another (an ExtensionRunner over the loader whose extensions it dispatches to) holds it this way for as long as it lives.
+	Retain(handle string) (SessionGraphObject, func(), bool)
 	// Callback runs the function the extension named id (RequestSessionGraphCallback) and answers its result. A closed connection fails it.
 	Callback(ctx context.Context, id string, args json.RawMessage) (json.RawMessage, error)
 }
@@ -105,6 +107,10 @@ type graphScope struct {
 
 func (s graphScope) Object(handle string) (SessionGraphObject, bool) {
 	return s.host.sessionGraphObjects.lookup(s.conn, handle)
+}
+
+func (s graphScope) Retain(handle string) (SessionGraphObject, func(), bool) {
+	return s.host.sessionGraphObjects.retain(s.conn, handle)
 }
 
 func (s graphScope) Callback(ctx context.Context, id string, args json.RawMessage) (json.RawMessage, error) {

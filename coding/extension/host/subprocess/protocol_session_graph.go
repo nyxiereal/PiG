@@ -28,6 +28,9 @@ const (
 	SessionGraphResourceLoader    = "DefaultResourceLoader"
 	SessionGraphPackageManager    = "DefaultPackageManager"
 	SessionGraphProjectTrustStore = "ProjectTrustStore"
+	// SessionGraphExtensionRuntime and SessionGraphExtensionRunner are Pi's createExtensionRuntime() result and ExtensionRunner (core/extensions/loader.ts, runner.ts). The runner runs over the extensions a DefaultResourceLoader of the same connection loaded, which stay in their own subprocesses.
+	SessionGraphExtensionRuntime = "ExtensionRuntime"
+	SessionGraphExtensionRunner  = "ExtensionRunner"
 	// SessionGraphAgentSessionServices names the two host steps of Pi's createAgentSessionServices (agent-session-services.ts): it builds no object, it only has static functions (SessionGraphServicesResolve, SessionGraphServicesApply).
 	SessionGraphAgentSessionServices = "AgentSessionServices"
 )

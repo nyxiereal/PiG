@@ -91,7 +91,7 @@ func (r *sessionGraphRig) script(tool string) (map[string]any, string) {
 	args := map[string]any{
 		"mrAuth": filepath.Join(root, "mr", "auth.json"), "mrModels": filepath.Join(root, "mr", "models.json"), "mrStore": filepath.Join(root, "mr", "models-store.json"), "mrServer": modelServer,
 		"cwd": filepath.Join(root, "project"), "dir": filepath.Join(root, "sessions"), "otherDir": filepath.Join(root, "other"), "junk": filepath.Join(root, "junk.jsonl"),
-		"probeExt": filepath.Join(root, "probe", "probe.mjs"), "servicesProbe": filepath.Join(root, "probe", "services.mjs"), "refsProbe": filepath.Join(root, "probe", "refs.mjs"), "servicesAgentDir": filepath.Join(root, "agent-services"),
+		"probeExt": filepath.Join(root, "probe", "probe.mjs"), "runnerProbeA": filepath.Join(root, "probe", "runner-a.mjs"), "runnerProbeB": filepath.Join(root, "probe", "runner-b.mjs"), "servicesProbe": filepath.Join(root, "probe", "services.mjs"), "refsProbe": filepath.Join(root, "probe", "refs.mjs"), "servicesAgentDir": filepath.Join(root, "agent-services"),
 		"agentDir": filepath.Join(root, "agent"), "configDir": configDir, "root": root, "pmCwd": filepath.Join(root, "pm-project"), "pmAgentDir": filepath.Join(root, "pm-agent"), "loaderAgentDir": filepath.Join(root, "agent-loader"), "brokenCwd": filepath.Join(root, "broken"),
 	}
 	files := map[string]string{
@@ -115,6 +115,8 @@ func (r *sessionGraphRig) script(tool string) (map[string]any, string) {
 		filepath.Join(root, "probe", "probe.mjs"):                                childHandlesProbe,
 		filepath.Join(root, "probe", "services.mjs"):                             servicesProbe,
 		filepath.Join(root, "probe", "refs.mjs"):                                 extensionRefsProbe,
+		filepath.Join(root, "probe", "runner-a.mjs"):                             extensionRunnerProbeA,
+		filepath.Join(root, "probe", "runner-b.mjs"):                             extensionRunnerProbeB,
 		filepath.Join(root, "agent-services", "auth.json"):                       `{"svc-local":{"type":"api_key","key":"svc-key"}}`,
 		filepath.Join(root, "agent-services", "models.json"):                     `{"providers":{"svc-local":{"baseUrl":"` + modelServer + `","api":"openai-completions","apiKey":"svc-key","models":[{"id":"s1","name":"S One","reasoning":false,"input":["text"],"cost":{"input":0,"output":0,"cacheRead":0,"cacheWrite":0},"contextWindow":4000,"maxTokens":500}]}}}`,
 		filepath.Join(root, "agent-services", "settings.json"):                   `{"defaultProvider":"svc-local","defaultModel":"s1"}`,

@@ -7,6 +7,8 @@ use std::path::Path;
 use std::sync::{Arc, Mutex};
 use std::time::{SystemTime, UNIX_EPOCH};
 
+mod extension_runner;
+
 fn text(value: &Value) -> &str {
     value.as_str().unwrap_or_default()
 }
@@ -1141,6 +1143,10 @@ pub fn new_extension() -> Extension {
         Err(error) => ToolResult::Error(error),
     });
     ext.tool("extension_refs", "Runs the compiled-in extension factories script.", empty_schema(), |ctx, args| match extension_refs_script(ctx, &args) {
+        Ok(report) => ToolResult::text(report.to_string()),
+        Err(error) => ToolResult::Error(error.to_string()),
+    });
+    ext.tool("extension_runner", "Runs the createExtensionRuntime and ExtensionRunner script.", empty_schema(), |ctx, args| match extension_runner::extension_runner_script(ctx, &args) {
         Ok(report) => ToolResult::text(report.to_string()),
         Err(error) => ToolResult::Error(error.to_string()),
     });

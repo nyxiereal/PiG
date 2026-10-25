@@ -36,6 +36,8 @@ type graphLoaderOptions struct {
 	Cwd                           string    `json:"cwd"`
 	AgentDir                      string    `json:"agentDir"`
 	SettingsManager               string    `json:"settingsManager"`
+	// Runtime is the handle of an ExtensionRuntime (createExtensionRuntime) the loader loads its extensions against.
+	Runtime                       string    `json:"runtime"`
 	AdditionalExtensionPaths      []string  `json:"additionalExtensionPaths"`
 	AdditionalSkillPaths          []string  `json:"additionalSkillPaths"`
 	AdditionalPromptTemplatePaths []string  `json:"additionalPromptTemplatePaths"`
@@ -152,6 +154,14 @@ func newGraphResourceLoader(scope subprocess.SessionGraphScope, op string, raw j
 			}
 			return base
 		}
+	}
+	if options.Runtime != "" {
+		object, ok := scope.Object(options.Runtime)
+		runtime, isRuntime := object.(*GraphExtensionRuntime)
+		if !ok || !isRuntime {
+			return nil, errors.New(subprocess.SessionGraphUnknownMessage)
+		}
+		loaderOptions.Runtime = runtime.runtime
 	}
 	for _, entry := range options.ExtensionFactories {
 		factory, err := entry.factory(loaderOptions.AgentDir)

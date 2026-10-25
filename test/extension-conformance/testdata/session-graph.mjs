@@ -1,6 +1,7 @@
 // The Node fixture of the session graph conformance rows (session_graph_test.go). It runs the script of testfixture/sessiongraph (Go), testdata/session-graph-rust and the inline Python fixture with Pi's own SessionManager, so the report it makes is Pi's.
 import { DefaultPackageManager, DefaultResourceLoader, ModelRuntime, ProjectTrustStore, SessionManager, SettingsManager, createAgentSession, createCodemodeExtension, createMcpExtension, createToolSearchExtension, createAgentSessionFromServices, createAgentSessionServices, getAgentDir, hasTrustRequiringProjectResources } from "@earendil-works/pi-coding-agent";
 import { createAssistantMessageEventStream, createProvider } from "@earendil-works/pi-ai";
+import { extensionRunnerScript } from "./extension-runner.mjs";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 
@@ -893,5 +894,9 @@ export default function (pi) {
   pi.registerTool({
     name: "extension_refs", label: "extension_refs", description: "Runs the compiled-in extension factories script.", parameters: { type: "object" },
     execute: async (_id, params) => ({ content: [{ type: "text", text: JSON.stringify(await extensionRefsScript(params)) }] }),
+  });
+  pi.registerTool({
+    name: "extension_runner", label: "extension_runner", description: "Runs the createExtensionRuntime and ExtensionRunner script.", parameters: { type: "object" },
+    execute: async (_id, params) => ({ content: [{ type: "text", text: JSON.stringify(await extensionRunnerScript(params).catch((e) => { throw new Error(String(e.stack)); })) }] }),
   });
 }

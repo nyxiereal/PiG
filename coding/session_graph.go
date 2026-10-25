@@ -1,4 +1,4 @@
-// pig-specific: serves the classes an extension builds around a Pi session (SessionManager, SettingsManager, DefaultResourceLoader, DefaultPackageManager, ProjectTrustStore, ModelRuntime) to the Go, Python and Rust extension SDKs. The Node runtime serves Pi's own classes.
+// pig-specific: serves the classes an extension builds around a Pi session (SessionManager, SettingsManager, DefaultResourceLoader, DefaultPackageManager, ProjectTrustStore, ModelRuntime, ExtensionRuntime, ExtensionRunner) to the Go, Python and Rust extension SDKs. The Node runtime serves Pi's own classes.
 
 package coding
 
@@ -34,6 +34,10 @@ func (*SessionGraph) New(ctx context.Context, scope subprocess.SessionGraphScope
 		return newGraphPackageManager(scope, op, args)
 	case subprocess.SessionGraphModelRuntime:
 		return newGraphModelRuntime(ctx, scope, op, args)
+	case subprocess.SessionGraphExtensionRuntime:
+		return newGraphExtensionRuntime(scope, op, args)
+	case subprocess.SessionGraphExtensionRunner:
+		return newGraphExtensionRunner(scope, op, args)
 	}
 	return nil, fmt.Errorf("the host does not construct %s", kind)
 }

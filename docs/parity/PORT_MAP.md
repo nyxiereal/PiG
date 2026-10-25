@@ -632,7 +632,7 @@ The tmux scenario harness cannot drive a Windows `.exe`. Windows verification re
 | `packages/codemode/src/index.ts` | `(Go has no barrel exports: the exports are the codemode package)` | n/a |
 | `packages/codemode/src/portable.ts` | `(Go has no barrel exports: the exports are the codemode package)` | n/a |
 | `packages/codemode/src/runtime/execution.ts` | `codemode/execution.go (Execution, the host's deadline and result handling); codemode/vmlauncher.go (VmLauncher, VmChannel, VmEvents); codemode/sandbox.go (CodemodeSandboxBase); codemode/run.go (CodemodeSandboxBase.start); codemode/remote.go (RemoteCodemodeSandbox.close)` | ✅ |
-| `packages/codemode/src/runtime/host.ts` | `codemode/sandbox.go; codemode/execution.go; codemode/workerlauncher.go (workerLauncher: acquireWorker admission, onWorkerStarted exit reporting, stop without waiting for exit)` | ✅ |
+| `packages/codemode/src/runtime/host.ts` | `codemode/sandbox.go; codemode/workerlauncher.go (workerLauncher: acquireWorker admission, onWorkerStarted exit reporting, stop without waiting for exit)` | ✅ |
 | `packages/codemode/src/runtime/inline.ts` | `codemode/inline.go; codemode/inlinechannel.go; codemode/inline_consts.go; the halt instrumentation behind the interrupt budget (haltcheck, halt_grace) and the wasm loader option (SandboxOptions.Wasm) live in the same package` | ✅ |
 | `packages/codemode/src/runtime/prelude-source.ts` | `codemode/assets/prelude.js; codemode/assets.go` | ✅ |
 | `packages/codemode/src/runtime/protocol.ts` | `codemode/vmdriver.go (WorkerToHostMessage, HostToWorkerMessage as the host/VM seam); codemode/remote_protocol.go (VmStartData and the remote wire forms)` | ✅ |
@@ -825,7 +825,7 @@ The daemon is a Go program with Pi's command line and wire protocol (D96); the R
 | `packages/env/daemon/src/scan.rs` | `durable/env/line_scan.go` (LineScanner; tests in env/daemon/scan_test.go) | ✅ |
 | `packages/env/daemon/src/sys/mod.rs` | `(Rust module barrel: Go selects sys_unix.go or sys_windows.go by build constraint)` | n/a |
 | `packages/env/daemon/src/sys/unix.rs` | `env/daemon/sys_unix.go` | ✅ |
-| `packages/env/daemon/src/sys/windows.rs` | `env/daemon/sys_windows.go (commands run through durable/env/node, whose spawn path builds the Windows command line with nodespawn.SetCommandLine, libuv's quote_cmd_arg, so quote_argument has no Go function; its test is ported as TestExecDeliversPiQuoteArgumentVectorsThroughTheSpawnPath in env/daemon/sys_windows_test.go, which sends each vector through the daemon's exec to a helper child and compares the command line and the received argv; Windows only, proven green and mutation-killed on windows-latest)` | ✅ |
+| `packages/env/daemon/src/sys/windows.rs` | `env/daemon/sys_windows.go (commands run through durable/env/node, whose spawn path builds the Windows command line with nodespawn.SetCommandLine, libuv's quote_cmd_arg, so quote_argument has no Go function; its test is ported as TestExecDeliversPiQuoteArgumentVectorsThroughTheSpawnPath in env/daemon/sys_windows_test.go, which sends each vector through the daemon's exec to a helper child and compares the command line and the received argv; Windows only, proven green and mutation-killed on windows-latest, but the ledger's coverage run is Linux and executes no statement of sys_windows.go, so the row stays partial on this host)` | 🟡 |
 | `packages/env/daemon/src/watch.rs` | `env/daemon/watch.go` | ✅ |
 | `packages/env/daemon/src/window.rs` | `env/daemon/window.go (tests in env/daemon/window_test.go)` | ✅ |
 

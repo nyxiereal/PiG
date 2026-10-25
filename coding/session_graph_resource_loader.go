@@ -54,6 +54,8 @@ type graphLoaderOptions struct {
 	AgentsFilesOverride           string    `json:"agentsFilesOverride"`
 	SystemPromptOverride          string    `json:"systemPromptOverride"`
 	AppendSystemPromptOverride    string    `json:"appendSystemPromptOverride"`
+	// ExtensionFactories are the compiled-in extensions the extension asked for by name (createCodemodeExtension, createToolSearchExtension, createMcpExtension); an inline function of the extension's own is not served.
+	ExtensionFactories []graphExtensionFactory `json:"extensionFactories"`
 }
 
 func newGraphResourceLoader(scope subprocess.SessionGraphScope, op string, raw json.RawMessage) (*GraphResourceLoader, error) {
@@ -150,6 +152,13 @@ func newGraphResourceLoader(scope subprocess.SessionGraphScope, op string, raw j
 			}
 			return base
 		}
+	}
+	for _, entry := range options.ExtensionFactories {
+		factory, err := entry.factory(loaderOptions.AgentDir)
+		if err != nil {
+			return nil, err
+		}
+		loaderOptions.ExtensionFactories = append(loaderOptions.ExtensionFactories, factory)
 	}
 	g.loader = NewDefaultResourceLoader(loaderOptions)
 	return g, nil

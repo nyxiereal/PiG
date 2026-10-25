@@ -1,5 +1,5 @@
 // The Node fixture of the session graph conformance rows (session_graph_test.go). It runs the script of testfixture/sessiongraph (Go), testdata/session-graph-rust and the inline Python fixture with Pi's own SessionManager, so the report it makes is Pi's.
-import { DefaultPackageManager, DefaultResourceLoader, ModelRuntime, ProjectTrustStore, SessionManager, SettingsManager, createAgentSession, createAgentSessionFromServices, createAgentSessionServices, getAgentDir, hasTrustRequiringProjectResources } from "@earendil-works/pi-coding-agent";
+import { DefaultPackageManager, DefaultResourceLoader, ModelRuntime, ProjectTrustStore, SessionManager, SettingsManager, createAgentSession, createCodemodeExtension, createMcpExtension, createToolSearchExtension, createAgentSessionFromServices, createAgentSessionServices, getAgentDir, hasTrustRequiringProjectResources } from "@earendil-works/pi-coding-agent";
 import { createAssistantMessageEventStream, createProvider } from "@earendil-works/pi-ai";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -830,6 +830,29 @@ async function createProviderScript() {
   return r;
 }
 
+// createCodemodeExtension, createToolSearchExtension and createMcpExtension: Pi's own factories are the expectation (extension_refs). The Go, Python and Rust scripts pass their SDK's references to a DefaultResourceLoader and must report the same.
+async function extensionRefsScript({ mrAuth, mrModels, mrStore, cwd, agentDir, refsProbe, dir }) {
+  const r = {};
+  const rt = await ModelRuntime.create({ authPath: mrAuth, modelsPath: mrModels, modelsStorePath: mrStore });
+  const settings = SettingsManager.inMemory({ compaction: { enabled: false }, retry: { enabled: false }, defaultProvider: "mr-local", defaultModel: "m1" });
+  const quiet = { cwd, agentDir, settingsManager: settings, noExtensions: true, noSkills: true, noPromptTemplates: true, noThemes: true, noContextFiles: true, additionalExtensionPaths: [refsProbe] };
+  const observe = async (loader, tools) => {
+    await loader.reload();
+    const manager = SessionManager.inMemory(cwd);
+    const { session } = await createAgentSession({ sessionManager: manager, settingsManager: settings, modelRuntime: rt, resourceLoader: loader, tools });
+    await session.bindExtensions({});
+    const seen = manager.getEntries().filter((entry) => entry.type === "custom" && entry.customType === "refs_seen").map((entry) => entry.data);
+    session.dispose();
+    return seen;
+  };
+  const factories = () => [createCodemodeExtension({ mode: "only", inlineBudget: 123, models: false }), createToolSearchExtension(), createMcpExtension({ logPath: join(dir, "mcp.log"), startupWaitMs: 0 })];
+  r.inactive = await observe(new DefaultResourceLoader({ ...quiet, extensionFactories: factories() }), undefined);
+  r.active = await observe(new DefaultResourceLoader({ ...quiet, extensionFactories: factories() }), ["codemode", "tool_search"]);
+  r.defaults = await observe(new DefaultResourceLoader({ ...quiet, extensionFactories: [createCodemodeExtension(), createToolSearchExtension()] }), ["codemode", "tool_search"]);
+  r.none = await observe(new DefaultResourceLoader(quiet), ["codemode", "tool_search"]);
+  return r;
+}
+
 export default function (pi) {
   pi.registerTool({
     name: "session_manager", label: "session_manager", description: "Runs the SessionManager script.", parameters: { type: "object" },
@@ -866,5 +889,9 @@ export default function (pi) {
   pi.registerTool({
     name: "create_provider", label: "create_provider", description: "Runs the createProvider script.", parameters: { type: "object" },
     execute: async () => ({ content: [{ type: "text", text: JSON.stringify(await createProviderScript()) }] }),
+  });
+  pi.registerTool({
+    name: "extension_refs", label: "extension_refs", description: "Runs the compiled-in extension factories script.", parameters: { type: "object" },
+    execute: async (_id, params) => ({ content: [{ type: "text", text: JSON.stringify(await extensionRefsScript(params)) }] }),
   });
 }

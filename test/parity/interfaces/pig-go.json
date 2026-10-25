@@ -77355,6 +77355,17 @@
       "shapeHash": "sha256:321680ee46c4a0f45a5be83a13a18383fa9efbfe0593819bdad691b1d0fe0ddb"
     },
     {
+      "id": "go:github.com/MichaelKinsy/PiG/coding#decodeFactoryOptions",
+      "package": "github.com/MichaelKinsy/PiG/coding",
+      "name": "decodeFactoryOptions",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func(f graphExtensionFactory, into any) error"
+      },
+      "shapeHash": "sha256:2508ae7d38cc0f727c65128f536d2ab389568667ca1b8893669e57b2ade91116"
+    },
+    {
       "id": "go:github.com/MichaelKinsy/PiG/coding#decodeNestedArguments",
       "package": "github.com/MichaelKinsy/PiG/coding",
       "name": "decodeNestedArguments",
@@ -77815,6 +77826,28 @@
         "type": "func(status github.com/MichaelKinsy/PiG/ai.AuthStatus) map[string]any"
       },
       "shapeHash": "sha256:9e7a683fcdf389254e15ff9fd634a51f2cfb03f08c4646e4b609d46a841c8f6f"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/coding#graphExtensionFactory",
+      "package": "github.com/MichaelKinsy/PiG/coding",
+      "name": "graphExtensionFactory",
+      "kind": "type",
+      "exported": false,
+      "shape": {
+        "type": "graphExtensionFactory"
+      },
+      "shapeHash": "sha256:470093e9284c5d2bb2cf72519391e70c316a2036bf351e33578daaf384c4bacc"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/coding#graphExtensionFactory.factory",
+      "package": "github.com/MichaelKinsy/PiG/coding",
+      "name": "graphExtensionFactory.factory",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func(agentDir string) (github.com/MichaelKinsy/PiG/coding/extension.InlineExtension, error)"
+      },
+      "shapeHash": "sha256:e1bd9148089649228e60824318afc37c3d34a1da71cb047c85a3faf04b062740"
     },
     {
       "id": "go:github.com/MichaelKinsy/PiG/coding#graphExtensionsOf",
@@ -177158,6 +177191,17 @@
       "shapeHash": "sha256:d3e88d845b45738d175326445319a3aea07197f0c2c53d9e8aba9f96591e24a7"
     },
     {
+      "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#CodemodeExtensionOptions",
+      "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
+      "name": "CodemodeExtensionOptions",
+      "kind": "type",
+      "exported": true,
+      "shape": {
+        "type": "CodemodeExtensionOptions"
+      },
+      "shapeHash": "sha256:8cc059d3bd35de16ecdfc014893c72dc433560418f067d1b9f388bbd41aead6e"
+    },
+    {
       "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#CollapseSystemMessages",
       "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
       "name": "CollapseSystemMessages",
@@ -179182,6 +179226,17 @@
       "shapeHash": "sha256:89ae0af61c77ff0e251c2627f46fa2bc13110a385a4e76b232797734bd9bf81a"
     },
     {
+      "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#CreateCodemodeExtension",
+      "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
+      "name": "CreateCodemodeExtension",
+      "kind": "function",
+      "exported": true,
+      "shape": {
+        "type": "func(options ...CodemodeExtensionOptions) ExtensionFactory"
+      },
+      "shapeHash": "sha256:bc2b7ba73753170e13c790a81e67fe8e5062ee146650c6d429afb9078f6dc141"
+    },
+    {
       "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#CreateCodingTools",
       "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
       "name": "CreateCodingTools",
@@ -179314,6 +179369,17 @@
       "shapeHash": "sha256:3870d6a90d0bb260fb60e7a2af9f092b644577d63c404829fed9315a365cec5d"
     },
     {
+      "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#CreateMcpExtension",
+      "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
+      "name": "CreateMcpExtension",
+      "kind": "function",
+      "exported": true,
+      "shape": {
+        "type": "func(options ...McpExtensionOptions) ExtensionFactory"
+      },
+      "shapeHash": "sha256:8051c3b1f0c7f2783a704acc0f729425317e5b624b28301bfc10666f349fb384"
+    },
+    {
       "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#CreatePowerShellTool",
       "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
       "name": "CreatePowerShellTool",
@@ -179389,6 +179455,17 @@
         "type": "func(cwd string, options *ReadToolOptions) (BuiltinToolDefinition, error)"
       },
       "shapeHash": "sha256:d25e9409e07f316fdd0f28324831ae85a9220b288968142e3198d6497c0227b6"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#CreateToolSearchExtension",
+      "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
+      "name": "CreateToolSearchExtension",
+      "kind": "function",
+      "exported": true,
+      "shape": {
+        "type": "func() ExtensionFactory"
+      },
+      "shapeHash": "sha256:4c3a1ef97a9970d7414acb405141bf3c213ca8292949d6f285bbd51daee3214b"
     },
     {
       "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#CreateWriteTool",
@@ -182603,6 +182680,17 @@
       "shapeHash": "sha256:e7f2c03174478d1aa4cb57f2cdf82d713068df7f127c6453141f2c750c665901"
     },
     {
+      "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#ExtensionFactory",
+      "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
+      "name": "ExtensionFactory",
+      "kind": "type",
+      "exported": true,
+      "shape": {
+        "type": "ExtensionFactory"
+      },
+      "shapeHash": "sha256:eb5c47bb71b492b09892584191a66852829d34a4d481cccb475a8c6064293b0d"
+    },
+    {
       "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#ExtensionFlagValue",
       "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
       "name": "ExtensionFlagValue",
@@ -183591,6 +183679,17 @@
         "type": "McpExposure"
       },
       "shapeHash": "sha256:2c1a0afe1e605bba5432d4b775b7bbd048d6c867e6a70445364ee414c2d06a6a"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#McpExtensionOptions",
+      "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
+      "name": "McpExtensionOptions",
+      "kind": "type",
+      "exported": true,
+      "shape": {
+        "type": "McpExtensionOptions"
+      },
+      "shapeHash": "sha256:bb9d40a78746b83acf20300896dae7646582a4fae5a087a1dbfbc124c0d79ec4"
     },
     {
       "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#McpOAuthConfig",
@@ -194681,6 +194780,17 @@
       "shapeHash": "sha256:6320ac68bd22b44fdcc4619eb1bb6166e15ab5fc8e78dbf2401aeda8f9e49a1d"
     },
     {
+      "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#errExtensionFactoryNotServed",
+      "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
+      "name": "errExtensionFactoryNotServed",
+      "kind": "variable",
+      "exported": false,
+      "shape": {
+        "type": "error"
+      },
+      "shapeHash": "sha256:6320ac68bd22b44fdcc4619eb1bb6166e15ab5fc8e78dbf2401aeda8f9e49a1d"
+    },
+    {
       "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#errFrameTooLarge",
       "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
       "name": "errFrameTooLarge",
@@ -194921,6 +195031,17 @@
         "type": "[]string"
       },
       "shapeHash": "sha256:a1c330895d4124c2ac5e7956eaa7a61082b08546669578b38030562429ad3b1e"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#extensionFactoriesWire",
+      "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
+      "name": "extensionFactoriesWire",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func(factories []any) ([]map[string]any, error)"
+      },
+      "shapeHash": "sha256:87dd5b609fb1510c449e2ecfeb3760252a03895f602b1d4bf3cd6651d39886c2"
     },
     {
       "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#extensionHandlerStopTimeout",

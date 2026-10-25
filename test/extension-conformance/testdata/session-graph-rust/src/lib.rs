@@ -1,6 +1,6 @@
 //! Fixture for the session graph conformance rows (test/extension-conformance/session_graph_test.go): the script of testfixture/sessiongraph (Go), testdata/session-graph.mjs (Node, Pi's own classes) and testdata/session_graph_python.py.
 
-use pig_sdk::{create_provider, CreateProviderOptions, ProviderApi, ProviderStreams, ProviderAuth, APIKeyAuth, AuthResult, ProviderStreamFn, ProviderOperationFn, ProviderOperationOptions, ProviderStreamOptions, RefreshModelsContext, ModelsPublication, create_assistant_message_event_stream, ProviderSignal, create_agent_session_from_services, create_agent_session_services, CreateAgentSessionFromServicesOptions, CreateAgentSessionServicesOptions, SessionStartEvent, CreateAgentSessionOptions, ModelRuntime, ModelRuntimeCreateOptions, ModelRoute, VirtualModel, DefaultPackageManager, PackageManagerOptions, DefaultResourceLoader, DefaultResourceLoaderOptions, empty_schema, Context, Extension, NewSessionOptions, SessionInfo, SessionManager, SettingsManager, SettingsManagerCreateOptions, ToolResult, has_trust_requiring_project_resources, ProjectTrustStore, ProjectTrustStoreEntry, ProjectTrustUpdate};
+use pig_sdk::{create_codemode_extension, create_tool_search_extension, create_mcp_extension, CodemodeExtensionOptions, McpExtensionOptions, ExtensionFactory, create_provider, CreateProviderOptions, ProviderApi, ProviderStreams, ProviderAuth, APIKeyAuth, AuthResult, ProviderStreamFn, ProviderOperationFn, ProviderOperationOptions, ProviderStreamOptions, RefreshModelsContext, ModelsPublication, create_assistant_message_event_stream, ProviderSignal, create_agent_session_from_services, create_agent_session_services, CreateAgentSessionFromServicesOptions, CreateAgentSessionServicesOptions, SessionStartEvent, CreateAgentSessionOptions, ModelRuntime, ModelRuntimeCreateOptions, ModelRoute, VirtualModel, DefaultPackageManager, PackageManagerOptions, DefaultResourceLoader, DefaultResourceLoaderOptions, empty_schema, Context, Extension, NewSessionOptions, SessionInfo, SessionManager, SettingsManager, SettingsManagerCreateOptions, ToolResult, has_trust_requiring_project_resources, ProjectTrustStore, ProjectTrustStoreEntry, ProjectTrustUpdate};
 use serde_json::{json, Value};
 use std::io;
 use std::path::Path;
@@ -951,6 +951,39 @@ fn create_provider_script() -> Result<Value, String> {
     Ok(Value::Object(r))
 }
 
+/// The compiled-in extension references over a DefaultResourceLoader, as testdata/session-graph.mjs extensionRefsScript does with Pi's factories; the report is Pi's own run's.
+fn extension_refs_script(ctx: &Context, args: &Value) -> io::Result<Value> {
+    let (cwd, agent_dir) = (text(&args["cwd"]), text(&args["agentDir"]));
+    let rt = ModelRuntime::create(ctx, ModelRuntimeCreateOptions { auth_path: Some(text(&args["mrAuth"]).into()), models_path: Some(text(&args["mrModels"]).into()), models_store_path: Some(text(&args["mrStore"]).into()), ..Default::default() })?;
+    let settings = SettingsManager::in_memory(ctx, Some(json!({"compaction": {"enabled": false}, "retry": {"enabled": false}, "defaultProvider": "mr-local", "defaultModel": "m1"})), None)?;
+    let observe = |factories: Vec<ExtensionFactory>, tools: Option<Vec<String>>| -> io::Result<Value> {
+        let loader = DefaultResourceLoader::new(ctx, DefaultResourceLoaderOptions {
+            cwd: cwd.into(), agent_dir: agent_dir.into(), settings_manager: Some(&settings), no_extensions: true, no_skills: true, no_prompt_templates: true, no_themes: true, no_context_files: true,
+            additional_extension_paths: vec![text(&args["refsProbe"]).into()], extension_factories: factories, ..Default::default()
+        })?;
+        loader.reload(None)?;
+        let manager = SessionManager::in_memory(ctx, Some(cwd), None, None)?;
+        let session = ctx.create_agent_session(CreateAgentSessionOptions {
+            session_manager: Some(manager.handle().to_string()), settings_manager: Some(settings.handle().to_string()), model_runtime: Some(rt.handle().to_string()),
+            resource_loader: Some(loader.handle().to_string()), tools, ..Default::default()
+        })?;
+        session.bind_extensions()?;
+        let seen: Vec<Value> = manager.get_entries()?.as_array().cloned().unwrap_or_default().iter().filter(|entry| entry["type"] == "custom" && entry["customType"] == "refs_seen").map(|entry| entry["data"].clone()).collect();
+        session.dispose();
+        Ok(json!(seen))
+    };
+    let factories = || vec![
+        create_codemode_extension(CodemodeExtensionOptions { mode: Some("only".into()), inline_budget: Some(123.0), models: Some(false) }),
+        create_tool_search_extension(),
+        create_mcp_extension(McpExtensionOptions { log_path: Some(Path::new(text(&args["dir"])).join("mcp.log").to_string_lossy().into_owned()), startup_wait_ms: Some(0.0) }),
+    ];
+    let both = || Some(vec!["codemode".to_string(), "tool_search".to_string()]);
+    Ok(json!({
+        "inactive": observe(factories(), None)?, "active": observe(factories(), both())?,
+        "defaults": observe(vec![create_codemode_extension(CodemodeExtensionOptions::default()), create_tool_search_extension()], both())?, "none": observe(vec![], both())?,
+    }))
+}
+
 fn model_runtime_script(ctx: &Context, args: &Value) -> io::Result<Value> {
     let (auth, models, store, server) = (text(&args["mrAuth"]), text(&args["mrModels"]), text(&args["mrStore"]), text(&args["mrServer"]));
     let mut r = serde_json::Map::new();
@@ -1106,6 +1139,10 @@ pub fn new_extension() -> Extension {
     ext.tool("create_provider", "Runs the createProvider script.", empty_schema(), |_ctx, _args| match create_provider_script() {
         Ok(report) => ToolResult::text(report.to_string()),
         Err(error) => ToolResult::Error(error),
+    });
+    ext.tool("extension_refs", "Runs the compiled-in extension factories script.", empty_schema(), |ctx, args| match extension_refs_script(ctx, &args) {
+        Ok(report) => ToolResult::text(report.to_string()),
+        Err(error) => ToolResult::Error(error.to_string()),
     });
     ext.tool("services", "Runs the createAgentSessionServices script.", empty_schema(), |ctx, args| match services_script(ctx, &args) {
         Ok(report) => ToolResult::text(report.to_string()),

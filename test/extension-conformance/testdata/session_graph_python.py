@@ -963,6 +963,43 @@ def create_provider_tool(ctx, params):
     return json.dumps(create_provider_script(ctx, params))
 
 
+def extension_refs_script(ctx, args):
+    """The compiled-in extension references over a DefaultResourceLoader, as testdata/session-graph.mjs extensionRefsScript does with Pi's factories; the report is Pi's own run's."""
+    r = {}
+    cwd, agent_dir = args["cwd"], args["agentDir"]
+    rt = ModelRuntime.create(ctx, auth_path=args["mrAuth"], models_path=args["mrModels"], models_store_path=args["mrStore"])
+    settings = SettingsManager.in_memory(ctx, {"compaction": {"enabled": False}, "retry": {"enabled": False}, "defaultProvider": "mr-local", "defaultModel": "m1"})
+    quiet = dict(cwd=cwd, agent_dir=agent_dir, settings_manager=settings, no_extensions=True, no_skills=True, no_prompt_templates=True, no_themes=True, no_context_files=True, additional_extension_paths=[args["refsProbe"]])
+
+    def observe(factories, tools):
+        loader = DefaultResourceLoader(ctx, extension_factories=factories, **quiet)
+        loader.reload()
+        manager = SessionManager.in_memory(ctx, cwd)
+        session = ctx.create_agent_session(pig_sdk.CreateAgentSessionOptions(session_manager=manager, settings_manager=settings, model_runtime=rt, resource_loader=loader, tools=tools))
+        session.bind_extensions()
+        seen = [entry["data"] for entry in manager.get_entries() if entry["type"] == "custom" and entry.get("customType") == "refs_seen"]
+        session.dispose()
+        return seen
+
+    def factories():
+        return [
+            pig_sdk.create_codemode_extension(mode="only", inline_budget=123, models=False),
+            pig_sdk.create_tool_search_extension(),
+            pig_sdk.create_mcp_extension(log_path=os.path.join(args["dir"], "mcp.log"), startup_wait_ms=0),
+        ]
+
+    both = ["codemode", "tool_search"]
+    r["inactive"] = observe(factories(), None)
+    r["active"] = observe(factories(), both)
+    r["defaults"] = observe([pig_sdk.create_codemode_extension(), pig_sdk.create_tool_search_extension()], both)
+    r["none"] = observe([], both)
+    return r
+
+
+def extension_refs_tool(ctx, params):
+    return json.dumps(extension_refs_script(ctx, params))
+
+
 def new_extension():
     ext = pig_sdk.Extension("session-graph")
     ext.register_tool(pig_sdk.ToolDefinition(name="session_manager", label="session_manager", description="Runs the SessionManager script.", parameters={"type": "object"}, execute=session_manager_tool))
@@ -973,5 +1010,6 @@ def new_extension():
     ext.register_tool(pig_sdk.ToolDefinition(name="package_manager", label="package_manager", description="Runs the DefaultPackageManager script.", parameters={"type": "object"}, execute=packages_tool))
     ext.register_tool(pig_sdk.ToolDefinition(name="child_handles", label="child_handles", description="Runs the createAgentSession handle options script.", parameters={"type": "object"}, execute=child_handles_tool))
     ext.register_tool(pig_sdk.ToolDefinition(name="create_provider", label="create_provider", description="Runs the createProvider script.", parameters={"type": "object"}, execute=create_provider_tool))
+    ext.register_tool(pig_sdk.ToolDefinition(name="extension_refs", label="extension_refs", description="Runs the compiled-in extension factories script.", parameters={"type": "object"}, execute=extension_refs_tool))
     ext.register_tool(pig_sdk.ToolDefinition(name="services", label="services", description="Runs the createAgentSessionServices script.", parameters={"type": "object"}, execute=services_tool))
     return ext

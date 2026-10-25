@@ -112,6 +112,7 @@ from .kit import ViewComponent as ViewComponent
 from .event_bus import EventBus as EventBus, EventBusHandler as EventBusHandler, _EventBusHub
 from .state_feed import StateFeed
 from .user_bash import BashExecOptions as BashExecOptions, BashOperations as BashOperations, _BashOperationsTable, _data_update, _run_user_bash_exec, _user_bash_operations_reply
+from .extension_factories import ExtensionFactory as ExtensionFactory, create_codemode_extension as create_codemode_extension, create_mcp_extension as create_mcp_extension, create_tool_search_extension as create_tool_search_extension
 from .create_provider import ProviderStreams as ProviderStreams, create_provider as create_provider
 from .provider import (
     Provider, ProviderSignal,

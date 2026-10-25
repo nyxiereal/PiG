@@ -528,6 +528,7 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 | [BF-70e1841](#bf-70e1841) | /settings warnings submenu: a warning the settings never set shows as on and a toggle always reports the… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-7177d5f](#bf-7177d5f) | fix(tui): card of an unregistered tool is Pi's formatToolExecution | PiG's own defect | All platforms | Unreleased |
 | [BF-725e104](#bf-725e104) | The upstream test inventory records Pi's `shell-path-exists.test.ts` as ported instead of partial: Pi mocks… | PiG's own defect | Windows | 0.5.2 |
+| [BF-72db80f](#bf-72db80f) | fix(durable): a streamed partial commits the text of its own events | PiG's own defect | All platforms | Unreleased |
 | [BF-72e0ca2](#bf-72e0ca2) | A Kitty image in a padded or colored box, or with text beside it, is no longer dropped from the fullscreen… | PiG's own defect | All platforms | Unreleased |
 | [BF-72e7ab2](#bf-72e7ab2) | A tool card whose `app.tools.expand` key is unbound shows an empty key in ".. | PiG's own defect | All platforms | 0.5.0 |
 | [BF-72e7ab2-2](#bf-72e7ab2-2) | `TestMcpManagerViewMatchesPi` renders the /mcp manager footers under rebound, multi-key and unbound… | PiG's own defect | All platforms | 0.5.0 |
@@ -8257,6 +8258,19 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 - **Fix commits:** `725e104b55` (2026-10-20)
 - **Tests:** None recorded.
 - **Release note:** The upstream test inventory records Pi's `shell-path-exists.test.ts` as ported instead of partial: Pi mocks `accessSync` and `spawnSync`, PiG's Windows alias and Unix cases match them case for case, and the native Windows check ran and passed on the Windows runner. The release gate no longer reports it as an open hot-path gap.
+
+### BF-72db80f
+
+**fix(durable): a streamed partial commits the text of its own events**
+
+- **Source:** PiG's own defect
+- **Symptom:** fix(durable): a streamed partial commits the text of its own events
+- **Root cause:** A partial commit appends the text the response's events added to the committed string when the lengths agree, and the length is all it checks. The flush took the newest partial on the timer goroutine, encoded it later (a live view encodes the stream's current publication, not the one the event was observed at), and only then took the changes, so an event could be observed between the partial and the changes. A partial one event behind or ahead of the changes, at two commits in a row, appended the next event's characters to a string that lacked the previous ones: the committed text was the right length with characters in the wrong place, and the next commit, whose string no longer began with…
+- **User impact:** Behavior differed from Pi
+- **Platform:** All platforms
+- **Fixed in:** Unreleased
+- **Fix commits:** `72db80f5fb` (2026-10-25)
+- **Tests:** `durable/harness/harness_events_test.go::TestAgentEvents`, `durable/harness/partial_throttle_test.go::TestPartialChangesABlockTheBoundPartialLacksKeepsItsChangesForTheNextCut`, `durable/harness/partial_throttle_test.go::TestPartialChangesACutLeavesTheChangesOfLaterEventsToTheNextCut`, `durable/harness/partial_throttle_test.go::TestPartialChangesUncutPutsBackTheArgumentChangesOfACutThatNoCommitUsed`, `durable/harness/partial_throttle_test.go::TestPartialThrottleTakesAPartialWithExactlyTheChangesOfTheEventsUpToIt`
 
 ### BF-72e0ca2
 

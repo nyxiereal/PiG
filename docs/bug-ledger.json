@@ -15472,6 +15472,31 @@
       "tests": []
     },
     {
+      "id": "BF-72db80f",
+      "title": "fix(durable): a streamed partial commits the text of its own events",
+      "symptom": "fix(durable): a streamed partial commits the text of its own events",
+      "rootCause": "A partial commit appends the text the response's events added to the committed string when the lengths agree, and the length is all it checks. The flush took the newest partial on the timer goroutine, encoded it later (a live view encodes the stream's current publication, not the one the event was observed at), and only then took the changes, so an event could be observed between the partial and the changes. A partial one event behind or ahead of the changes, at two commits in a row, appended the next event's characters to a string that lacked the previous ones: the committed text was the right length with characters in the wrong place, and the next commit, whose string no longer began with…",
+      "rootCauseSource": "commit",
+      "userImpact": "Behavior differed from Pi",
+      "platform": "All platforms",
+      "class": "own",
+      "fixedIn": "Unreleased",
+      "origin": "commit",
+      "commits": [
+        {
+          "hash": "72db80f5fb",
+          "date": "2026-10-25"
+        }
+      ],
+      "tests": [
+        "durable/harness/harness_events_test.go::TestAgentEvents",
+        "durable/harness/partial_throttle_test.go::TestPartialChangesABlockTheBoundPartialLacksKeepsItsChangesForTheNextCut",
+        "durable/harness/partial_throttle_test.go::TestPartialChangesACutLeavesTheChangesOfLaterEventsToTheNextCut",
+        "durable/harness/partial_throttle_test.go::TestPartialChangesUncutPutsBackTheArgumentChangesOfACutThatNoCommitUsed",
+        "durable/harness/partial_throttle_test.go::TestPartialThrottleTakesAPartialWithExactlyTheChangesOfTheEventsUpToIt"
+      ]
+    },
+    {
       "id": "BF-72e0ca2",
       "title": "A Kitty image in a padded or colored box, or with text beside it, is no longer dropped from the fullscreen…",
       "symptom": "A Kitty image in a padded or colored box, or with text beside it, is no longer dropped from the fullscreen view once its first row scrolls above the viewport: the visible rows are cropped.",

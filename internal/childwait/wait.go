@@ -63,10 +63,9 @@ type Pipes struct {
 
 	mu sync.Mutex
 
-	// Bit i is set once the reader of files[i] has returned: nothing more is
-	// taken from that pipe, so it holds no output a reader will deliver. A pipe
-	// past the 64th is never marked, and is asked about as one still read.
-	stopped atomic.Uint64
+	// stopped[i] is set once the reader of files[i] has returned: nothing more
+	// is taken from that pipe, so it holds no output a reader will deliver.
+	stopped []atomic.Bool
 }
 
 // Start reads each file until it fails or ends, calling onData with the index
@@ -82,14 +81,13 @@ func Start(files []*os.File, onData func(index int, chunk []byte), hooks *Hooks)
 		hooks:    hooks,
 		activity: make(chan struct{}, 1),
 		done:     make(chan struct{}),
+		stopped:  make([]atomic.Bool, len(files)),
 	}
 	var readers sync.WaitGroup
 	for index, file := range files {
 		readers.Go(func() {
 			p.read(index, file)
-			if index < 64 {
-				p.stopped.Or(1 << index)
-			}
+			p.stopped[index].Store(true)
 		})
 	}
 	go func() {
@@ -199,7 +197,7 @@ func (p *Pipes) verdict(mayHoldOutput func() bool) graceVerdict {
 	}
 	ended, behind := true, false
 	for index, file := range p.files {
-		if index < 64 && p.stopped.Load()&(1<<index) != 0 {
+		if p.stopped[index].Load() {
 			continue
 		}
 		hungUp, unread, known := pollPipe(file)

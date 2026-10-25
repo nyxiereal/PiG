@@ -87,8 +87,19 @@ func graphServicesApply(ctx context.Context, scope subprocess.SessionGraphScope,
 		}
 		for _, pair := range pairs {
 			var name string
+			if json.Unmarshal(pair[0], &name) != nil {
+				return nil, errors.New("AgentSessionServices.apply: an extension flag value is a [name, true|string] pair")
+			}
+			// The value is a boolean or a string (a JavaScript Map<string, boolean | string>).
 			var value any
-			if json.Unmarshal(pair[0], &name) != nil || json.Unmarshal(pair[1], &value) != nil {
+			var text string
+			var flag bool
+			switch {
+			case json.Unmarshal(pair[1], &text) == nil:
+				value = text
+			case json.Unmarshal(pair[1], &flag) == nil:
+				value = flag
+			default:
 				return nil, errors.New("AgentSessionServices.apply: an extension flag value is a [name, true|string] pair")
 			}
 			flags = append(flags, ExtensionFlagValue{Name: name, Value: value})

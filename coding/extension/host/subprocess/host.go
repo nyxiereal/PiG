@@ -3508,24 +3508,7 @@ func (h *Host) adoptConn(ctx context.Context, me *managedExt, rawConn net.Conn, 
 				loadErr.StderrLog = me.stderrLogPath
 				return nil, loadErr
 			}
-			// Model-provider registration and OAuth registration are
-			// independent concerns: an extension may contribute an OAuth login
-			// with no model-provider callback wired on the host, so gate only
-			// the model-provider hook, never the OAuth registration.
-			h.attachProviderOperations(me, provider, &cfg)
-			if err := h.providerRuntime.RegisterProvider(provider.Name, cfg, extConfigOrigin(me.config)); err != nil {
-				_ = conn.Close("provider registration failed")
-				cancel()
-				return nil, err
-			}
-			if h.uiBridge != nil {
-				h.uiBridge.RecordProviderRegistration(provider.Name, provider.Config)
-			}
-			h.mu.Lock()
-			notifySuperseded := h.transferProviderOwnershipLocked(me, conn, provider.Name)
-			h.mu.Unlock()
-			notifySuperseded()
-			if err := h.registerOAuthProvider(me, provider.Name, provider.Config); err != nil {
+			if err := h.queueLoadedProvider(me, conn, provider, cfg); err != nil {
 				_ = conn.Close("provider registration failed")
 				cancel()
 				loadErr := newLoadError(me.config.Name, "register", "provider_config_invalid", err)

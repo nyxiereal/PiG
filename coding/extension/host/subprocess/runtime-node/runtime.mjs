@@ -4581,8 +4581,8 @@ export class Runtime {
       return;
     }
     if (!config) throw new Error("Provider config is required when registering by name");
-    // Pi validates the incoming registration on its own, before it touches the stored configuration, then merges its defined values over the previous effective root (model-runtime.ts:753-766).
-    piProviderComposer().validateExtensionProvider(name, piBuiltinProvider(name), this.registryState.providers?.[name]?.modelsConfig, config);
+    // A registration made while the extension loads is queued, as Pi's loader queues it (loader.ts:217-218); the model runtime that applies the queue validates it and reports the rejection as a diagnostic, and the extension stays loaded. After the load Pi's registerProvider validates the incoming registration on its own, before it touches the stored configuration, then merges its defined values over the previous effective root (model-runtime.ts:753-766).
+    if (this.loadState === "active") piProviderComposer().validateExtensionProvider(name, piBuiltinProvider(name), this.registryState.providers?.[name]?.modelsConfig, config);
     // A loading member merges over its own queued root, else over the cell's active root, as Pi's flush merges over the effective registration.
     const merged = { ...(this.loadState === "active" ? this.registeredProviderConfig(name) ?? this.foreignProviderConfigForMerge(name) : this.registeredProviderConfigs.get(name) ?? this.providerConfigObjects.get(name)?.config) };
     for (const [key, value] of Object.entries(config)) {

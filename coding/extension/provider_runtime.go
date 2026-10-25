@@ -108,15 +108,24 @@ func (r *ExtensionRuntime) RegisterProvider(name string, config ProviderConfig, 
 	return register(name, config)
 }
 
+// QueueProviderRegistration queues the registration an extension makes while it loads, whether or not a registry is bound: Pi's loader queues it in the runtime of the load, which is not bound yet, and the services or the runner that binds applies it after every extension of the load finished, so a registration the registry rejects is a diagnostic of that binding and the extension stays loaded (loader.ts:217-218, agent-session-services.ts:157-169, runner.ts:471-487). A runtime that outlives a load (a reload, a host the owner bound before loading) is not bound again until its owner binds it, which applies the queue.
+//
+// upstream: loader.ts:217-218 (`runtime.registerProvider` of the loading runtime)
+func (r *ExtensionRuntime) QueueProviderRegistration(name string, config ProviderConfig, extensionPath string) {
+	r.mu.Lock()
+	r.pendingProviderRegistrations.entries = append(r.pendingProviderRegistrations.entries, PendingProviderRegistration{Name: name, Config: config, ExtensionPath: extensionPath})
+	r.mu.Unlock()
+}
+
 // UnregisterProvider removes every queued registration of name before binding, and invokes the registry immediately afterward.
 // The optional extensionPath is accepted as upstream's second parameter; neither upstream branch reads it.
 // upstream: loader.ts:220 `unregisterProvider: (name) =>`, runner.ts:534
 func (r *ExtensionRuntime) UnregisterProvider(name string, extensionPath ...string) {
 	_ = extensionPath
 	r.mu.Lock()
+	// Pi's filter replaces the queue array; an already-running bind iteration retains its original array. A bound runtime holds a queue too when an extension registered while it loaded (QueueProviderRegistration), and an unregistration removes those, as Pi's loader does before the runner binds.
+	r.pendingProviderRegistrations = &providerRegistrationQueue{entries: slices.DeleteFunc(slices.Clone(r.pendingProviderRegistrations.entries), func(entry PendingProviderRegistration) bool { return entry.Name == name })}
 	if !r.bound {
-		// Pi's filter replaces the queue array; an already-running bind iteration retains its original array.
-		r.pendingProviderRegistrations = &providerRegistrationQueue{entries: slices.DeleteFunc(slices.Clone(r.pendingProviderRegistrations.entries), func(entry PendingProviderRegistration) bool { return entry.Name == name })}
 		r.pendingNativeProviders = slices.DeleteFunc(slices.Clone(r.pendingNativeProviders), func(entry PendingNativeProviderRegistration) bool {
 			return entry.carrier != nil && entry.carrier.ID == name
 		})

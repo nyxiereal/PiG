@@ -444,7 +444,7 @@ func (b *cliRuntimeBuilder) buildResources(ctx context.Context, in cliBuildInput
 			build.SDKDrift = append(build.SDKDrift, drift)
 		}
 	}
-	virtualModelDiagnostics := flushExtensionHostVirtualModels(build.Host, registry)
+	registrationDiagnostics := flushExtensionHostRegistrations(build.Host, registry)
 	// Pi createAgentSessionServices awaits a local refresh after it flushes extension provider registrations, before model resolution and --list-models (agent-session-services.ts:158-182). The registrations only queued their refresh, and this call yields to it (model-runtime.ts:744-750). Later host registrations start their own refresh.
 	if in.Startup {
 		startupRegistrationRefreshReady.Store(true)
@@ -455,7 +455,7 @@ func (b *cliRuntimeBuilder) buildResources(ctx context.Context, in cliBuildInput
 		// startup, so interactive mode keeps a reload-capable host.
 		build.Host, build.Bridge = ensureReloadableExtensionHost(build.Host, build.Bridge, flags.NoExtensions, cwd, registry.ModelRegistry, build.ReloadExtensionConfigs)
 		// A host created for /reload has loaded nothing; binding it applies what a reload registers.
-		virtualModelDiagnostics = append(virtualModelDiagnostics, flushExtensionHostVirtualModels(build.Host, registry)...)
+		registrationDiagnostics = append(registrationDiagnostics, flushExtensionHostRegistrations(build.Host, registry)...)
 	}
 	// An extension's createAgentSession builds a child over this build's model runtime, in every mode.
 	BindChildSessions(build.Bridge, services)
@@ -523,7 +523,7 @@ func (b *cliRuntimeBuilder) buildResources(ctx context.Context, in cliBuildInput
 	var flagDiagnostics []codingagent.AgentSessionRuntimeDiagnostic
 	build.ExtensionFlagValues, flagDiagnostics = services.ApplyExtensionFlagValues(build.Extensions)
 	conflicts := codingagent.DetectExtensionConflicts(build.Extensions)
-	build.ExtensionDiagnostics = slices.Concat(sdkDiagnostics, build.PreTrustExtensionDiagnostics, virtualModelDiagnostics, flagDiagnostics, extensionLoadDiagnostics(withUpgradeHints(extensionLoadErrs, build.SDKDrift)), extensionErrorDiagnostics(builtinErrs), extensionConflictDiagnostics(conflicts), staleCopyDiagnostics(codingagent.DetectToolConflicts(build.Extensions), finalExtConfigs), extensionWarningDiagnostics(mergeExtensionWarnings(packageWarnings, replacementWarnings)))
+	build.ExtensionDiagnostics = slices.Concat(sdkDiagnostics, build.PreTrustExtensionDiagnostics, registrationDiagnostics, flagDiagnostics, extensionLoadDiagnostics(withUpgradeHints(extensionLoadErrs, build.SDKDrift)), extensionErrorDiagnostics(builtinErrs), extensionConflictDiagnostics(conflicts), staleCopyDiagnostics(codingagent.DetectToolConflicts(build.Extensions), finalExtConfigs), extensionWarningDiagnostics(mergeExtensionWarnings(packageWarnings, replacementWarnings)))
 	trace.Mark("extensions-loaded")
 
 	build.Flags = flags

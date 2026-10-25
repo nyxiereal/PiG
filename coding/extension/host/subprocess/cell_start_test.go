@@ -101,6 +101,10 @@ func TestLoadAllPreparesConcurrentlyAndRunsFactoriesInPlanOrder(t *testing.T) {
 		t.Fatalf("load errors: %v", errs)
 	}
 
+	// The registry is asked after every extension loaded, in registration order.
+	if failures := applyQueuedRegistrations(host); len(failures) != 0 {
+		t.Fatalf("registration failures: %v", failures)
+	}
 	var planned []string
 	for _, cell := range PlanCells(configs, nil) {
 		planned = append(planned, cellExtNames(cell)...)

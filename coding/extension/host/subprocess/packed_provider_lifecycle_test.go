@@ -84,6 +84,7 @@ func TestPackedCell_ProviderLifecycle(t *testing.T) {
 
 	check := func(want []string) {
 		t.Helper()
+		applyQueuedRegistrations(h)
 		mu.Lock()
 		got := make([]string, 0, len(registered))
 		for k := range registered {

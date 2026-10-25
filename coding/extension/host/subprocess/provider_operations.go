@@ -155,3 +155,20 @@ func (p *nativeProviderProxy) operations(carrier *extension.NativeProvider) {
 		carrier.CancelDeferred = p.cancelDeferred
 	}
 }
+
+// queueLoadedProvider queues the registration an extension declared while it loaded, as Pi's loader queues it (loader.ts:217-218): the registry is not asked until the services or the runner that binds it apply the queue, after every extension of the load finished, and the registry's rejection is the diagnostic `Extension "<path>" error: <message>` of that binding (agent-session-services.ts:157-169, runner.ts:471-487), not a failed load. What the host itself keeps for the extension (the replicas' record, the ownership of the provider's callbacks, the bridged login) is recorded at once: a reload decides which providers its replacement keeps from it, and a host that binds no registry (the login and inspection commands) lists the login from the load. A callback registration takes effect whether or not a registry was bound before the load. Native Provider objects register through [Host.registerNativeProvider] instead.
+//
+// upstream: loader.ts:217-218, agent-session-services.ts:157-169
+func (h *Host) queueLoadedProvider(me *managedExt, conn *Conn, provider ProviderDecl, cfg extension.ProviderConfig) error {
+	// Model-provider registration and OAuth registration are independent concerns: an extension may contribute an OAuth login with no model-provider callback wired on the host, so gate only the model-provider hook, never the OAuth registration.
+	h.attachProviderOperations(me, provider, &cfg)
+	h.providerRuntime.QueueProviderRegistration(provider.Name, cfg, extConfigOrigin(me.config))
+	if h.uiBridge != nil {
+		h.uiBridge.RecordProviderRegistration(provider.Name, provider.Config)
+	}
+	h.mu.Lock()
+	notifySuperseded := h.transferProviderOwnershipLocked(me, conn, provider.Name)
+	h.mu.Unlock()
+	notifySuperseded()
+	return h.registerOAuthProvider(me, provider.Name, provider.Config)
+}

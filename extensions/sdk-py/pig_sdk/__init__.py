@@ -3098,6 +3098,9 @@ class Context:
         """``Date.parse(text)`` over this handler's own connection; see :func:`pig_sdk.parse_date`."""
         from . import host_helpers
 
+        ms = host_helpers._parse_iso_date(text)
+        if ms is not None:
+            return ms
         return host_helpers._decode_date(self._call("date.parse", {"text": text}).get("result") or {})
 
     def generate_diff_string(self, old_content: str, new_content: str, context_lines: "int | None" = None) -> "DiffString":

@@ -216,6 +216,7 @@ type ToolDecl struct {
 	PreparesArguments bool `json:"prepares_arguments,omitempty"`
 	// Refinements lists the schema nodes of Parameters that carry TypeBox refinements (Type.Refine), which the extension runs: the host asks with RequestRefineArguments while it
 	// validates the arguments, in the order TypeBox calls them.
+	//portlint:allow emptydrop PiG wire field read by the host as a list: an empty list and an absent one both mean the tool has no refinement
 	Refinements []RefinementDecl `json:"refinements,omitempty"`
 	Source      string           `json:"source,omitempty"` // pig additive (D23): per-tool source override; default: extension name
 	// RenderShell is upstream ToolDefinition.renderShell: "self" when the

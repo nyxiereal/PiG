@@ -11,6 +11,7 @@ import (
 	"testing"
 
 	"github.com/MichaelKinsy/PiG/internal/codingagent"
+	"github.com/MichaelKinsy/PiG/internal/testenv"
 )
 
 func packageSources(sm *codingagent.SettingsManager, local bool) []string {
@@ -372,9 +373,7 @@ func TestPackageManagerNpmInstallAndUninstallPassTheRealPathWhenTheAgentDirIsASy
 	}
 	cwd, realAgent := t.TempDir(), t.TempDir()
 	agentLink := filepath.Join(t.TempDir(), "agent-link")
-	if err := os.Symlink(realAgent, agentLink); err != nil {
-		t.Fatal(err)
-	}
+	testenv.Symlink(t, realAgent, agentLink)
 	sm := codingagent.NewSettingsManagerWithProjectTrust(cwd, agentLink, true)
 	pm := NewPackageManager(PackageManagerOptions{CWD: cwd, SettingsManager: sm})
 	command, log := fakeNpm(t, "1.0.0")

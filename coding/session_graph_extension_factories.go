@@ -24,12 +24,12 @@ func (f graphExtensionFactory) factory(agentDir string) (extension.InlineExtensi
 	switch f.Builtin {
 	case "codemode":
 		// index.ts CodemodeExtensionOptions: mode, inlineBudget and models (default true).
-		var options struct {
+		options, err := decodeFactoryOptions[struct {
 			Mode         string   `json:"mode"`
 			InlineBudget *float64 `json:"inlineBudget"`
 			Models       *bool    `json:"models"`
-		}
-		if err := decodeFactoryOptions(f, &options); err != nil {
+		}](f)
+		if err != nil {
 			return nil, err
 		}
 		if options.Mode != "" && options.Mode != codemode.ModeOn && options.Mode != codemode.ModeOnly {
@@ -45,11 +45,11 @@ func (f graphExtensionFactory) factory(agentDir string) (extension.InlineExtensi
 		return toolsearch.CreateToolSearchExtension(), nil
 	case "mcp":
 		// index.ts McpExtensionOptions: the data options logPath and startupWaitMs. The function options (loadConfig, createTransport, credentials, openUrl, updateConfig) run caller code and are not served.
-		var options struct {
+		options, err := decodeFactoryOptions[struct {
 			LogPath       string   `json:"logPath"`
 			StartupWaitMs *float64 `json:"startupWaitMs"`
-		}
-		if err := decodeFactoryOptions(f, &options); err != nil {
+		}](f)
+		if err != nil {
 			return nil, err
 		}
 		built := mcpext.Options{LogPath: options.LogPath, AgentDir: agentDir, ConfigDirName: icodingagent.ConfigDirName()}
@@ -62,12 +62,13 @@ func (f graphExtensionFactory) factory(agentDir string) (extension.InlineExtensi
 	return nil, fmt.Errorf("the host serves no compiled-in extension named %q", f.Builtin)
 }
 
-func decodeFactoryOptions(f graphExtensionFactory, into any) error {
+func decodeFactoryOptions[T any](f graphExtensionFactory) (T, error) {
+	var options T
 	if len(f.Options) == 0 || string(f.Options) == "null" {
-		return nil
+		return options, nil
 	}
-	if err := json.Unmarshal(f.Options, into); err != nil {
-		return fmt.Errorf("options of the %s extension: %w", f.Builtin, err)
+	if err := json.Unmarshal(f.Options, &options); err != nil {
+		return options, fmt.Errorf("options of the %s extension: %w", f.Builtin, err)
 	}
-	return nil
+	return options, nil
 }

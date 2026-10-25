@@ -29,6 +29,29 @@ func plainWrite(name string, flag int, perm os.FileMode, content io.Reader) erro
 	return err
 }
 
+// writer is one way to write a file; chunk is 0 for plainWrite.
+type writer struct {
+	name  string
+	chunk int64
+	write func(string, int, os.FileMode, io.Reader) error
+}
+
+// writers is plain, one hold across the whole file (the first form of Write), and Write at several chunk sizes.
+func writers() []writer {
+	list := []writer{{"plain", 0, plainWrite}, {"whole", 1 << 40, execfile.Write}}
+	for _, chunk := range []int64{64 << 10, 256 << 10, 1 << 20, 4 << 20} {
+		list = append(list, writer{fmt.Sprintf("chunk=%dKiB", chunk>>10), chunk, execfile.Write})
+	}
+	return list
+}
+
+func (w writer) use() (restore func()) {
+	if w.chunk == 0 {
+		return func() {}
+	}
+	return execfile.SetChunkSize(w.chunk)
+}
+
 func benchmarkSource(b *testing.B, size int) string {
 	b.Helper()
 	source := filepath.Join(b.TempDir(), "compiled")
@@ -38,11 +61,12 @@ func benchmarkSource(b *testing.B, size int) string {
 	return source
 }
 
-// BenchmarkWrite measures one copy of a compiled binary into place, as copyArtifact and copyBuiltBinary do, with and without the hold on forks.
+// BenchmarkWrite measures one copy of a compiled binary into place, as copyArtifact and copyBuiltBinary do.
 func BenchmarkWrite(b *testing.B) {
-	for _, size := range []int{64 << 10, 1 << 20, 16 << 20} {
-		for name, write := range map[string]func(string, int, os.FileMode, io.Reader) error{"plain": plainWrite, "execfile": execfile.Write} {
-			b.Run(fmt.Sprintf("%s/%dKiB", name, size>>10), func(b *testing.B) {
+	for _, size := range []int{1 << 20, 4 << 20, 16 << 20} {
+		for _, w := range writers() {
+			b.Run(fmt.Sprintf("%s/%dMiB", w.name, size>>20), func(b *testing.B) {
+				defer w.use()()
 				source := benchmarkSource(b, size)
 				destination := filepath.Join(b.TempDir(), "runner")
 				b.ReportAllocs()
@@ -52,7 +76,7 @@ func BenchmarkWrite(b *testing.B) {
 					if err != nil {
 						b.Fatal(err)
 					}
-					err = write(destination, os.O_CREATE|os.O_EXCL, 0o755, input)
+					err = w.write(destination, os.O_CREATE|os.O_EXCL, 0o755, input)
 					_ = input.Close()
 					if err != nil {
 						b.Fatal(err)
@@ -73,16 +97,14 @@ func BenchmarkForkWhileWriting(b *testing.B) {
 		b.Skipf("no true(1) to start: %v", err)
 	}
 	for _, pause := range []time.Duration{50 * time.Millisecond, 0} {
-		for _, impl := range []struct {
-			name  string
-			write func(string, int, os.FileMode, io.Reader) error
-		}{{"plain", plainWrite}, {"execfile", execfile.Write}} {
-			b.Run(fmt.Sprintf("%s/pause=%v", impl.name, pause), func(b *testing.B) {
+		for _, w := range writers() {
+			b.Run(fmt.Sprintf("%s/pause=%v", w.name, pause), func(b *testing.B) {
+				defer w.use()()
 				source := benchmarkSource(b, 16<<20)
 				destination := filepath.Join(b.TempDir(), "runner")
 				stop := make(chan struct{})
-				var writer sync.WaitGroup
-				writer.Go(func() {
+				var copier sync.WaitGroup
+				copier.Go(func() {
 					for {
 						select {
 						case <-stop:
@@ -94,13 +116,13 @@ func BenchmarkForkWhileWriting(b *testing.B) {
 							return
 						}
 						_ = os.Remove(destination)
-						_ = impl.write(destination, os.O_CREATE|os.O_EXCL, 0o755, input)
+						_ = w.write(destination, os.O_CREATE|os.O_EXCL, 0o755, input)
 						_ = input.Close()
 					}
 				})
 				defer func() {
 					close(stop)
-					writer.Wait()
+					copier.Wait()
 				}()
 				starts := make([]time.Duration, 0, 4096)
 				b.ReportAllocs()

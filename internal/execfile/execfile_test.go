@@ -6,6 +6,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"syscall"
 	"testing"
@@ -89,5 +90,102 @@ func TestWriteTruncatesWhenAsked(t *testing.T) {
 	}
 	if got, err := os.ReadFile(name); err != nil || string(got) != "new" {
 		t.Fatalf("file = %q, %v", got, err)
+	}
+}
+
+// Write holds the fork lock for one chunk at a time: a process start that arrives during a chunk runs between two chunks, when the file is partly written and no descriptor of it is open, not after the whole copy.
+func TestWriteReleasesTheForkLockBetweenChunks(t *testing.T) {
+	defer execfile.SetChunkSize(8)()
+	name := filepath.Join(t.TempDir(), "runner")
+
+	type observation struct {
+		size       int64
+		openWriter bool
+	}
+	observed := make(chan observation, 1)
+	var reads int
+	content := readerFunc(func(p []byte) (int, error) {
+		reads++
+		switch reads {
+		case 1:
+			// A fork: it takes the write side of the lock, so it waits for the chunk in progress and runs before the next chunk.
+			go func() {
+				syscall.ForkLock.Lock()
+				defer syscall.ForkLock.Unlock()
+				info, err := os.Stat(name)
+				if err != nil {
+					t.Error(err)
+				}
+				observed <- observation{info.Size(), hasOpenDescriptor(name)}
+			}()
+		case 2:
+			// Wait until that fork is queued: a read lock is refused while a writer waits.
+			for syscall.ForkLock.TryRLock() {
+				syscall.ForkLock.RUnlock()
+				runtime.Gosched()
+			}
+		}
+		if reads > 6 {
+			return 0, io.EOF
+		}
+		return copy(p, "abcd"), nil
+	})
+	if err := execfile.Write(name, os.O_CREATE|os.O_EXCL, 0o755, content); err != nil {
+		t.Fatal(err)
+	}
+	got := <-observed
+	if got.size != 8 {
+		t.Fatalf("the fork ran with %d bytes written, want the first chunk of 8: the lock was held across chunks", got.size)
+	}
+	if got.openWriter {
+		t.Fatal("a descriptor of the file was open when the fork ran")
+	}
+	if data, err := os.ReadFile(name); err != nil || string(data) != strings.Repeat("abcd", 6) {
+		t.Fatalf("file = %q, %v", data, err)
+	}
+}
+
+// hasOpenDescriptor reports whether this process holds name open. It can tell only where /proc/self/fd exists.
+func hasOpenDescriptor(name string) bool {
+	entries, err := os.ReadDir("/proc/self/fd")
+	if err != nil {
+		return false
+	}
+	for _, entry := range entries {
+		if target, err := os.Readlink(filepath.Join("/proc/self/fd", entry.Name())); err == nil && target == name {
+			return true
+		}
+	}
+	return false
+}
+
+// Truncation and exclusive creation apply to the first chunk only; the later chunks continue where the last one ended.
+func TestWriteAcrossChunksKeepsAllContent(t *testing.T) {
+	defer execfile.SetChunkSize(8)()
+	name := filepath.Join(t.TempDir(), "binary")
+	if err := os.WriteFile(name, bytes.Repeat([]byte("old"), 100), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	want := strings.Repeat("0123456789", 5)
+	if err := execfile.Write(name, os.O_CREATE|os.O_TRUNC, 0o755, strings.NewReader(want)); err != nil {
+		t.Fatal(err)
+	}
+	if got, err := os.ReadFile(name); err != nil || string(got) != want {
+		t.Fatalf("file = %q, %v", got, err)
+	}
+	// A length that is a multiple of the chunk ends with an empty chunk.
+	exact := strings.Repeat("x", 16)
+	if err := execfile.Write(filepath.Join(filepath.Dir(name), "exact"), os.O_CREATE|os.O_EXCL, 0o755, strings.NewReader(exact)); err != nil {
+		t.Fatal(err)
+	}
+	if got, err := os.ReadFile(filepath.Join(filepath.Dir(name), "exact")); err != nil || string(got) != exact {
+		t.Fatalf("exact file = %q, %v", got, err)
+	}
+	empty := filepath.Join(filepath.Dir(name), "empty")
+	if err := execfile.Write(empty, os.O_CREATE|os.O_EXCL, 0o755, strings.NewReader("")); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := os.Stat(empty); err != nil {
+		t.Fatalf("empty content did not create the file: %v", err)
 	}
 }

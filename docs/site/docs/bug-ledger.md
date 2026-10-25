@@ -17010,6 +17010,7 @@ Each divergence record is accounted for here. A divergence that fixes a Pi defec
 | D188 | Opening a store at an older Durable schema version keeps a copy of it first, where Pi upgrades it in place | deliberate difference |
 | D190 | The built-in file mutation queue also orders mutations of one existing file reached through a hard link or a… | [BF-648ff3e-13](#bf-648ff3e-13) |
 | D198 | The Go, Rust and Python `Type` has no Codec family (`Codec`, `Decode`, `Encode`, `DecodeBuilder`… | [BF-D198](#bf-d198) |
+| D199 | PiG lists OpenRouter's :nitro and :floor routing variants beside every OpenRouter model, where Pi lists only… | deliberate difference |
 
 ## Fix-titled commits that are not bugs in a release
 

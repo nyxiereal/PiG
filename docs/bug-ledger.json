@@ -36033,6 +36033,10 @@
       "id": "D198",
       "title": "The Go, Rust and Python `Type` has no Codec family (`Codec`, `Decode`, `Encode`, `DecodeBuilder`…",
       "entry": "BF-D198"
+    },
+    {
+      "id": "D199",
+      "title": "PiG lists OpenRouter's :nitro and :floor routing variants beside every OpenRouter model, where Pi lists only…"
     }
   ],
   "exemptCommits": {

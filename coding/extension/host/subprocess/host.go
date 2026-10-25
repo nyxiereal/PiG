@@ -3490,7 +3490,7 @@ func (h *Host) adoptConn(ctx context.Context, me *managedExt, rawConn net.Conn, 
 	// them. Same binary → same providers, so skip.
 	for _, provider := range reg.Providers {
 		if provider.Native != nil {
-			if err := h.registerNativeProvider(ctx, me, conn, provider.Native); err != nil {
+			if err := h.registerNativeProvider(ctx, me, conn, provider.Native, !isRestart); err != nil {
 				return nil, err
 			}
 		}

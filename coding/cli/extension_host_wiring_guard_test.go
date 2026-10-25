@@ -207,7 +207,7 @@ func TestBuildFlushesTheExtensionHostProviderRegistrations(t *testing.T) {
 	bindProviderRegistry(host, services.Registry().ModelRegistry)
 	model := []extension.ProviderModelConfig{{ID: "m", Name: "M"}}
 	queue := func(name, api string) {
-		host.Runtime().QueueProviderRegistration(name, extension.ProviderConfig{API: ai.API(api), BaseURL: "https://" + name + ".invalid/v1", APIKey: "key", Models: model}, "/ext/"+name+".ts")
+		host.Runtime().QueueProviderRegistration(name, extension.ProviderConfig{API: ai.API(api), BaseURL: "https://" + name + ".invalid/v1", APIKey: "key", Models: model}, "/ext/"+name+".ts", nil)
 	}
 	queue("good", "openai-completions")
 	queue("bad", "")

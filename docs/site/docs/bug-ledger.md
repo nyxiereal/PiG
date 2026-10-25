@@ -562,6 +562,7 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 | [BF-76f780d-2](#bf-76f780d-2) | A grammar (custom) tool input no longer copies the whole input so far on every delta | PiG's own defect | All platforms | Unreleased |
 | [BF-773a868](#bf-773a868) | RPC mode no longer hangs when a Node extension command calls `pi.sendMessage(..., { triggerTurn: true })`… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-773a868-2](#bf-773a868-2) | RPC mode no longer hangs when a Node extension command calls `pi.appendEntry` and then `pi.setSessionName`… | PiG's own defect | All platforms | 0.5.0 |
+| [BF-7744a0b](#bf-7744a0b) | `--model <provider>/<id>` now resolves when the provider id itself contains a `/`, such as a URL-derived id… | PiG's own defect | All platforms | Unreleased |
 | [BF-7768bea](#bf-7768bea) | fix(ai): tool-call arguments are written as JSON.stringify writes them, and keep a lone surrogate | PiG's own defect | All platforms | Unreleased |
 | [BF-779318a](#bf-779318a) | OpenAI-compatible streams where one chunk carries reasoning and content (LiteLLM and similar proxies) now… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-78c4c6c](#bf-78c4c6c) | `pig piglet add` now names the offending bundled path and where it came from (for example `Package herdr… | PiG's own defect | All platforms | 0.5.0 |
@@ -596,6 +597,7 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 | [BF-80bb522-3](#bf-80bb522-3) | Amazon Bedrock Converse requests merge adjacent messages that have the same role | A Pi defect that PiG fixed first | All platforms | 0.5.0 |
 | [BF-80c797d](#bf-80c797d) | Text that holds ill-formed UTF-8 is written with one U+FFFD for each ill-formed sequence, as Node decodes it… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-8153bc7](#bf-8153bc7) | A tool round whose results request `Handoff` no longer ends the run on the tool-calling answer: the handoff's… | PiG's own defect | All platforms | Unreleased |
+| [BF-81e1a45](#bf-81e1a45) | Streaming a tool call's arguments allocates less per delta | PiG's own defect | All platforms | Unreleased |
 | [BF-81e584b](#bf-81e584b) | anthropic-messages payload now matches Pi for four cases found by the new live-Pi oracle… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-81e584b-2](#bf-81e584b-2) | Live-Pi oracle `TestMistralMessagesPayloadMatchesPi` (`ai/mistral_messages_payload_oracle_test.go`… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-8241433](#bf-8241433) | A Mistral stream chunk with a member of an unexpected type is read as Pi's JavaScript reads it instead of… | PiG's own defect | All platforms | 0.5.0 |
@@ -846,6 +848,7 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 | [BF-b730205](#bf-b730205) | OpenRouter image models that only the Images API serves (for example `openai/gpt-image-2.5-flare`) now… | A Pi defect that PiG fixed first | All platforms | 0.5.0 |
 | [BF-b751326](#bf-b751326) | When an extension in a shared Go, Rust or Python process crashes, the error for each stopped extension now… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-b78cdae](#bf-b78cdae) | A YAML parse error on a block scalar used as an implicit key (`name: x` followed by `\|description: ...`)… | PiG's own defect | All platforms | 0.5.0 |
+| [BF-b7d9b2b](#bf-b7d9b2b) | `pig install` and `pig remove` no longer add ever deeper nested entries to the npm `package-lock.json` when… | PiG's own defect | All platforms | Unreleased |
 | [BF-b84facb](#bf-b84facb) | fix(codingagent,tui): extension editor follows the terminal rows; title and image fallback close only the… | PiG's own defect | All platforms | Unreleased |
 | [BF-b88044f](#bf-b88044f) | A login flow's text prompt accepts an empty answer, as Pi's does, instead of failing with "<prompt> is… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-b8c5de6](#bf-b8c5de6) | Interactive startup no longer reads terminal input while it checks for fd and rg unless one of them is being… | PiG's own defect | All platforms | 0.5.0 |
@@ -953,6 +956,7 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 | [BF-d7855fd](#bf-d7855fd) | A subprocess extension's message, entry or tool renderer, or tool renderer resolver, that was busy past the… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-d7bfea6](#bf-d7bfea6) | A git source whose ref has no repository (`git:#v1`) no longer panics, and a ref split out of an opaque-path… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-d7c7f86](#bf-d7c7f86) | fix(runtimecell): start a packed cell's members in order so a later member's factory cannot take the factory… | PiG's own defect | All platforms | Unreleased |
+| [BF-d7fbf00](#bf-d7fbf00) | Stored assistant messages of a durable conversation now carry `thinkingLevel`: a generation records the… | PiG's own defect | All platforms | Unreleased |
 | [BF-d80425c](#bf-d80425c) | fix(train): gate repairs after merging train 3 and the ordering stack | PiG's own defect | All platforms | Unreleased |
 | [BF-d80c1cd](#bf-d80c1cd) | Where Pi calls `new URL(value)`, Pig now parses a `ws:`, `wss:`, `ftp:` or `file:` URL, and a bracketed IPv6… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-d8357e2](#bf-d8357e2) | Cache warmer pure functions against live Pi: new `TestCacheWarmerPureFunctionsMatchPi`… | PiG's own defect | All platforms | 0.5.0 |
@@ -8712,6 +8716,20 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 - **Tests:** `coding/cli/rpc_command_send_order_test.go::TestRPCCommandTurnStartOrderMatchesPi`, `coding/cli/rpc_ui_integration_test.go::TestRPCModeExtensionUIRoundTrip`, `coding/cli/session_wire_lifecycle_test.go::TestModeWireLifecycle`
 - **Release note:** RPC mode no longer hangs when a Node extension command calls `pi.appendEntry` and then `pi.setSessionName` while a `session_info_changed` handler is subscribed.
 
+### BF-7744a0b
+
+**`--model <provider>/<id>` now resolves when the provider id itself contains a `/`, such as a URL-derived id…**
+
+- **Source:** PiG's own defect
+- **Symptom:** The reference was split at its first `/`, so the prefix never named a provider and resolution ended in "not found".
+- **Root cause:** --model "<provider>/<id>" split the reference at its first "/", so a provider id that contains one (URL-derived ids such as llama=http://host:10800) never matched. splitProviderPrefix now compares the text with the catalog's provider ids, as Pi's splitProviderPrefix does: a provider matches when the text, up to the first "/" at or after the end of its lowercased trimmed id, trims to that id; the longest id wins and the first in catalog order on a tie. Positions are UTF-16 units, as in the source.
+- **User impact:** Behavior differed from Pi
+- **Platform:** All platforms
+- **Fixed in:** Unreleased
+- **Fix commits:** `7744a0bd9a` (2026-10-25)
+- **Tests:** `internal/codingagent/model_reference_upstream_test.go::TestResolveModelReferenceMatchesUpstream`, `internal/codingagent/model_resolver_oracle_test.go::TestModelResolverMatchesPi`
+- **Release note:** `--model <provider>/<id>` now resolves when the provider id itself contains a `/`, such as a URL-derived id like `llama-server=http://host:10800`. Before, the reference was split at its first `/`, so the prefix never named a provider and resolution ended in "not found". The longest matching provider id wins.
+
 ### BF-7768bea
 
 **fix(ai): tool-call arguments are written as JSON.stringify writes them, and keep a lone surrogate**
@@ -9182,6 +9200,20 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 - **Fix commits:** `8153bc7a9e` (2026-10-24)
 - **Tests:** `durable/harness/harness_inbox_test.go::TestInbox`
 - **Release note:** A tool round whose results request `Handoff` no longer ends the run on the tool-calling answer: the handoff's `pi.reset` entry is written and the same run continues with a new generation in the new context, so the submission settles with the eventual answer. Queued writes and selected steers are placed after the handoff text, follow-ups wait for the run's final boundary, and a queued reset still ends the run `unanswered` with reason `reset`. A round whose every result also sets `Terminate` ends the run after the handoff.
+
+### BF-81e1a45
+
+**Streaming a tool call's arguments allocates less per delta**
+
+- **Source:** PiG's own defect
+- **Symptom:** Streaming a tool call's arguments allocates less per delta.
+- **Root cause:** Pi's incremental parse of tool-call arguments () costs a snapshot per delta. PiG paid more than Pi on top of it: the parser recorded the changes nobody read, and every publish of the message cell copied the arguments the parser had just copied.
+- **User impact:** An operation failed or was rejected
+- **Platform:** All platforms
+- **Fixed in:** Unreleased
+- **Fix commits:** `81e1a45f0b` (2026-10-25)
+- **Tests:** `ai/streamed_arguments_shared_test.go::TestMutatingWhatASubscriberReceivedChangesNoSnapshotOfAStreamedCall`, `ai/streamed_arguments_shared_test.go::TestPublishedStreamedArgumentsShareTheSnapshotOnlyWhenValidAndEqualACloneAlways`, `ai/streamed_arguments_shared_test.go::TestStreamingSnapshotValidImpliesCloneJSONValueEqualsIt`, `ai/streamed_arguments_shared_test.go::TestStreamingSnapshotValidityRules`, `ai/streamed_arguments_shared_test.go::TestSubscribersMutatingConcurrentlyDoNotRaceWithAStreamingProducer`
+- **Release note:** Streaming a tool call's arguments allocates less per delta. The incremental parser no longer records changes nobody reads, and a streamed message's published copy keeps the parser's validated snapshot instead of copying it again (an invalid byte in an argument string is still rewritten as before). A 250 KB `write` call streams about 13% faster with about 22% fewer allocations; the print-mode allocation ceilings per delta fall from 20 and 35 to the measured 18.5 and 18.3 (faux provider and OpenAI Completions).
 
 ### BF-81e584b
 
@@ -12667,6 +12699,20 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 - **Tests:** `internal/yaml12/parse_mutation_test.go::TestParseMatchesTheLibraryOnErrorRangesPastNonASCII`
 - **Release note:** A YAML parse error on a block scalar used as an implicit key (`name: x` followed by `|description: ...`) draws the carets of the `Implicit keys need to be on a single line` message as the yaml library does when the scalar's content holds a non-ASCII character: the range ends one UTF-16 unit per character after the key's offset, where it used to count bytes and print one caret or too many.
 
+### BF-b7d9b2b
+
+**`pig install` and `pig remove` no longer add ever deeper nested entries to the npm `package-lock.json` when…**
+
+- **Source:** PiG's own defect
+- **Symptom:** `pig install` and `pig remove` no longer add ever deeper nested entries to the npm `package-lock.json` when the agent directory is reached through a symlink, such as `~/.pi` linked into a dotfiles repository.
+- **Root cause:** Install, temporary install and the update batch now pass the root's real path when it exists (RealInstallRoot, package-manager.ts getNpmInstallArgs), and uninstall passes the real path after its existence check (uninstallNpm).
+- **User impact:** Behavior differed from Pi
+- **Platform:** All platforms
+- **Fixed in:** Unreleased
+- **Fix commits:** `b7d9b2b676` (2026-10-25)
+- **Tests:** `coding/cli/npm_command_name_test.go::TestNpmCommandClassificationAtInstallAndRemove`, `coding/cli/package_batch_upstream_test.go::TestPackageBatchedConcurrentUpdatesOriginal`, `coding/cli/package_cli_output_test.go::TestPackageChildOutputAndFailure`, `internal/packagemanager/package_manager_ops_gaps_test.go::TestPackageManagerNpmInstallAndUninstallPassTheRealPathWhenTheAgentDirIsASymlink`, `internal/packagemanager/package_manager_ops_gaps_test.go::TestPackageManagerNpmUninstallAndUpdateCheckUseTheConfiguredCommand`
+- **Release note:** `pig install` and `pig remove` no longer add ever deeper nested entries to the npm `package-lock.json` when the agent directory is reached through a symlink, such as `~/.pi` linked into a dotfiles repository. PiG now passes the resolved real path to npm as `--prefix` (or `--cwd` for Bun).
+
 ### BF-b84facb
 
 **fix(codingagent,tui): extension editor follows the terminal rows; title and image fallback close only the…**
@@ -14151,6 +14197,20 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 - **Fixed in:** Unreleased
 - **Fix commits:** `d7c7f86a12` (2026-10-21)
 - **Tests:** None recorded.
+
+### BF-d7fbf00
+
+**Stored assistant messages of a durable conversation now carry `thinkingLevel`: a generation records the…**
+
+- **Source:** PiG's own defect
+- **Symptom:** Stored assistant messages of a durable conversation now carry `thinkingLevel`: a generation records the thinking level its request asked for on the response, also after polling a deferred one.
+- **Root cause:** A generation records the Pi thinking level its request asked for on the response, also after polling a deferred one, as pi-agent-core's agent loop does: the poll checkpoint carries thinkingLevel (absent in checkpoints of earlier versions, which record none), and classification sets it on the message before it is stored. Ported in both engines, durable/harness (generation.go) and the core engine (durable/core/turn).
+- **User impact:** Behavior differed from Pi
+- **Platform:** All platforms
+- **Fixed in:** Unreleased
+- **Fix commits:** `d7fbf0046b` (2026-10-25)
+- **Tests:** `durable/harness/harness_generation_recovery_test.go::TestGenerationRecovery`, `durable/harness/harness_generation_test.go::TestGeneration`
+- **Release note:** Stored assistant messages of a durable conversation now carry `thinkingLevel`: a generation records the thinking level its request asked for on the response, also after polling a deferred one. A poll checkpoint written by an earlier version has no level and records none.
 
 ### BF-d80425c
 

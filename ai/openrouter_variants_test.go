@@ -161,3 +161,32 @@ func TestRewriteRecordIdentity(t *testing.T) {
 		}
 	}
 }
+
+// The derived variants are held once per variant of each bundled model: listing again, or looking a variant up, builds none and the
+// entries it returns are the held ones.
+func TestDerivedOpenRouterVariantsAreBuiltOnce(t *testing.T) {
+	bases := piListedModels(ListModels("openrouter"))
+	count := func() int {
+		n := 0
+		derivedVariants.Range(func(_, _ any) bool { n++; return true })
+		return n
+	}
+	first := count()
+	if first < len(bases)*len(OpenRouterRoutingVariants) {
+		t.Fatalf("%d derived variants held after a list of %d bases", first, len(bases))
+	}
+	allocs := testing.AllocsPerRun(5, func() { _ = ListModels("openrouter") })
+	if second := count(); second != first {
+		t.Errorf("a second list holds %d derived variants, the first held %d", second, first)
+	}
+	// One slice, no derivation: the list itself, the id set the check for a listed variant would build is skipped.
+	if allocs > 50 {
+		t.Errorf("a list allocates %v times; it should copy held entries, not derive them", allocs)
+	}
+	spec := "openrouter/" + bases[0].ID + ":nitro"
+	got, _ := LookupModelExact(spec)
+	held, _ := derivedVariants.Load(derivedVariantKey{bases[0].ID, "nitro"})
+	if got != held.(*derivedVariant).entry {
+		t.Error("a lookup returns an entry other than the held one")
+	}
+}

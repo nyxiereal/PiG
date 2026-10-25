@@ -79,22 +79,28 @@ func OpenRouterRoutingVariantIDs(provider, id string) []string {
 }
 
 // WithOpenRouterRoutingVariants lists each routing variant of every OpenRouter chat model of models right after the model, leaving
-// a variant the catalog already lists where it is. It returns models itself when it holds no OpenRouter model. The variants are
-// derived here, so only the entries listed are built.
+// a variant the catalog already lists where it is. It returns models itself when it holds no OpenRouter model. A bundled model's variants are
+// derived once and held (derivedOpenRouterVariant), so a list costs a copy of each entry listed.
 func WithOpenRouterRoutingVariants(models []GeneratedModel) []GeneratedModel {
-	bases := 0
+	bases, hasVariant := 0, false
 	for i := range models {
 		if isOpenRouterBase(&models[i]) {
 			bases++
+		} else if _, _, variant := OpenRouterRoutingVariant(models[i].Provider, models[i].ID); variant {
+			hasVariant = true
 		}
 	}
 	if bases == 0 {
 		return models
 	}
-	listed := make(map[string]struct{}, len(models))
-	for i := range models {
-		if models[i].Provider == "openrouter" { //portlint:allow providerliteral the variants are OpenRouter's own routing suffixes
-			listed[models[i].ID] = struct{}{}
+	// A variant the list already holds is rare (Pi's catalog lists none); the set of them is built only then.
+	var listed map[string]struct{}
+	if hasVariant {
+		listed = make(map[string]struct{}, len(models))
+		for i := range models {
+			if models[i].Provider == "openrouter" { //portlint:allow providerliteral the variants are OpenRouter's own routing suffixes
+				listed[models[i].ID] = struct{}{}
+			}
 		}
 	}
 	out := make([]GeneratedModel, 0, len(models)+bases*len(OpenRouterRoutingVariants))
@@ -104,12 +110,44 @@ func WithOpenRouterRoutingVariants(models []GeneratedModel) []GeneratedModel {
 			continue
 		}
 		for _, variant := range OpenRouterRoutingVariants {
-			if _, exists := listed[models[i].ID+":"+variant]; !exists {
-				out = append(out, models[i].OpenRouterVariant(variant))
+			if _, exists := listed[models[i].ID+":"+variant]; hasVariant && exists {
+				continue
 			}
+			out = append(out, *derivedOpenRouterVariant(&models[i], variant))
 		}
 	}
 	return out
+}
+
+// derivedVariantKey names the variant of a bundled OpenRouter model.
+type derivedVariantKey struct{ base, variant string }
+
+// derivedVariant is a variant derived from a bundled base entry, with the name and record of the base it was derived from.
+type derivedVariant struct {
+	baseName, baseRecord string
+	entry                *GeneratedModel
+}
+
+// derivedVariants holds the variants derived from the bundled OpenRouter models, each built once and never written: a listing copies the
+// entry and a lookup returns it. It holds at most one entry per variant of each bundled model, so it is bounded by the catalog.
+var derivedVariants sync.Map
+
+// derivedOpenRouterVariant is base.OpenRouterVariant(variant), built once for a base that is a bundled model and derived afresh for any other.
+func derivedOpenRouterVariant(base *GeneratedModel, variant string) *GeneratedModel {
+	key := derivedVariantKey{base.ID, variant}
+	if cached, ok := derivedVariants.Load(key); ok {
+		if derived := cached.(*derivedVariant); derived.baseName == base.DisplayName && derived.baseRecord == base.Record {
+			return derived.entry
+		}
+		entry := base.OpenRouterVariant(variant)
+		return &entry
+	}
+	entry := base.OpenRouterVariant(variant)
+	actual, _ := derivedVariants.LoadOrStore(key, &derivedVariant{baseName: base.DisplayName, baseRecord: base.Record, entry: &entry})
+	if derived := actual.(*derivedVariant); derived.baseName == base.DisplayName && derived.baseRecord == base.Record {
+		return derived.entry
+	}
+	return &entry
 }
 
 // openRouterVariants holds the variant entries LookupModel and LookupModelExact have derived, by the spec they were asked for, so a
@@ -130,8 +168,8 @@ func lookupOpenRouterVariant(spec string, base func(string) (*GeneratedModel, bo
 	if !ok || !isOpenRouterBase(entry) {
 		return nil, false
 	}
-	derived := entry.OpenRouterVariant(spec[cut+1:])
-	actual, _ := openRouterVariants.LoadOrStore(spec, &derived)
+	derived := derivedOpenRouterVariant(entry, spec[cut+1:])
+	actual, _ := openRouterVariants.LoadOrStore(spec, derived)
 	return actual.(*GeneratedModel), true
 }
 

@@ -1,5 +1,6 @@
 // The Node fixture of the session graph conformance rows (session_graph_test.go). It runs the script of testfixture/sessiongraph (Go), testdata/session-graph-rust and the inline Python fixture with Pi's own SessionManager, so the report it makes is Pi's.
 import { DefaultPackageManager, DefaultResourceLoader, ModelRuntime, ProjectTrustStore, SessionManager, SettingsManager, createAgentSession, createAgentSessionFromServices, createAgentSessionServices, getAgentDir, hasTrustRequiringProjectResources } from "@earendil-works/pi-coding-agent";
+import { createAssistantMessageEventStream, createProvider } from "@earendil-works/pi-ai";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 
@@ -711,6 +712,124 @@ async function servicesScript({ mrAuth, mrModels, mrStore, cwd, agentDir, servic
   return r;
 }
 
+// createProvider (pi-ai models.ts): Pi's own run is the expectation (create_provider). The Go, Python and Rust scripts call their SDK's CreateProvider with the same parts and must report the same. The provider is built and driven
+// in the extension process, as Pi's is.
+async function createProviderScript() {
+  const r = {};
+  const auth = { apiKey: { name: "Key", resolve: async () => ({ auth: { apiKey: "k" } }) } };
+  const M = (id, api, extra = {}) => ({ id, name: id, api, provider: "cp", ...extra });
+  const message = (model, text) => ({
+    role: "assistant", content: [{ type: "text", text }], api: model.api, provider: model.provider, model: model.id,
+    usage: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0, totalTokens: 0, cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0, total: 0 } }, stopReason: "stop", timestamp: 1,
+  });
+  const scripted = (tag) => (model) => {
+    const stream = createAssistantMessageEventStream();
+    stream.push({ type: "done", reason: "stop", message: message(model, `${tag}:${model.id}`) });
+    return stream;
+  };
+  const impl = (tag, extra = {}) => ({ stream: scripted(`${tag}.stream`), streamSimple: scripted(`${tag}.simple`), ...extra });
+  const drain = async (stream) => {
+    const types = [];
+    for await (const event of stream) types.push(event.type);
+    const result = await stream.result();
+    return {
+      types, text: result.content.map((block) => block.text ?? "").join(""), stopReason: result.stopReason, error: result.errorMessage ?? null, api: result.api ?? null, provider: result.provider, model: result.model,
+      usageZero: result.usage.totalTokens === 0, timestampIsNumber: typeof result.timestamp === "number",
+    };
+  };
+  const thrown = (fn) => {
+    try {
+      fn();
+    } catch (error) {
+      return error.message;
+    }
+    return "no error";
+  };
+  const rejected = async (fn) => {
+    try {
+      await fn();
+    } catch (error) {
+      return error.message;
+    }
+    return "no error";
+  };
+  const base = [M("c1", "api-a"), M("c2", "api-b"), M("i1", "img-a", { type: "image" }), M("k1", "cls-a", { type: "classifier" })];
+  const p = createProvider({ id: "cp", auth, models: base, api: { "api-a": impl("a"), "api-b": impl("b") }, baseUrl: "http://x", headers: { h: "1" } });
+  r.meta = {
+    id: p.id, name: p.name, baseUrl: p.baseUrl ?? null, headers: p.headers ?? null, named: createProvider({ id: "cp2", name: "Named", auth, models: [], api: impl("s") }).name,
+    methods: Object.fromEntries(["fetchDeferred", "cancelDeferred", "generateImages", "classify", "refreshModels", "filterModels", "filterAllModels"].map((name) => [name, typeof p[name]])),
+  };
+  r.models = { chat: p.getModels().map((model) => model.id), all: p.getAllModels().map((model) => model.id) };
+  r.dispatch = {
+    a: await drain(p.stream(base[0], {})), b: await drain(p.streamSimple(base[1], {})), missing: await drain(p.stream(M("c9", "api-z"), {})),
+    noApi: await drain(p.streamSimple({ id: "c8", provider: "cp" }, {})),
+    single: await drain(createProvider({ id: "sp", auth, models: [], api: impl("s") }).stream(M("x", "anything"), {})),
+  };
+  r.invalid = {
+    none: thrown(() => createProvider({ id: "e1", auth, models: [] })),
+    empty: thrown(() => createProvider({ id: "e2", auth, models: [], api: {}, images: {}, classifiers: {} })),
+  };
+  const cancelled = [];
+  const deferredApis = {
+    "api-a": impl("a", { fetchDeferred: (model, handle) => scripted(`a.fetch.${handle.id}`)(model), cancelDeferred: async (_model, handle) => { cancelled.push(handle.id); } }),
+    "api-b": impl("b"),
+  };
+  const d = createProvider({ id: "dp", auth, models: [], api: deferredApis });
+  const broken = createProvider({ id: "bp", auth, models: [], api: { "api-a": impl("a", { fetchDeferred: () => { throw new Error("fetch boom"); } }) } });
+  r.deferred = {
+    fetched: await drain(d.fetchDeferred(M("c1", "api-a"), { id: "h1" })), unsupported: await drain(d.fetchDeferred(M("c2", "api-b"), { id: "h2" })),
+    noApi: await drain(d.fetchDeferred(M("c3", "api-z"), { id: "h3" })), thrown: await drain(broken.fetchDeferred(M("c1", "api-a"), { id: "h4" })),
+    cancelOk: await rejected(() => d.cancelDeferred(M("c1", "api-a"), { id: "h1" })), cancelled,
+    cancelUnsupported: await rejected(() => d.cancelDeferred(M("c2", "api-b"), { id: "h2" })), cancelNoApi: await rejected(() => d.cancelDeferred(M("c3", "api-z"), { id: "h3" })),
+  };
+  const pick = (result) => ({
+    api: result.api ?? null, provider: result.provider, model: result.model, stopReason: result.stopReason, error: result.errorMessage ?? null, output: result.output ?? null, answers: result.answers ?? null,
+    timestampIsNumber: typeof result.timestamp === "number",
+  });
+  const o = createProvider({
+    id: "op", auth, models: [],
+    images: { "img-a": { generateImages: async (model) => ({ api: model.api, provider: model.provider, model: model.id, output: [{ type: "image", data: "x" }], stopReason: "stop", timestamp: 1 }) } },
+    classifiers: { "cls-a": { classify: async (model) => ({ api: model.api, provider: model.provider, model: model.id, answers: { q: "a" }, stopReason: "stop", timestamp: 1 }) } },
+  });
+  r.operations = {
+    methods: { stream: typeof o.stream, generateImages: typeof o.generateImages, classify: typeof o.classify },
+    image: pick(await o.generateImages(M("i1", "img-a", { type: "image" }), {})), imageMissing: pick(await o.generateImages(M("i2", "img-z", { type: "image" }), {})),
+    classify: pick(await o.classify(M("k1", "cls-a", { type: "classifier" }), {})), classifyMissing: pick(await o.classify(M("k2", "cls-z", { type: "classifier" }), {})),
+  };
+  const fetchCalls = [];
+  const publications = [];
+  const f = createProvider({
+    id: "fp", auth, models: [M("c1", "api-a", { name: "Base One" }), M("c2", "api-a")], api: impl("f"),
+    fetchModels: async (context) => {
+      fetchCalls.push(context.allowNetwork);
+      return [M("c1", "api-a", { name: "Fetched One" }), M("c3", "api-a"), M("u1", "api-a", { type: "future" }), M("i1", "img-a", { type: "image" })];
+    },
+  });
+  const catalog = () => f.getAllModels().map((model) => `${model.id}:${model.name}:${model.type ?? "chat"}`);
+  const refreshContext = (extra = {}) => ({
+    allowNetwork: true, signal: new AbortController().signal,
+    publish: async (publication) => {
+      publications.push({ persist: publication.persist === undefined ? "omitted" : { models: publication.persist.models.map((model) => model.id), checkedAt: typeof publication.persist.checkedAt }, update: typeof publication.update });
+      publication.update?.();
+      return true;
+    },
+    ...extra,
+  });
+  const stored = { models: [M("c1", "api-a", { name: "Stored One", provider: "fp" }), M("z9", "api-a", { provider: "other" })] };
+  r.refresh = { present: typeof f.refreshModels, absent: typeof p.refreshModels, initial: catalog() };
+  await f.refreshModels(refreshContext({ stored, allowNetwork: false }));
+  r.refresh.restoredOffline = { catalog: catalog(), fetchCalls: [...fetchCalls], publications: publications.splice(0) };
+  const controller = new AbortController();
+  controller.abort();
+  await f.refreshModels(refreshContext({ stored, signal: controller.signal }));
+  r.refresh.aborted = { fetchCalls: [...fetchCalls], publications: publications.splice(0) };
+  await f.refreshModels(refreshContext({ stored, publish: async () => false }));
+  r.refresh.refused = { catalog: catalog(), fetchCalls: [...fetchCalls] };
+  await f.refreshModels(refreshContext());
+  r.refresh.fetched = { catalog: catalog(), fetchCalls: [...fetchCalls], publications: publications.splice(0), chat: f.getModels().map((model) => model.id) };
+  return r;
+}
+
 export default function (pi) {
   pi.registerTool({
     name: "session_manager", label: "session_manager", description: "Runs the SessionManager script.", parameters: { type: "object" },
@@ -743,5 +862,9 @@ export default function (pi) {
   pi.registerTool({
     name: "services", label: "services", description: "Runs the createAgentSessionServices script.", parameters: { type: "object" },
     execute: async (_id, params) => ({ content: [{ type: "text", text: JSON.stringify(await servicesScript(params)) }] }),
+  });
+  pi.registerTool({
+    name: "create_provider", label: "create_provider", description: "Runs the createProvider script.", parameters: { type: "object" },
+    execute: async () => ({ content: [{ type: "text", text: JSON.stringify(await createProviderScript()) }] }),
   });
 }

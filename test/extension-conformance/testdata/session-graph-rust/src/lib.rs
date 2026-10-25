@@ -1,6 +1,6 @@
 //! Fixture for the session graph conformance rows (test/extension-conformance/session_graph_test.go): the script of testfixture/sessiongraph (Go), testdata/session-graph.mjs (Node, Pi's own classes) and testdata/session_graph_python.py.
 
-use pig_sdk::{create_agent_session_from_services, create_agent_session_services, CreateAgentSessionFromServicesOptions, CreateAgentSessionServicesOptions, SessionStartEvent, CreateAgentSessionOptions, ModelRuntime, ModelRuntimeCreateOptions, ModelRoute, VirtualModel, DefaultPackageManager, PackageManagerOptions, DefaultResourceLoader, DefaultResourceLoaderOptions, empty_schema, Context, Extension, NewSessionOptions, SessionInfo, SessionManager, SettingsManager, SettingsManagerCreateOptions, ToolResult, has_trust_requiring_project_resources, ProjectTrustStore, ProjectTrustStoreEntry, ProjectTrustUpdate};
+use pig_sdk::{create_provider, CreateProviderOptions, ProviderApi, ProviderStreams, ProviderAuth, APIKeyAuth, AuthResult, ProviderStreamFn, ProviderOperationFn, ProviderOperationOptions, ProviderStreamOptions, RefreshModelsContext, ModelsPublication, create_assistant_message_event_stream, ProviderSignal, create_agent_session_from_services, create_agent_session_services, CreateAgentSessionFromServicesOptions, CreateAgentSessionServicesOptions, SessionStartEvent, CreateAgentSessionOptions, ModelRuntime, ModelRuntimeCreateOptions, ModelRoute, VirtualModel, DefaultPackageManager, PackageManagerOptions, DefaultResourceLoader, DefaultResourceLoaderOptions, empty_schema, Context, Extension, NewSessionOptions, SessionInfo, SessionManager, SettingsManager, SettingsManagerCreateOptions, ToolResult, has_trust_requiring_project_resources, ProjectTrustStore, ProjectTrustStoreEntry, ProjectTrustUpdate};
 use serde_json::{json, Value};
 use std::io;
 use std::path::Path;
@@ -791,6 +791,166 @@ fn services_script(ctx: &Context, args: &Value) -> io::Result<Value> {
     Ok(Value::Object(r))
 }
 
+/// pi-ai's createProvider over the parts of testdata/session-graph.mjs createProviderScript; the report is Pi's own run's.
+fn create_provider_script() -> Result<Value, String> {
+    let auth = || ProviderAuth { api_key: Some(APIKeyAuth { name: "Key".into(), check: None, resolve: Arc::new(|_| Ok(Some(AuthResult { auth: json!({"apiKey": "k"}), env: None, source: None }))), login: None }), oauth: None };
+    fn model(id: &str, api: &str, extra: Value) -> Value {
+        let mut value = json!({"id": id, "name": id, "api": api, "provider": "cp"});
+        for (key, field) in extra.as_object().cloned().unwrap_or_default() {
+            value[key] = field;
+        }
+        value
+    }
+    let m = |id: &str, api: &str| model(id, api, json!({}));
+    let scripted = move |tag: String| -> ProviderStreamFn {
+        Arc::new(move |model, _context, _options| {
+            let stream = create_assistant_message_event_stream();
+            stream.push(json!({"type": "done", "reason": "stop", "message": json!({
+                "role": "assistant", "content": [{"type": "text", "text": format!("{}:{}", tag, text(&model["id"]))}], "api": model["api"], "provider": model["provider"], "model": model["id"],
+                "usage": {"input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0, "totalTokens": 0, "cost": {"input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0, "total": 0}},
+                "stopReason": "stop", "timestamp": 1,
+            })}));
+            Ok(stream)
+        })
+    };
+    let impl_ = |tag: &str| ProviderStreams { stream: scripted(format!("{tag}.stream")), stream_simple: scripted(format!("{tag}.simple")), fetch_deferred: None, cancel_deferred: None };
+    let drain = |stream: Arc<pig_sdk::ModelEventStream>| -> Value {
+        let mut types = Vec::new();
+        while let Some(event) = stream.next() {
+            types.push(event["type"].clone());
+        }
+        let result = stream.result().unwrap_or(Value::Null);
+        let content: String = result["content"].as_array().map(Vec::as_slice).unwrap_or_default().iter().map(|block| text(&block["text"]).to_string()).collect();
+        json!({
+            "types": types, "text": content, "stopReason": result["stopReason"], "error": result["errorMessage"], "api": result["api"], "provider": result["provider"], "model": result["model"],
+            "usageZero": result["usage"]["totalTokens"] == 0, "timestampIsNumber": result["timestamp"].is_number(),
+        })
+    };
+    let kind = |present: bool| if present { "function" } else { "undefined" };
+    let options = ProviderStreamOptions::default();
+    let operation_options = || ProviderOperationOptions { signal: ProviderSignal::default(), values: json!({}) };
+    let options_for = |api: Option<ProviderApi>, id: &str, models: Vec<Value>| CreateProviderOptions {
+        id: id.into(), name: None, base_url: None, headers: None, auth: auth(), models, fetch_models: None, filter_models: None, filter_all_models: None, api, images: vec![], classifiers: vec![],
+    };
+    let mut r = serde_json::Map::new();
+    let base = vec![m("c1", "api-a"), m("c2", "api-b"), model("i1", "img-a", json!({"type": "image"})), model("k1", "cls-a", json!({"type": "classifier"}))];
+    let mut opts = options_for(Some(ProviderApi::ByApi(vec![("api-a".into(), impl_("a")), ("api-b".into(), impl_("b"))])), "cp", base.clone());
+    opts.base_url = Some("http://x".into());
+    opts.headers = Some(json!({"h": "1"}));
+    let p = create_provider(opts)?;
+    let mut named_opts = options_for(Some(ProviderApi::Single(impl_("s"))), "cp2", vec![]);
+    named_opts.name = Some("Named".into());
+    let named = create_provider(named_opts)?;
+    r.insert("meta".into(), json!({
+        "id": p.id, "name": p.name, "baseUrl": p.base_url, "headers": p.headers, "named": named.name,
+        "methods": {"fetchDeferred": kind(p.fetch_deferred.is_some()), "cancelDeferred": kind(p.cancel_deferred.is_some()), "generateImages": kind(p.generate_images.is_some()), "classify": kind(p.classify.is_some()),
+                    "refreshModels": kind(p.refresh_models.is_some()), "filterModels": kind(p.filter_models.is_some()), "filterAllModels": kind(p.filter_all_models.is_some())},
+    }));
+    let ids = |models: Vec<Arc<Value>>| -> Vec<Value> { models.iter().map(|model| model["id"].clone()).collect() };
+    r.insert("models".into(), json!({"chat": ids((p.get_models)()?), "all": ids((p.get_all_models.as_ref().unwrap())()?)}));
+    let sp = create_provider(options_for(Some(ProviderApi::Single(impl_("s"))), "sp", vec![]))?;
+    r.insert("dispatch".into(), json!({
+        "a": drain((p.stream)(Arc::new(base[0].clone()), json!({}), options.clone())?),
+        "b": drain((p.stream_simple)(Arc::new(base[1].clone()), json!({}), options.clone())?),
+        "missing": drain((p.stream)(Arc::new(m("c9", "api-z")), json!({}), options.clone())?),
+        "noApi": drain((p.stream_simple)(Arc::new(json!({"id": "c8", "provider": "cp"})), json!({}), options.clone())?),
+        "single": drain((sp.stream)(Arc::new(m("x", "anything")), json!({}), options.clone())?),
+    }));
+    let failed = |result: Result<pig_sdk::Provider, String>| match result { Ok(_) => "no error".to_string(), Err(error) => error };
+    let mut empty = options_for(Some(ProviderApi::ByApi(vec![])), "e2", vec![]);
+    empty.images = vec![];
+    r.insert("invalid".into(), json!({"none": failed(create_provider(options_for(None, "e1", vec![]))), "empty": failed(create_provider(empty))}));
+    let cancelled: Arc<Mutex<Vec<Value>>> = Arc::new(Mutex::new(Vec::new()));
+    let mut api_a = impl_("a");
+    api_a.fetch_deferred = Some(Arc::new(move |model, handle, options| {
+        let tag = format!("a.fetch.{}", text(&handle["id"]));
+        scripted(tag)(model, handle, options)
+    }));
+    let sink = cancelled.clone();
+    api_a.cancel_deferred = Some(Arc::new(move |_model, handle, _options| {
+        sink.lock().unwrap().push(handle["id"].clone());
+        Ok(())
+    }));
+    let d = create_provider(options_for(Some(ProviderApi::ByApi(vec![("api-a".into(), api_a), ("api-b".into(), impl_("b"))])), "dp", vec![]))?;
+    let mut broken_a = impl_("a");
+    broken_a.fetch_deferred = Some(Arc::new(|_model, _handle, _options| Err("fetch boom".to_string())));
+    let broken = create_provider(options_for(Some(ProviderApi::ByApi(vec![("api-a".into(), broken_a)])), "bp", vec![]))?;
+    let handle = |id: &str| json!({"id": id});
+    let message_of = |result: Result<(), String>| match result { Ok(()) => "no error".to_string(), Err(error) => error };
+    let cancel = |model: Value, id: &str| message_of((d.cancel_deferred.as_ref().unwrap())(Arc::new(model), handle(id), options.clone()));
+    let fetch = |provider: &pig_sdk::Provider, model: Value, id: &str| -> Result<Value, String> { Ok(drain((provider.fetch_deferred.as_ref().unwrap())(Arc::new(model), handle(id), options.clone())?)) };
+    let cancel_ok = cancel(m("c1", "api-a"), "h1");
+    r.insert("deferred".into(), json!({
+        "fetched": fetch(&d, m("c1", "api-a"), "h1")?, "unsupported": fetch(&d, m("c2", "api-b"), "h2")?, "noApi": fetch(&d, m("c3", "api-z"), "h3")?, "thrown": fetch(&broken, m("c1", "api-a"), "h4")?,
+        "cancelOk": cancel_ok, "cancelled": *cancelled.lock().unwrap(),
+        "cancelUnsupported": cancel(m("c2", "api-b"), "h2"), "cancelNoApi": cancel(m("c3", "api-z"), "h3"),
+    }));
+    let pick = |result: Value| json!({
+        "api": result["api"], "provider": result["provider"], "model": result["model"], "stopReason": result["stopReason"], "error": result["errorMessage"], "output": result["output"], "answers": result["answers"],
+        "timestampIsNumber": result["timestamp"].is_number(),
+    });
+    let mut op_opts = options_for(None, "op", vec![]);
+    let image_op: ProviderOperationFn = Arc::new(|model, _request, _options| Ok(json!({"api": model["api"], "provider": model["provider"], "model": model["id"], "output": [{"type": "image", "data": "x"}], "stopReason": "stop", "timestamp": 1})));
+    let classify_op: ProviderOperationFn = Arc::new(|model, _request, _options| Ok(json!({"api": model["api"], "provider": model["provider"], "model": model["id"], "answers": {"q": "a"}, "stopReason": "stop", "timestamp": 1})));
+    op_opts.images = vec![("img-a".into(), image_op)];
+    op_opts.classifiers = vec![("cls-a".into(), classify_op)];
+    let o = create_provider(op_opts)?;
+    let generate = |model: Value| -> Result<Value, String> { Ok(pick((o.generate_images.as_ref().unwrap())(Arc::new(model), json!({}), operation_options())?)) };
+    let classify = |model: Value| -> Result<Value, String> { Ok(pick((o.classify.as_ref().unwrap())(Arc::new(model), json!({}), operation_options())?)) };
+    r.insert("operations".into(), json!({
+        "methods": {"stream": "function", "generateImages": kind(o.generate_images.is_some()), "classify": kind(o.classify.is_some())},
+        "image": generate(model("i1", "img-a", json!({"type": "image"})))?, "imageMissing": generate(model("i2", "img-z", json!({"type": "image"})))?,
+        "classify": classify(model("k1", "cls-a", json!({"type": "classifier"})))?, "classifyMissing": classify(model("k2", "cls-z", json!({"type": "classifier"})))?,
+    }));
+    let fetch_calls: Arc<Mutex<Vec<bool>>> = Arc::new(Mutex::new(Vec::new()));
+    let calls = fetch_calls.clone();
+    let mut fetch_opts = options_for(Some(ProviderApi::Single(impl_("f"))), "fp", vec![model("c1", "api-a", json!({"name": "Base One"})), m("c2", "api-a")]);
+    fetch_opts.fetch_models = Some(Arc::new(move |context| {
+        calls.lock().unwrap().push(context.allow_network);
+        Ok(vec![model("c1", "api-a", json!({"name": "Fetched One"})), m("c3", "api-a"), model("u1", "api-a", json!({"type": "future"})), model("i1", "img-a", json!({"type": "image"}))])
+    }));
+    let f = create_provider(fetch_opts)?;
+    let catalog = || -> Vec<String> { (f.get_all_models.as_ref().unwrap())().unwrap().iter().map(|model| format!("{}:{}:{}", text(&model["id"]), text(&model["name"]), model["type"].as_str().unwrap_or("chat"))).collect() };
+    let publications: Arc<Mutex<Vec<Value>>> = Arc::new(Mutex::new(Vec::new()));
+    let publisher = |sink: Arc<Mutex<Vec<Value>>>| -> Arc<dyn Fn(ModelsPublication) -> Result<bool, String> + Send + Sync> {
+        Arc::new(move |publication: ModelsPublication| {
+            let persist = match &publication.persist {
+                None => json!("omitted"),
+                Some(persist) => json!({"models": persist["models"].as_array().map(Vec::as_slice).unwrap_or_default().iter().map(|model| model["id"].clone()).collect::<Vec<_>>(), "checkedAt": if persist["checkedAt"].is_number() { "number" } else { "other" }}),
+            };
+            sink.lock().unwrap().push(json!({"persist": persist, "update": if publication.update.is_some() { "function" } else { "undefined" }}));
+            if let Some(update) = &publication.update {
+                update()?;
+            }
+            Ok(true)
+        })
+    };
+    let context = |allow_network: bool, signal: ProviderSignal, stored: Option<Value>, publish: Arc<dyn Fn(ModelsPublication) -> Result<bool, String> + Send + Sync>| RefreshModelsContext {
+        credential: None, stored, allow_network, force: None, signal, publish, base_url: None,
+    };
+    let stored = json!({"models": [model("c1", "api-a", json!({"name": "Stored One", "provider": "fp"})), model("z9", "api-a", json!({"provider": "other"}))]});
+    let refresh_models = f.refresh_models.as_ref().unwrap();
+    let mut refresh = serde_json::Map::new();
+    refresh.insert("present".into(), json!(kind(f.refresh_models.is_some())));
+    refresh.insert("absent".into(), json!(kind(p.refresh_models.is_some())));
+    refresh.insert("initial".into(), json!(catalog()));
+    refresh_models(context(false, ProviderSignal::default(), Some(stored.clone()), publisher(publications.clone())))?;
+    refresh.insert("restoredOffline".into(), json!({"catalog": catalog(), "fetchCalls": *fetch_calls.lock().unwrap(), "publications": std::mem::take(&mut *publications.lock().unwrap())}));
+    let aborted = ProviderSignal::default();
+    aborted.cancel();
+    refresh_models(context(true, aborted, Some(stored.clone()), publisher(publications.clone())))?;
+    refresh.insert("aborted".into(), json!({"fetchCalls": *fetch_calls.lock().unwrap(), "publications": std::mem::take(&mut *publications.lock().unwrap())}));
+    refresh_models(context(true, ProviderSignal::default(), Some(stored), Arc::new(|_| Ok(false))))?;
+    refresh.insert("refused".into(), json!({"catalog": catalog(), "fetchCalls": *fetch_calls.lock().unwrap()}));
+    refresh_models(context(true, ProviderSignal::default(), None, publisher(publications.clone())))?;
+    refresh.insert("fetched".into(), json!({
+        "catalog": catalog(), "fetchCalls": *fetch_calls.lock().unwrap(), "publications": std::mem::take(&mut *publications.lock().unwrap()),
+        "chat": (f.get_models)()?.iter().map(|model| model["id"].clone()).collect::<Vec<_>>(),
+    }));
+    r.insert("refresh".into(), Value::Object(refresh));
+    Ok(Value::Object(r))
+}
+
 fn model_runtime_script(ctx: &Context, args: &Value) -> io::Result<Value> {
     let (auth, models, store, server) = (text(&args["mrAuth"]), text(&args["mrModels"]), text(&args["mrStore"]), text(&args["mrServer"]));
     let mut r = serde_json::Map::new();
@@ -942,6 +1102,10 @@ pub fn new_extension() -> Extension {
     ext.tool("child_handles", "Runs the createAgentSession handle options script.", empty_schema(), |ctx, args| match child_handles_script(ctx, &args) {
         Ok(report) => ToolResult::text(report.to_string()),
         Err(error) => ToolResult::Error(error.to_string()),
+    });
+    ext.tool("create_provider", "Runs the createProvider script.", empty_schema(), |_ctx, _args| match create_provider_script() {
+        Ok(report) => ToolResult::text(report.to_string()),
+        Err(error) => ToolResult::Error(error),
     });
     ext.tool("services", "Runs the createAgentSessionServices script.", empty_schema(), |ctx, args| match services_script(ctx, &args) {
         Ok(report) => ToolResult::text(report.to_string()),

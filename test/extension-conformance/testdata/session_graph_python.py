@@ -817,6 +817,152 @@ def services_tool(ctx, params):
     return json.dumps(services_script(ctx, params))
 
 
+def create_provider_script(ctx, args):
+    """pi-ai's createProvider over the parts of testdata/session-graph.mjs createProviderScript; the report is Pi's own run's."""
+    r = {}
+    auth = pig_sdk.ProviderAuth(api_key=pig_sdk.APIKeyAuth(name="Key", resolve=lambda _input: pig_sdk.AuthResult(auth={"apiKey": "k"})))
+
+    def M(identifier, api, **extra):
+        return {"id": identifier, "name": identifier, "api": api, "provider": "cp", **extra}
+
+    def message(model, text):
+        return {
+            "role": "assistant", "content": [{"type": "text", "text": text}], "api": model.get("api"), "provider": model.get("provider"), "model": model.get("id"),
+            "usage": {"input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0, "totalTokens": 0, "cost": {"input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0, "total": 0}},
+            "stopReason": "stop", "timestamp": 1,
+        }
+
+    def scripted(tag):
+        def run(model, _context, _options):
+            stream = pig_sdk.create_assistant_message_event_stream()
+            stream.push({"type": "done", "reason": "stop", "message": message(model, tag + ":" + model["id"])})
+            return stream
+        return run
+
+    def impl(tag, **extra):
+        return pig_sdk.ProviderStreams(stream=scripted(tag + ".stream"), stream_simple=scripted(tag + ".simple"), **extra)
+
+    def drain(stream):
+        types = [event["type"] for event in stream.events()]
+        result = stream.result()
+        return {
+            "types": types, "text": "".join(block.get("text", "") for block in result["content"]), "stopReason": result["stopReason"], "error": result.get("errorMessage"), "api": result.get("api"),
+            "provider": result["provider"], "model": result["model"], "usageZero": result["usage"]["totalTokens"] == 0, "timestampIsNumber": isinstance(result["timestamp"], (int, float)),
+        }
+
+    def thrown(fn):
+        try:
+            fn()
+        except Exception as error:  # noqa: BLE001
+            return str(error)
+        return "no error"
+
+    def kind(value):
+        return "function" if value is not None else "undefined"
+
+    base = [M("c1", "api-a"), M("c2", "api-b"), M("i1", "img-a", type="image"), M("k1", "cls-a", type="classifier")]
+    p = pig_sdk.create_provider(id="cp", auth=auth, models=base, api={"api-a": impl("a"), "api-b": impl("b")}, base_url="http://x", headers={"h": "1"})
+    named = pig_sdk.create_provider(id="cp2", name="Named", auth=auth, models=[], api=impl("s"))
+    r["meta"] = {
+        "id": p.id, "name": p.name, "baseUrl": p.base_url, "headers": p.headers, "named": named.name,
+        "methods": {"fetchDeferred": kind(p.fetch_deferred), "cancelDeferred": kind(p.cancel_deferred), "generateImages": kind(p.generate_images), "classify": kind(p.classify),
+                    "refreshModels": kind(p.refresh_models), "filterModels": kind(p.filter_models), "filterAllModels": kind(p.filter_all_models)},
+    }
+    r["models"] = {"chat": [model["id"] for model in p.get_models()], "all": [model["id"] for model in p.get_all_models()]}
+    options = pig_sdk.ProviderStreamOptions()
+    sp = pig_sdk.create_provider(id="sp", auth=auth, models=[], api=impl("s"))
+    r["dispatch"] = {
+        "a": drain(p.stream(base[0], {}, options)), "b": drain(p.stream_simple(base[1], {}, options)), "missing": drain(p.stream(M("c9", "api-z"), {}, options)),
+        "noApi": drain(p.stream_simple({"id": "c8", "provider": "cp"}, {}, options)), "single": drain(sp.stream(M("x", "anything"), {}, options)),
+    }
+    r["invalid"] = {
+        "none": thrown(lambda: pig_sdk.create_provider(id="e1", auth=auth, models=[])),
+        "empty": thrown(lambda: pig_sdk.create_provider(id="e2", auth=auth, models=[], api={}, images={}, classifiers={})),
+    }
+    cancelled = []
+
+    def cancel_a(_model, handle, _options):
+        cancelled.append(handle["id"])
+
+    def broken_fetch(_model, _handle, _options):
+        raise RuntimeError("fetch boom")
+
+    d = pig_sdk.create_provider(id="dp", auth=auth, models=[], api={
+        "api-a": impl("a", fetch_deferred=lambda model, handle, o: scripted("a.fetch." + handle["id"])(model, handle, o), cancel_deferred=cancel_a),
+        "api-b": impl("b"),
+    })
+    broken = pig_sdk.create_provider(id="bp", auth=auth, models=[], api={"api-a": impl("a", fetch_deferred=broken_fetch)})
+    r["deferred"] = {
+        "fetched": drain(d.fetch_deferred(M("c1", "api-a"), {"id": "h1"}, options)), "unsupported": drain(d.fetch_deferred(M("c2", "api-b"), {"id": "h2"}, options)),
+        "noApi": drain(d.fetch_deferred(M("c3", "api-z"), {"id": "h3"}, options)), "thrown": drain(broken.fetch_deferred(M("c1", "api-a"), {"id": "h4"}, options)),
+        "cancelOk": thrown(lambda: d.cancel_deferred(M("c1", "api-a"), {"id": "h1"}, options)), "cancelled": cancelled,
+        "cancelUnsupported": thrown(lambda: d.cancel_deferred(M("c2", "api-b"), {"id": "h2"}, options)), "cancelNoApi": thrown(lambda: d.cancel_deferred(M("c3", "api-z"), {"id": "h3"}, options)),
+    }
+
+    def pick(result):
+        return {
+            "api": result.get("api"), "provider": result["provider"], "model": result["model"], "stopReason": result["stopReason"], "error": result.get("errorMessage"), "output": result.get("output"),
+            "answers": result.get("answers"), "timestampIsNumber": isinstance(result.get("timestamp"), (int, float)),
+        }
+
+    o = pig_sdk.create_provider(
+        id="op", auth=auth, models=[],
+        images={"img-a": lambda model, _request, _options: {"api": model["api"], "provider": model["provider"], "model": model["id"], "output": [{"type": "image", "data": "x"}], "stopReason": "stop", "timestamp": 1}},
+        classifiers={"cls-a": lambda model, _request, _options: {"api": model["api"], "provider": model["provider"], "model": model["id"], "answers": {"q": "a"}, "stopReason": "stop", "timestamp": 1}},
+    )
+    operation_options = pig_sdk.ProviderOperationOptions()
+    r["operations"] = {
+        "methods": {"stream": "function", "generateImages": kind(o.generate_images), "classify": kind(o.classify)},
+        "image": pick(o.generate_images(M("i1", "img-a", type="image"), {}, operation_options)), "imageMissing": pick(o.generate_images(M("i2", "img-z", type="image"), {}, operation_options)),
+        "classify": pick(o.classify(M("k1", "cls-a", type="classifier"), {}, operation_options)), "classifyMissing": pick(o.classify(M("k2", "cls-z", type="classifier"), {}, operation_options)),
+    }
+    fetch_calls = []
+    publications = []
+
+    def fetch_models(context):
+        fetch_calls.append(context.allow_network)
+        return [M("c1", "api-a", name="Fetched One"), M("c3", "api-a"), M("u1", "api-a", type="future"), M("i1", "img-a", type="image")]
+
+    f = pig_sdk.create_provider(id="fp", auth=auth, models=[M("c1", "api-a", name="Base One"), M("c2", "api-a")], api=impl("f"), fetch_models=fetch_models)
+
+    def catalog():
+        return [f"{model['id']}:{model['name']}:{model.get('type', 'chat')}" for model in f.get_all_models()]
+
+    def publish(publication):
+        persist = publication.persist
+        publications.append({
+            "persist": "omitted" if persist is pig_sdk.provider.OMITTED else {"models": [model["id"] for model in persist["models"]], "checkedAt": "number" if isinstance(persist["checkedAt"], (int, float)) else "other"},
+            "update": "function" if publication.update is not None else "undefined",
+        })
+        if publication.update is not None:
+            publication.update()
+        return True
+
+    def refresh_context(allow_network=True, signal=None, stored=None, publisher=publish):
+        return pig_sdk.RefreshModelsContext(publish=publisher, stored=stored, allow_network=allow_network, signal=signal or pig_sdk.ProviderSignal())
+
+    stored = {"models": [M("c1", "api-a", name="Stored One", provider="fp"), M("z9", "api-a", provider="other")]}
+    refresh = {"present": kind(f.refresh_models), "absent": kind(p.refresh_models), "initial": catalog()}
+    f.refresh_models(refresh_context(False, stored=stored))
+    refresh["restoredOffline"] = {"catalog": catalog(), "fetchCalls": list(fetch_calls), "publications": list(publications)}
+    publications.clear()
+    aborted = pig_sdk.ProviderSignal()
+    aborted.set()
+    f.refresh_models(refresh_context(True, signal=aborted, stored=stored))
+    refresh["aborted"] = {"fetchCalls": list(fetch_calls), "publications": list(publications)}
+    publications.clear()
+    f.refresh_models(refresh_context(True, stored=stored, publisher=lambda _publication: False))
+    refresh["refused"] = {"catalog": catalog(), "fetchCalls": list(fetch_calls)}
+    f.refresh_models(refresh_context(True))
+    refresh["fetched"] = {"catalog": catalog(), "fetchCalls": list(fetch_calls), "publications": list(publications), "chat": [model["id"] for model in f.get_models()]}
+    r["refresh"] = refresh
+    return r
+
+
+def create_provider_tool(ctx, params):
+    return json.dumps(create_provider_script(ctx, params))
+
+
 def new_extension():
     ext = pig_sdk.Extension("session-graph")
     ext.register_tool(pig_sdk.ToolDefinition(name="session_manager", label="session_manager", description="Runs the SessionManager script.", parameters={"type": "object"}, execute=session_manager_tool))
@@ -826,5 +972,6 @@ def new_extension():
     ext.register_tool(pig_sdk.ToolDefinition(name="model_runtime", label="model_runtime", description="Runs the ModelRuntime script.", parameters={"type": "object"}, execute=model_runtime_tool))
     ext.register_tool(pig_sdk.ToolDefinition(name="package_manager", label="package_manager", description="Runs the DefaultPackageManager script.", parameters={"type": "object"}, execute=packages_tool))
     ext.register_tool(pig_sdk.ToolDefinition(name="child_handles", label="child_handles", description="Runs the createAgentSession handle options script.", parameters={"type": "object"}, execute=child_handles_tool))
+    ext.register_tool(pig_sdk.ToolDefinition(name="create_provider", label="create_provider", description="Runs the createProvider script.", parameters={"type": "object"}, execute=create_provider_tool))
     ext.register_tool(pig_sdk.ToolDefinition(name="services", label="services", description="Runs the createAgentSessionServices script.", parameters={"type": "object"}, execute=services_tool))
     return ext

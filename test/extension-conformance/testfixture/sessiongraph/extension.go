@@ -307,6 +307,17 @@ func Extension() *sdk.Extension {
 		},
 	})
 	e.RegisterTool(sdk.ToolDefinition{
+		Name: "create_provider", Label: "create_provider", Description: "Runs the createProvider script.", Parameters: sdk.Schema{"type": "object"},
+		Execute: func(ctx sdk.Context, args map[string]any) (result any, err error) {
+			report, err := createProviderScript()
+			if err != nil {
+				return nil, err
+			}
+			encoded, err := json.Marshal(report)
+			return string(encoded), err
+		},
+	})
+	e.RegisterTool(sdk.ToolDefinition{
 		Name: "services", Label: "services", Description: "Runs the createAgentSessionServices script.", Parameters: sdk.Schema{"type": "object"},
 		Execute: func(ctx sdk.Context, args map[string]any) (result any, err error) {
 			defer func() {

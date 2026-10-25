@@ -550,3 +550,23 @@ func TestSessionGraphAgentSessionServicesAcrossSDKs(t *testing.T) {
 //
 //go:embed testdata/session-graph-services.json
 var sessionGraphServicesWant string
+
+// pi-ai's createProvider (models.ts:1077) for every SDK, against the report of Pi's own createProvider run (the Node row): the provider's metadata and model lists, dispatch on model.api (and the stream error of a model whose api has no
+// implementation), the two forms of `api`, the required-implementation error, deferred fetch and cancel, image and classifier operations, and the model refresh (stored restore, offline, aborted, refused and fetched publications).
+func TestSessionGraphCreateProviderAcrossSDKs(t *testing.T) {
+	t.Parallel()
+	eachSessionGraphSDK(t, func(t *testing.T, r *sessionGraphRig, _ string) {
+		report, root := r.script("create_provider")
+		got := normalizeSessionGraph(t, report, root)
+		if path := os.Getenv("SESSION_GRAPH_PRINT"); path != "" {
+			encoded, _ := json.MarshalIndent(got, "", "\t")
+			_ = os.WriteFile(path, encoded, 0o600)
+		}
+		requireSessionGraphReport(t, got, sessionGraphCreateProviderWant)
+	})
+}
+
+// sessionGraphCreateProviderWant is the report of Pi's own createProvider (the Node row).
+//
+//go:embed testdata/session-graph-create-provider.json
+var sessionGraphCreateProviderWant string

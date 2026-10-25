@@ -1386,7 +1386,7 @@ closing = "Pure helpers ported per SDK with vector tests from Pi at the pin (tes
 "pi-ai: createFauxCore" = { go = "gap:SdkExportsLedger", rust = "gap:SdkExportsLedger", python = "gap:SdkExportsLedger" }
 "pi-ai: createInitialSystemMessage" = { go = "native:CreateInitialSystemMessage", rust = "native:create_initial_system_message", python = "native:create_initial_system_message" }
 "pi-ai: createModels" = { go = "gap:SdkSessionGraph", rust = "gap:SdkSessionGraph", python = "gap:SdkSessionGraph" }
-"pi-ai: createProvider" = { go = "gap:SdkSessionGraph", rust = "gap:SdkSessionGraph", python = "gap:SdkSessionGraph" }
+"pi-ai: createProvider" = { go = "native:CreateProvider", rust = "native:create_provider", python = "native:create_provider" }
 "pi-ai: declarationsEqual" = { go = "gap:SdkExportsLedger", rust = "gap:SdkExportsLedger", python = "gap:SdkExportsLedger" }
 "pi-ai: defaultProviderAuthContext" = { go = "gap:SdkSessionGraph", rust = "gap:SdkSessionGraph", python = "gap:SdkSessionGraph" }
 "pi-ai: envApiKeyAuth" = { go = "native:EnvAPIKeyAuth", rust = "native:env_api_key_auth", python = "native:env_api_key_auth" }
@@ -1496,7 +1496,7 @@ closing = "Pure helpers ported per SDK with vector tests from Pi at the pin (tes
 "pi-ai/compat: createFauxCore" = { go = "gap:SdkExportsLedger", rust = "gap:SdkExportsLedger", python = "gap:SdkExportsLedger" }
 "pi-ai/compat: createInitialSystemMessage" = { go = "native:CreateInitialSystemMessage", rust = "native:create_initial_system_message", python = "native:create_initial_system_message" }
 "pi-ai/compat: createModels" = { go = "gap:SdkSessionGraph", rust = "gap:SdkSessionGraph", python = "gap:SdkSessionGraph" }
-"pi-ai/compat: createProvider" = { go = "gap:SdkSessionGraph", rust = "gap:SdkSessionGraph", python = "gap:SdkSessionGraph" }
+"pi-ai/compat: createProvider" = { go = "native:CreateProvider", rust = "native:create_provider", python = "native:create_provider" }
 "pi-ai/compat: declarationsEqual" = { go = "gap:SdkExportsLedger", rust = "gap:SdkExportsLedger", python = "gap:SdkExportsLedger" }
 "pi-ai/compat: defaultProviderAuthContext" = { go = "gap:SdkSessionGraph", rust = "gap:SdkSessionGraph", python = "gap:SdkSessionGraph" }
 "pi-ai/compat: envApiKeyAuth" = { go = "native:EnvAPIKeyAuth", rust = "native:env_api_key_auth", python = "native:env_api_key_auth" }

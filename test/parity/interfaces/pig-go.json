@@ -179336,6 +179336,28 @@
       "shapeHash": "sha256:6dd88efc071466e71c67fe989e25bd27648c1f82cb46c46c0e19f50feed339f2"
     },
     {
+      "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#CreateProvider",
+      "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
+      "name": "CreateProvider",
+      "kind": "function",
+      "exported": true,
+      "shape": {
+        "type": "func(options CreateProviderOptions) (*Provider, error)"
+      },
+      "shapeHash": "sha256:21ee5bbe1036b86e815cf2ba8b47c338b94d7329870c9b8aeabfdc06de8dff71"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#CreateProviderOptions",
+      "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
+      "name": "CreateProviderOptions",
+      "kind": "type",
+      "exported": true,
+      "shape": {
+        "type": "CreateProviderOptions"
+      },
+      "shapeHash": "sha256:9483ca1fdae696fc748def4d345e587c3c5770afb5b2d4f4dafbb2521e3dc32d"
+    },
+    {
       "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#CreateReadOnlyTools",
       "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
       "name": "CreateReadOnlyTools",
@@ -186288,6 +186310,17 @@
       "shapeHash": "sha256:f78b61812d219db165b778ec8577a8cfa2a90eb05bc64f16b5ffa06597795a6e"
     },
     {
+      "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#ProviderStreams",
+      "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
+      "name": "ProviderStreams",
+      "kind": "type",
+      "exported": true,
+      "shape": {
+        "type": "ProviderStreams"
+      },
+      "shapeHash": "sha256:37cc86f370d3432c0177f73de74270562573241d52d89f7c78bd175dabff4b7c"
+    },
+    {
       "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#RawKeyHint",
       "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
       "name": "RawKeyHint",
@@ -192646,6 +192679,17 @@
       "shapeHash": "sha256:0bc48284d2904c3e611688382dd940d9e75b28283ac1800c23d5483ca80c0725"
     },
     {
+      "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#apiText",
+      "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
+      "name": "apiText",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func(model map[string]any) string"
+      },
+      "shapeHash": "sha256:c1c38c3951c89449cf886360573213d350534ba64327f67ba6a5b9d24cae110d"
+    },
+    {
       "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#appendStreamText",
       "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
       "name": "appendStreamText",
@@ -197770,6 +197814,17 @@
         "type": "providerOperations"
       },
       "shapeHash": "sha256:71a64ec48e3ac853000085db33264f2d3ceff20349fa242fab78f3bde44f12c6"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#providerSetupErrorStream",
+      "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
+      "name": "providerSetupErrorStream",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func(model map[string]any, err error) *ModelEventStream"
+      },
+      "shapeHash": "sha256:9c3c262d4f02973d9a1b668d90b36baef69a6885e04ffcef6889faa193cd0067"
     },
     {
       "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#providerStreamCallbackNames",

@@ -112,6 +112,7 @@ from .kit import ViewComponent as ViewComponent
 from .event_bus import EventBus as EventBus, EventBusHandler as EventBusHandler, _EventBusHub
 from .state_feed import StateFeed
 from .user_bash import BashExecOptions as BashExecOptions, BashOperations as BashOperations, _BashOperationsTable, _data_update, _run_user_bash_exec, _user_bash_operations_reply
+from .create_provider import ProviderStreams as ProviderStreams, create_provider as create_provider
 from .provider import (
     Provider, ProviderSignal,
     ProviderAuth as ProviderAuth, APIKeyAuth as APIKeyAuth, OAuthAuth as OAuthAuth,

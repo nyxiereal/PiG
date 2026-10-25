@@ -131,7 +131,7 @@ func modelRegistryScript(ctx sdk.Context, args map[string]any) map[string]any {
 	storedModel["provider"] = "stored-prov"
 	storedProvider := ok(sdk.CreateProvider(sdk.CreateProviderOptions{
 		ID: "stored-prov", Name: "Stored Native",
-		Auth: sdk.ProviderAuth{APIKey: &sdk.APIKeyAuth{Name: "Key", Check: func(sdk.APIKeyAuthInput) (*sdk.AuthCheck, error) { return nil, nil }, Resolve: func(sdk.APIKeyAuthInput) (*sdk.AuthResult, error) { return nil, nil }}},
+		Auth:   sdk.ProviderAuth{APIKey: &sdk.APIKeyAuth{Name: "Key", Check: func(sdk.APIKeyAuthInput) (*sdk.AuthCheck, error) { return nil, nil }, Resolve: func(sdk.APIKeyAuthInput) (*sdk.AuthResult, error) { return nil, nil }}},
 		Models: []map[string]any{storedModel}, APIs: map[string]sdk.ProviderStreams{"nat-api": {Stream: scripted("s.stream"), StreamSimple: scripted("s.simple")}},
 	}))
 	check(registry.RegisterNativeProvider(storedProvider))

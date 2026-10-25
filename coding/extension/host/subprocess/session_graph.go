@@ -34,6 +34,8 @@ type SessionGraphScope interface {
 	Callback(ctx context.Context, id string, args json.RawMessage) (json.RawMessage, error)
 	// Add makes an object the host built (not one the extension constructed with CallSessionGraphNew) live for the connection and names it, so the extension can call its methods with CallSessionGraphCall. The extension's release call and the end of the connection drop it like any object; Remove drops it earlier.
 	Add(object SessionGraphObject) (handle string, err error)
+	// RegisterNativeProvider binds the Provider object the extension declared (a NativeProviderDeclaration as JSON: the callbacks stay in the extension) to the extension's connection and hands its carrier to register, which installs it in the registry of a graph ModelRuntime instead of the Session's. It answers the declaration with the host's handle for the object, and a release function that ends the registration: the object leaves the host when its last reference is gone.
+	RegisterNativeProvider(ctx context.Context, declaration json.RawMessage, register func(context.Context, *extension.NativeProvider) error) (declared json.RawMessage, release func(), err error)
 	// Remove drops the object Add named. A handle the extension already released is ignored.
 	Remove(handle string)
 }
@@ -131,6 +133,10 @@ func (s graphScope) Callback(ctx context.Context, id string, args json.RawMessag
 
 func (s graphScope) Add(object SessionGraphObject) (string, error) {
 	return s.host.sessionGraphObjects.add(s.conn, object)
+}
+
+func (s graphScope) RegisterNativeProvider(ctx context.Context, declaration json.RawMessage, register func(context.Context, *extension.NativeProvider) error) (json.RawMessage, func(), error) {
+	return s.host.registerGraphNativeProvider(ctx, s.conn, declaration, register)
 }
 
 func (s graphScope) Remove(handle string) { s.host.sessionGraphObjects.remove(s.conn, handle) }

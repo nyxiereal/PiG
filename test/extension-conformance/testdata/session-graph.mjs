@@ -1,5 +1,5 @@
 // The Node fixture of the session graph conformance rows (session_graph_test.go). It runs the script of testfixture/sessiongraph (Go), testdata/session-graph-rust and the inline Python fixture with Pi's own SessionManager, so the report it makes is Pi's.
-import { DefaultPackageManager, DefaultResourceLoader, ModelRuntime, ProjectTrustStore, SessionManager, SettingsManager, createAgentSession, createCodemodeExtension, createMcpExtension, createToolSearchExtension, createAgentSessionFromServices, createAgentSessionServices, getAgentDir, hasTrustRequiringProjectResources } from "@earendil-works/pi-coding-agent";
+import { DefaultPackageManager, DefaultResourceLoader, ModelRegistry, ModelRuntime, ProjectTrustStore, SessionManager, SettingsManager, createAgentSession, createCodemodeExtension, createMcpExtension, createToolSearchExtension, createAgentSessionFromServices, createAgentSessionServices, getAgentDir, hasTrustRequiringProjectResources } from "@earendil-works/pi-coding-agent";
 import { createAssistantMessageEventStream, createProvider } from "@earendil-works/pi-ai";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -627,6 +627,95 @@ async function modelRuntimeScript({ mrAuth, mrModels, mrStore, mrServer }) {
   return r;
 }
 
+// ModelRegistry over a ModelRuntime (model-registry.ts): Pi's own run is the expectation (model_registry). Every member of `new ModelRegistry(runtime)` forwards to the runtime; the Go, Python and Rust scripts build the registry over their SDK's runtime and must report the same. The one reported difference is `builtin`: Pi's getProvider and getProviders answer a builtin provider's
+// Provider object, the other SDKs fail with the D78 error because that object holds functions the host cannot carry (the test overlays that expectation for them).
+async function modelRegistryScript({ mrAuth, mrModels, mrStore, mrServer }) {
+  const r = {};
+  const rt = await ModelRuntime.create({ authPath: mrAuth, modelsPath: mrModels, modelsStorePath: mrStore });
+  const registry = new ModelRegistry(rt);
+  const local = registry.find("mr-local", "m1");
+  const availableOfType = (await registry.getAvailableOfType("chat", "mr-local")).map((model) => model.id);
+  r.catalog = {
+    error: orNull(registry.getError()), all: registry.getAll().filter((model) => model.provider === "mr-local").map(pickModel), builtinListed: registry.getAll().some((model) => model.provider === "anthropic"),
+    available: registry.getAvailable().filter((model) => model.provider === "mr-local").map((model) => model.id), one: pickModel(local), missing: registry.find("mr-local", "nope") === undefined,
+    findOfType: pickModel(registry.findOfType("chat", "mr-local", "m1")), ofType: registry.getModelsOfType("chat", "mr-local").map((model) => model.id), oneOfType: pickModel(registry.getModelOfType("chat", "mr-local", "m1")),
+    oneOfTypeMissing: registry.getModelOfType("image", "mr-local", "m1") === undefined, imagesOfType: registry.getModelsOfType("image", "mr-local").length, availableOfType,
+  };
+  const unknown = { ...local, provider: "nope-prov" };
+  r.auth = {
+    configured: registry.hasConfiguredAuth(local), unconfigured: registry.hasConfiguredAuth(unknown), oauth: registry.isUsingOAuth(local),
+    status: registry.getProviderAuthStatus("mr-local"), storedStatus: registry.getProviderAuthStatus("stored-prov"), unknownStatus: registry.getProviderAuthStatus("nope-prov"),
+    displayLocal: registry.getProviderDisplayName("mr-local"), displayBuiltin: registry.getProviderDisplayName("anthropic"), displayUnknown: registry.getProviderDisplayName("nope-prov"),
+    providerAuth: plain(await registry.getProviderAuth("mr-local")), providerAuthNone: plain(await registry.getProviderAuth("nope-prov")),
+    apiKey: orNull(await registry.getApiKeyForProvider("mr-local")), apiKeyNone: orNull(await registry.getApiKeyForProvider("nope-prov")),
+    request: plain(await registry.getApiKeyAndHeaders(local)), requestUnconfigured: plain(await registry.getApiKeyAndHeaders(unknown)),
+  };
+
+  const before = [...registry.getRegisteredProviderIds()];
+  registry.registerProvider("reg-prov", {
+    baseUrl: mrServer, apiKey: "regkey", api: "openai-completions", headers: { "x-reg": "1" },
+    models: [{ id: "r1", name: "Reg One", reasoning: false, input: ["text"], cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 }, contextWindow: 4000, maxTokens: 500 }],
+  });
+  const config = registry.getRegisteredProviderConfig("reg-prov");
+  r.registered = {
+    before, ids: [...registry.getRegisteredProviderIds()], models: registry.getAll().filter((model) => model.provider === "reg-prov").map(pickModel), baseUrl: config.baseUrl, apiKey: config.apiKey, api: config.api, headers: plain(config.headers), modelIds: config.models.map((model) => model.id),
+    unregisteredConfig: registry.getRegisteredProviderConfig("nope-prov") === undefined, rejected: await failed(() => registry.registerProvider("bad-prov", { models: [{ id: "x" }] })),
+  };
+  registry.unregisterProvider("reg-prov");
+  r.registered.after = { ids: [...registry.getRegisteredProviderIds()], models: registry.getAll().filter((model) => model.provider === "reg-prov").length, config: registry.getRegisteredProviderConfig("reg-prov") === undefined };
+
+  const nativeModel = { id: "n1", name: "N One", api: "nat-api", provider: "nreg", baseUrl: "https://ext.invalid", reasoning: false, input: ["text"], cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 }, contextWindow: 4000, maxTokens: 500 };
+  const message = (model, text) => ({
+    role: "assistant", content: [{ type: "text", text }], api: model.api, provider: model.provider, model: model.id,
+    usage: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0, totalTokens: 0, cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0, total: 0 } }, stopReason: "stop", timestamp: 1,
+  });
+  const scripted = (tag) => (model) => {
+    const stream = createAssistantMessageEventStream();
+    stream.push({ type: "done", reason: "stop", message: message(model, `${tag}:${model.id}`) });
+    return stream;
+  };
+  const provider = createProvider({ id: "nreg", name: "Native Reg", auth: { apiKey: { name: "Key", check: async () => ({ type: "api_key", source: "ext check" }), resolve: async () => ({ auth: { apiKey: "nk" } }) } }, models: [nativeModel], api: { "nat-api": { stream: scripted("n.stream"), streamSimple: scripted("n.simple") } } });
+  registry.registerProvider(provider);
+  const conversation = { systemPrompt: "Be brief.", messages: [{ role: "user", content: "say hello", timestamp: 1 }] };
+  const nativeStream = registry.streamSimple(nativeModel, conversation, {});
+  const nativeEvents = [];
+  for await (const event of nativeStream) nativeEvents.push(event.type);
+  const nativeMessage = await nativeStream.result();
+  r.native = {
+    registered: registry.getRegisteredNativeProvider("nreg")?.id ?? null, same: registry.getRegisteredNativeProvider("nreg") === provider, viaGetProvider: registry.getProvider("nreg")?.id ?? null, viaRuntime: rt.getProvider("nreg")?.id ?? null,
+    viaRuntimeRegistered: rt.getRegisteredNativeProvider("nreg")?.id ?? null, none: registry.getRegisteredNativeProvider("nope-prov") === undefined, noneProvider: registry.getProvider("nope-prov") === undefined,
+    ids: [...registry.getRegisteredProviderIds()], displayName: registry.getProviderDisplayName("nreg"), models: registry.getAll().filter((model) => model.provider === "nreg").map((model) => model.id),
+    auth: plain(await registry.getProviderAuth("nreg")), request: plain(await registry.getApiKeyAndHeaders(nativeModel)),
+    events: nativeEvents, text: nativeMessage.content.map((block) => block.text ?? "").join(""), stopReason: nativeMessage.stopReason, completed: (await registry.complete(nativeModel, conversation, {})).stopReason,
+  };
+  registry.unregisterProvider("nreg");
+  r.native.after = { registered: registry.getRegisteredNativeProvider("nreg") === undefined, provider: registry.getProvider("nreg") === undefined, models: registry.getAll().filter((model) => model.provider === "nreg").length };
+  r.builtin = { provider: registry.getProvider("anthropic").id, providers: rt.getProviders().some((candidate) => candidate.id === "anthropic") ? "anthropic" : "absent" };
+
+  registry.registerVirtualModel({
+    provider: "mr-virtual", id: "v1", name: "Virtual One", thinkingLevels: ["off", "high"], contextWindow: 1000, maxTokens: 100, input: ["text"],
+    route: async () => ({ model: rt.getPhysicalModel("mr-local", "m1"), thinkingLevel: "off" }),
+  });
+  r.virtual = { model: pickModel(registry.find("mr-virtual", "v1")), thinkingLevels: registry.find("mr-virtual", "v1").thinkingLevels ?? null };
+  registry.unregisterVirtualModel("mr-virtual", "v1");
+  r.virtual.after = registry.find("mr-virtual", "v1") === undefined;
+
+  const refreshed = await registry.refresh({ allowNetwork: false });
+  r.refresh = { aborted: refreshed.aborted, errors: Object.fromEntries(refreshed.errors) };
+  const events = [];
+  const stream = registry.streamSimple(local, conversation, { maxTokens: 50 });
+  for await (const event of stream) events.push(event.type);
+  const result = await stream.result();
+  const full = await registry.complete(local, conversation, { maxTokens: 50 });
+  const classified = await registry.classify(local, { state: {}, questions: {} });
+  const imaged = await registry.generateImages(local, { input: [{ type: "text", text: "a cat" }] });
+  r.stream = {
+    events, stopReason: result.stopReason, text: result.content.map((block) => block.text ?? "").join(""), provider: result.provider, model: result.model, api: result.api, full: full.stopReason,
+    classifyStop: classified.stopReason, classifyError: classified.errorMessage ?? null, imagesStop: imaged.stopReason, imagesError: imaged.errorMessage ?? null,
+  };
+  return r;
+}
+
 // createAgentSession over the objects the extension built: Pi's own run is the expectation (child_handles). One run of the script per SDK; the Go, Python and Rust scripts build the same objects through their SDK and must report the same.
 async function childHandlesScript({ mrAuth, mrModels, mrStore, cwd, dir, agentDir, probeExt }) {
   const r = {};
@@ -958,6 +1047,10 @@ export default function (pi) {
   pi.registerTool({
     name: "package_manager", label: "package_manager", description: "Runs the DefaultPackageManager script.", parameters: { type: "object" },
     execute: async (_id, params) => ({ content: [{ type: "text", text: JSON.stringify(await packagesScript(params)) }] }),
+  });
+  pi.registerTool({
+    name: "model_registry", label: "model_registry", description: "Runs the ModelRegistry over a ModelRuntime script.", parameters: { type: "object" },
+    execute: async (_id, params) => ({ content: [{ type: "text", text: JSON.stringify(await modelRegistryScript(params)) }] }),
   });
   pi.registerTool({
     name: "child_handles", label: "child_handles", description: "Runs the createAgentSession handle options script.", parameters: { type: "object" },

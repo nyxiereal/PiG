@@ -425,7 +425,7 @@ closing = "Pure helpers ported per SDK with vector tests from Pi at the pin (tes
 "pi-coding-agent: LoginDialogComponent.showPrompt" = { go = "gap:SdkExportsLedger", rust = "gap:SdkExportsLedger", python = "gap:SdkExportsLedger" }
 "pi-coding-agent: LoginDialogComponent.showWaiting" = { go = "gap:SdkExportsLedger", rust = "gap:SdkExportsLedger", python = "gap:SdkExportsLedger" }
 "pi-coding-agent: LoginDialogComponent.signal" = { go = "gap:SdkExportsLedger", rust = "gap:SdkExportsLedger", python = "gap:SdkExportsLedger" }
-"pi-coding-agent: ModelRegistry" = { go = "gap:SdkSessionGraph", rust = "gap:SdkSessionGraph", python = "gap:SdkSessionGraph" }
+"pi-coding-agent: ModelRegistry" = { go = "native:NewModelRegistry", rust = "native:ModelRegistry::new", python = "native:ModelRegistry" }
 "pi-coding-agent: ModelRegistry.classify" = { go = "native:ModelRegistry.Classify", rust = "native:ModelRegistry::classify", python = "native:ModelRegistry.classify" }
 "pi-coding-agent: ModelRegistry.complete" = { go = "native:ModelRegistry.Complete", rust = "native:ModelRegistry::complete", python = "native:ModelRegistry.complete" }
 "pi-coding-agent: ModelRegistry.find" = { go = "native:ModelRegistry.Find", rust = "native:ModelRegistry::find", python = "native:ModelRegistry.find" }
@@ -476,10 +476,10 @@ closing = "Pure helpers ported per SDK with vector tests from Pi at the pin (tes
 "pi-coding-agent: ModelRuntime.getModels" = { go = "native:ModelRuntime.GetModels", rust = "native:ModelRuntime::get_models", python = "native:ModelRuntime.get_models" }
 "pi-coding-agent: ModelRuntime.getModelsOfType" = { go = "native:ModelRuntime.GetModelsOfType", rust = "native:ModelRuntime::get_models_of_type", python = "native:ModelRuntime.get_models_of_type" }
 "pi-coding-agent: ModelRuntime.getPhysicalModel" = { go = "native:ModelRuntime.GetPhysicalModel", rust = "native:ModelRuntime::get_physical_model", python = "native:ModelRuntime.get_physical_model" }
-"pi-coding-agent: ModelRuntime.getProvider" = { go = "gap:SdkSessionGraph", rust = "gap:SdkSessionGraph", python = "gap:SdkSessionGraph" }
+"pi-coding-agent: ModelRuntime.getProvider" = { go = "native:ModelRuntime.GetProvider", rust = "native:ModelRuntime::get_provider", python = "native:ModelRuntime.get_provider" }
 "pi-coding-agent: ModelRuntime.getProviderAuthStatus" = { go = "native:ModelRuntime.GetProviderAuthStatus", rust = "native:ModelRuntime::get_provider_auth_status", python = "native:ModelRuntime.get_provider_auth_status" }
-"pi-coding-agent: ModelRuntime.getProviders" = { go = "gap:SdkSessionGraph", rust = "gap:SdkSessionGraph", python = "gap:SdkSessionGraph" }
-"pi-coding-agent: ModelRuntime.getRegisteredNativeProvider" = { go = "gap:SdkSessionGraph", rust = "gap:SdkSessionGraph", python = "gap:SdkSessionGraph" }
+"pi-coding-agent: ModelRuntime.getProviders" = { go = "native:ModelRuntime.GetProviders", rust = "native:ModelRuntime::get_providers", python = "native:ModelRuntime.get_providers" }
+"pi-coding-agent: ModelRuntime.getRegisteredNativeProvider" = { go = "native:ModelRuntime.GetRegisteredNativeProvider", rust = "native:ModelRuntime::get_registered_native_provider", python = "native:ModelRuntime.get_registered_native_provider" }
 "pi-coding-agent: ModelRuntime.getRegisteredProviderConfig" = { go = "native:ModelRuntime.GetRegisteredProviderConfig", rust = "native:ModelRuntime::get_registered_provider_config", python = "native:ModelRuntime.get_registered_provider_config" }
 "pi-coding-agent: ModelRuntime.getRegisteredProviderIds" = { go = "native:ModelRuntime.GetRegisteredProviderIDs", rust = "native:ModelRuntime::get_registered_provider_ids", python = "native:ModelRuntime.get_registered_provider_ids" }
 "pi-coding-agent: ModelRuntime.hasConfiguredAuth" = { go = "native:ModelRuntime.HasConfiguredAuth", rust = "native:ModelRuntime::has_configured_auth", python = "native:ModelRuntime.has_configured_auth" }
@@ -489,7 +489,7 @@ closing = "Pure helpers ported per SDK with vector tests from Pi at the pin (tes
 "pi-coding-agent: ModelRuntime.login" = { go = "native:ModelRuntime.Login", rust = "native:ModelRuntime::login", python = "native:ModelRuntime.login" }
 "pi-coding-agent: ModelRuntime.logout" = { go = "native:ModelRuntime.Logout", rust = "native:ModelRuntime::logout", python = "native:ModelRuntime.logout" }
 "pi-coding-agent: ModelRuntime.refresh" = { go = "native:ModelRuntime.Refresh", rust = "native:ModelRuntime::refresh", python = "native:ModelRuntime.refresh" }
-"pi-coding-agent: ModelRuntime.registerNativeProvider" = { go = "gap:SdkSessionGraph", rust = "gap:SdkSessionGraph", python = "gap:SdkSessionGraph" }
+"pi-coding-agent: ModelRuntime.registerNativeProvider" = { go = "native:ModelRuntime.RegisterNativeProvider", rust = "native:ModelRuntime::register_native_provider", python = "native:ModelRuntime.register_native_provider" }
 "pi-coding-agent: ModelRuntime.registerProvider" = { go = "native:ModelRuntime.RegisterProvider", rust = "native:ModelRuntime::register_provider", python = "native:ModelRuntime.register_provider" }
 "pi-coding-agent: ModelRuntime.registerVirtualModel" = { go = "native:ModelRuntime.RegisterVirtualModel", rust = "native:ModelRuntime::register_virtual_model", python = "native:ModelRuntime.register_virtual_model" }
 "pi-coding-agent: ModelRuntime.removeRuntimeApiKey" = { go = "native:ModelRuntime.RemoveRuntimeAPIKey", rust = "native:ModelRuntime::remove_runtime_api_key", python = "native:ModelRuntime.remove_runtime_api_key" }

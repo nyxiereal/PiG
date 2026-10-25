@@ -10,7 +10,7 @@ Use counts (`uses`) are the number of the 255 scanned npm packages that import t
 
 | Module | Rows | type-only (identity by kind) | Node served | Go gaps | Rust gaps | Python gaps |
 |---|---|---|---|---|---|---|
-| `pi-coding-agent` | 920 | 305 | 910 | 387 | 387 | 387 |
+| `pi-coding-agent` | 920 | 305 | 910 | 382 | 382 | 382 |
 | `pi-tui` | 365 | 85 | 364 | 147 | 147 | 147 |
 | `pi-ai` | 97 | 197 | 97 | 66 | 66 | 66 |
 | `pi-ai/compat` | 156 | 204 | 156 | 122 | 122 | 122 |
@@ -23,12 +23,12 @@ Use counts (`uses`) are the number of the 255 scanned npm packages that import t
 | C2Sessions | C2Sessions lane (createAgentSession family, E1/E6) | 0.5.2 | 396 | Conformance rows for createAgentSession, createAgentSessionRuntime and the pi-agent-core Agent loop in all four SDKs (branch feat/sdk-child-agent-sessions) |
 | SdkExportsLedger | SdkExportsLedger lane (Pi application internals no extension scan imports) | 0.5.2 | 1158 | Owner decision per export, listed with usage counts in handoffs/0.5.2/sdk-exports-internals.md: a numbered divergence in docs/parity/DIVERGENCES.md (cells become divergence:D<n>), or a real lane with a port and a conformance row |
 | SdkPiAiHelpers | SdkPiAiHelpers lane (pi-ai pure helpers, StringEnum, host getters, E17-E22) | 0.5.2 | 150 | Pure helpers with vector tests from Pi at the pin; host getters and the pi-ai compat calls with a conformance row per SDK |
-| SdkSessionGraph | SdkSessionGraph lane (SessionManager/SettingsManager/ModelRuntime/resource loader, E2-E5) | 0.5.2 | 348 | Host calls for session open/list/inMemory, scoped settings, standalone model runtime, resource loader and package manager, with a conformance row per SDK |
+| SdkSessionGraph | SdkSessionGraph lane (SessionManager/SettingsManager/ModelRuntime/resource loader, E2-E5) | 0.5.2 | 333 | Host calls for session open/list/inMemory, scoped settings, standalone model runtime, resource loader and package manager, with a conformance row per SDK |
 | SdkTuiHelpers | SdkTuiHelpers lane (pi-tui helpers, keys, keybindings, theme and rendering helpers, E8-E16) | 0.5.2 | 249 | Pure helpers ported per SDK with vector tests from Pi at the pin (test/parity/sdk-vectors), keybinding and theme helpers with a conformance row per SDK |
 
 ## High-use gaps (block the release gate)
 
-8 exports imported by 5 or more scanned packages have a gap.
+7 exports imported by 5 or more scanned packages have a gap.
 
 | Export | uses | Gaps |
 |---|---|---|
@@ -39,7 +39,6 @@ Use counts (`uses`) are the number of the 255 scanned npm packages that import t
 | `pi-coding-agent: createExtensionRuntime` | 6 | Go SdkSessionGraph; Rust SdkSessionGraph; Python SdkSessionGraph |
 | `pi-tui: TuiAltScreen` | 6 | Go SdkTuiHelpers; Rust SdkTuiHelpers; Python SdkTuiHelpers |
 | `pi-coding-agent: ExtensionRunner` | 5 | Go SdkSessionGraph; Rust SdkSessionGraph; Python SdkSessionGraph |
-| `pi-coding-agent: ModelRegistry` | 5 | Go SdkSessionGraph; Rust SdkSessionGraph; Python SdkSessionGraph |
 
 ## Realized cells no fixture reaches
 
@@ -415,7 +414,7 @@ None.
 | `LoginDialogComponent.showPrompt` | 0 | served | gap:SdkExportsLedger | gap:SdkExportsLedger | gap:SdkExportsLedger |
 | `LoginDialogComponent.showWaiting` | 0 | served | gap:SdkExportsLedger | gap:SdkExportsLedger | gap:SdkExportsLedger |
 | `LoginDialogComponent.signal` | 0 | served | gap:SdkExportsLedger | gap:SdkExportsLedger | gap:SdkExportsLedger |
-| `ModelRegistry` | 5 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
+| `ModelRegistry` | 5 | served | native:NewModelRegistry | native:ModelRegistry::new | native:ModelRegistry |
 | `ModelRegistry.classify` | 0 | served | native:ModelRegistry.Classify | native:ModelRegistry::classify | native:ModelRegistry.classify |
 | `ModelRegistry.complete` | 0 | served | native:ModelRegistry.Complete | native:ModelRegistry::complete | native:ModelRegistry.complete |
 | `ModelRegistry.find` | 0 | served | native:ModelRegistry.Find | native:ModelRegistry::find | native:ModelRegistry.find |
@@ -466,10 +465,10 @@ None.
 | `ModelRuntime.getModels` | 0 | served | native:ModelRuntime.GetModels | native:ModelRuntime::get_models | native:ModelRuntime.get_models |
 | `ModelRuntime.getModelsOfType` | 0 | served | native:ModelRuntime.GetModelsOfType | native:ModelRuntime::get_models_of_type | native:ModelRuntime.get_models_of_type |
 | `ModelRuntime.getPhysicalModel` | 0 | served | native:ModelRuntime.GetPhysicalModel | native:ModelRuntime::get_physical_model | native:ModelRuntime.get_physical_model |
-| `ModelRuntime.getProvider` | 0 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
+| `ModelRuntime.getProvider` | 0 | served | native:ModelRuntime.GetProvider | native:ModelRuntime::get_provider | native:ModelRuntime.get_provider |
 | `ModelRuntime.getProviderAuthStatus` | 0 | served | native:ModelRuntime.GetProviderAuthStatus | native:ModelRuntime::get_provider_auth_status | native:ModelRuntime.get_provider_auth_status |
-| `ModelRuntime.getProviders` | 0 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
-| `ModelRuntime.getRegisteredNativeProvider` | 0 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
+| `ModelRuntime.getProviders` | 0 | served | native:ModelRuntime.GetProviders | native:ModelRuntime::get_providers | native:ModelRuntime.get_providers |
+| `ModelRuntime.getRegisteredNativeProvider` | 0 | served | native:ModelRuntime.GetRegisteredNativeProvider | native:ModelRuntime::get_registered_native_provider | native:ModelRuntime.get_registered_native_provider |
 | `ModelRuntime.getRegisteredProviderConfig` | 0 | served | native:ModelRuntime.GetRegisteredProviderConfig | native:ModelRuntime::get_registered_provider_config | native:ModelRuntime.get_registered_provider_config |
 | `ModelRuntime.getRegisteredProviderIds` | 0 | served | native:ModelRuntime.GetRegisteredProviderIDs | native:ModelRuntime::get_registered_provider_ids | native:ModelRuntime.get_registered_provider_ids |
 | `ModelRuntime.hasConfiguredAuth` | 0 | served | native:ModelRuntime.HasConfiguredAuth | native:ModelRuntime::has_configured_auth | native:ModelRuntime.has_configured_auth |
@@ -479,7 +478,7 @@ None.
 | `ModelRuntime.login` | 0 | served | native:ModelRuntime.Login | native:ModelRuntime::login | native:ModelRuntime.login |
 | `ModelRuntime.logout` | 0 | served | native:ModelRuntime.Logout | native:ModelRuntime::logout | native:ModelRuntime.logout |
 | `ModelRuntime.refresh` | 0 | served | native:ModelRuntime.Refresh | native:ModelRuntime::refresh | native:ModelRuntime.refresh |
-| `ModelRuntime.registerNativeProvider` | 0 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
+| `ModelRuntime.registerNativeProvider` | 0 | served | native:ModelRuntime.RegisterNativeProvider | native:ModelRuntime::register_native_provider | native:ModelRuntime.register_native_provider |
 | `ModelRuntime.registerProvider` | 0 | served | native:ModelRuntime.RegisterProvider | native:ModelRuntime::register_provider | native:ModelRuntime.register_provider |
 | `ModelRuntime.registerVirtualModel` | 0 | served | native:ModelRuntime.RegisterVirtualModel | native:ModelRuntime::register_virtual_model | native:ModelRuntime.register_virtual_model |
 | `ModelRuntime.removeRuntimeApiKey` | 0 | served | native:ModelRuntime.RemoveRuntimeAPIKey | native:ModelRuntime::remove_runtime_api_key | native:ModelRuntime.remove_runtime_api_key |

@@ -490,6 +490,40 @@ func TestSessionGraphModelRuntimeAcrossSDKs(t *testing.T) {
 //go:embed testdata/session-graph-model-runtime.json
 var sessionGraphModelRuntimeWant string
 
+// model-registry.ts ModelRegistry over a ModelRuntime (`new ModelRegistry(runtime)`: catalog, auth and request auth, provider registration by name and by Provider object, the Provider object members, virtual models, refresh, streams, classify and generateImages) for every SDK. The expectation is the report of Pi's own ModelRegistry (the Node row), except `builtin`: Pi's getProvider and getProviders answer a builtin provider's
+// Provider object, and the Go, Python and Rust SDKs fail with the D78 error (docs/parity/divergences/D78.md), which their cells must report.
+func TestSessionGraphModelRegistryAcrossSDKs(t *testing.T) {
+	t.Parallel()
+	eachSessionGraphSDK(t, func(t *testing.T, r *sessionGraphRig, sdkName string) {
+		report, root := r.script("model_registry")
+		got := normalizeSessionGraph(t, report, root)
+		if path := os.Getenv("SESSION_GRAPH_PRINT"); path != "" {
+			encoded, _ := json.MarshalIndent(got, "", "\t")
+			_ = os.WriteFile(path, encoded, 0o600)
+		}
+		want := sessionGraphModelRegistryWant
+		if sdkName != "node" {
+			var expected map[string]any
+			if err := json.Unmarshal([]byte(want), &expected); err != nil {
+				t.Fatal(err)
+			}
+			const d78 = "error: builtin/composed Provider object carrier is unavailable (D78)"
+			expected["builtin"] = map[string]any{"provider": d78, "providers": d78}
+			encoded, err := json.Marshal(expected)
+			if err != nil {
+				t.Fatal(err)
+			}
+			want = string(encoded)
+		}
+		requireSessionGraphReport(t, got, want)
+	})
+}
+
+// sessionGraphModelRegistryWant is the report of Pi's own ModelRegistry (the Node row), with the run's model server as "<server>".
+//
+//go:embed testdata/session-graph-model-registry.json
+var sessionGraphModelRegistryWant string
+
 // childHandlesProbe is the extension the child session of the child_handles script loads (additionalExtensionPaths of its resource loader): it registers one tool, which the session must have among its active tools.
 const childHandlesProbe = `export default function (pi) {
   pi.registerTool({ name: "probe_tool", label: "probe", description: "the probe extension's tool", parameters: { type: "object" }, execute: async () => ({ content: [{ type: "text", text: "probed" }], details: {} }) });

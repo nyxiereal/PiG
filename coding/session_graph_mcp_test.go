@@ -63,6 +63,10 @@ func (s *mcpFakeScope) Add(object subprocess.SessionGraphObject) (string, error)
 	return handle, nil
 }
 
+func (s *mcpFakeScope) RegisterNativeProvider(context.Context, json.RawMessage, func(context.Context, *extension.NativeProvider) error) (json.RawMessage, func(), error) {
+	return nil, nil, errors.New("the fake scope registers no Provider objects")
+}
+
 func (s *mcpFakeScope) Remove(handle string) {
 	s.mu.Lock()
 	defer s.mu.Unlock()

@@ -66751,6 +66751,28 @@
       "shapeHash": "sha256:07fecea51179288484cfda3f49b3307fa0666eab1648aa7941432c29e7024afc"
     },
     {
+      "id": "go:github.com/MichaelKinsy/PiG/coding#GraphModelRuntime.getProvider",
+      "package": "github.com/MichaelKinsy/PiG/coding",
+      "name": "GraphModelRuntime.getProvider",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func(id string) (any, error)"
+      },
+      "shapeHash": "sha256:21f5554fc5adbf4f7331479e1ae68bcdd08bf7df5f7ea0a0c3ed7c03ee26d8bb"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/coding#GraphModelRuntime.getProviders",
+      "package": "github.com/MichaelKinsy/PiG/coding",
+      "name": "GraphModelRuntime.getProviders",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func() (any, error)"
+      },
+      "shapeHash": "sha256:70a256c5cf6634c4f4abc481f1f25f58f7380d313905ad14cda858fc7f93e2fc"
+    },
+    {
       "id": "go:github.com/MichaelKinsy/PiG/coding#GraphModelRuntime.login",
       "package": "github.com/MichaelKinsy/PiG/coding",
       "name": "GraphModelRuntime.login",
@@ -66760,6 +66782,39 @@
         "type": "func(ctx context.Context, args github.com/MichaelKinsy/PiG/internal/codingagent.GraphArgs) (any, error)"
       },
       "shapeHash": "sha256:a286e7e33906c3b605dc98760917e00b70494b511ab30c657447058ce9c8e5e6"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/coding#GraphModelRuntime.nativeProvider",
+      "package": "github.com/MichaelKinsy/PiG/coding",
+      "name": "GraphModelRuntime.nativeProvider",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func(id string) github.com/MichaelKinsy/PiG/extensions/sdk/json.RawMessage"
+      },
+      "shapeHash": "sha256:acee8fb31ced92d3c370366d88173c2981db7d12415a32ff65f31cfe81a05c0f"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/coding#GraphModelRuntime.registerNativeProvider",
+      "package": "github.com/MichaelKinsy/PiG/coding",
+      "name": "GraphModelRuntime.registerNativeProvider",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func(ctx context.Context, args github.com/MichaelKinsy/PiG/internal/codingagent.GraphArgs) (any, error)"
+      },
+      "shapeHash": "sha256:a286e7e33906c3b605dc98760917e00b70494b511ab30c657447058ce9c8e5e6"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/coding#GraphModelRuntime.releaseNative",
+      "package": "github.com/MichaelKinsy/PiG/coding",
+      "name": "GraphModelRuntime.releaseNative",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func(id string)"
+      },
+      "shapeHash": "sha256:cfecdc755116fa71eb3b2bdd3bd35e8bff60ec89238fe389c46963b6e90a69dd"
     },
     {
       "id": "go:github.com/MichaelKinsy/PiG/coding#GraphModelRuntime.resolveModel",
@@ -78466,6 +78521,17 @@
       "shapeHash": "sha256:928310872084a3232e42c5ddee4fff5f604f01b2c7640f89b5faac99ec3c2045"
     },
     {
+      "id": "go:github.com/MichaelKinsy/PiG/coding#graphNativeProvider",
+      "package": "github.com/MichaelKinsy/PiG/coding",
+      "name": "graphNativeProvider",
+      "kind": "type",
+      "exported": false,
+      "shape": {
+        "type": "graphNativeProvider"
+      },
+      "shapeHash": "sha256:0032175bb912ff9e9a38358d4f8a0953ca6a56bd162fd05bfd3c6d7042925f95"
+    },
+    {
       "id": "go:github.com/MichaelKinsy/PiG/coding#graphPrompt",
       "package": "github.com/MichaelKinsy/PiG/coding",
       "name": "graphPrompt",
@@ -78510,15 +78576,15 @@
       "shapeHash": "sha256:148cbae045b8a540051b807b5f76324e08dab9f13ab4d0e1783c41cc1f1a95b8"
     },
     {
-      "id": "go:github.com/MichaelKinsy/PiG/coding#graphProviderObjectError",
+      "id": "go:github.com/MichaelKinsy/PiG/coding#graphProviderCarrierMessage",
       "package": "github.com/MichaelKinsy/PiG/coding",
-      "name": "graphProviderObjectError",
-      "kind": "function",
+      "name": "graphProviderCarrierMessage",
+      "kind": "constant",
       "exported": false,
       "shape": {
-        "type": "func(method string) error"
+        "type": "untyped string"
       },
-      "shapeHash": "sha256:0f394c8ea5d56eb86093b74e515fe3f07e2a923979c8830b952acc8db8793566"
+      "shapeHash": "sha256:7eabd192b9f1c379102c8dc793881875f1f949f6b752e15a20b93080cb0b311d"
     },
     {
       "id": "go:github.com/MichaelKinsy/PiG/coding#graphRefreshResult",
@@ -124798,6 +124864,17 @@
       "shapeHash": "sha256:bb68d662d84de9b666f2e0e902cd1035e89d90b2fe439ef4a32a46ea69ebaa64"
     },
     {
+      "id": "go:github.com/MichaelKinsy/PiG/coding/extension/host/subprocess#Host.registerGraphNativeProvider",
+      "package": "github.com/MichaelKinsy/PiG/coding/extension/host/subprocess",
+      "name": "Host.registerGraphNativeProvider",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func(ctx context.Context, conn *Conn, raw encoding/json.RawMessage, register func(context.Context, *github.com/MichaelKinsy/PiG/coding/extension.NativeProvider) error) (encoding/json.RawMessage, func(), error)"
+      },
+      "shapeHash": "sha256:f95801d0973cb29fc6cdf6b3b5449f7406ef655a44eff744cf2030ab6db70881"
+    },
+    {
       "id": "go:github.com/MichaelKinsy/PiG/coding/extension/host/subprocess#Host.registerNativeProvider",
       "package": "github.com/MichaelKinsy/PiG/coding/extension/host/subprocess",
       "name": "Host.registerNativeProvider",
@@ -137127,6 +137204,17 @@
         "type": "func(handle string) (SessionGraphObject, bool)"
       },
       "shapeHash": "sha256:c5e6a9202b516f4088ce3b48343c5ab00291c7b1d0514992f68fe98d926f1319"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/coding/extension/host/subprocess#graphScope.RegisterNativeProvider",
+      "package": "github.com/MichaelKinsy/PiG/coding/extension/host/subprocess",
+      "name": "graphScope.RegisterNativeProvider",
+      "kind": "function",
+      "exported": true,
+      "shape": {
+        "type": "func(ctx context.Context, declaration github.com/MichaelKinsy/PiG/extensions/sdk/json.RawMessage, register func(context.Context, *github.com/MichaelKinsy/PiG/coding/extension.NativeProvider) error) (github.com/MichaelKinsy/PiG/extensions/sdk/json.RawMessage, func(), error)"
+      },
+      "shapeHash": "sha256:56f3c68e074eca1c12d083d6aca9a5aec1a837565f366df51887b950386cc3af"
     },
     {
       "id": "go:github.com/MichaelKinsy/PiG/coding/extension/host/subprocess#graphScope.Remove",
@@ -185485,6 +185573,17 @@
       "shapeHash": "sha256:b28c157064aaa40a64ce11515b5f565517502e2fb8476ce624183c81a4f3b4eb"
     },
     {
+      "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#ModelRuntime.GetProvider",
+      "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
+      "name": "ModelRuntime.GetProvider",
+      "kind": "function",
+      "exported": true,
+      "shape": {
+        "type": "func(provider string) (*Provider, error)"
+      },
+      "shapeHash": "sha256:6163b0e254f08d0bb79e9299e13113cd361787c06a1fdccf2c839c8d74cfc568"
+    },
+    {
       "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#ModelRuntime.GetProviderAuthStatus",
       "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
       "name": "ModelRuntime.GetProviderAuthStatus",
@@ -185494,6 +185593,28 @@
         "type": "func(provider string) (ProviderAuthStatus, error)"
       },
       "shapeHash": "sha256:f80a87637d7025cf0e36233816dafb6a3e4bf28aff00c1dee9133940fed7e8d0"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#ModelRuntime.GetProviders",
+      "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
+      "name": "ModelRuntime.GetProviders",
+      "kind": "function",
+      "exported": true,
+      "shape": {
+        "type": "func() ([]*Provider, error)"
+      },
+      "shapeHash": "sha256:bff69cdf19b1945e4e274d6f78763606f966ecba6615e9cd45fc2d07ff85f113"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#ModelRuntime.GetRegisteredNativeProvider",
+      "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
+      "name": "ModelRuntime.GetRegisteredNativeProvider",
+      "kind": "function",
+      "exported": true,
+      "shape": {
+        "type": "func(providerName string) (*Provider, error)"
+      },
+      "shapeHash": "sha256:bb961bbe125e22309746382251c610dd69ce7182ec20f4b9f5745d407681a704"
     },
     {
       "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#ModelRuntime.GetRegisteredProviderConfig",
@@ -185606,6 +185727,17 @@
       "shapeHash": "sha256:cfe717d6cd2ffa07354a39bc0933ded27309cacac63878afea2f878b1c6ddebf"
     },
     {
+      "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#ModelRuntime.RegisterNativeProvider",
+      "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
+      "name": "ModelRuntime.RegisterNativeProvider",
+      "kind": "function",
+      "exported": true,
+      "shape": {
+        "type": "func(provider *Provider) error"
+      },
+      "shapeHash": "sha256:021bde5cd7fb3b1fbe218eb6f5516b261460570a19108a2569e6be59a7573af4"
+    },
+    {
       "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#ModelRuntime.RegisterProvider",
       "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
       "name": "ModelRuntime.RegisterProvider",
@@ -185705,6 +185837,17 @@
       "shapeHash": "sha256:a490d54a0601a6d443cdeb9036df10762f5b2063d5c08bb90ebdff4bb7b558a3"
     },
     {
+      "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#ModelRuntime.providerDisplayName",
+      "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
+      "name": "ModelRuntime.providerDisplayName",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func(provider string) (string, error)"
+      },
+      "shapeHash": "sha256:4e2fb8671a1199440cebe542e9bc8f2dbbbe713b2ce75b58d668c507d938ad56"
+    },
+    {
       "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#ModelRuntime.registry",
       "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
       "name": "ModelRuntime.registry",
@@ -185714,6 +185857,17 @@
         "type": "func() ModelRegistry"
       },
       "shapeHash": "sha256:c9b67358674873ccba7732ed58091476d9a55b40ee8bc1b7895dbd4b48502221"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#ModelRuntime.requestAuth",
+      "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
+      "name": "ModelRuntime.requestAuth",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func(model map[string]any) map[string]any"
+      },
+      "shapeHash": "sha256:64ffb693dacf330e9d5ccfb67aacceb0de5e9af8991a36e8174659bf3e579bd9"
     },
     {
       "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#ModelRuntimeCreate",
@@ -186000,6 +186154,17 @@
         "type": "func(c Context, options DefaultResourceLoaderOptions) (*DefaultResourceLoader, error)"
       },
       "shapeHash": "sha256:281b6e1e1493ec2e9478d7671c407cbd54ea81976ae1f8436b364d1d32071bd9"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#NewModelRegistry",
+      "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
+      "name": "NewModelRegistry",
+      "kind": "function",
+      "exported": true,
+      "shape": {
+        "type": "func(runtime *ModelRuntime) ModelRegistry"
+      },
+      "shapeHash": "sha256:6638a70a41ac34fff39530c18463bafe05040f9759354255802942e430ce211e"
     },
     {
       "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#NewOrderedExposures",
@@ -193768,6 +193933,17 @@
       "shapeHash": "sha256:05271ed6703d653b6c238eb23156c27d85c8f122a2032d5b71c898c90af43126"
     },
     {
+      "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#authResultMap",
+      "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
+      "name": "authResultMap",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func(result *AuthResult) (map[string]any, error)"
+      },
+      "shapeHash": "sha256:8aa5d2060f95ff59236a2be0f4680754fdc868b3d1f46a5b883f893c2289bcb4"
+    },
+    {
       "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#autocompleteCall",
       "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
       "name": "autocompleteCall",
@@ -197948,6 +198124,17 @@
       "shapeHash": "sha256:ede8a847037a965f1d0450b4d983b0bbb1512be026de1eff6d34f2b4c79a5553"
     },
     {
+      "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#modelProvider",
+      "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
+      "name": "modelProvider",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func(model map[string]any) string"
+      },
+      "shapeHash": "sha256:c1c38c3951c89449cf886360573213d350534ba64327f67ba6a5b9d24cae110d"
+    },
+    {
       "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#modelStreamCallbackOption",
       "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
       "name": "modelStreamCallbackOption",
@@ -198947,6 +199134,17 @@
         "type": "providerDef"
       },
       "shapeHash": "sha256:60692214f8a6185abaf64570c626483981a815b9f90cb40b342d83f541555c63"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#providerFromDeclaration",
+      "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
+      "name": "providerFromDeclaration",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func(c Context, decl providerObjectDeclaration) (*Provider, error)"
+      },
+      "shapeHash": "sha256:4c7ba8050604a777825897d7595d42103b0b6719e5cc22a93df37d2763c60fe4"
     },
     {
       "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#providerInvoke",

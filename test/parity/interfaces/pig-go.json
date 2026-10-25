@@ -115041,6 +115041,17 @@
       "shapeHash": "sha256:6e3aff30807829f76b91c372d0b371ca33d1626e863073a5779d7580af4a50a3"
     },
     {
+      "id": "go:github.com/MichaelKinsy/PiG/coding/extension/host/runtimecell#ReadDirShared",
+      "package": "github.com/MichaelKinsy/PiG/coding/extension/host/runtimecell",
+      "name": "ReadDirShared",
+      "kind": "function",
+      "exported": true,
+      "shape": {
+        "type": "func(dir string) ([]io/fs.DirEntry, error)"
+      },
+      "shapeHash": "sha256:27f5528fb0cf646d235c9c11769eb4b7913061cf53ef6d209abd25642023dfbb"
+    },
+    {
       "id": "go:github.com/MichaelKinsy/PiG/coding/extension/host/runtimecell#ResolvePrebuilt",
       "package": "github.com/MichaelKinsy/PiG/coding/extension/host/runtimecell",
       "name": "ResolvePrebuilt",
@@ -115270,6 +115281,17 @@
         "type": "func(name string, err error, lstat func() error) bool"
       },
       "shapeHash": "sha256:b24357b1a3b440a4e7c0054f01787d27342b30a8505ee715bb6cde0a3875507e"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/coding/extension/host/runtimecell#WalkDirShared",
+      "package": "github.com/MichaelKinsy/PiG/coding/extension/host/runtimecell",
+      "name": "WalkDirShared",
+      "kind": "function",
+      "exported": true,
+      "shape": {
+        "type": "func(root string, fn io/fs.WalkDirFunc) error"
+      },
+      "shapeHash": "sha256:d267377f04793a9c8babe32561329b064324cf0d9fa681a012758b9541987e10"
     },
     {
       "id": "go:github.com/MichaelKinsy/PiG/coding/extension/host/runtimecell#WithGoBuildModule",
@@ -116834,6 +116856,17 @@
       "shapeHash": "sha256:111a4680467bfc62ed8b1dea0cdf42745307d62f968cc53ea6726c97078428e6"
     },
     {
+      "id": "go:github.com/MichaelKinsy/PiG/coding/extension/host/runtimecell#newSharedDirFS",
+      "package": "github.com/MichaelKinsy/PiG/coding/extension/host/runtimecell",
+      "name": "newSharedDirFS",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func(root string) io/fs.FS"
+      },
+      "shapeHash": "sha256:02abf7d41ddb1ab4f55d0fceea503134e635ec4d0a187993c744e0ad47b5ff36"
+    },
+    {
       "id": "go:github.com/MichaelKinsy/PiG/coding/extension/host/runtimecell#newUsageLock",
       "package": "github.com/MichaelKinsy/PiG/coding/extension/host/runtimecell",
       "name": "newUsageLock",
@@ -117118,6 +117151,17 @@
         "type": "func(finalDir string) (cellFailureMeta, bool)"
       },
       "shapeHash": "sha256:258934e8a6ad5f91f7fa7eeec48317f59d882c12708472c986c29583e1314bb6"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/coding/extension/host/runtimecell#readDirShared",
+      "package": "github.com/MichaelKinsy/PiG/coding/extension/host/runtimecell",
+      "name": "readDirShared",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func(dir string) ([]io/fs.DirEntry, error)"
+      },
+      "shapeHash": "sha256:27f5528fb0cf646d235c9c11769eb4b7913061cf53ef6d209abd25642023dfbb"
     },
     {
       "id": "go:github.com/MichaelKinsy/PiG/coding/extension/host/runtimecell#readEntryUse",
@@ -117800,6 +117844,50 @@
         "type": "func(extensions []GoExtension) string"
       },
       "shapeHash": "sha256:1997b02f3bfe8c8b97b6093a2ed5a449724bd664740bc45ab6d5922416497203"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/coding/extension/host/runtimecell#sharedDirFS",
+      "package": "github.com/MichaelKinsy/PiG/coding/extension/host/runtimecell",
+      "name": "sharedDirFS",
+      "kind": "type",
+      "exported": false,
+      "shape": {
+        "type": "sharedDirFS"
+      },
+      "shapeHash": "sha256:93bdae5fb2418f4d5f66bb98fbcf35f9656d4bd24893feea8d09c2fd07ab561d"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/coding/extension/host/runtimecell#sharedDirFS.Open",
+      "package": "github.com/MichaelKinsy/PiG/coding/extension/host/runtimecell",
+      "name": "sharedDirFS.Open",
+      "kind": "function",
+      "exported": true,
+      "shape": {
+        "type": "func(name string) (io/fs.File, error)"
+      },
+      "shapeHash": "sha256:e0c060a528ba67bb8cdfde5df3f9054f1fdcb285333951ba685b49589cc26bb9"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/coding/extension/host/runtimecell#sharedDirFS.ReadDir",
+      "package": "github.com/MichaelKinsy/PiG/coding/extension/host/runtimecell",
+      "name": "sharedDirFS.ReadDir",
+      "kind": "function",
+      "exported": true,
+      "shape": {
+        "type": "func(name string) ([]io/fs.DirEntry, error)"
+      },
+      "shapeHash": "sha256:d74ad37b21a56b2afc34101e616642d83ba35fdb35e70b6c8fe9008bde05607c"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/coding/extension/host/runtimecell#sharedDirFS.Stat",
+      "package": "github.com/MichaelKinsy/PiG/coding/extension/host/runtimecell",
+      "name": "sharedDirFS.Stat",
+      "kind": "function",
+      "exported": true,
+      "shape": {
+        "type": "func(name string) (io/fs.FileInfo, error)"
+      },
+      "shapeHash": "sha256:8662f39363744371033a90433abfc710b8a9d494dc99afef9694685d51fea8c8"
     },
     {
       "id": "go:github.com/MichaelKinsy/PiG/coding/extension/host/runtimecell#skipPackedHashDir",
@@ -118636,6 +118724,17 @@
         "type": "func(ctx context.Context, delay time.Duration) error"
       },
       "shapeHash": "sha256:8e7ad5aa6a2f4ae9d6933a8a7372f6edff9187a335dd6b17a7d22f0ae6e0ece7"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/coding/extension/host/runtimecell#walkDirShared",
+      "package": "github.com/MichaelKinsy/PiG/coding/extension/host/runtimecell",
+      "name": "walkDirShared",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func(path string, d io/fs.DirEntry, fn io/fs.WalkDirFunc) error"
+      },
+      "shapeHash": "sha256:0e7b9ba56891388cedae7aa397f2f6b8dca3d94c20d7540f1d83e70bdbc8e3f6"
     },
     {
       "id": "go:github.com/MichaelKinsy/PiG/coding/extension/host/runtimecell#windowsDeletion",

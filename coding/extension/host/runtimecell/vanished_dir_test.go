@@ -5,7 +5,6 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
-	"runtime"
 	"strconv"
 	"strings"
 	"testing"
@@ -157,9 +156,6 @@ func TestHashGoModuleFailsWhenADeniedDirectoryStillExistsAtTheEnd(t *testing.T) 
 
 // The hash of an on-disk module is stable while a build creates and removes directories under a directory of the module that no CACHEDIR.TAG marks (cargo's rmeta temp directories before its target directory's tag exists, or any other tool's output).
 func TestHashGoModuleIgnoresConcurrentChurnOfUntaggedDirectories(t *testing.T) {
-	if runtime.GOOS == "windows" {
-		t.Skip("Windows keeps a directory that another process is deleting visible to Lstat (it reads the directory entry without opening it) and answers its open with ERROR_ACCESS_DENIED or ERROR_SHARING_VIOLATION until the last handle closes. A live directory the walk may not list gives the same answers, so a hash cannot tell them apart without waiting, and the walk fails closed on both. A throwaway Windows run of this churn failed 100 of 100 iterations on that, with sharing violations and, after a Lstat re-check at the end of the walk, with the directory still there. What Windows guarantees is the tagged case, which never opens below the tag (the cargo target directory tests), and the classification tests with the real codes.")
-	}
 	root := t.TempDir()
 	for name, content := range goModuleFiles() {
 		path := filepath.Join(root, filepath.FromSlash(name))
@@ -180,7 +176,6 @@ func TestHashGoModuleIgnoresConcurrentChurnOfUntaggedDirectories(t *testing.T) {
 	}
 	stop, done := make(chan struct{}), make(chan error, 1)
 	go func() {
-		var busy []string
 		for i := 0; ; i++ {
 			select {
 			case <-stop:
@@ -197,7 +192,7 @@ func TestHashGoModuleIgnoresConcurrentChurnOfUntaggedDirectories(t *testing.T) {
 				done <- err
 				return
 			}
-			if err := removeChurnDir(temp, &busy); err != nil {
+			if err := os.RemoveAll(temp); err != nil && !errors.Is(err, fs.ErrNotExist) {
 				done <- err
 				return
 			}
@@ -215,23 +210,4 @@ func TestHashGoModuleIgnoresConcurrentChurnOfUntaggedDirectories(t *testing.T) {
 	if err := <-done; err != nil {
 		t.Fatal(err)
 	}
-}
-
-// removeChurnDir removes the churn directory temp, and any that an earlier call could not remove. Windows refuses to delete an
-// entry the hash walk has open (a sharing violation, or an access denial on one pending deletion): that is the operating system's
-// delete semantics, not what the test checks, so such a directory is kept for the next call and the t.TempDir cleanup.
-func removeChurnDir(temp string, retry *[]string) error {
-	pending := append([]string(nil), *retry...)
-	pending = append(pending, temp)
-	var busy []string
-	for _, path := range pending {
-		if err := os.RemoveAll(path); err != nil && !errors.Is(err, fs.ErrNotExist) {
-			if !churnRemovalBusy(err) {
-				return err
-			}
-			busy = append(busy, path)
-		}
-	}
-	*retry = busy
-	return nil
 }

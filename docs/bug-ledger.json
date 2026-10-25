@@ -17744,6 +17744,25 @@
       ]
     },
     {
+      "id": "BF-87a6ac5",
+      "title": "Fix in shipped code",
+      "symptom": "Fix in shipped code",
+      "rootCause": "UnmarshalKeepingSurrogates is generic over its destination, so the call sites decode into their own concrete types. The perf-lint entry for FromJsonValue's typed decode keeps its count and follows the callee's new name. unmarshalOrdered is generic for the same reason.",
+      "rootCauseSource": "commit",
+      "userImpact": "Behavior differed from Pi",
+      "platform": "All platforms",
+      "class": "own",
+      "fixedIn": "Unreleased",
+      "origin": "commit",
+      "commits": [
+        {
+          "hash": "87a6ac512c",
+          "date": "2026-10-25"
+        }
+      ],
+      "tests": []
+    },
+    {
       "id": "BF-88177e8",
       "title": "fix(cli): type the validate-only scratch-fetch marker as D28 and extend the record",
       "symptom": "fix(cli): type the validate-only scratch-fetch marker as D28 and extend the record",
@@ -23767,6 +23786,25 @@
       "tests": [
         "coding/session_compact_extension_test.go::TestCompactForExtensionReturnsUpstreamResultShape"
       ]
+    },
+    {
+      "id": "BF-b2b0c63",
+      "title": "Fix in shipped code",
+      "symptom": "Fix in shipped code",
+      "rootCause": "The lone-surrogate fidelity moves to the root: chordjson's default string unquote reads a surrogate escape as its unit, so delta.DecodeJson callers need no wrapper, durable/json.go and nested_result.go are back to main's calls (the nested result decodes with delta.DecodeJson and so keeps document order), NestedToolCallRecord is main's text again, and the stale any-trap entries are deleted.",
+      "rootCauseSource": "commit",
+      "userImpact": "Behavior differed from Pi",
+      "platform": "All platforms",
+      "class": "own",
+      "fixedIn": "Unreleased",
+      "origin": "commit",
+      "commits": [
+        {
+          "hash": "b2b0c63c54",
+          "date": "2026-10-25"
+        }
+      ],
+      "tests": []
     },
     {
       "id": "BF-b2c219f",

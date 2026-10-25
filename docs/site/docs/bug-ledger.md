@@ -605,6 +605,7 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 | [BF-869cef8](#bf-869cef8) | A pi-messages stream event that is a number, string, boolean or array is skipped, as Pi skips an event of… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-86c411a](#bf-86c411a) | fix(builtin): codemode and tool_search declare their parameters in TypeBox key order | PiG's own defect | All platforms | Unreleased |
 | [BF-871b48d](#bf-871b48d) | `pig install <source> --validate-only` now validates git and npm sources that are not installed yet | PiG's own defect | All platforms | 0.5.3 |
+| [BF-87a6ac5](#bf-87a6ac5) | Fix in shipped code | PiG's own defect | All platforms | Unreleased |
 | [BF-88177e8](#bf-88177e8) | fix(cli): type the validate-only scratch-fetch marker as D28 and extend the record | PiG's own defect | All platforms | Unreleased |
 | [BF-8894a13](#bf-8894a13) | A double-quoted YAML string in a skill, prompt template or `parseFrontmatter` header now reads a… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-8894a13-2](#bf-8894a13-2) | The liveness conformance harness answers the host-parser helper calls a factory makes before the register… | PiG's own defect | All platforms | 0.5.0 |
@@ -810,6 +811,7 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 | [BF-b0608a9](#bf-b0608a9) | OpenRouter generated-image data URLs are matched exactly as Pi does (`^data:([^;]+);base64,(.+)$`): a URL… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-b06ad92](#bf-b06ad92) | An MCP server `url` can use environment variables (`"url": "${TOOLS_URL}"`): PiG checks and connects to the… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-b18a7ff](#bf-b18a7ff) | `ctx.compact` answers `onComplete` with the compaction result's members in Pi's order (`summary`… | PiG's own defect | All platforms | 0.5.0 |
+| [BF-b2b0c63](#bf-b2b0c63) | Fix in shipped code | PiG's own defect | All platforms | Unreleased |
 | [BF-b2c219f](#bf-b2c219f) | fix(runtimecell): satisfy the divergence, port and perf gates for the usage-lease and fingerprint changes | PiG's own defect | All platforms | Unreleased |
 | [BF-b341a82](#bf-b341a82) | `go install github.com/MichaelKinsy/PiG/cmd/pig@latest` works again | PiG's own defect | All platforms | 0.5.2 |
 | [BF-b3543f8](#bf-b3543f8) | Fixed MCP stdio servers staying alive after PiG exited because the terminal closed, it crashed, or it… | PiG's own defect | All platforms | 0.5.0 |
@@ -9291,6 +9293,19 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 - **Tests:** `coding/cli/extension_validate_command_test.go::TestInstallValidateOnlyValidatesInstalledGitSource`, `coding/cli/extension_validate_command_test.go::TestInstallValidateOnlyValidatesUninstalledGitSourceInScratchDir`, `coding/cli/extension_validate_command_test.go::TestInstallValidateOnlyValidatesUninstalledNPMSourceInScratchDir`
 - **Release note:** `pig install <source> --validate-only` now validates git and npm sources that are not installed yet. It fetches them into a temporary directory that is removed afterwards, and no longer reports `stat …/git/<host>/<owner>/<repo>: no such file or directory`. Installed packages and settings are not touched.
 
+### BF-87a6ac5
+
+**Fix in shipped code**
+
+- **Source:** PiG's own defect
+- **Symptom:** Fix in shipped code
+- **Root cause:** UnmarshalKeepingSurrogates is generic over its destination, so the call sites decode into their own concrete types. The perf-lint entry for FromJsonValue's typed decode keeps its count and follows the callee's new name. unmarshalOrdered is generic for the same reason.
+- **User impact:** Behavior differed from Pi
+- **Platform:** All platforms
+- **Fixed in:** Unreleased
+- **Fix commits:** `87a6ac512c` (2026-10-25)
+- **Tests:** None recorded.
+
 ### BF-88177e8
 
 **fix(cli): type the validate-only scratch-fetch marker as D28 and extend the record**
@@ -12151,6 +12166,19 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 - **Fix commits:** `b18a7ffd06` (2026-10-07)
 - **Tests:** `coding/session_compact_extension_test.go::TestCompactForExtensionReturnsUpstreamResultShape`
 - **Release note:** `ctx.compact` answers `onComplete` with the compaction result's members in Pi's order (`summary`, `firstKeptEntryId`, `tokensBefore`, `estimatedTokensAfter`, `usage`, `details`); they were written alphabetically.
+
+### BF-b2b0c63
+
+**Fix in shipped code**
+
+- **Source:** PiG's own defect
+- **Symptom:** Fix in shipped code
+- **Root cause:** The lone-surrogate fidelity moves to the root: chordjson's default string unquote reads a surrogate escape as its unit, so delta.DecodeJson callers need no wrapper, durable/json.go and nested_result.go are back to main's calls (the nested result decodes with delta.DecodeJson and so keeps document order), NestedToolCallRecord is main's text again, and the stale any-trap entries are deleted.
+- **User impact:** Behavior differed from Pi
+- **Platform:** All platforms
+- **Fixed in:** Unreleased
+- **Fix commits:** `b2b0c63c54` (2026-10-25)
+- **Tests:** None recorded.
 
 ### BF-b2c219f
 

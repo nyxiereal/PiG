@@ -273,26 +273,26 @@ make async-contracts` or `make verify` from `docs/parity/PORT_MAP.md` and `test/
   port. Everything else is invariant rule, not progress narrative.
 -->
 
-**Porting:** 632 / 634 intended-portable entries ✅ (99.7%); **Verification:** 575 behavioral (91.0%), 57 untested.
-Raw PORT_MAP rows: 709. Breakdown: 75 n/a (designed out) · 2 🟡 partial. See docs/parity/DIVERGENCES.md for the documented exceptions.
+**Porting:** 633 / 634 intended-portable entries ✅ (99.8%); **Verification:** 633 behavioral (100.0%), 0 untested.
+Raw PORT_MAP rows: 709. Breakdown: 75 n/a (designed out) · 1 🟡 partial. See docs/parity/DIVERGENCES.md for the documented exceptions.
 
 | package | src files | n/a | intended | ✅ | 🟡 | ⬜ | ported | behavioral |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|
 | `agent` | 6 | 1 | 5 | 5 | 0 | 0 | 100.0% | 100.0% |
-| `ai` | 208 | 22 | 186 | 185 | 1 | 0 | 99.5% | 97.3% |
-| `chord` | 40 | 5 | 35 | 35 | 0 | 0 | 100.0% | 37.1% |
+| `ai` | 208 | 22 | 186 | 185 | 1 | 0 | 99.5% | 100.0% |
+| `chord` | 40 | 5 | 35 | 35 | 0 | 0 | 100.0% | 100.0% |
 | `codemode` | 17 | 4 | 13 | 13 | 0 | 0 | 100.0% | 100.0% |
-| `coding-agent` | 254 | 27 | 227 | 227 | 0 | 0 | 100.0% | 97.4% |
-| `durable` | 84 | 9 | 75 | 75 | 0 | 0 | 100.0% | 86.7% |
-| `env` | 23 | 3 | 20 | 19 | 1 | 0 | 95.0% | 26.3% |
+| `coding-agent` | 254 | 27 | 227 | 227 | 0 | 0 | 100.0% | 100.0% |
+| `durable` | 84 | 9 | 75 | 75 | 0 | 0 | 100.0% | 100.0% |
+| `env` | 23 | 3 | 20 | 20 | 0 | 0 | 100.0% | 100.0% |
 | `evals` | 5 | 0 | 5 | 5 | 0 | 0 | 100.0% | 100.0% |
 | `mcp` | 18 | 3 | 15 | 15 | 0 | 0 | 100.0% | 100.0% |
 | `telemetry` | 8 | 1 | 7 | 7 | 0 | 0 | 100.0% | 100.0% |
 | `tui` | 46 | 0 | 46 | 46 | 0 | 0 | 100.0% | 100.0% |
 
-- **Four core packages (agent, ai, coding-agent, tui):** 463 / 464 intended-portable files ✅ (99.8%) from 514 rows; 452 behavioral (97.6%), 0 weak-only, 11 untested.
-- **Shipped surface (agent, ai, codemode, coding-agent, mcp, telemetry, tui; coding-agent without ):** 498 / 499 intended-portable files ✅ (99.8%) from 557 rows; 487 behavioral (97.8%), 0 weak-only, 11 untested.
-- **Whole monorepo (11 packages):** 632 / 634 intended-portable files ✅ (99.7%) from 709 rows; 575 behavioral (91.0%), 0 weak-only, 57 untested.
+- **Four core packages (agent, ai, coding-agent, tui):** 463 / 464 intended-portable files ✅ (99.8%) from 514 rows; 463 behavioral (100.0%), 0 weak-only, 0 untested.
+- **Shipped surface (agent, ai, codemode, coding-agent, mcp, telemetry, tui; coding-agent without ):** 498 / 499 intended-portable files ✅ (99.8%) from 557 rows; 498 behavioral (100.0%), 0 weak-only, 0 untested.
+- **Whole monorepo (11 packages):** 633 / 634 intended-portable files ✅ (99.8%) from 709 rows; 633 behavioral (100.0%), 0 weak-only, 0 untested.
 - **Interface closure:** 13363 of 13363 semantic interface IDs closed (217 designed-out, 13146 ported). A file-level ✅ does not close an interface ID.
 
 Behavioral evidence includes paired scenarios and reviewed mutation-proven unit tests; the family table below counts paired scenarios only.

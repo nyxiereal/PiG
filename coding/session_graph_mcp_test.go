@@ -36,6 +36,12 @@ func (s *mcpFakeScope) Object(handle string) (subprocess.SessionGraphObject, boo
 	return object, ok
 }
 
+// Retain returns the object with a no-op release: the fake scope holds its objects for the whole test.
+func (s *mcpFakeScope) Retain(handle string) (subprocess.SessionGraphObject, func(), bool) {
+	object, ok := s.Object(handle)
+	return object, func() {}, ok
+}
+
 func (s *mcpFakeScope) Callback(_ context.Context, id string, raw json.RawMessage) (json.RawMessage, error) {
 	var args []json.RawMessage
 	if err := json.Unmarshal(raw, &args); err != nil {

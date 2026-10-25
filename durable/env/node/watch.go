@@ -814,6 +814,13 @@ func (watcher *nodeFileWatcher) onEvent(path string) {
 	if watcher.closed {
 		return
 	}
+	// fsnotify's kqueue backend names an event for a descriptor whose watch it already removed (a directory deleted under a recursive
+	// watch) with an empty path, and "." once cleaned. Every target is within such a path, so it would report the target itself, which
+	// Pi's FSEvents-backed daemon does not. It names no entry: only a rescan follows, which finds what changed.
+	if !filepath.IsAbs(path) {
+		watcher.scheduleFlushLocked()
+		return
+	}
 	// The file a linked target points to changed: report the target.
 	if link, ok := watcher.linkAliases[path]; ok {
 		watcher.events[link] = true

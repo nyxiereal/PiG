@@ -11,6 +11,7 @@ import (
 	"github.com/MichaelKinsy/PiG/durable/internal/ordered"
 	sdkjson "github.com/MichaelKinsy/PiG/extensions/sdk/json"
 	"github.com/MichaelKinsy/PiG/internal/chord/chordjson"
+	"github.com/MichaelKinsy/PiG/internal/jsstring"
 )
 
 // ToJsonValue returns a detached strict JSON copy of value: nil, bool, float64, string, []any, or *delta.JsonObject. It
@@ -89,7 +90,7 @@ func FromJsonValue[T any](value JsonValue) (T, error) {
 		}
 		return typed, nil
 	}
-	if err := sdkjson.Unmarshal(encoded, &decoded); err != nil {
+	if err := jsstring.UnmarshalKeepingSurrogates(encoded, &decoded); err != nil {
 		return decoded, err
 	}
 	if ordered.HasDynamic(reflect.TypeFor[T]()) {
@@ -122,7 +123,7 @@ func holdsDynamicJSON[T any]() bool {
 
 // marshalStrict is json.Marshal with a non-finite number reported as chord's strict JSON error.
 func marshalStrict(value any) ([]byte, error) {
-	encoded, err := sdkjson.Marshal(value)
+	encoded, err := jsstring.MarshalKeepingSurrogates(value)
 	// A value's own MarshalJSON may use either package, so the non-finite number can arrive as either package's error.
 	if unsupported, ok := errors.AsType[*sdkjson.UnsupportedValueError](err); ok && isNonFinite(unsupported.Str) {
 		return nil, nonFiniteError{}
@@ -147,7 +148,7 @@ func unmarshalOrdered(data []byte, target any) error {
 		}
 		return err
 	}
-	if err := sdkjson.Unmarshal(data, target); err != nil {
+	if err := jsstring.UnmarshalKeepingSurrogates(data, target); err != nil {
 		return err
 	}
 	if ordered.HasDynamic(reflect.TypeOf(target).Elem()) {
@@ -164,5 +165,8 @@ func unmarshalOrdered(data []byte, target any) error {
 // WTF-8 form of its UTF-16 unit, where encoding/json would replace it with U+FFFD. Pi's strings hold such a unit and
 // JSON.stringify writes it back as the escape, so a value must survive a copy unchanged.
 func decodeJson(data []byte) (any, error) {
+	if !jsstring.HasSurrogateEscape(data) {
+		return delta.DecodeJson(data)
+	}
 	return chordjson.DecodeUnquoting(data, func(raw []byte, text *string) error { return sdkjson.Unmarshal(raw, text) })
 }

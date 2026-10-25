@@ -40,7 +40,7 @@ const (
 //     preparation committed; a resend after recovery uses them unchanged), and Cutoff, the newest entry included in
 //     the request.
 //   - retry: Attempt, Compacted, Until.
-//   - poll: Attempt, Compacted, Model, Cutoff, Handle, PollAt.
+//   - poll: Attempt, Compacted, Model, ThinkingLevel (absent in checkpoints of earlier versions), Cutoff, Handle, PollAt.
 //   - tools: Assistant (the tool-calling answer), Tools (tool tasks created so far, in call order) and Pending (calls of
 //     a sequential round not started yet, in call order). The generation owns the tool tasks (spec §8.5).
 type GenerationCheckpoint struct {
@@ -88,7 +88,9 @@ type generationRequestInfo struct {
 	attempt   int
 	compacted *durable.TaskId
 	model     durable.ModelRef
-	cutoff    durable.EntryId
+	// thinkingLevel is the level the request asked for, "" when the checkpoint has none (a record of an earlier version).
+	thinkingLevel ai.ModelThinkingLevel
+	cutoff        durable.EntryId
 	// messages is the committed model context through cutoff, when the phase already derived it.
 	messages []ai.Message
 	// pollAt is set when the message came from polling, so a still deferred result polls strictly later.
@@ -357,7 +359,7 @@ func generationRequestHandler(ctx context.Context, task durable.RunningTask[Gene
 	if err != nil {
 		return err
 	}
-	request := generationRequestInfo{attempt: checkpoint.Attempt, compacted: checkpoint.Compacted, model: ref, cutoff: *checkpoint.Cutoff, messages: view.Messages}
+	request := generationRequestInfo{attempt: checkpoint.Attempt, compacted: checkpoint.Compacted, model: ref, thinkingLevel: checkpoint.ThinkingLevel, cutoff: *checkpoint.Cutoff, messages: view.Messages}
 	return classify(ctx, runtime, request, message)
 }
 
@@ -396,7 +398,7 @@ func generationPollHandler(ctx context.Context, task durable.RunningTask[Generat
 	if message == nil {
 		return errors.New("deferred fetch returned no message")
 	}
-	request := generationRequestInfo{attempt: checkpoint.Attempt, compacted: checkpoint.Compacted, model: ref, cutoff: *checkpoint.Cutoff, pollAt: checkpoint.PollAt}
+	request := generationRequestInfo{attempt: checkpoint.Attempt, compacted: checkpoint.Compacted, model: ref, thinkingLevel: checkpoint.ThinkingLevel, cutoff: *checkpoint.Cutoff, pollAt: checkpoint.PollAt}
 	return classify(ctx, runtime, request, *message)
 }
 
@@ -816,7 +818,11 @@ func classify(ctx context.Context, runtime generationRuntime, request generation
 		return context.Cause(runtime.Signal())
 	}
 	conversationId := runtime.ConversationId()
-	attempt, compacted, ref, cutoff := request.attempt, request.compacted, request.model, request.cutoff
+	attempt, compacted, ref, thinkingLevel, cutoff := request.attempt, request.compacted, request.model, request.thinkingLevel, request.cutoff
+	// Record the requested level, as pi-agent-core's agent loop does (generation.ts classify).
+	if thinkingLevel != "" {
+		message.ThinkingLevel = thinkingLevel
+	}
 	if message.StopReason == ai.StopReasonDeferred && message.Deferred != nil {
 		handle := *message.Deferred
 		pollAfter := float64(defaultPollAfter)
@@ -836,7 +842,7 @@ func classify(ctx context.Context, runtime generationRuntime, request generation
 			if err := live.Set("generation", delta.JsonObjectOf("attempt", float64(attempt), "deferred", delta.JsonObjectOf("pollAt", pollAt))); err != nil {
 				return nil, err
 			}
-			next := GenerationCheckpoint{Phase: generationPoll, Attempt: attempt, Compacted: compacted, Model: &ref, Cutoff: &cutoff, Handle: &handle, PollAt: &pollAt}
+			next := GenerationCheckpoint{Phase: generationPoll, Attempt: attempt, Compacted: compacted, Model: &ref, ThinkingLevel: thinkingLevel, Cutoff: &cutoff, Handle: &handle, PollAt: &pollAt}
 			return sleepingState[GenerationCheckpoint, GenerationResult](next, pollAt), nil
 		})
 	}

@@ -416,6 +416,41 @@ func TestGeneration(t *testing.T) {
 		closeHarness(t, harness)
 	})
 
+	t.Run("records the requested thinking level on answers, streamed and polled", func(t *testing.T) {
+		// upstream: packages/durable/test/harness-generation.test.ts:388
+		pollAfter := int64(1)
+		setup := chatSetup(t, ai.FauxConfig{Deferred: &ai.FauxDeferredConfig{PendingFetches: 1, PollAfterMS: &pollAfter}})
+		setup.Faux.SetResponses([]ai.FauxResponseStep{fauxAnswer("streamed"), fauxAnswer("polled")})
+		harness, root := openChat(t, storage.NewMemoryStorage(), setup)
+		harness.Resume()
+		answer := func(content string) ai.AssistantMessage {
+			settled := must(submitInput(t, root, content).Wait(testContext))
+			if settled.Status != durable.SubmissionDone || settled.Type != durable.SubmissionTypeInput {
+				t.Fatalf("Unexpected %s", settled.Status)
+			}
+			entry := commitValue(t, root, func(tx durable.Tx) (*durable.TypedEntry[durable.Never], error) {
+				return durable.TxEntry(tx, durable.AssistantEntry, *settled.Answer)
+			})
+			return entry.Model[0].(ai.AssistantMessage)
+		}
+		if err := root.Configure(testContext, AgentChange{ThinkingLevel: SetTo(ai.ModelThinkingLevel("high"))}); err != nil {
+			t.Fatal(err)
+		}
+		if got := answer("one").ThinkingLevel; got != "high" {
+			t.Fatalf("streamed answer thinkingLevel = %q, want high", got)
+		}
+		setup.SetSettings(func(settings *HarnessSettings) {
+			settings.Stream = &durable.ConversationStreamOptions{Deferred: &ai.DeferredOption{Enabled: true}}
+		})
+		if got := answer("two").ThinkingLevel; got != "high" {
+			t.Fatalf("polled answer thinkingLevel = %q, want high", got)
+		}
+		if fetches := setup.Faux.(interface{ DeferredFetchCount() int }).DeferredFetchCount(); fetches != 2 {
+			t.Fatalf("deferred fetches = %d, want 2", fetches)
+		}
+		closeHarness(t, harness)
+	})
+
 	t.Run("converts the committed partial when aborted during streaming", func(t *testing.T) {
 		// upstream: packages/durable/test/harness-generation.test.ts:291
 		setup := chatSetup(t, ai.FauxConfig{TokensPerSecond: 20, TokenSize: &ai.FauxTokenSize{Min: new(1), Max: new(1)}})

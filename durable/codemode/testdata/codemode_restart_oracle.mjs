@@ -34,8 +34,24 @@ const { defineTool, ToolResultEntry, ToolTask } = await import("@earendil-works/
 const codemode = await load("durable/src/codemode/codemode.ts");
 const { chatSetup, openChat, allEntries } = await load("durable/test/chat-support.ts");
 const { addTool } = await load("durable/test/harness-support.ts");
-const { ControlledStorage, context } = await load("durable/test/session-support.ts");
-const { aborted, deferred, eventually } = await load("durable/test/task-support.ts");
+const { ControlledStorage, context, flush } = await load("durable/test/session-support.ts");
+const { aborted, deferred } = await load("durable/test/task-support.ts");
+
+/** How long a scenario's wait for a state may last before the state is taken not to come. */
+const WAIT_MS = 60_000;
+/**
+ * Wait for `check` to hold, a macrotask turn at a time. Pi's `eventually` gives a condition 200 turns, which is a count: the turns
+ * pass as fast as the machine runs them, but what a scenario waits for (the script's first call, the journal entry it writes) is work
+ * the sandbox does in a worker thread that has to start first, so on a machine too loaded to start it in time the turns are spent
+ * before the work is done. The bound here is time, and only ends a wait for a state that does not come.
+ */
+async function eventually(check) {
+	const deadline = Date.now() + WAIT_MS;
+	while (!(await check())) {
+		if (Date.now() > deadline) throw new Error("Condition was not reached");
+		await flush();
+	}
+}
 
 /**
  * Storage whose commits a scenario controls: after `queue()`, each commit waits in order until `release()` lets the oldest

@@ -62,7 +62,7 @@ type terminalInputWaiter struct {
 	callbackDone chan struct{}
 }
 
-func newTerminalInputWaiter(ctx context.Context) (*terminalInputWaiter, error) {
+func newTerminalInputWaiter(ctx context.Context, _ *os.File) (*terminalInputWaiter, error) {
 	cancelRead, cancelWrite, err := os.Pipe()
 	if err != nil {
 		return nil, err
@@ -102,6 +102,9 @@ func (w *terminalInputWaiter) wait(file *os.File, ms int) (bool, error) {
 		return pollfds[0].Revents != 0, nil
 	}
 }
+
+// readPipe reports no pipe: a pipe is waited on by wait like any other file, since poll answers for it.
+func (w *terminalInputWaiter) readPipe(*os.File, int) ([]byte, bool, error) { return nil, false, nil }
 
 func (w *terminalInputWaiter) close() {
 	if !w.stopCallback() {

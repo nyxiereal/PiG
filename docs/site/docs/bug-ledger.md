@@ -1090,6 +1090,7 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 | [BF-f7d701e](#bf-f7d701e) | Tool argument validation asserts the `format` keyword for the formats TypeBox checks (date, time, date-time… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-f8673e6](#bf-f8673e6) | Tool argument conversion for TypeBox schemas lower-cases with JavaScript rules (an `İ` in `UNDEFİNED` no… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-f90fedc](#bf-f90fedc) | fix(cli): satisfy errcheck and gocritic in the validate-only change | PiG's own defect | All platforms | Unreleased |
+| [BF-f9648c6](#bf-f9648c6) | On Windows, stopping a terminal reader whose input is a pipe no longer hangs | PiG's own defect | Windows | Unreleased |
 | [BF-f98d129](#bf-f98d129) | Clearing the queued messages (RPC `clear_queue`, the SDK, the interactive restore-to-editor key) no longer… | A Pi defect that PiG fixed first | All platforms | 0.5.0 |
 | [BF-f98d129-2](#bf-f98d129-2) | Omitting a failed retry attempt no longer makes the context usage jump to an estimate of the whole history | A Pi defect that PiG fixed first | All platforms | 0.5.0 |
 | [BF-f98d129-3](#bf-f98d129-3) | A request carries at most the model's `inputLimits.images.maxPerRequest` images | A Pi defect that PiG fixed first | All platforms | 0.5.0 |
@@ -16043,6 +16044,20 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 - **Fixed in:** Unreleased
 - **Fix commits:** `f90fedc1f1` (2026-10-22)
 - **Tests:** None recorded.
+
+### BF-f9648c6
+
+**On Windows, stopping a terminal reader whose input is a pipe no longer hangs**
+
+- **Source:** PiG's own defect
+- **Symptom:** On Windows, stopping a terminal reader whose input is a pipe no longer hangs.
+- **Root cause:** TestInteractiveShutdownLeavesTerminalFileForNextReader timed out after 30m in Windows native-3 (run 40075386948, job 120845797941; twice more on 2026-10-12 and 2026-10-24). The dump has the test goroutine in interactiveTerminalReader.pause waiting for the reader session, and the session in tui.ReadInputChunk -> ReadFile on the pipe the test uses as its terminal.
+- **User impact:** Crash, hang or runaway process
+- **Platform:** Windows
+- **Fixed in:** Unreleased
+- **Fix commits:** `0869584873` (2026-10-24), `f9648c6fd5` (2026-10-24)
+- **Tests:** `internal/codingagent/keystroke_hop_test.go::TestKeystrokeReachesTheOwnerInOneHandOff`, `internal/codingagent/shutdown_input_owner_test.go::TestInteractiveShutdownLeavesTerminalFileForNextReader`, `tui/terminal_native_windows_test.go::TestWindowsInputWaiterTimesOutSignalsAndCancels`, `tui/terminal_pipe_windows_test.go::TestReadInputStreamDeliversAPipeToItsEnd`, `tui/terminal_pipe_windows_test.go::TestReadInputStreamLeavesAPipeForTheNextReader`
+- **Release note:** On Windows, stopping a terminal reader whose input is a pipe no longer hangs. The reader waited on the input handle for input, but a pipe handle reads as ready whether or not input is queued, so a reader over a pipe went into a read that cancellation could not end, and `Stop`, shutdown and an external-editor handoff waited on it for good (seen as a 30 minute `internal/codingagent` test timeout in Windows CI). A pipe is now waited on in a zero-byte read, as Node's libuv does, which takes no input and which cancelling the reader ends, so a cancelled reader returns at once and leaves later input to the next reader. A console, which `pig` itself reads, is waited on as before.
 
 ### BF-f98d129
 

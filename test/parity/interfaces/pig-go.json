@@ -342780,9 +342780,9 @@
       "kind": "function",
       "exported": false,
       "shape": {
-        "type": "func(ctx context.Context) (*terminalInputWaiter, error)"
+        "type": "func(ctx context.Context, _ *os.File) (*terminalInputWaiter, error)"
       },
-      "shapeHash": "sha256:c230c6c4e4909d7456559569e30b502b07315bddc1390960b511b1102f0cb0e9"
+      "shapeHash": "sha256:0dbedc3a82df5af1b4e6189cbb1fcadb4ec34e18a6eff81471a0efb8765c3315"
     },
     {
       "id": "go:github.com/MichaelKinsy/PiG/tui#newTerminalReader",
@@ -348855,6 +348855,17 @@
         "type": "func()"
       },
       "shapeHash": "sha256:032e891204f123caf14d3d421fa9728efc3f31299c17e98859c219dccddd74fb"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/tui#terminalInputWaiter.readPipe",
+      "package": "github.com/MichaelKinsy/PiG/tui",
+      "name": "terminalInputWaiter.readPipe",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func(*os.File, int) ([]byte, bool, error)"
+      },
+      "shapeHash": "sha256:ba8306a9367add3e31d5c5cf0de304a4a4ba0ff8cd3410360898cff452f050b7"
     },
     {
       "id": "go:github.com/MichaelKinsy/PiG/tui#terminalInputWaiter.wait",

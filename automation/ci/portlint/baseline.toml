@@ -6909,12 +6909,6 @@ snippet = "if err := json.Unmarshal(encoded, &params); err != nil {"
 
 [[hit]]
 check = "jsonclone"
-file = "ai/transcript.go"
-func = "normalizeJSONValue"
-snippet = "decoder := sdkjson.NewDecoder(bytes.NewReader(encoded))"
-
-[[hit]]
-check = "jsonclone"
 file = "ai/types.go"
 func = "ToolCall.UnmarshalJSON"
 snippet = "if err := sdkjson.Unmarshal(decodable, &decoded); err != nil {"

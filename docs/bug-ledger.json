@@ -20893,6 +20893,38 @@
       ]
     },
     {
+      "id": "BF-958e80d",
+      "title": "A tool call whose arguments hold a number out of float64 range (`1e999`, `-1e999`) no longer ends the session…",
+      "symptom": "Pi reads such a number as an infinity, keeps it in the call's arguments, and writes `null` wherever it serializes them (events, the session file, requests); PiG now does the same, for a streamed argument text, a tool call a Go caller or the faux provider supplies, and an Anthropic `content_block_start` input, which used to end the turn with a decode error.",
+      "rootCause": "Pi's JSON.parse reads 1e999 as Infinity (and partial-json reads Infinity, -Infinity and NaN), keeps it in a tool call's arguments, and every serialization, JSON.stringify, writes null. A tool call in PiG could hold a non-finite float64 (the streamed text of a provider that hands the cell the parser's number, a Go caller's FauxToolCall, a provider that decodes the whole input) but publishing it copied the arguments through cloneJSONValue, which panicked with \"clone validated JSON value: json: unsupported value: +Inf\" and ended the session.",
+      "rootCauseSource": "commit",
+      "userImpact": "Crash, hang or runaway process",
+      "platform": "All platforms",
+      "class": "own",
+      "fixedIn": "Unreleased",
+      "releaseNote": "A tool call whose arguments hold a number out of float64 range (`1e999`, `-1e999`) no longer ends the session with a panic (`clone validated JSON value: json: unsupported value: +Inf`). Pi reads such a number as an infinity, keeps it in the call's arguments, and writes `null` wherever it serializes them (events, the session file, requests); PiG now does the same, for a streamed argument text, a tool call a Go caller or the faux provider supplies, and an Anthropic `content_block_start` input, which used to end the turn with a decode error.",
+      "origin": "release note",
+      "commits": [
+        {
+          "hash": "958e80d99f",
+          "date": "2026-10-25"
+        }
+      ],
+      "tests": [
+        "ai/tool_call_nonfinite_test.go::FuzzToolArgumentNumberLiterals",
+        "ai/tool_call_nonfinite_test.go::TestCellPublishesNonFiniteArguments",
+        "ai/tool_call_nonfinite_test.go::TestNonFiniteArgumentsAreValidCloneAndSerializeAsStringify",
+        "ai/tool_call_nonfinite_test.go::TestNonFiniteArgumentsDoNotExcuseOtherFaults",
+        "ai/tool_call_nonfinite_test.go::TestStreamedNonFiniteArgumentsDoNotPanic",
+        "ai/tool_call_nonfinite_test.go::TestStreamedNonFiniteArgumentsMatchPi",
+        "ai/transcript_frozen_test.go::TestFrozenContextStillValidatesAndStillCopiesTheCallersTools",
+        "ai/transcript_test.go::TestNormalizeContextAcceptsNonFiniteToolArguments",
+        "coding/cli/nonfinite_tool_args_test.go::TestPrintJSONModeWritesNonFiniteToolArgumentsAsNull",
+        "coding/cli/nonfinite_tool_args_test.go::TestRPCEventsWriteNonFiniteToolArgumentsAsNull",
+        "coding/cli/rpc_output_differential_test.go::TestRPCEventLinesWriteNullForANonFiniteToolCall"
+      ]
+    },
+    {
       "id": "BF-95a5f79",
       "title": "RPC mode starts the `--tools` list active in its own order when it names extension tools, as Pi does",
       "symptom": "RPC mode starts the `--tools` list active in its own order when it names extension tools, as Pi does.",

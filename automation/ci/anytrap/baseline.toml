@@ -132,7 +132,7 @@ count = 1
 
 [[hit]]
 file = "ai/transcript.go"
-func = "normalizeJSONValue"
+func = "normalizeJSONValueWith"
 call = "sdkjson.Decode"
 dest = "*any"
 count = 1

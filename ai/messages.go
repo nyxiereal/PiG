@@ -164,10 +164,10 @@ func (message AssistantMessage) cloneMessage() Message {
 }
 
 func cloneAssistantMessage(message AssistantMessage) AssistantMessage {
-	return cloneAssistantMessageWith(message, cloneJSONValue)
+	return cloneAssistantMessageWith(message, cloneArgumentsValue)
 }
 
-// clonePublishedAssistantMessage is cloneAssistantMessage for a snapshot a message cell published. Publication already copied its tool arguments through cloneJSONValue, so their strings are valid and a copy need not read them again: without that, every observation of a streaming tool call would read all of its arguments so far.
+// clonePublishedAssistantMessage is cloneAssistantMessage for a snapshot a message cell published. Publication already copied its tool arguments through cloneArgumentsValue, so their strings are valid and a copy need not read them again: without that, every observation of a streaming tool call would read all of its arguments so far.
 func clonePublishedAssistantMessage(message AssistantMessage) AssistantMessage {
 	return cloneAssistantMessageWith(message, clonePublishedJSONValue)
 }
@@ -329,7 +329,7 @@ func cloneNestedToolCalls(calls *NestedToolCalls) *NestedToolCalls {
 	cloned := &NestedToolCalls{Calls: make([]NestedToolCallRecord, len(calls.Calls)), Complete: calls.Complete}
 	for i, call := range calls.Calls {
 		if call.Arguments != nil {
-			call.Arguments = cloneJSONValue(map[string]any(call.Arguments)).(map[string]any)
+			call.Arguments = cloneArgumentsValue(map[string]any(call.Arguments)).(map[string]any)
 		}
 		if call.ArgumentsBytes != nil {
 			call.ArgumentsBytes = new(*call.ArgumentsBytes)
@@ -492,7 +492,7 @@ func cloneUserContentBlock(block UserContentBlock) UserContentBlock {
 }
 
 func cloneAssistantContent(blocks []AssistantContentBlock) []AssistantContentBlock {
-	return cloneAssistantContentWith(blocks, cloneJSONValue)
+	return cloneAssistantContentWith(blocks, cloneArgumentsValue)
 }
 
 func cloneAssistantContentWith(blocks []AssistantContentBlock, cloneArguments func(any) any) []AssistantContentBlock {

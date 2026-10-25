@@ -64,7 +64,11 @@ func ResolveTemporarySource(cwd, agentDir string, sm *codingagent.SettingsManage
 		if err != nil {
 			return "", err
 		}
-		args = append(args, NpmInstallArgs(manager, ref.Locator, root, ref.NPMRegistry)...)
+		realRoot, err := RealInstallRoot(root)
+		if err != nil {
+			return "", &InstallFailureError{Err: err}
+		}
+		args = append(args, NpmInstallArgs(manager, ref.Locator, realRoot, ref.NPMRegistry)...)
 		if err := RunPackageProcess("", command[0], args...); err != nil {
 			return "", &InstallFailureError{Err: err}
 		}

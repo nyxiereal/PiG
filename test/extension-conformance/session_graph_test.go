@@ -88,7 +88,9 @@ func (r *sessionGraphRig) script(tool string) (map[string]any, string) {
 	}
 	configDir := icodingagent.ConfigDirName()
 	modelServer := sessionGraphModelServer(r.t)
+	toolServer := sessionGraphToolModelServer(r.t, "mcp__demo__echo", `{"text":"hi"}`)
 	args := map[string]any{
+		"mrToolModels": filepath.Join(root, "mr", "models-tool.json"), "mcpProbe": filepath.Join(root, "probe", "mcp.mjs"),
 		"mrAuth": filepath.Join(root, "mr", "auth.json"), "mrModels": filepath.Join(root, "mr", "models.json"), "mrStore": filepath.Join(root, "mr", "models-store.json"), "mrServer": modelServer,
 		"cwd": filepath.Join(root, "project"), "dir": filepath.Join(root, "sessions"), "otherDir": filepath.Join(root, "other"), "junk": filepath.Join(root, "junk.jsonl"),
 		"probeExt": filepath.Join(root, "probe", "probe.mjs"), "servicesProbe": filepath.Join(root, "probe", "services.mjs"), "refsProbe": filepath.Join(root, "probe", "refs.mjs"), "servicesAgentDir": filepath.Join(root, "agent-services"),
@@ -115,6 +117,8 @@ func (r *sessionGraphRig) script(tool string) (map[string]any, string) {
 		filepath.Join(root, "probe", "probe.mjs"):                                childHandlesProbe,
 		filepath.Join(root, "probe", "services.mjs"):                             servicesProbe,
 		filepath.Join(root, "probe", "refs.mjs"):                                 extensionRefsProbe,
+		filepath.Join(root, "probe", "mcp.mjs"):                                  mcpOptionsProbe,
+		filepath.Join(root, "mr", "models-tool.json"):                            `{"providers":{"mr-tool":{"baseUrl":"` + toolServer + `","api":"openai-completions","apiKey":"mr-key","models":[{"id":"m1","name":"M One","reasoning":false,"input":["text"],"cost":{"input":1,"output":2,"cacheRead":0,"cacheWrite":0},"contextWindow":8000,"maxTokens":1000}]}}}`,
 		filepath.Join(root, "agent-services", "auth.json"):                       `{"svc-local":{"type":"api_key","key":"svc-key"}}`,
 		filepath.Join(root, "agent-services", "models.json"):                     `{"providers":{"svc-local":{"baseUrl":"` + modelServer + `","api":"openai-completions","apiKey":"svc-key","models":[{"id":"s1","name":"S One","reasoning":false,"input":["text"],"cost":{"input":0,"output":0,"cacheRead":0,"cacheWrite":0},"contextWindow":4000,"maxTokens":500}]}}}`,
 		filepath.Join(root, "agent-services", "settings.json"):                   `{"defaultProvider":"svc-local","defaultModel":"s1"}`,
@@ -605,3 +609,65 @@ func TestSessionGraphExtensionFactoriesAcrossSDKs(t *testing.T) {
 //
 //go:embed testdata/session-graph-extension-factories.json
 var sessionGraphExtensionFactoriesWant string
+
+// sessionGraphToolModelServer is a model that calls the tool toolName with arguments on its first request and answers with text once a tool result is in the conversation.
+func sessionGraphToolModelServer(t *testing.T, toolName, arguments string) string {
+	t.Helper()
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
+		var body struct {
+			Messages []struct {
+				Role string `json:"role"`
+			} `json:"messages"`
+		}
+		_ = json.NewDecoder(request.Body).Decode(&body)
+		toolResult := false
+		for _, message := range body.Messages {
+			toolResult = toolResult || message.Role == "tool"
+		}
+		w.Header().Set("Content-Type", "text/event-stream")
+		chunks := []string{
+			`{"id":"c1","object":"chat.completion.chunk","created":1,"model":"m1","choices":[{"index":0,"delta":{"role":"assistant","content":"done"},"finish_reason":null}]}`,
+			`{"id":"c1","object":"chat.completion.chunk","created":1,"model":"m1","choices":[{"index":0,"delta":{},"finish_reason":"stop"}],"usage":{"prompt_tokens":3,"completion_tokens":2,"total_tokens":5}}`,
+		}
+		if !toolResult {
+			call, _ := json.Marshal(map[string]any{"name": toolName, "arguments": arguments})
+			chunks = []string{
+				`{"id":"c1","object":"chat.completion.chunk","created":1,"model":"m1","choices":[{"index":0,"delta":{"role":"assistant","tool_calls":[{"index":0,"id":"call_1","type":"function","function":` + string(call) + `}]},"finish_reason":null}]}`,
+				`{"id":"c1","object":"chat.completion.chunk","created":1,"model":"m1","choices":[{"index":0,"delta":{},"finish_reason":"tool_calls"}],"usage":{"prompt_tokens":3,"completion_tokens":2,"total_tokens":5}}`,
+			}
+		}
+		for _, chunk := range chunks {
+			_, _ = fmt.Fprintf(w, "data: %s\n\n", chunk)
+		}
+		_, _ = fmt.Fprint(w, "data: [DONE]\n\n")
+	}))
+	t.Cleanup(server.Close)
+	return server.URL
+}
+
+// mcpOptionsProbe is the extension the mcp_options script loads next to the MCP extension: when the run ends it records, in the session log, the MCP tools the session has.
+const mcpOptionsProbe = `export default function (pi) {
+  pi.on("agent_end", async (_event, ctx) => {
+    ctx.sessionManager.appendCustomEntry("mcp_seen", { tools: pi.getAllTools().map((tool) => tool.name).filter((name) => name.startsWith("mcp__")).sort(), active: pi.getActiveTools().filter((name) => name.startsWith("mcp__")).sort() });
+  });
+}
+`
+
+// createMcpExtension's function options (extensions/mcp/index.ts McpExtensionOptions) for every SDK, against the report of Pi's own factory (the Node row): loadConfig's context and result, the transports createTransport made (what the client sent them, in order, the auth provider's token), the credential store's operations, and a tool call that crosses the transport.
+func TestSessionGraphMcpOptionsAcrossSDKs(t *testing.T) {
+	t.Parallel()
+	eachSessionGraphSDKWith(t, newSessionGraphRigWithChildren, func(t *testing.T, r *sessionGraphRig, _ string) {
+		report, root := r.script("mcp_options")
+		got := normalizeSessionGraph(t, report, root)
+		if path := os.Getenv("SESSION_GRAPH_PRINT"); path != "" {
+			encoded, _ := json.MarshalIndent(got, "", "\t")
+			_ = os.WriteFile(path, encoded, 0o600)
+		}
+		requireSessionGraphReport(t, got, sessionGraphMcpOptionsWant)
+	})
+}
+
+// sessionGraphMcpOptionsWant is the report of Pi's own createMcpExtension (the Node row).
+//
+//go:embed testdata/session-graph-mcp-options.json
+var sessionGraphMcpOptionsWant string

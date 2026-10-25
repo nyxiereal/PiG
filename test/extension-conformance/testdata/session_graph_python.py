@@ -1,6 +1,7 @@
 # The Python fixture of the session graph conformance rows (session_graph_test.go): the script of testfixture/sessiongraph (Go), testdata/session-graph.mjs (Node, Pi's own classes) and testdata/session-graph-rust.
 import json
 import os
+import threading
 
 import pig_sdk
 from pig_sdk import DefaultPackageManager, DefaultResourceLoader, ModelRuntime, ProjectTrustStore, SessionManager, SettingsManager, has_trust_requiring_project_resources
@@ -1000,6 +1001,143 @@ def extension_refs_tool(ctx, params):
     return json.dumps(extension_refs_script(ctx, params))
 
 
+class McpScriptTransport(pig_sdk.McpTransportEvents):
+    """The in-process peer behind create_transport."""
+
+    def __init__(self, log, events, auth):
+        super().__init__()
+        self.log, self.events, self.auth = log, events, auth
+
+    def start(self):
+        self.log.add(self.events, "start")
+        if self.auth is not None:
+            token = self.auth.token()
+            self.log.add(self.events, "token undefined" if token is None else f"token {token}")
+
+    def send(self, message, signal):
+        self.log.add(self.events, f"send {message.get('method', 'response')}")
+        reply = mcp_peer_reply(message)
+        if reply is not None:
+            self.emit_message(reply)
+
+    def close(self):
+        self.log.add(self.events, "close")
+        self.emit_close()
+
+
+class McpScriptLog:
+    def __init__(self):
+        self.lock = threading.Lock()
+        self.demo, self.remote, self.credentials, self.load_config = [], [], [], []
+
+    def server(self, name):
+        return self.remote if name == "remote" else self.demo
+
+    def add(self, entries, entry):
+        with self.lock:
+            entries.append(entry)
+
+
+def mcp_peer_reply(message):
+    """Answers one message of the MCP handshake, the tool list and a tool call, as testdata/session-graph.mjs mcpPeerReply does."""
+    if "id" not in message:
+        return None
+
+    def reply(result):
+        return {"jsonrpc": "2.0", "id": message["id"], "result": result}
+
+    method = message.get("method")
+    if method == "initialize":
+        return reply({"protocolVersion": message["params"]["protocolVersion"], "capabilities": {"tools": {}}, "serverInfo": {"name": "fake", "version": "1"}})
+    if method == "tools/list":
+        return reply({"tools": [{"name": "echo", "description": "Echo text", "inputSchema": {"type": "object", "properties": {"text": {"type": "string"}}, "required": ["text"]}}]})
+    if method == "tools/call":
+        return reply({"content": [{"type": "text", "text": "echo:" + message["params"]["arguments"]["text"]}]})
+    if method == "ping":
+        return reply({})
+    return {"jsonrpc": "2.0", "id": message["id"], "error": {"code": -32601, "message": "method not found"}}
+
+
+class McpScriptServerStore:
+    def __init__(self, log, name, state):
+        self.log, self.name, self.state = log, name, state
+
+    def load(self):
+        self.log.add(self.log.credentials, f"load {self.name}")
+        return self.state
+
+    def save(self, state):
+        self.log.add(self.log.credentials, f"save {self.name}")
+
+    def with_refresh_lock(self, fn):
+        self.log.add(self.log.credentials, f"lock {self.name}")
+        return fn()
+
+
+class McpScriptCredentials:
+    def __init__(self, log, state):
+        self.log, self.state = log, state
+
+    def for_server(self, name, server_url):
+        self.log.add(self.log.credentials, f"forServer {name} {server_url}")
+        return McpScriptServerStore(self.log, name, self.state)
+
+    def tokens(self, name, server_url):
+        self.log.add(self.log.credentials, f"tokens {name} {server_url}")
+        return {"access_token": "tok-1", "token_type": "Bearer"}
+
+    def remove(self, name, server_url):
+        self.log.add(self.log.credentials, f"remove {name} {server_url}")
+        return True
+
+
+def mcp_options_script(ctx, args):
+    """Passes load_config, create_transport and credentials to create_mcp_extension, as testdata/session-graph.mjs mcpOptionsScript does with Pi's factory; the report is Pi's own run's."""
+    cwd, agent_dir = args["cwd"], args["agentDir"]
+    log = McpScriptLog()
+    rt = ModelRuntime.create(ctx, auth_path=args["mrAuth"], models_path=args["mrToolModels"], models_store_path=args["mrStore"])
+    settings = SettingsManager.in_memory(ctx, {"compaction": {"enabled": False}, "retry": {"enabled": False}, "defaultProvider": "mr-tool", "defaultModel": "m1"})
+    state = {"serverUrl": "http://127.0.0.1:9/mcp", "tokens": {"access_token": "tok-1", "token_type": "Bearer"}}
+
+    def load_config(c):
+        with log.lock:
+            log.load_config.append({"cwd": c["cwd"], "isProjectTrusted": c["isProjectTrusted"]})
+        return {"servers": [
+            {"name": "demo", "config": {"command": "unused", "exposure": "direct"}, "source": "<config>", "scope": "global"},
+            {"name": "remote", "config": {"url": "http://127.0.0.1:9/mcp", "exposure": "direct"}, "source": "<config>", "scope": "global"},
+        ], "errors": []}
+
+    def create_transport(entry, transport_cwd, auth):
+        events = log.server(entry["name"])
+        log.add(events, f"create {entry['name']} cwd={transport_cwd} auth={'true' if auth is not None else 'false'}")
+        return McpScriptTransport(log, events, auth)
+
+    factory = pig_sdk.create_mcp_extension(
+        load_config=load_config, create_transport=create_transport, credentials=McpScriptCredentials(log, state),
+        open_url=lambda url: None, update_config=lambda entry, patch: None, log_path=os.path.join(agent_dir, "mcp.log"),
+    )
+    loader = DefaultResourceLoader(
+        ctx, cwd=cwd, agent_dir=agent_dir, settings_manager=settings, no_extensions=True, no_skills=True, no_prompt_templates=True, no_themes=True, no_context_files=True,
+        additional_extension_paths=[args["mcpProbe"]], extension_factories=[factory],
+    )
+    loader.reload()
+    manager = SessionManager.in_memory(ctx, cwd)
+    session = ctx.create_agent_session(pig_sdk.CreateAgentSessionOptions(session_manager=manager, settings_manager=settings, model_runtime=rt, resource_loader=loader))
+    session.bind_extensions()
+    for prompt in ("call the tool", "/mcp reconnect demo", "/mcp logout remote"):
+        session.prompt(prompt)
+    messages = ["".join(part["text"] for part in message["content"]) for message in session.messages() if message.get("role") == "toolResult"]
+    seen = [entry["data"] for entry in manager.get_entries() if entry["type"] == "custom" and entry.get("customType") == "mcp_seen"]
+    with log.lock:
+        report = {"messages": messages, "seen": seen, "log": {"demo": list(log.demo), "remote": list(log.remote), "credentials": list(log.credentials), "loadConfig": list(log.load_config)}}
+    session.dispose()
+    return report
+
+
+def mcp_options_tool(ctx, params):
+    return json.dumps(mcp_options_script(ctx, params))
+
+
 def new_extension():
     ext = pig_sdk.Extension("session-graph")
     ext.register_tool(pig_sdk.ToolDefinition(name="session_manager", label="session_manager", description="Runs the SessionManager script.", parameters={"type": "object"}, execute=session_manager_tool))
@@ -1011,5 +1149,6 @@ def new_extension():
     ext.register_tool(pig_sdk.ToolDefinition(name="child_handles", label="child_handles", description="Runs the createAgentSession handle options script.", parameters={"type": "object"}, execute=child_handles_tool))
     ext.register_tool(pig_sdk.ToolDefinition(name="create_provider", label="create_provider", description="Runs the createProvider script.", parameters={"type": "object"}, execute=create_provider_tool))
     ext.register_tool(pig_sdk.ToolDefinition(name="extension_refs", label="extension_refs", description="Runs the compiled-in extension factories script.", parameters={"type": "object"}, execute=extension_refs_tool))
+    ext.register_tool(pig_sdk.ToolDefinition(name="mcp_options", label="mcp_options", description="Runs the createMcpExtension function options script.", parameters={"type": "object"}, execute=mcp_options_tool))
     ext.register_tool(pig_sdk.ToolDefinition(name="services", label="services", description="Runs the createAgentSessionServices script.", parameters={"type": "object"}, execute=services_tool))
     return ext

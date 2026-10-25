@@ -10,7 +10,7 @@ Use counts (`uses`) are the number of the 255 scanned npm packages that import t
 
 | Module | Rows | type-only (identity by kind) | Node served | Go gaps | Rust gaps | Python gaps |
 |---|---|---|---|---|---|---|
-| `pi-coding-agent` | 920 | 305 | 910 | 388 | 388 | 388 |
+| `pi-coding-agent` | 920 | 305 | 910 | 387 | 387 | 387 |
 | `pi-tui` | 365 | 85 | 364 | 147 | 147 | 147 |
 | `pi-ai` | 97 | 197 | 97 | 66 | 66 | 66 |
 | `pi-ai/compat` | 156 | 204 | 156 | 122 | 122 | 122 |
@@ -20,7 +20,7 @@ Use counts (`uses`) are the number of the 255 scanned npm packages that import t
 
 | Lane | Owner | Opened | Gap cells | Closing row |
 |---|---|---|---|---|
-| C2Sessions | C2Sessions lane (createAgentSession family, E1/E6) | 0.5.2 | 399 | Conformance rows for createAgentSession, createAgentSessionRuntime and the pi-agent-core Agent loop in all four SDKs (branch feat/sdk-child-agent-sessions) |
+| C2Sessions | C2Sessions lane (createAgentSession family, E1/E6) | 0.5.2 | 396 | Conformance rows for createAgentSession, createAgentSessionRuntime and the pi-agent-core Agent loop in all four SDKs (branch feat/sdk-child-agent-sessions) |
 | SdkExportsLedger | SdkExportsLedger lane (Pi application internals no extension scan imports) | 0.5.2 | 1158 | Owner decision per export, listed with usage counts in handoffs/0.5.2/sdk-exports-internals.md: a numbered divergence in docs/parity/DIVERGENCES.md (cells become divergence:D<n>), or a real lane with a port and a conformance row |
 | SdkPiAiHelpers | SdkPiAiHelpers lane (pi-ai pure helpers, StringEnum, host getters, E17-E22) | 0.5.2 | 150 | Pure helpers with vector tests from Pi at the pin; host getters and the pi-ai compat calls with a conformance row per SDK |
 | SdkSessionGraph | SdkSessionGraph lane (SessionManager/SettingsManager/ModelRuntime/resource loader, E2-E5) | 0.5.2 | 348 | Host calls for session open/list/inMemory, scoped settings, standalone model runtime, resource loader and package manager, with a conformance row per SDK |
@@ -28,7 +28,7 @@ Use counts (`uses`) are the number of the 255 scanned npm packages that import t
 
 ## High-use gaps (block the release gate)
 
-9 exports imported by 5 or more scanned packages have a gap.
+8 exports imported by 5 or more scanned packages have a gap.
 
 | Export | uses | Gaps |
 |---|---|---|
@@ -37,7 +37,6 @@ Use counts (`uses`) are the number of the 255 scanned npm packages that import t
 | `pi-ai/compat: Type` | 14 | Go SdkPiAiHelpers; Rust SdkPiAiHelpers; Python SdkPiAiHelpers |
 | `pi-coding-agent: createAgentSessionRuntime` | 6 | Go SdkSessionGraph; Rust SdkSessionGraph; Python SdkSessionGraph |
 | `pi-coding-agent: createExtensionRuntime` | 6 | Go SdkSessionGraph; Rust SdkSessionGraph; Python SdkSessionGraph |
-| `pi-coding-agent: createMcpExtension` | 6 | Go C2Sessions; Rust C2Sessions; Python C2Sessions |
 | `pi-tui: TuiAltScreen` | 6 | Go SdkTuiHelpers; Rust SdkTuiHelpers; Python SdkTuiHelpers |
 | `pi-coding-agent: ExtensionRunner` | 5 | Go SdkSessionGraph; Rust SdkSessionGraph; Python SdkSessionGraph |
 | `pi-coding-agent: ModelRegistry` | 5 | Go SdkSessionGraph; Rust SdkSessionGraph; Python SdkSessionGraph |
@@ -889,7 +888,7 @@ None.
 | `createLocalPowerShellOperations` | 1 | served | native:CreateLocalPowerShellOperations | native:create_local_powershell_operations | native:create_local_powershell_operations |
 | `createLsTool` | 4 | served | native:CreateLsTool | native:create_ls_tool | native:create_ls_tool |
 | `createLsToolDefinition` | 10 | served | native:CreateLsToolDefinition | native:create_ls_tool_definition | native:create_ls_tool_definition |
-| `createMcpExtension` | 6 | served | gap:C2Sessions | gap:C2Sessions | gap:C2Sessions |
+| `createMcpExtension` | 6 | served | native:CreateMcpExtension | native:create_mcp_extension | native:create_mcp_extension |
 | `createPowerShellTool` | 0 | served | native:CreatePowerShellTool | native:create_powershell_tool | native:create_powershell_tool |
 | `createPowerShellToolDefinition` | 1 | served | native:CreatePowerShellToolDefinition | native:create_powershell_tool_definition | native:create_powershell_tool_definition |
 | `createReadOnlyTools` | 3 | served | native:CreateReadOnlyTools | native:create_read_only_tools | native:create_read_only_tools |

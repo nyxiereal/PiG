@@ -60,7 +60,7 @@ class DefaultResourceLoader(_GraphObject):
             "systemPromptOverride": _callback_id(context, system_prompt_override), "appendSystemPromptOverride": _callback_id(context, append_system_prompt_override),
         }
         if extension_factories:
-            wire["extensionFactories"] = [{"builtin": factory.builtin, "options": factory.options} for factory in extension_factories]
+            wire["extensionFactories"] = [factory._wire(context) for factory in extension_factories]
         if settings_manager is not None:
             wire["settingsManager"] = settings_manager.handle
         super().__init__(context, "DefaultResourceLoader", "new", wire)

@@ -8,6 +8,7 @@ import (
 	"github.com/MichaelKinsy/PiG/coding/extension"
 	"github.com/MichaelKinsy/PiG/coding/extension/builtin/codemode"
 	"github.com/MichaelKinsy/PiG/coding/extension/builtin/toolsearch"
+	"github.com/MichaelKinsy/PiG/coding/extension/host/subprocess"
 	"github.com/MichaelKinsy/PiG/coding/mcpext"
 	"github.com/MichaelKinsy/PiG/extensions/sdk/json"
 	icodingagent "github.com/MichaelKinsy/PiG/internal/codingagent"
@@ -19,8 +20,8 @@ type graphExtensionFactory struct {
 	Options json.RawMessage `json:"options"`
 }
 
-// factory builds the host's factory of the named extension. agentDir is the loader's agent directory, where the MCP extension keeps its configuration, credentials and log.
-func (f graphExtensionFactory) factory(agentDir string) (extension.InlineExtension, error) {
+// factory builds the host's factory of the named extension. agentDir is the loader's agent directory, where the MCP extension keeps its configuration, credentials and log. scope is the extension's connection, where the functions an option names run.
+func (f graphExtensionFactory) factory(scope subprocess.SessionGraphScope, agentDir string) (extension.InlineExtension, error) {
 	switch f.Builtin {
 	case "codemode":
 		// index.ts CodemodeExtensionOptions: mode, inlineBudget and models (default true).
@@ -46,10 +47,11 @@ func (f graphExtensionFactory) factory(agentDir string) (extension.InlineExtensi
 	case "tool-search":
 		return toolsearch.CreateToolSearchExtension(), nil
 	case "mcp":
-		// index.ts McpExtensionOptions: the data options logPath and startupWaitMs. The function options (loadConfig, createTransport, credentials, openUrl, updateConfig) run caller code and are not served.
+		// index.ts McpExtensionOptions: the data options logPath and startupWaitMs, and the function options (loadConfig, createTransport, credentials, openUrl, updateConfig), which the extension names by callback id (session_graph_mcp.go).
 		var options struct {
 			LogPath       string   `json:"logPath"`
 			StartupWaitMs *float64 `json:"startupWaitMs"`
+			graphMcpFunctions
 		}
 		if f.hasOptions() {
 			if err := json.Unmarshal(f.Options, &options); err != nil {
@@ -61,6 +63,7 @@ func (f graphExtensionFactory) factory(agentDir string) (extension.InlineExtensi
 			wait := int(*options.StartupWaitMs)
 			built.StartupWaitMs = &wait
 		}
+		options.apply(scope, &built)
 		return mcpext.CreateMcpExtension(built), nil
 	}
 	return nil, fmt.Errorf("the host serves no compiled-in extension named %q", f.Builtin)

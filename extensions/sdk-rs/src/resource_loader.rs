@@ -80,7 +80,14 @@ impl DefaultResourceLoader {
             .extension_factories
             .iter()
             .filter_map(|factory| match factory {
-                ExtensionFactory::Builtin { name, options } => Some(json!({"builtin": name, "options": options})),
+                ExtensionFactory::Builtin { name, options, mcp } => {
+                    // The option object is built for each loader: a function is named to the host in the connection's table once per loader it is passed to.
+                    let mut options = options.clone();
+                    if let (Some(functions), Some(wire)) = (mcp, options.as_object_mut()) {
+                        functions.register(context, wire);
+                    }
+                    Some(json!({"builtin": name, "options": options}))
+                }
                 ExtensionFactory::Inline(_) => None,
             })
             .collect();

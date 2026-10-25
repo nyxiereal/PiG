@@ -34,3 +34,24 @@ func TestResolve(t *testing.T) {
 		})
 	}
 }
+
+func TestClipNote(t *testing.T) {
+	for _, tc := range []struct {
+		name          string
+		full, budget  time.Duration
+		untilDeadline time.Duration
+		want          string
+	}{
+		{name: "whole bound", full: Default, budget: Default, untilDeadline: time.Hour},
+		{name: "bound cut by the deadline", full: Default, budget: 2400 * time.Millisecond, untilDeadline: 12400 * time.Millisecond,
+			want: "testbudget: the wait bound is 2.4s, cut from 2m0s because the go test -timeout deadline is 12.4s away; a wait that ends at this bound reports a package run that is out of time, not an awaited event that is late"},
+		{name: "override cut to the floor", full: 300 * time.Second, budget: time.Second, untilDeadline: 3 * time.Second,
+			want: "testbudget: the wait bound is 1s, cut from 5m0s because the go test -timeout deadline is 3s away; a wait that ends at this bound reports a package run that is out of time, not an awaited event that is late"},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			if got := clipNote(tc.full, tc.budget, tc.untilDeadline); got != tc.want {
+				t.Fatalf("clipNote = %q, want %q", got, tc.want)
+			}
+		})
+	}
+}

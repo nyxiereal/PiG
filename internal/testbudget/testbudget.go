@@ -5,6 +5,13 @@
 // long a genuine hang takes to fail. Fixed 5-10 s deadlines turned into
 // failures when many test binaries shared a machine (load average 80 on 14
 // cores), so waits use [Wait] instead. Only test code imports this package.
+//
+// The go test -timeout deadline caps every bound, so a test that starts when
+// the package run is about to expire reports a timeout of its own, naming a
+// wait, a few seconds before the test binary's timeout panic. That test is not
+// at fault: the run is out of time. A package whose tests need longer than
+// -timeout in one process (coding/cli needs about 25 minutes on 4 CPUs) runs
+// as several go test processes in CI (automation/ci/test-grouped.sh).
 package testbudget
 
 import (
@@ -12,6 +19,7 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"sync"
 	"testing"
 	"time"
 )
@@ -28,16 +36,40 @@ const Default = 120 * time.Second
 // test's own diagnostics instead of the test binary's timeout panic.
 const grace = 10 * time.Second
 
+// clipNoted holds the names of the tests whose cut bound Wait already logged.
+var clipNoted sync.Map
+
 // Wait returns the hang bound for t: Default or the Env override, capped to
-// end before t's deadline.
+// end before t's deadline. When the deadline cuts the bound, Wait logs that
+// once for t, so a failure at that bound names its cause: the package run is
+// out of time, and the awaited event is not late.
 func Wait(t *testing.T) time.Duration {
 	t.Helper()
 	deadline, hasDeadline := t.Deadline()
-	budget, err := Resolve(os.Getenv(Env), time.Until(deadline), hasDeadline)
+	untilDeadline := time.Until(deadline)
+	budget, err := Resolve(os.Getenv(Env), untilDeadline, hasDeadline)
 	if err != nil {
 		t.Fatal(err)
 	}
+	if hasDeadline {
+		full, _ := Resolve(os.Getenv(Env), 0, false)
+		if note := clipNote(full, budget, untilDeadline); note != "" {
+			if _, noted := clipNoted.LoadOrStore(t.Name(), struct{}{}); !noted {
+				t.Log(note)
+			}
+		}
+	}
 	return budget
+}
+
+// clipNote describes a bound the go test deadline cut from full to budget, or
+// returns "" when the deadline left it whole.
+func clipNote(full, budget, untilDeadline time.Duration) string {
+	if budget >= full {
+		return ""
+	}
+	return fmt.Sprintf("testbudget: the wait bound is %s, cut from %s because the go test -timeout deadline is %s away; a wait that ends at this bound reports a package run that is out of time, not an awaited event that is late",
+		budget.Round(time.Millisecond), full, untilDeadline.Round(time.Millisecond))
 }
 
 // Context returns t.Context() bounded by Wait(t).

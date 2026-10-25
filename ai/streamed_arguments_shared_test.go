@@ -85,6 +85,8 @@ var streamedArgumentsRuns = map[string]streamedArgumentsRun{
 	"invalid key":          {[]string{"{\"a\xff\":1,", `"b":2}`}, []bool{false, false}},
 	"split character":      {[]string{"{\"c\":\"\xe2\x82", "\xac and more\"}"}, []bool{false, true}},
 	"nested and lone high": {[]string{`{"list":["a",{"b":"\ud83d`, `\ude00"}],"c":[1,2`, `]}`}, []bool{true, true, true}},
+	// A number that is not finite is kept as it is (a tool call's arguments write it as null); the stream is not shared, as it never was.
+	"number not finite": {[]string{`{"n":1e999,`, `"m":2}`}, []bool{false, false}},
 }
 
 // publishedArguments is the arguments of the first tool call of what the view's cell published last, as the cell holds them.
@@ -98,7 +100,7 @@ func sameObject(a, b JsonObject) bool {
 }
 
 // A streamed tool call's published arguments are the producer's own immutable snapshot exactly when the parser says it is valid, and
-// they equal what cloneJSONValue returns for the producer's arguments at every step, an invalid string rewritten as before.
+// they equal what cloneArgumentsValue returns for the producer's arguments at every step, an invalid string rewritten as before.
 func TestPublishedStreamedArgumentsShareTheSnapshotOnlyWhenValidAndEqualACloneAlways(t *testing.T) {
 	for name, run := range streamedArgumentsRuns {
 		t.Run(name, func(t *testing.T) {
@@ -111,7 +113,7 @@ func TestPublishedStreamedArgumentsShareTheSnapshotOnlyWhenValidAndEqualACloneAl
 					view := builder.publish()
 					produced := builder.partial.Content[0].(ToolCall).Arguments
 					published := publishedArguments(view)
-					want := JsonObject(cloneJSONValue(produced).(map[string]any))
+					want := JsonObject(cloneArgumentsValue(produced).(map[string]any))
 					if !reflect.DeepEqual(published, want) {
 						t.Fatalf("piece %d: published %#v, want the clone %#v", i, published, want)
 					}
@@ -171,7 +173,7 @@ func streamedRunObservations(t *testing.T, pieces []string, mutate bool) (observ
 			builder.toolCallDelta(streamToolCallDelta{index: 0, argumentsDelta: piece})
 			view := builder.publish()
 			fresh := view.Observe()
-			observed = append(observed, JsonObject(cloneJSONValue(fresh.Content[0].(ToolCall).Arguments).(map[string]any)))
+			observed = append(observed, JsonObject(cloneArgumentsValue(fresh.Content[0].(ToolCall).Arguments).(map[string]any)))
 			if mutate {
 				for _, handout := range []*AssistantMessage{fresh, view.Observe(), view.ShallowCopy(), view.delivered(), view} {
 					mutateHandout(handout)
@@ -195,8 +197,8 @@ func TestMutatingWhatASubscriberReceivedChangesNoSnapshotOfAStreamedCall(t *test
 			if !reflect.DeepEqual(mutated, untouched) {
 				t.Fatalf("observations after mutation:\n got %#v\nwant %#v", mutated, untouched)
 			}
-			want := JsonObject(cloneJSONValue(untouched[len(untouched)-1]).(map[string]any))
-			if !reflect.DeepEqual(JsonObject(cloneJSONValue(produced).(map[string]any)), want) || !reflect.DeepEqual(published, want) {
+			want := JsonObject(cloneArgumentsValue(untouched[len(untouched)-1]).(map[string]any))
+			if !reflect.DeepEqual(JsonObject(cloneArgumentsValue(produced).(map[string]any)), want) || !reflect.DeepEqual(published, want) {
 				t.Fatalf("producer %#v and cell %#v must both equal %#v", produced, published, want)
 			}
 		})

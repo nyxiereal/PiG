@@ -1,4 +1,4 @@
-version = "1.4.0+38ff9917"
+version = "1.4.0+d5b3de22"
 
 [[files]]
 path = "packages/agent/src/agent-loop.ts"

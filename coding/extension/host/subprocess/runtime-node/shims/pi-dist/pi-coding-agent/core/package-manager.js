@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { chmodSync, existsSync, globSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync, } from "node:fs";
+import { chmodSync, existsSync, globSync, mkdirSync, readdirSync, readFileSync, realpathSync, rmSync, statSync, writeFileSync, } from "node:fs";
 import { homedir } from "node:os";
 function getEnv() {
     if (process.platform !== "linux" || Object.keys(process.env).length > 0) {
@@ -1514,7 +1514,9 @@ export class DefaultPackageManager {
         const npmCommand = this.getNpmCommand();
         return this.runCommandSync(npmCommand.command, [...npmCommand.args, ...args]);
     }
-    getNpmInstallArgs(specs, installRoot) {
+    getNpmInstallArgs(specs, root) {
+        // npm writes broken nested package-lock.json paths when --prefix goes through a symlink.
+        const installRoot = existsSync(root) ? realpathSync(root) : root;
         const packageManagerName = this.getPackageManagerName();
         // Extension packages run inside pi and resolve pi APIs through loader aliases/virtual modules.
         // Disable peer dependency resolution for managed installs (npm's --legacy-peer-deps, and
@@ -1542,10 +1544,12 @@ export class DefaultPackageManager {
         await this.runNpmCommand(this.getNpmInstallArgs([source.spec], installRoot));
     }
     async uninstallNpm(source, scope) {
-        const installRoot = this.getNpmInstallRoot(scope, false);
-        if (!existsSync(installRoot)) {
+        const root = this.getNpmInstallRoot(scope, false);
+        if (!existsSync(root)) {
             return;
         }
+        // npm writes broken nested package-lock.json paths when --prefix goes through a symlink.
+        const installRoot = realpathSync(root);
         const packageManagerName = this.getPackageManagerName();
         if (packageManagerName === "bun") {
             await this.runNpmCommand(["uninstall", source.name, "--cwd", installRoot]);

@@ -369,11 +369,11 @@ func TestPackageManagerNpmUninstallAndUpdateCheckUseTheConfiguredCommand(t *test
 // npm gets the real path as --prefix, or it writes ever deeper nested entries into package-lock.json.
 func TestPackageManagerNpmInstallAndUninstallPassTheRealPathWhenTheAgentDirIsASymlink(t *testing.T) {
 	if runtime.GOOS == "windows" {
-		t.Skip("uses a shell script as the npm command and a symlink")
+		t.Skip("uses a shell script as the npm command")
 	}
 	cwd, realAgent := t.TempDir(), t.TempDir()
 	agentLink := filepath.Join(t.TempDir(), "agent-link")
-	testenv.Symlink(t, realAgent, agentLink)
+	testenv.RequireDirectoryLink(t, realAgent, agentLink)
 	sm := codingagent.NewSettingsManagerWithProjectTrust(cwd, agentLink, true)
 	pm := NewPackageManager(PackageManagerOptions{CWD: cwd, SettingsManager: sm})
 	command, log := fakeNpm(t, "1.0.0")

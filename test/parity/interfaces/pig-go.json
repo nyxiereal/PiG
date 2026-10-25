@@ -87761,17 +87761,6 @@
       "shapeHash": "sha256:20394ab6c0c134b86300166cff7ece2adb58372b84c2457148216c559d0af3ef"
     },
     {
-      "id": "go:github.com/MichaelKinsy/PiG/coding/cli#isPigletBinary",
-      "package": "github.com/MichaelKinsy/PiG/coding/cli",
-      "name": "isPigletBinary",
-      "kind": "variable",
-      "exported": false,
-      "shape": {
-        "type": "func() bool"
-      },
-      "shapeHash": "sha256:f632619397f10a7f0e472ad47d2824ec7e080d15ac9eb0994e24800757b3fb96"
-    },
-    {
       "id": "go:github.com/MichaelKinsy/PiG/coding/cli#isPlainRuntimeMetadataCommand",
       "package": "github.com/MichaelKinsy/PiG/coding/cli",
       "name": "isPlainRuntimeMetadataCommand",
@@ -89334,15 +89323,15 @@
       "shapeHash": "sha256:03d38d5beddcbb2535f9dc4f086403d8838371f9391d20bdc824d3a6af8d12d3"
     },
     {
-      "id": "go:github.com/MichaelKinsy/PiG/coding/cli#pigletBinaryName",
+      "id": "go:github.com/MichaelKinsy/PiG/coding/cli#pigletBinary",
       "package": "github.com/MichaelKinsy/PiG/coding/cli",
-      "name": "pigletBinaryName",
-      "kind": "variable",
+      "name": "pigletBinary",
+      "kind": "type",
       "exported": false,
       "shape": {
-        "type": "func() string"
+        "type": "pigletBinary"
       },
-      "shapeHash": "sha256:31cac5b359d9888bdbe3fe08c486b2e404a728edce6e0aaaa60e59ceafc92fb5"
+      "shapeHash": "sha256:73f260455c65d082c6656531acaceb04663e51072fe5f63d4426ab8e997333f5"
     },
     {
       "id": "go:github.com/MichaelKinsy/PiG/coding/cli#pigletBinaryOverlayRefusal",
@@ -89351,9 +89340,9 @@
       "kind": "function",
       "exported": false,
       "shape": {
-        "type": "func(flags map[string]any) string"
+        "type": "func(flags map[string]any, binary pigletBinary) string"
       },
-      "shapeHash": "sha256:d536c34868fd994f7a62e1478a87e7aa9327fd3f11ac46ad9bec18137b5d98bb"
+      "shapeHash": "sha256:e3a3d53cd65f24ae501507d5e42156b4c68443781cc41cc1ed79895928b40e82"
     },
     {
       "id": "go:github.com/MichaelKinsy/PiG/coding/cli#pigletExtensionFailurePath",
@@ -89376,17 +89365,6 @@
         "type": "func(p *github.com/MichaelKinsy/PiG/coding/piglet.Piglet) string"
       },
       "shapeHash": "sha256:eacc0493d95f13b7b1f04247b7c8974bf481d36b220160fab277463bdb9f93da"
-    },
-    {
-      "id": "go:github.com/MichaelKinsy/PiG/coding/cli#pigletOverlayBase",
-      "package": "github.com/MichaelKinsy/PiG/coding/cli",
-      "name": "pigletOverlayBase",
-      "kind": "variable",
-      "exported": false,
-      "shape": {
-        "type": "func() *github.com/MichaelKinsy/PiG/coding/piglet.OverlayBase"
-      },
-      "shapeHash": "sha256:be135690873d2c7cfe6a4ca5485a31cca9da33b6c94a74d2bd1ddae4931e09a4"
     },
     {
       "id": "go:github.com/MichaelKinsy/PiG/coding/cli#pigletToolOwner",
@@ -90674,6 +90652,17 @@
         "type": "func(p *github.com/MichaelKinsy/PiG/coding/piglet.Piglet) []github.com/MichaelKinsy/PiG/coding/extension/host/subprocess.ExtConfig"
       },
       "shapeHash": "sha256:bb9f2ea8836417f7e66d0a70442d77f7550dc10c6d9d8585a26cb0fedca70fbb"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/coding/cli#resolvePigletOn",
+      "package": "github.com/MichaelKinsy/PiG/coding/cli",
+      "name": "resolvePigletOn",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func(unknownFlags map[string]any, trustOverride *bool, binary pigletBinary) (*github.com/MichaelKinsy/PiG/coding/piglet.Piglet, bool)"
+      },
+      "shapeHash": "sha256:16bf93cabcfbf5f3c6c41ea2a73fa7800a71f94f71c84e84cad925ee9d44c13d"
     },
     {
       "id": "go:github.com/MichaelKinsy/PiG/coding/cli#resolveProjectTrusted",
@@ -94062,6 +94051,17 @@
         "type": "func(args []string, stdout io.Writer, stderr io.Writer) int"
       },
       "shapeHash": "sha256:bab0e5ace95d5f2ceb0d72a95d8b031c60d0da9d88a05b835eaa5205ea4f1d16"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/coding/cli#runningPigletBinary",
+      "package": "github.com/MichaelKinsy/PiG/coding/cli",
+      "name": "runningPigletBinary",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func() pigletBinary"
+      },
+      "shapeHash": "sha256:243916ed9e6098f2d1c6b564ba95072e3af79e9036e15f1d5a7e5ce76a92c4b0"
     },
     {
       "id": "go:github.com/MichaelKinsy/PiG/coding/cli#runtimeModelOf",

@@ -698,7 +698,7 @@ func TestAVMThatIsToldTheSameResultNumberTwiceCrashes(t *testing.T) {
 	}
 	mu.Lock()
 	defer mu.Unlock()
-	if crash != "Result 2 has sequence number 5, expected 1 or later, once" {
+	if crash != "Error: Result 2 has sequence number 5, expected 1 or later, once" {
 		t.Fatalf("crash = %q", crash)
 	}
 }

@@ -916,6 +916,9 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 | [BF-d11ca55](#bf-d11ca55) | `pig piglet build --format binary` from a Pig checkout with a `go.work` builds a Piglet whose fused Go… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-d133e3d](#bf-d133e3d) | Codemode scripts that patch built-ins, for example `Array.prototype.toJSON = ...`, no longer break the tool… | A fix Pi shipped that PiG ported | All platforms | 0.5.0 |
 | [BF-d133e3d-2](#bf-d133e3d-2) | MCP OAuth sign-in no longer fails with `invalid_redirect_uri` on OpenID Connect servers: client registration… | A fix Pi shipped that PiG ported | All platforms | 0.5.0 |
+| [BF-d1af7ae](#bf-d1af7ae) | The crash message of a deterministic code mode VM that is told a result number it cannot take now reads as… | PiG's own defect | All platforms | Unreleased |
+| [BF-d1af7ae-2](#bf-d1af7ae-2) | The errors that name a code mode tool or global (`Tool "x" is already registered`, `Invalid global name "x"`… | PiG's own defect | All platforms | Unreleased |
+| [BF-d1af7ae-3](#bf-d1af7ae-3) | A code mode `done` message that carries no store writes now fails the execution with Pi's `store writes is… | PiG's own defect | All platforms | Unreleased |
 | [BF-d1cbde3](#bf-d1cbde3) | The pi-messages, Cloudflare Workers AI and TypeSafe System One, and OpenAI decisions request URLs are built… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-d1f258f](#bf-d1f258f) | The `/settings` search edits like Pi's search input: the cursor moves with the arrow keys, Ctrl+W, Ctrl+K… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-d212cdf](#bf-d212cdf) | `pig --piglet piglets/standard/pig-standard.yaml` no longer warns on every start that its `piglogin`… | PiG's own defect | All platforms | 0.5.0 |
@@ -13630,6 +13633,48 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 - **Fix commits:** `affc944ad8` (2026-10-05), `d133e3d912` (2026-10-05)
 - **Tests:** `ai/assistant_retry_test.go::TestIsRetryableAssistantErrorClassification`, `mcp/oauth/oauth_test.go::TestMCPOAuthRegistersWithAnApplicationTypeDerivedFromTheRedirectURIsUnlessOneIsSet`
 - **Release note:** MCP OAuth sign-in no longer fails with `invalid_redirect_uri` on OpenID Connect servers: client registration sends `application_type`, `native` for loopback and custom-scheme redirects.
+
+### BF-d1af7ae
+
+**The crash message of a deterministic code mode VM that is told a result number it cannot take now reads as…**
+
+- **Source:** PiG's own defect
+- **Symptom:** The crash message of a deterministic code mode VM that is told a result number it cannot take now reads as Pi's does, `Error: Result 2 has sequence number 5, expected 1 or later, once`, and names `undefined` for a result that carries no number, where it read `Result 2 has sequence number 0, ...`.
+- **Root cause:** A new test drives Pi's own serveCodemodeRemote, RemoteCodemodeSandbox, InlineCodemodeSandbox and CodemodeSandboxBase.start (the vendored pi-dist) and PiG with the same cases and compares the frames of the remote exchange, the requests, the events of a deterministic run, what deliver refuses and the outcomes. It found three differences, all fixed here:
+- **User impact:** Crash, hang or runaway process
+- **Platform:** All platforms
+- **Fixed in:** Unreleased
+- **Fix commits:** `d1af7aece3` (2026-10-24)
+- **Tests:** `codemode/deterministic_test.go::TestAVMThatIsToldTheSameResultNumberTwiceCrashes`, `codemode/wire_oracle_test.go::TestWireBehaviorMatchesPi`
+- **Release note:** The crash message of a deterministic code mode VM that is told a result number it cannot take now reads as Pi's does, `Error: Result 2 has sequence number 5, expected 1 or later, once`, and names `undefined` for a result that carries no number, where it read `Result 2 has sequence number 0, ...`.
+
+### BF-d1af7ae-2
+
+**The errors that name a code mode tool or global (`Tool "x" is already registered`, `Invalid global name "x"`…**
+
+- **Source:** PiG's own defect
+- **Symptom:** The errors that name a code mode tool or global (`Tool "x" is already registered`, `Invalid global name "x"`, `Global "x" is already registered`, `Global "x" conflicts with the namespace "x"`) write the name as it was given, as Pi does, instead of Go-escaped (`"we\"ird"`).
+- **Root cause:** A new test drives Pi's own serveCodemodeRemote, RemoteCodemodeSandbox, InlineCodemodeSandbox and CodemodeSandboxBase.start (the vendored pi-dist) and PiG with the same cases and compares the frames of the remote exchange, the requests, the events of a deterministic run, what deliver refuses and the outcomes. It found three differences, all fixed here:
+- **User impact:** An operation failed or was rejected
+- **Platform:** All platforms
+- **Fixed in:** Unreleased
+- **Fix commits:** `d1af7aece3` (2026-10-24)
+- **Tests:** `codemode/deterministic_test.go::TestAVMThatIsToldTheSameResultNumberTwiceCrashes`, `codemode/wire_oracle_test.go::TestWireBehaviorMatchesPi`
+- **Release note:** The errors that name a code mode tool or global (`Tool "x" is already registered`, `Invalid global name "x"`, `Global "x" is already registered`, `Global "x" conflicts with the namespace "x"`) write the name as it was given, as Pi does, instead of Go-escaped (`"we\"ird"`).
+
+### BF-d1af7ae-3
+
+**A code mode `done` message that carries no store writes now fails the execution with Pi's `store writes is…**
+
+- **Source:** PiG's own defect
+- **Symptom:** A code mode `done` message that carries no store writes now fails the execution with Pi's `store writes is not valid JSON` instead of `unknown message from the worker`.
+- **Root cause:** A new test drives Pi's own serveCodemodeRemote, RemoteCodemodeSandbox, InlineCodemodeSandbox and CodemodeSandboxBase.start (the vendored pi-dist) and PiG with the same cases and compares the frames of the remote exchange, the requests, the events of a deterministic run, what deliver refuses and the outcomes. It found three differences, all fixed here:
+- **User impact:** An operation failed or was rejected
+- **Platform:** All platforms
+- **Fixed in:** Unreleased
+- **Fix commits:** `d1af7aece3` (2026-10-24)
+- **Tests:** `codemode/deterministic_test.go::TestAVMThatIsToldTheSameResultNumberTwiceCrashes`, `codemode/wire_oracle_test.go::TestWireBehaviorMatchesPi`
+- **Release note:** A code mode `done` message that carries no store writes now fails the execution with Pi's `store writes is not valid JSON` instead of `unknown message from the worker`.
 
 ### BF-d1cbde3
 

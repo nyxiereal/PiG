@@ -88,7 +88,7 @@ func sharesStreamedArguments(streamed map[int]JsonObject, index int, call ToolCa
 // cloneArgumentsFrom returns what cloneJSONValue returns for arguments, reusing the members of earlier, an immutable copy of an earlier state of the same arguments, that have not changed. It copies the whole tree the usual way unless every member is plain JSON.
 func cloneArgumentsFrom(arguments, earlier JsonObject) JsonObject {
 	if earlier == nil {
-		return JsonObject(cloneJSONValue(arguments).(map[string]any))
+		return JsonObject(cloneArgumentsValue(arguments).(map[string]any))
 	}
 	if len(arguments) == len(earlier) && identicalPlainJSON(map[string]any(arguments), map[string]any(earlier)) {
 		return earlier
@@ -96,7 +96,7 @@ func cloneArgumentsFrom(arguments, earlier JsonObject) JsonObject {
 	out := make(map[string]any, len(arguments))
 	for key, value := range arguments {
 		if !utf8.ValidString(key) {
-			return JsonObject(cloneJSONValue(arguments).(map[string]any))
+			return JsonObject(cloneArgumentsValue(arguments).(map[string]any))
 		}
 		previous, found := earlier[key]
 		switch {
@@ -107,7 +107,7 @@ func cloneArgumentsFrom(arguments, earlier JsonObject) JsonObject {
 		default:
 			copied, ok := clonePlainJSON(value, &plainWalk{})
 			if !ok {
-				return JsonObject(cloneJSONValue(arguments).(map[string]any))
+				return JsonObject(cloneArgumentsValue(arguments).(map[string]any))
 			}
 			out[key] = copied
 		}

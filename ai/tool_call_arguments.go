@@ -321,7 +321,7 @@ func (content *ToolCall) CopyArgumentsFrom(other ToolCall) {
 	content.Arguments, content.argumentOrder, content.nonObjectArguments = nil, other.argumentOrder, slices.Clone(other.nonObjectArguments)
 	content.ArgumentsError = other.ArgumentsError
 	if other.Arguments != nil {
-		content.Arguments = JsonObject(cloneJSONValue(map[string]any(other.Arguments)).(map[string]any))
+		content.Arguments = JsonObject(cloneArgumentsValue(map[string]any(other.Arguments)).(map[string]any))
 	}
 }
 
@@ -426,7 +426,7 @@ func MarshalJSONInSourceOrder(value any, source []byte) ([]byte, error) {
 // marshalInRecordedOrder encodes value as JSON.stringify does, with order's member order; a nil order is sorted order with integer-like keys first.
 func marshalInRecordedOrder(value any, order schemaObjectOrder) ([]byte, error) {
 	// The ordered walk recurses without bound, so a cycle or a value with no JSON form is rejected first.
-	if err := validateJsonValue(value); err != nil {
+	if err := validateArgumentsValue(value); err != nil {
 		return nil, err
 	}
 	return marshalSchemaWithOrder(value, order, "")

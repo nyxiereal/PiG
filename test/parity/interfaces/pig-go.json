@@ -26007,6 +26007,28 @@
       "shapeHash": "sha256:e174f8719461b904c88023fdcf9a115ba867fe82c27289a0b06347e3921b833a"
     },
     {
+      "id": "go:github.com/MichaelKinsy/PiG/ai#ValidationMemo.validateArguments",
+      "package": "github.com/MichaelKinsy/PiG/ai",
+      "name": "ValidationMemo.validateArguments",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func(value any) error"
+      },
+      "shapeHash": "sha256:e174f8719461b904c88023fdcf9a115ba867fe82c27289a0b06347e3921b833a"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/ai#ValidationMemo.validateWith",
+      "package": "github.com/MichaelKinsy/PiG/ai",
+      "name": "ValidationMemo.validateWith",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func(value any, validate func(any) error) error"
+      },
+      "shapeHash": "sha256:703a6d85ccc16e77728fa4d162fb7e0f9605ed3fb8b8b1a09a659d4fa364690a"
+    },
+    {
       "id": "go:github.com/MichaelKinsy/PiG/ai#VercelAIGatewayClassifierModels",
       "package": "github.com/MichaelKinsy/PiG/ai",
       "name": "VercelAIGatewayClassifierModels",
@@ -27424,6 +27446,28 @@
         "type": "func() (anthRequest, *string)"
       },
       "shapeHash": "sha256:bd6a50983df20a69a53bdcb464f1a7b972321b9ec45251f462a04449cb8ee9bc"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/ai#anthStartInput",
+      "package": "github.com/MichaelKinsy/PiG/ai",
+      "name": "anthStartInput",
+      "kind": "type",
+      "exported": false,
+      "shape": {
+        "type": "anthStartInput"
+      },
+      "shapeHash": "sha256:148f0f3eb065c064eaec0e8fc61a3a326cd2734f2eab57031a94f26ed57cad69"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/ai#anthStartInput.UnmarshalJSON",
+      "package": "github.com/MichaelKinsy/PiG/ai",
+      "name": "anthStartInput.UnmarshalJSON",
+      "kind": "function",
+      "exported": true,
+      "shape": {
+        "type": "func(data []byte) error"
+      },
+      "shapeHash": "sha256:2e7a46ef7c2011cd2aa41a3ad171f9b6f5461f06a15b57547cff43508937a222"
     },
     {
       "id": "go:github.com/MichaelKinsy/PiG/ai#anthSystemBlock",
@@ -34904,6 +34948,17 @@
         "type": "func(arguments JsonObject, earlier JsonObject) JsonObject"
       },
       "shapeHash": "sha256:a08cf2721dc9fed423d671145b429a3812c75ffbb13d10dc7889d7d5f9a3cb2a"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/ai#cloneArgumentsValue",
+      "package": "github.com/MichaelKinsy/PiG/ai",
+      "name": "cloneArgumentsValue",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func(value any) any"
+      },
+      "shapeHash": "sha256:58494e9647d2e04ac6624b3e7b553df18c673f71b808e18583a8cfccf6bf88b4"
     },
     {
       "id": "go:github.com/MichaelKinsy/PiG/ai#cloneAssistantContent",
@@ -43530,6 +43585,28 @@
       "shapeHash": "sha256:f2725fb6d0e48bf41c16aa01c519f969a5b73c964dab8fef5c9ab7100ed29c20"
     },
     {
+      "id": "go:github.com/MichaelKinsy/PiG/ai#hasNonFiniteNumber",
+      "package": "github.com/MichaelKinsy/PiG/ai",
+      "name": "hasNonFiniteNumber",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func(value any) bool"
+      },
+      "shapeHash": "sha256:e97bf7bf1ecfdfceef9dc48e038cbf324758ba5a8557005c28b1eea4898962d3"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/ai#hasNonFiniteNumberWalk",
+      "package": "github.com/MichaelKinsy/PiG/ai",
+      "name": "hasNonFiniteNumberWalk",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func(value any, walk *plainWalk) bool"
+      },
+      "shapeHash": "sha256:9299d3216e6b04e92b0cb5689f2b4fb5e5df11452b544d43f78f2d5cddfaf9aa"
+    },
+    {
       "id": "go:github.com/MichaelKinsy/PiG/ai#hasProviderHeader",
       "package": "github.com/MichaelKinsy/PiG/ai",
       "name": "hasProviderHeader",
@@ -51780,6 +51857,17 @@
       "shapeHash": "sha256:106968f90f1aa47e3071e4ef0d52de5190aa4892d5ce69419117f9119e6cbf35"
     },
     {
+      "id": "go:github.com/MichaelKinsy/PiG/ai#nonFiniteNumber",
+      "package": "github.com/MichaelKinsy/PiG/ai",
+      "name": "nonFiniteNumber",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func(value any) bool"
+      },
+      "shapeHash": "sha256:e97bf7bf1ecfdfceef9dc48e038cbf324758ba5a8557005c28b1eea4898962d3"
+    },
+    {
       "id": "go:github.com/MichaelKinsy/PiG/ai#nonFiniteToNull",
       "package": "github.com/MichaelKinsy/PiG/ai",
       "name": "nonFiniteToNull",
@@ -52009,6 +52097,17 @@
         "type": "func(value any) (any, error)"
       },
       "shapeHash": "sha256:ef4c3d2aa753a3f2332a0ec39173feae225519cd05a5022741093105c59c75a3"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/ai#normalizeJSONValueWith",
+      "package": "github.com/MichaelKinsy/PiG/ai",
+      "name": "normalizeJSONValueWith",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func(value any, marshal func(any) ([]byte, error)) (any, error)"
+      },
+      "shapeHash": "sha256:9aebbff978f93dc79f375f29d60ec83f03c68da7693b28eeca07064e84200827"
     },
     {
       "id": "go:github.com/MichaelKinsy/PiG/ai#normalizeMissingMessageContent",
@@ -64010,6 +64109,17 @@
         "type": "func(raw encoding/json.RawMessage) (float64, bool)"
       },
       "shapeHash": "sha256:86af3c78c3ea2b2b1a7edc25d9b04e3003dccfd170af1218aa39cf3490f4bbe0"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/ai#validateArgumentsValue",
+      "package": "github.com/MichaelKinsy/PiG/ai",
+      "name": "validateArgumentsValue",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func(value any) error"
+      },
+      "shapeHash": "sha256:e174f8719461b904c88023fdcf9a115ba867fe82c27289a0b06347e3921b833a"
     },
     {
       "id": "go:github.com/MichaelKinsy/PiG/ai#validateJsonValue",

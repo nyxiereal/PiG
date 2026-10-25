@@ -128,7 +128,10 @@ func execCases() []execCase {
 		{name: "a mark inside the output", request: sh(`printf 'a\357\273\277b'`)},
 		{name: "empty output", request: sh("true")},
 		{name: "descendant holds the pipes", request: sh("(sleep 3 &) ; echo done")},
-		{name: "descendant writes after exit", request: sh("(sleep 0.05; echo late) & echo early")},
+		// The descendant writes once the shell has been reaped (kill -0 fails), within the daemons' 100 ms grace and after the exit on any
+		// machine. A `sleep 0.05` writes 50 ms after the sleep started, and starting it on macOS can take longer than the whole grace, so
+		// whichever daemon ran into that lost the line: Pi's in one run, PiG's in the next.
+		{name: "descendant writes after exit", request: sh("(while kill -0 $$ 2>/dev/null; do :; done; echo late) & echo early")},
 		{name: "timeout", request: sh("echo before; sleep 30", "timeoutMs", 300)},
 		{name: "timeout with spill", request: sh("echo before; sleep 30", "timeoutMs", 300, "spill", object("afterBytes", 1, "afterLines", 100))},
 		{name: "timeout of zero", request: sh("sleep 30", "timeoutMs", 0)},

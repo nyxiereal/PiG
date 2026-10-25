@@ -17,7 +17,7 @@ CLI_SHARDS=8
 CLI_PKG=./coding/cli
 SUBPROCESS_PKG=./coding/extension/host/subprocess
 CONFORMANCE_PKG=./test/extension-conformance
-# Heavy packages that run as several go test processes, each under its own package timeout and each warm from the shared Go and Cargo caches, like cmd/pig: <package>:<shards>. test-shard-pattern.sh partitions each package's tests by name hash, and run_sharded_pkg refuses to run a package unless its shard patterns select every listed test exactly once. changed mode runs these packages whole.
+# Heavy packages that run as several go test processes, each under its own package timeout and each warm from the shared Go and Cargo caches, like cmd/pig: <package>:<shards>. test-shard-pattern.sh partitions each package's tests by name hash, with the slowest pinned to shards by automation/ci/test-shard-weights.txt for the shard count declared here, and run_sharded_pkg refuses to run a package unless its shard patterns select every listed test exactly once. changed mode runs these packages whole.
 SHARDED_SPEC=(
   ./ai:7
   ./coding:4
@@ -27,7 +27,7 @@ SHARDED_SPEC=(
   ./codemode:2
   ./durable/codemode:2
   ./coding/extension/host/subprocess:3
-  ./test/extension-conformance:3
+  ./test/extension-conformance:8
 )
 MODE=${1:-default}
 COUNT_FLAG=()

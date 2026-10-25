@@ -2677,7 +2677,7 @@ snippet = "args, _ := json.Marshal(map[string]string{\"key\": provider.declarati
 [[hit]]
 check = "mapkeyorder"
 file = "coding/extension/host/subprocess/provider_object_lifetime.go"
-func = "Host.transferProviderOwnershipLocked"
+func = "Host.claimProviderOwnershipLocked"
 snippet = "args, _ := json.Marshal(map[string]string{\"name\": id})"
 
 [[hit]]
@@ -5922,7 +5922,7 @@ check = "ctxbackground"
 file = "coding/extension/runtime_state.go"
 func = "ExtensionRuntime.bindNativeProviders"
 snippet = "if err := actions.registerNative(context.Background(), entry.Provider, entry.carrier); err != nil && report != nil {"
-
+snippet = "err := actions.registerNative(context.Background(), entry.Provider, entry.carrier)"
 [[hit]]
 check = "ctxbackground"
 file = "coding/mcpext/extension.go"

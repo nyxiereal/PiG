@@ -1907,6 +1907,9 @@ func TestToolRounds(t *testing.T) {
 				return streamOf(fauxMessage("partial", ai.StopReasonPending), 300*time.Millisecond, final), nil
 			}
 		})
+		// The partial is stored at once, so the failed final commit leaves it for the reopened run to convert; held, it would
+		// be lost with the failed Session (harness-structured.test.ts:1339).
+		setup.SetSettings(func(settings *HarnessSettings) { settings.Progress = &ProgressPolicyPatch{PersistWithinMs: new(0.0)} })
 		addTask(t, setup.Registry, nodeTask.Erased())
 		var opened Harness
 		addHooks(t, setup.Registry, GenerationTask.Erased(), &GenerationHooks{BeforeRequest: func(ctx context.Context, _ GenerationRequest, api HookApi) (*GenerationRequest, error) {

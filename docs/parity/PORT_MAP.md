@@ -244,6 +244,7 @@ The tmux scenario harness cannot drive a Windows `.exe`. Windows verification re
 | `packages/ai/src/utils/hash.ts` | `ai/openai.go shortHash32 (UTF-16 code units with uint32 Math.imul wrap), used by ai/openai.go normalizeCompletionsToolCallID, ai/openai_responses.go foreign fc_ ids, and ai/mistral.go deriveMistralToolCallID (upstream oracles in ai/openai_responses_foreign_toolcall_test.go and ai/mistral_test.go)` | ✅ |
 | `packages/ai/src/utils/headers.ts` | `ai/githubcopilot.go + ai/provider_response.go`, `ai/classifier_http.go` | ✅ |
 | `packages/ai/src/utils/json-parse.ts` | `ai/json_repair.go (repairJSON, ParseJSONWithRepair) + ai/streaming_json.go (ParseStreamingJson; ai/json_parse_upstream_test.go)` | ✅ |
+| `packages/ai/src/utils/streaming-json.ts` | `ai/streaming_json_parser.go (StreamingJSONParser, ToolCallArgumentsStream; ai/streaming_json_parser_oracle_test.go, ai/streaming_tool_arguments_upstream_test.go)` | ✅ |
 | `packages/ai/src/utils/diagnostics.ts` | `ai/diagnostics.go (FormatThrownValue, ExtractDiagnosticError, CreateAssistantMessageDiagnostic, AppendAssistantMessageDiagnostic; ai/diagnostics_upstream_test.go) + ai/types.go (DiagnosticErrorInfo, AssistantMessageDiagnostic)` | ✅ |
 | `packages/ai/src/utils/node-http-proxy.ts` | `ai/node_http_proxy.go + ai/bedrock.go` | ✅ |
 | `packages/ai/src/utils/overflow.ts` | `ai/overflow.go (IsContextOverflow, IsRecoverableLength, GetOverflowPatterns; overflow_test.go)`, `internal/codingagent/auto_recovery.go`, `durable/core/turn/patterns.go (generated)` | ✅ |
@@ -650,9 +651,10 @@ The tmux scenario harness cannot drive a Windows `.exe`. Windows verification re
 | `packages/chord/src/types.ts` | `chord/host/types.go (Context is context.Context; JsonRepresentation, RemoteServiceContract, IsAny are compile-time TypeScript machinery with no Go form, replaced by reflection classification at provide time)` | ✅ |
 | `packages/chord/src/json.ts` | `internal/chord/chordjson/chordjson.go:70 Copy, Stored, IsValue; chord/json.go:12`, `chord/delta/delta.go`, `durable/json.go CopyJson` | ✅ |
 | `packages/chord/src/context/index.ts` | `chord/context/chordctx.go Background, TODO, NewKey, WithValue, WithAbortSignal, WithoutAbortSignal, WithCancel, Await, Telemetry, WithTelemetry, TraceIn (Pi 92ab5360 moves traceIn's context last, traceIn(options, fn, context); TraceIn keeps the context first, as every Go function does)` | ✅ |
-| `packages/chord/src/delta/index.ts` | `chord/delta/delta.go:317 AssertValidOpValue, apply.go:227 Apply, ApplyImmutable, apply.go:255 ApplyImmutableBatchesSeq, codec.go:17 Encoder/Decoder, overlap.go:17` | ✅ |
+| `packages/chord/src/delta/index.ts` | `chord/delta/delta.go:317 AssertValidOpValue, apply.go:227 Apply, ApplyImmutable, apply.go:255 ApplyImmutableBatchesSeq, codec.go:17 Encoder/Decoder, overlap.go:17; ownedSlice is a V8 string-view detail that Go strings.Clone covers where an op or value keeps a cut of a larger string` | ✅ |
+| `packages/chord/src/delta/pending.ts` | `chord/delta/pending.go (PendingOps, PendingTake, MaxPendingOps; chord/delta/pending_test.go)` | ✅ |
 | `packages/chord/src/delta/diff.ts` | `chord/delta/diff.go:611 DiffRevisions` | ✅ |
-| `packages/chord/src/delta/tracker.ts` | `chord/delta/tracker.go (overlay with Object/Array draft handles, the Proxy draft; array roots through TrackArray, Change.Elements, Tracker.Root, Prepared.ValueRoot, PrepareReplaceRoot)` | ✅ |
+| `packages/chord/src/delta/tracker.ts` | `chord/delta/tracker.go + chord/delta/handles.go (overlay with Object/Array draft handles, the Proxy draft; array roots through TrackArray, Change.Elements, Tracker.Root, Prepared.ValueRoot, PrepareReplaceRoot; AppendText, the draft's append of text to a string member)` | ✅ |
 | `packages/chord/src/delta/draft.ts` | `TypeScript mapped type; the Go draft is chord/delta Object/Array` | n/a |
 | `packages/chord/src/delta/apply-immutable-trusted.ts` | `self-produced-op fast path of the tracker; the Go trackers materialize candidates themselves and ApplyImmutable covers the checked path (apply_immutable_upstream_test.go)` | n/a |
 | `packages/chord/src/delta/revision-validator.ts` | `WeakSet memo of validated JS container identities; a decoded Go revision has no shared identity and is validated by chordjson.Validate (state.go:917)` | n/a |
@@ -723,6 +725,7 @@ The tmux scenario harness cannot drive a Windows `.exe`. Windows verification re
 | `packages/durable/src/harness/harness.ts` | `durable/harness/harness.go`, `durable/harness/types.go` | ✅ |
 | `packages/durable/src/harness/inbox.ts` | `durable/harness/inbox.go` | ✅ |
 | `packages/durable/src/harness/json.ts` | `durable/harness/json.go` | ✅ |
+| `packages/durable/src/harness/partial-changes.ts` | `durable/harness/partial_changes.go (PartialChanges; durable/harness/partial_changes_upstream_test.go)` | ✅ |
 | `packages/durable/src/harness/live.ts` | `durable/harness/live.go` | ✅ |
 | `packages/durable/src/harness/prompt.ts` | `durable/harness/prompt.go` | ✅ |
 | `packages/durable/src/harness/provider.ts` | `durable/harness/provider.go` | ✅ |

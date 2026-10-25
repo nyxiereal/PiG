@@ -84,8 +84,8 @@ type livePublications struct {
 func observeLive(t *testing.T, harness Harness) *livePublications {
 	t.Helper()
 	collected := &livePublications{}
-	harness.SubscribeCommits(func(_ context.Context, publication durable.CommitPublication) {
-		for _, change := range documentChanges(publication) {
+	observeCommits(harness, func(_ context.Context, publication session.ObservedCommit) {
+		for _, change := range documentChanges(publication.Changes) {
 			if change.Record.Kind != "pi.live" || change.Value == nil {
 				continue
 			}
@@ -721,7 +721,7 @@ func TestGeneration(t *testing.T) {
 			Stream:        durable.ConversationStreamOptions{},
 			Retry:         durable.ConversationRetryPolicy{Enabled: true, MaxRetries: 3, BaseDelayMs: 2000, MaxAgentDelayMs: &maxAgentDelayMs},
 			Compaction:    durable.CompactionPolicy{Enabled: true, ReserveTokens: 16384, KeepRecentTokens: 20000, BackgroundTokens: 32768},
-			Progress:      durable.ProgressPolicy{PartialIntervalMs: 100, OutputIntervalMs: 100},
+			Progress:      durable.ProgressPolicy{PartialIntervalMs: 100, OutputIntervalMs: 100, PersistWithinMs: 1000},
 			ToolExecution: durable.ToolExecutionParallel,
 			SteeringMode:  durable.QueueOneAtATime,
 			FollowUpMode:  durable.QueueOneAtATime,
@@ -753,8 +753,18 @@ func TestGeneration(t *testing.T) {
 			t.Fatalf("compaction = %+v", resolved.Compaction)
 		}
 		progress := ResolveSettings(&HarnessSettings{Progress: &ProgressPolicyPatch{OutputIntervalMs: new(500.0)}}).Progress
-		if progress != (durable.ProgressPolicy{PartialIntervalMs: 100, OutputIntervalMs: 500}) {
+		if progress != (durable.ProgressPolicy{PartialIntervalMs: 100, OutputIntervalMs: 500, PersistWithinMs: 1000}) {
 			t.Fatalf("progress = %+v", progress)
+		}
+		// harness-generation.test.ts:530: not a number of milliseconds, 0 or more: the default.
+		if got := ResolveSettings(&HarnessSettings{Progress: &ProgressPolicyPatch{PersistWithinMs: new(-1.0)}}).Progress.PersistWithinMs; got != 1000 {
+			t.Fatalf("persistWithinMs -1 resolved to %v, want 1000", got)
+		}
+		if got := ResolveSettings(&HarnessSettings{Progress: &ProgressPolicyPatch{PersistWithinMs: new(math.NaN())}}).Progress.PersistWithinMs; got != 1000 {
+			t.Fatalf("persistWithinMs NaN resolved to %v, want 1000", got)
+		}
+		if got := ResolveSettings(&HarnessSettings{Progress: &ProgressPolicyPatch{PersistWithinMs: new(0.0)}}).Progress.PersistWithinMs; got != 0 {
+			t.Fatalf("persistWithinMs 0 resolved to %v, want 0", got)
 		}
 	})
 

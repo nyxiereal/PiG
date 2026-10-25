@@ -308,8 +308,11 @@ func TestConversationView(t *testing.T) {
 		b := noteEntry(t, root, "b")
 		noteEntry(t, root, "c")
 		recorded := record(t, root)
+		// Each awaited commit of Pi's test lets the delivery microtask finish before the next one; a commit made while a call is in flight is folded into the next call.
 		summary := noteEntry(t, root, "summary", b.Id)
+		drained(harness)
 		noteEntry(t, root, "d")
+		drained(harness)
 		if err := root.Reset(testContext, nil); err != nil {
 			t.Fatal(err)
 		}
@@ -413,7 +416,7 @@ func TestConversationView(t *testing.T) {
 		closeHarness(t, harness)
 	})
 
-	t.Run("replaces undelivered frames with the newest view after 100 pending frames", func(t *testing.T) {
+	t.Run("folds undelivered commits into one call whose ops reach the newest view", func(t *testing.T) {
 		// upstream: packages/durable/test/harness-view.test.ts:231
 		harness, root := openChat(t, storage.NewMemoryStorage(), chatSetup(t))
 		watch := must(root.Watch(testContext))
@@ -435,7 +438,9 @@ func TestConversationView(t *testing.T) {
 		if len(got) != 1 {
 			t.Fatalf("%d frames", len(got))
 		}
-		expectSameJSON(t, got[0].ops, []any{[]any{"r", got[0].value}})
+		if len(got[0].ops) == 0 || durable.Op(got[0].ops[0])[0] == "r" {
+			t.Fatalf("ops %v, want folded ops, not a root replacement", got[0].ops)
+		}
 		if len(got[0].value.Entries) != 101 {
 			t.Fatalf("%d entries", len(got[0].value.Entries))
 		}

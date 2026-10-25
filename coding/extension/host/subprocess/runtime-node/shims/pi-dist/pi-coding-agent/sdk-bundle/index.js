@@ -11123,6 +11123,8 @@ var ToolExecutionComponent = class extends Container26 {
   cwd;
   executionStarted = false;
   argsComplete = false;
+  /** `updateArgs()` ran since the last display update; the next render applies it. */
+  argsPending = false;
   result;
   hideComponent = false;
   constructor(toolName, toolCallId, args, options = {}, toolDefinition, ui, cwd) {
@@ -11207,9 +11209,14 @@ var ToolExecutionComponent = class extends Container26 {
       return { handled: true };
     });
   }
+  /**
+   * Show new partial arguments. Applied at the next render, so a call streaming many argument deltas between two
+   * frames runs its renderer once per frame, not once per delta (#9265).
+   */
   updateArgs(args) {
     this.args = args;
-    this.updateDisplay();
+    this.argsPending = true;
+    this.ui.requestRender();
   }
   markExecutionStarted() {
     this.executionStarted = true;
@@ -11247,6 +11254,8 @@ var ToolExecutionComponent = class extends Container26 {
     this.updateDisplay();
   }
   render(width) {
+    if (this.argsPending)
+      this.updateDisplay();
     if (this.hideComponent) {
       return [];
     }
@@ -11287,6 +11296,7 @@ var ToolExecutionComponent = class extends Container26 {
     });
   }
   updateDisplay() {
+    this.argsPending = false;
     const bgFn = this.isPartial ? (text) => theme.bg("toolPendingBg", text) : this.result?.isError ? (text) => theme.bg("toolErrorBg", text) : (text) => theme.bg("toolSuccessBg", text);
     let hasContent = false;
     this.hideComponent = false;

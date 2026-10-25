@@ -19,7 +19,7 @@ func assignOps(t *testing.T, base map[string]any, key string, value any) []any {
 	}
 	tracker := delta.Track(object)
 	change := tracker.BeginChange()
-	if err := AssignJson(change.State(), key, value); err != nil {
+	if err := AssignJson(change.State(), key, value, nil); err != nil {
 		t.Fatal(err)
 	}
 	prepared, err := change.Prepare()

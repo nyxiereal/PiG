@@ -1,5 +1,5 @@
 {
- "pin": "1.4.0+acf83acf",
+ "pin": "1.4.0+38ff9917",
  "package": "pi-tui@1.4.0",
  "module": "pi-tui",
  "export": "rgbColor",

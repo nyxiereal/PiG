@@ -1,5 +1,5 @@
 {
- "pi": "1.4.0+acf83acf",
+ "pi": "1.4.0+38ff9917",
  "node": "v24.19.0",
  "results": [
   {
@@ -8793,7 +8793,9 @@
            "type": "toolCall",
            "id": "fauxread1",
            "name": "read",
-           "arguments": {}
+           "arguments": {
+            "path": "par"
+           }
           }
          ],
          "api": "faux-probe",
@@ -8831,7 +8833,9 @@
            "type": "toolCall",
            "id": "fauxread1",
            "name": "read",
-           "arguments": {}
+           "arguments": {
+            "path": "parity-"
+           }
           }
          ],
          "api": "faux-probe",
@@ -8869,7 +8873,9 @@
            "type": "toolCall",
            "id": "fauxread1",
            "name": "read",
-           "arguments": {}
+           "arguments": {
+            "path": "parity-read"
+           }
           }
          ],
          "api": "faux-probe",
@@ -8907,7 +8913,9 @@
            "type": "toolCall",
            "id": "fauxread1",
            "name": "read",
-           "arguments": {}
+           "arguments": {
+            "path": "parity-read-tar"
+           }
           }
          ],
          "api": "faux-probe",
@@ -8945,7 +8953,9 @@
            "type": "toolCall",
            "id": "fauxread1",
            "name": "read",
-           "arguments": {}
+           "arguments": {
+            "path": "parity-read-target."
+           }
           }
          ],
          "api": "faux-probe",
@@ -8983,7 +8993,9 @@
            "type": "toolCall",
            "id": "fauxread1",
            "name": "read",
-           "arguments": {}
+           "arguments": {
+            "path": "parity-read-target.txt"
+           }
           }
          ],
          "api": "faux-probe",
@@ -9369,7 +9381,9 @@
             "type": "toolCall",
             "id": "fauxread1",
             "name": "read",
-            "arguments": {}
+            "arguments": {
+             "path": "parity-"
+            }
            }
           ],
           "api": "faux-probe",
@@ -9400,7 +9414,9 @@
            "type": "toolCall",
            "id": "fauxread1",
            "name": "read",
-           "arguments": {}
+           "arguments": {
+            "path": "parity-"
+           }
           }
          ],
          "api": "faux-probe",
@@ -9440,7 +9456,9 @@
             "type": "toolCall",
             "id": "fauxread1",
             "name": "read",
-            "arguments": {}
+            "arguments": {
+             "path": "parity-read"
+            }
            }
           ],
           "api": "faux-probe",
@@ -9471,7 +9489,9 @@
            "type": "toolCall",
            "id": "fauxread1",
            "name": "read",
-           "arguments": {}
+           "arguments": {
+            "path": "parity-read"
+           }
           }
          ],
          "api": "faux-probe",
@@ -9511,7 +9531,9 @@
             "type": "toolCall",
             "id": "fauxread1",
             "name": "read",
-            "arguments": {}
+            "arguments": {
+             "path": "parity-read-target."
+            }
            }
           ],
           "api": "faux-probe",
@@ -9542,7 +9564,9 @@
            "type": "toolCall",
            "id": "fauxread1",
            "name": "read",
-           "arguments": {}
+           "arguments": {
+            "path": "parity-read-target."
+           }
           }
          ],
          "api": "faux-probe",
@@ -9582,7 +9606,9 @@
             "type": "toolCall",
             "id": "fauxread1",
             "name": "read",
-            "arguments": {}
+            "arguments": {
+             "path": "parity-read-target.txt"
+            }
            }
           ],
           "api": "faux-probe",
@@ -9613,7 +9639,9 @@
            "type": "toolCall",
            "id": "fauxread1",
            "name": "read",
-           "arguments": {}
+           "arguments": {
+            "path": "parity-read-target.txt"
+           }
           }
          ],
          "api": "faux-probe",
@@ -10181,7 +10209,9 @@
            "type": "toolCall",
            "id": "fauxread1",
            "name": "read",
-           "arguments": {}
+           "arguments": {
+            "path": "par"
+           }
           }
          ],
          "api": "faux-probe",
@@ -10219,7 +10249,9 @@
            "type": "toolCall",
            "id": "fauxread1",
            "name": "read",
-           "arguments": {}
+           "arguments": {
+            "path": "parity-"
+           }
           }
          ],
          "api": "faux-probe",
@@ -10257,7 +10289,9 @@
            "type": "toolCall",
            "id": "fauxread1",
            "name": "read",
-           "arguments": {}
+           "arguments": {
+            "path": "parity-read"
+           }
           }
          ],
          "api": "faux-probe",
@@ -10295,7 +10329,9 @@
            "type": "toolCall",
            "id": "fauxread1",
            "name": "read",
-           "arguments": {}
+           "arguments": {
+            "path": "parity-read-tar"
+           }
           }
          ],
          "api": "faux-probe",
@@ -10333,7 +10369,9 @@
            "type": "toolCall",
            "id": "fauxread1",
            "name": "read",
-           "arguments": {}
+           "arguments": {
+            "path": "parity-read-target."
+           }
           }
          ],
          "api": "faux-probe",
@@ -10371,7 +10409,9 @@
            "type": "toolCall",
            "id": "fauxread1",
            "name": "read",
-           "arguments": {}
+           "arguments": {
+            "path": "parity-read-target.txt"
+           }
           }
          ],
          "api": "faux-probe",
@@ -10726,7 +10766,9 @@
             "type": "toolCall",
             "id": "fauxread1",
             "name": "read",
-            "arguments": {}
+            "arguments": {
+             "path": "parity-"
+            }
            }
           ],
           "api": "faux-probe",
@@ -10757,7 +10799,9 @@
            "type": "toolCall",
            "id": "fauxread1",
            "name": "read",
-           "arguments": {}
+           "arguments": {
+            "path": "parity-"
+           }
           }
          ],
          "api": "faux-probe",
@@ -10797,7 +10841,9 @@
             "type": "toolCall",
             "id": "fauxread1",
             "name": "read",
-            "arguments": {}
+            "arguments": {
+             "path": "parity-read"
+            }
            }
           ],
           "api": "faux-probe",
@@ -10828,7 +10874,9 @@
            "type": "toolCall",
            "id": "fauxread1",
            "name": "read",
-           "arguments": {}
+           "arguments": {
+            "path": "parity-read"
+           }
           }
          ],
          "api": "faux-probe",
@@ -10868,7 +10916,9 @@
             "type": "toolCall",
             "id": "fauxread1",
             "name": "read",
-            "arguments": {}
+            "arguments": {
+             "path": "parity-read-target."
+            }
            }
           ],
           "api": "faux-probe",
@@ -10899,7 +10949,9 @@
            "type": "toolCall",
            "id": "fauxread1",
            "name": "read",
-           "arguments": {}
+           "arguments": {
+            "path": "parity-read-target."
+           }
           }
          ],
          "api": "faux-probe",
@@ -10939,7 +10991,9 @@
             "type": "toolCall",
             "id": "fauxread1",
             "name": "read",
-            "arguments": {}
+            "arguments": {
+             "path": "parity-read-target.txt"
+            }
            }
           ],
           "api": "faux-probe",
@@ -10970,7 +11024,9 @@
            "type": "toolCall",
            "id": "fauxread1",
            "name": "read",
-           "arguments": {}
+           "arguments": {
+            "path": "parity-read-target.txt"
+           }
           }
          ],
          "api": "faux-probe",
@@ -11613,7 +11669,9 @@
            "type": "toolCall",
            "id": "fauxread1",
            "name": "read",
-           "arguments": {}
+           "arguments": {
+            "path": "parity-read"
+           }
           }
          ],
          "api": "faux-probe",
@@ -11651,7 +11709,9 @@
            "type": "toolCall",
            "id": "fauxread1",
            "name": "read",
-           "arguments": {}
+           "arguments": {
+            "path": "parity-read-tar"
+           }
           }
          ],
          "api": "faux-probe",
@@ -11689,7 +11749,9 @@
            "type": "toolCall",
            "id": "fauxread1",
            "name": "read",
-           "arguments": {}
+           "arguments": {
+            "path": "parity-read-target."
+           }
           }
          ],
          "api": "faux-probe",
@@ -11727,7 +11789,9 @@
            "type": "toolCall",
            "id": "fauxread1",
            "name": "read",
-           "arguments": {}
+           "arguments": {
+            "path": "parity-read-target.txt"
+           }
           }
          ],
          "api": "faux-probe",
@@ -12162,7 +12226,9 @@
             "type": "toolCall",
             "id": "fauxread1",
             "name": "read",
-            "arguments": {}
+            "arguments": {
+             "path": "parity-read"
+            }
            }
           ],
           "api": "faux-probe",
@@ -12193,7 +12259,9 @@
            "type": "toolCall",
            "id": "fauxread1",
            "name": "read",
-           "arguments": {}
+           "arguments": {
+            "path": "parity-read"
+           }
           }
          ],
          "api": "faux-probe",
@@ -12233,7 +12301,9 @@
             "type": "toolCall",
             "id": "fauxread1",
             "name": "read",
-            "arguments": {}
+            "arguments": {
+             "path": "parity-read-target."
+            }
            }
           ],
           "api": "faux-probe",
@@ -12264,7 +12334,9 @@
            "type": "toolCall",
            "id": "fauxread1",
            "name": "read",
-           "arguments": {}
+           "arguments": {
+            "path": "parity-read-target."
+           }
           }
          ],
          "api": "faux-probe",
@@ -12304,7 +12376,9 @@
             "type": "toolCall",
             "id": "fauxread1",
             "name": "read",
-            "arguments": {}
+            "arguments": {
+             "path": "parity-read-target.txt"
+            }
            }
           ],
           "api": "faux-probe",
@@ -12335,7 +12409,9 @@
            "type": "toolCall",
            "id": "fauxread1",
            "name": "read",
-           "arguments": {}
+           "arguments": {
+            "path": "parity-read-target.txt"
+           }
           }
          ],
          "api": "faux-probe",
@@ -14369,7 +14445,9 @@
            "type": "toolCall",
            "id": "fauxread1",
            "name": "read",
-           "arguments": {}
+           "arguments": {
+            "path": "parity-read-tar"
+           }
           }
          ],
          "api": "faux-probe",
@@ -14416,7 +14494,9 @@
            "type": "toolCall",
            "id": "fauxread1",
            "name": "read",
-           "arguments": {}
+           "arguments": {
+            "path": "parity-read-target."
+           }
           }
          ],
          "api": "faux-probe",
@@ -14463,7 +14543,9 @@
            "type": "toolCall",
            "id": "fauxread1",
            "name": "read",
-           "arguments": {}
+           "arguments": {
+            "path": "parity-read-target.txt"
+           }
           }
          ],
          "api": "faux-probe",
@@ -17041,7 +17123,9 @@
            "type": "toolCall",
            "id": "fauxread1",
            "name": "read",
-           "arguments": {}
+           "arguments": {
+            "path": "parity-read-target."
+           }
           }
          ],
          "api": "faux-probe",
@@ -17088,7 +17172,9 @@
            "type": "toolCall",
            "id": "fauxread1",
            "name": "read",
-           "arguments": {}
+           "arguments": {
+            "path": "parity-read-target.txt"
+           }
           }
          ],
          "api": "faux-probe",
@@ -26605,7 +26691,7 @@
         },
         "stopReason": "error",
         "errorMessage": "scripted factory failure",
-        "timestamp": 1792787535969,
+        "timestamp": 1792877051570,
         "durationMs": 1,
         "thinkingLevel": "off"
        }
@@ -26638,7 +26724,7 @@
         },
         "stopReason": "error",
         "errorMessage": "scripted factory failure",
-        "timestamp": 1792787535969,
+        "timestamp": 1792877051570,
         "durationMs": 1,
         "thinkingLevel": "off"
        }
@@ -26678,7 +26764,7 @@
          },
          "stopReason": "error",
          "errorMessage": "scripted factory failure",
-         "timestamp": 1792787535975,
+         "timestamp": 1792877051576,
          "durationMs": 0
         }
        }
@@ -26707,7 +26793,7 @@
         },
         "stopReason": "error",
         "errorMessage": "scripted factory failure",
-        "timestamp": 1792787535975,
+        "timestamp": 1792877051576,
         "durationMs": 0
        }
       }
@@ -26743,7 +26829,7 @@
          },
          "stopReason": "error",
          "errorMessage": "scripted factory failure",
-         "timestamp": 1792787535975,
+         "timestamp": 1792877051577,
          "durationMs": 0,
          "thinkingLevel": "off"
         }
@@ -26775,7 +26861,7 @@
          },
          "stopReason": "error",
          "errorMessage": "scripted factory failure",
-         "timestamp": 1792787535975,
+         "timestamp": 1792877051577,
          "durationMs": 0,
          "thinkingLevel": "off"
         }
@@ -26814,7 +26900,7 @@
          },
          "stopReason": "error",
          "errorMessage": "scripted factory failure",
-         "timestamp": 1792787535975,
+         "timestamp": 1792877051577,
          "durationMs": 0
         }
        }
@@ -26843,7 +26929,7 @@
         },
         "stopReason": "error",
         "errorMessage": "scripted factory failure",
-        "timestamp": 1792787535975,
+        "timestamp": 1792877051577,
         "durationMs": 0
        }
       }
@@ -26879,7 +26965,7 @@
          },
          "stopReason": "error",
          "errorMessage": "scripted factory failure",
-         "timestamp": 1792787535976,
+         "timestamp": 1792877051577,
          "durationMs": 0,
          "thinkingLevel": "off"
         }
@@ -26911,7 +26997,7 @@
          },
          "stopReason": "error",
          "errorMessage": "scripted factory failure",
-         "timestamp": 1792787535976,
+         "timestamp": 1792877051577,
          "durationMs": 0,
          "thinkingLevel": "off"
         }
@@ -26950,7 +27036,7 @@
          },
          "stopReason": "error",
          "errorMessage": "scripted factory failure",
-         "timestamp": 1792787535976,
+         "timestamp": 1792877051577,
          "durationMs": 0
         }
        }
@@ -26979,7 +27065,7 @@
         },
         "stopReason": "error",
         "errorMessage": "scripted factory failure",
-        "timestamp": 1792787535976,
+        "timestamp": 1792877051577,
         "durationMs": 0
        }
       }
@@ -27015,7 +27101,7 @@
          },
          "stopReason": "error",
          "errorMessage": "scripted factory failure",
-         "timestamp": 1792787535976,
+         "timestamp": 1792877051577,
          "durationMs": 0,
          "thinkingLevel": "off"
         }
@@ -27047,7 +27133,7 @@
          },
          "stopReason": "error",
          "errorMessage": "scripted factory failure",
-         "timestamp": 1792787535976,
+         "timestamp": 1792877051577,
          "durationMs": 0,
          "thinkingLevel": "off"
         }
@@ -30194,7 +30280,7 @@
         },
         "stopReason": "error",
         "errorMessage": "Faux response ended without a stop reason",
-        "timestamp": 1792787537140,
+        "timestamp": 1792877052837,
         "durationMs": 2,
         "thinkingLevel": "off"
        }
@@ -30232,7 +30318,7 @@
         },
         "stopReason": "error",
         "errorMessage": "No more faux responses queued",
-        "timestamp": 1792787539149,
+        "timestamp": 1792877054846,
         "durationMs": 0,
         "thinkingLevel": "off"
        }
@@ -30265,7 +30351,7 @@
         },
         "stopReason": "error",
         "errorMessage": "No more faux responses queued",
-        "timestamp": 1792787539149,
+        "timestamp": 1792877054846,
         "durationMs": 0,
         "thinkingLevel": "off"
        }
@@ -30513,7 +30599,7 @@
          },
          "stopReason": "error",
          "errorMessage": "Faux response ended without a stop reason",
-         "timestamp": 1792787539152,
+         "timestamp": 1792877054850,
          "durationMs": 0
         }
        }
@@ -30542,7 +30628,7 @@
         },
         "stopReason": "error",
         "errorMessage": "Faux response ended without a stop reason",
-        "timestamp": 1792787539152,
+        "timestamp": 1792877054850,
         "durationMs": 0
        }
       }
@@ -30941,7 +31027,7 @@
          },
          "stopReason": "error",
          "errorMessage": "Faux response ended without a stop reason",
-         "timestamp": 1792787539153,
+         "timestamp": 1792877054850,
          "durationMs": 0,
          "thinkingLevel": "off"
         }
@@ -31188,7 +31274,7 @@
          },
          "stopReason": "error",
          "errorMessage": "Faux response ended without a stop reason",
-         "timestamp": 1792787539153,
+         "timestamp": 1792877054850,
          "durationMs": 0
         }
        }
@@ -31217,7 +31303,7 @@
         },
         "stopReason": "error",
         "errorMessage": "Faux response ended without a stop reason",
-        "timestamp": 1792787539153,
+        "timestamp": 1792877054850,
         "durationMs": 0
        }
       }
@@ -31616,7 +31702,7 @@
          },
          "stopReason": "error",
          "errorMessage": "Faux response ended without a stop reason",
-         "timestamp": 1792787539153,
+         "timestamp": 1792877054850,
          "durationMs": 0,
          "thinkingLevel": "off"
         }
@@ -31863,7 +31949,7 @@
          },
          "stopReason": "error",
          "errorMessage": "Faux response ended without a stop reason",
-         "timestamp": 1792787539153,
+         "timestamp": 1792877054851,
          "durationMs": 0
         }
        }
@@ -31892,7 +31978,7 @@
         },
         "stopReason": "error",
         "errorMessage": "Faux response ended without a stop reason",
-        "timestamp": 1792787539153,
+        "timestamp": 1792877054851,
         "durationMs": 0
        }
       }
@@ -32291,7 +32377,7 @@
          },
          "stopReason": "error",
          "errorMessage": "Faux response ended without a stop reason",
-         "timestamp": 1792787539153,
+         "timestamp": 1792877054851,
          "durationMs": 0,
          "thinkingLevel": "off"
         }
@@ -41257,7 +41343,9 @@
            "type": "toolCall",
            "id": "fauxread1",
            "name": "read",
-           "arguments": {}
+           "arguments": {
+            "path": "par"
+           }
           }
          ],
          "api": "faux-probe",
@@ -41295,7 +41383,9 @@
            "type": "toolCall",
            "id": "fauxread1",
            "name": "read",
-           "arguments": {}
+           "arguments": {
+            "path": "parity-"
+           }
           }
          ],
          "api": "faux-probe",
@@ -41333,7 +41423,9 @@
            "type": "toolCall",
            "id": "fauxread1",
            "name": "read",
-           "arguments": {}
+           "arguments": {
+            "path": "parity-read"
+           }
           }
          ],
          "api": "faux-probe",
@@ -41371,7 +41463,9 @@
            "type": "toolCall",
            "id": "fauxread1",
            "name": "read",
-           "arguments": {}
+           "arguments": {
+            "path": "parity-read-tar"
+           }
           }
          ],
          "api": "faux-probe",
@@ -41409,7 +41503,9 @@
            "type": "toolCall",
            "id": "fauxread1",
            "name": "read",
-           "arguments": {}
+           "arguments": {
+            "path": "parity-read-target."
+           }
           }
          ],
          "api": "faux-probe",
@@ -41447,7 +41543,9 @@
            "type": "toolCall",
            "id": "fauxread1",
            "name": "read",
-           "arguments": {}
+           "arguments": {
+            "path": "parity-read-target.txt"
+           }
           }
          ],
          "api": "faux-probe",
@@ -41895,7 +41993,9 @@
             "type": "toolCall",
             "id": "fauxread1",
             "name": "read",
-            "arguments": {}
+            "arguments": {
+             "path": "par"
+            }
            }
           ],
           "api": "faux-probe",
@@ -41926,7 +42026,9 @@
            "type": "toolCall",
            "id": "fauxread1",
            "name": "read",
-           "arguments": {}
+           "arguments": {
+            "path": "par"
+           }
           }
          ],
          "api": "faux-probe",
@@ -41966,7 +42068,9 @@
             "type": "toolCall",
             "id": "fauxread1",
             "name": "read",
-            "arguments": {}
+            "arguments": {
+             "path": "parity-"
+            }
            }
           ],
           "api": "faux-probe",
@@ -41997,7 +42101,9 @@
            "type": "toolCall",
            "id": "fauxread1",
            "name": "read",
-           "arguments": {}
+           "arguments": {
+            "path": "parity-"
+           }
           }
          ],
          "api": "faux-probe",
@@ -42037,7 +42143,9 @@
             "type": "toolCall",
             "id": "fauxread1",
             "name": "read",
-            "arguments": {}
+            "arguments": {
+             "path": "parity-read"
+            }
            }
           ],
           "api": "faux-probe",
@@ -42068,7 +42176,9 @@
            "type": "toolCall",
            "id": "fauxread1",
            "name": "read",
-           "arguments": {}
+           "arguments": {
+            "path": "parity-read"
+           }
           }
          ],
          "api": "faux-probe",
@@ -42108,7 +42218,9 @@
             "type": "toolCall",
             "id": "fauxread1",
             "name": "read",
-            "arguments": {}
+            "arguments": {
+             "path": "parity-read-tar"
+            }
            }
           ],
           "api": "faux-probe",
@@ -42139,7 +42251,9 @@
            "type": "toolCall",
            "id": "fauxread1",
            "name": "read",
-           "arguments": {}
+           "arguments": {
+            "path": "parity-read-tar"
+           }
           }
          ],
          "api": "faux-probe",
@@ -42179,7 +42293,9 @@
             "type": "toolCall",
             "id": "fauxread1",
             "name": "read",
-            "arguments": {}
+            "arguments": {
+             "path": "parity-read-target."
+            }
            }
           ],
           "api": "faux-probe",
@@ -42210,7 +42326,9 @@
            "type": "toolCall",
            "id": "fauxread1",
            "name": "read",
-           "arguments": {}
+           "arguments": {
+            "path": "parity-read-target."
+           }
           }
          ],
          "api": "faux-probe",
@@ -42250,7 +42368,9 @@
             "type": "toolCall",
             "id": "fauxread1",
             "name": "read",
-            "arguments": {}
+            "arguments": {
+             "path": "parity-read-target.txt"
+            }
            }
           ],
           "api": "faux-probe",
@@ -42281,7 +42401,9 @@
            "type": "toolCall",
            "id": "fauxread1",
            "name": "read",
-           "arguments": {}
+           "arguments": {
+            "path": "parity-read-target.txt"
+           }
           }
          ],
          "api": "faux-probe",
@@ -42663,7 +42785,9 @@
            "type": "toolCall",
            "id": "fauxread1",
            "name": "read",
-           "arguments": {}
+           "arguments": {
+            "path": "par"
+           }
           }
          ],
          "api": "faux-probe",
@@ -42701,7 +42825,9 @@
            "type": "toolCall",
            "id": "fauxread1",
            "name": "read",
-           "arguments": {}
+           "arguments": {
+            "path": "parity-"
+           }
           }
          ],
          "api": "faux-probe",
@@ -42739,7 +42865,9 @@
            "type": "toolCall",
            "id": "fauxread1",
            "name": "read",
-           "arguments": {}
+           "arguments": {
+            "path": "parity-read"
+           }
           }
          ],
          "api": "faux-probe",
@@ -42777,7 +42905,9 @@
            "type": "toolCall",
            "id": "fauxread1",
            "name": "read",
-           "arguments": {}
+           "arguments": {
+            "path": "parity-read-tar"
+           }
           }
          ],
          "api": "faux-probe",
@@ -42815,7 +42945,9 @@
            "type": "toolCall",
            "id": "fauxread1",
            "name": "read",
-           "arguments": {}
+           "arguments": {
+            "path": "parity-read-target."
+           }
           }
          ],
          "api": "faux-probe",
@@ -42853,7 +42985,9 @@
            "type": "toolCall",
            "id": "fauxread1",
            "name": "read",
-           "arguments": {}
+           "arguments": {
+            "path": "parity-read-target.txt"
+           }
           }
          ],
          "api": "faux-probe",
@@ -43301,7 +43435,9 @@
             "type": "toolCall",
             "id": "fauxread1",
             "name": "read",
-            "arguments": {}
+            "arguments": {
+             "path": "par"
+            }
            }
           ],
           "api": "faux-probe",
@@ -43332,7 +43468,9 @@
            "type": "toolCall",
            "id": "fauxread1",
            "name": "read",
-           "arguments": {}
+           "arguments": {
+            "path": "par"
+           }
           }
          ],
          "api": "faux-probe",
@@ -43372,7 +43510,9 @@
             "type": "toolCall",
             "id": "fauxread1",
             "name": "read",
-            "arguments": {}
+            "arguments": {
+             "path": "parity-"
+            }
            }
           ],
           "api": "faux-probe",
@@ -43403,7 +43543,9 @@
            "type": "toolCall",
            "id": "fauxread1",
            "name": "read",
-           "arguments": {}
+           "arguments": {
+            "path": "parity-"
+           }
           }
          ],
          "api": "faux-probe",
@@ -43443,7 +43585,9 @@
             "type": "toolCall",
             "id": "fauxread1",
             "name": "read",
-            "arguments": {}
+            "arguments": {
+             "path": "parity-read"
+            }
            }
           ],
           "api": "faux-probe",
@@ -43474,7 +43618,9 @@
            "type": "toolCall",
            "id": "fauxread1",
            "name": "read",
-           "arguments": {}
+           "arguments": {
+            "path": "parity-read"
+           }
           }
          ],
          "api": "faux-probe",
@@ -43514,7 +43660,9 @@
             "type": "toolCall",
             "id": "fauxread1",
             "name": "read",
-            "arguments": {}
+            "arguments": {
+             "path": "parity-read-tar"
+            }
            }
           ],
           "api": "faux-probe",
@@ -43545,7 +43693,9 @@
            "type": "toolCall",
            "id": "fauxread1",
            "name": "read",
-           "arguments": {}
+           "arguments": {
+            "path": "parity-read-tar"
+           }
           }
          ],
          "api": "faux-probe",
@@ -43585,7 +43735,9 @@
             "type": "toolCall",
             "id": "fauxread1",
             "name": "read",
-            "arguments": {}
+            "arguments": {
+             "path": "parity-read-target."
+            }
            }
           ],
           "api": "faux-probe",
@@ -43616,7 +43768,9 @@
            "type": "toolCall",
            "id": "fauxread1",
            "name": "read",
-           "arguments": {}
+           "arguments": {
+            "path": "parity-read-target."
+           }
           }
          ],
          "api": "faux-probe",
@@ -43656,7 +43810,9 @@
             "type": "toolCall",
             "id": "fauxread1",
             "name": "read",
-            "arguments": {}
+            "arguments": {
+             "path": "parity-read-target.txt"
+            }
            }
           ],
           "api": "faux-probe",
@@ -43687,7 +43843,9 @@
            "type": "toolCall",
            "id": "fauxread1",
            "name": "read",
-           "arguments": {}
+           "arguments": {
+            "path": "parity-read-target.txt"
+           }
           }
          ],
          "api": "faux-probe",
@@ -44069,7 +44227,9 @@
            "type": "toolCall",
            "id": "fauxread1",
            "name": "read",
-           "arguments": {}
+           "arguments": {
+            "path": "par"
+           }
           }
          ],
          "api": "faux-probe",
@@ -44107,7 +44267,9 @@
            "type": "toolCall",
            "id": "fauxread1",
            "name": "read",
-           "arguments": {}
+           "arguments": {
+            "path": "parity-"
+           }
           }
          ],
          "api": "faux-probe",
@@ -44145,7 +44307,9 @@
            "type": "toolCall",
            "id": "fauxread1",
            "name": "read",
-           "arguments": {}
+           "arguments": {
+            "path": "parity-read"
+           }
           }
          ],
          "api": "faux-probe",
@@ -44183,7 +44347,9 @@
            "type": "toolCall",
            "id": "fauxread1",
            "name": "read",
-           "arguments": {}
+           "arguments": {
+            "path": "parity-read-tar"
+           }
           }
          ],
          "api": "faux-probe",
@@ -44221,7 +44387,9 @@
            "type": "toolCall",
            "id": "fauxread1",
            "name": "read",
-           "arguments": {}
+           "arguments": {
+            "path": "parity-read-target."
+           }
           }
          ],
          "api": "faux-probe",
@@ -44259,7 +44427,9 @@
            "type": "toolCall",
            "id": "fauxread1",
            "name": "read",
-           "arguments": {}
+           "arguments": {
+            "path": "parity-read-target.txt"
+           }
           }
          ],
          "api": "faux-probe",
@@ -44707,7 +44877,9 @@
             "type": "toolCall",
             "id": "fauxread1",
             "name": "read",
-            "arguments": {}
+            "arguments": {
+             "path": "par"
+            }
            }
           ],
           "api": "faux-probe",
@@ -44738,7 +44910,9 @@
            "type": "toolCall",
            "id": "fauxread1",
            "name": "read",
-           "arguments": {}
+           "arguments": {
+            "path": "par"
+           }
           }
          ],
          "api": "faux-probe",
@@ -44778,7 +44952,9 @@
             "type": "toolCall",
             "id": "fauxread1",
             "name": "read",
-            "arguments": {}
+            "arguments": {
+             "path": "parity-"
+            }
            }
           ],
           "api": "faux-probe",
@@ -44809,7 +44985,9 @@
            "type": "toolCall",
            "id": "fauxread1",
            "name": "read",
-           "arguments": {}
+           "arguments": {
+            "path": "parity-"
+           }
           }
          ],
          "api": "faux-probe",
@@ -44849,7 +45027,9 @@
             "type": "toolCall",
             "id": "fauxread1",
             "name": "read",
-            "arguments": {}
+            "arguments": {
+             "path": "parity-read"
+            }
            }
           ],
           "api": "faux-probe",
@@ -44880,7 +45060,9 @@
            "type": "toolCall",
            "id": "fauxread1",
            "name": "read",
-           "arguments": {}
+           "arguments": {
+            "path": "parity-read"
+           }
           }
          ],
          "api": "faux-probe",
@@ -44920,7 +45102,9 @@
             "type": "toolCall",
             "id": "fauxread1",
             "name": "read",
-            "arguments": {}
+            "arguments": {
+             "path": "parity-read-tar"
+            }
            }
           ],
           "api": "faux-probe",
@@ -44951,7 +45135,9 @@
            "type": "toolCall",
            "id": "fauxread1",
            "name": "read",
-           "arguments": {}
+           "arguments": {
+            "path": "parity-read-tar"
+           }
           }
          ],
          "api": "faux-probe",
@@ -44991,7 +45177,9 @@
             "type": "toolCall",
             "id": "fauxread1",
             "name": "read",
-            "arguments": {}
+            "arguments": {
+             "path": "parity-read-target."
+            }
            }
           ],
           "api": "faux-probe",
@@ -45022,7 +45210,9 @@
            "type": "toolCall",
            "id": "fauxread1",
            "name": "read",
-           "arguments": {}
+           "arguments": {
+            "path": "parity-read-target."
+           }
           }
          ],
          "api": "faux-probe",
@@ -45062,7 +45252,9 @@
             "type": "toolCall",
             "id": "fauxread1",
             "name": "read",
-            "arguments": {}
+            "arguments": {
+             "path": "parity-read-target.txt"
+            }
            }
           ],
           "api": "faux-probe",
@@ -45093,7 +45285,9 @@
            "type": "toolCall",
            "id": "fauxread1",
            "name": "read",
-           "arguments": {}
+           "arguments": {
+            "path": "parity-read-target.txt"
+           }
           }
          ],
          "api": "faux-probe",
@@ -46819,7 +47013,9 @@
            "type": "toolCall",
            "id": "fauxread1",
            "name": "read",
-           "arguments": {}
+           "arguments": {
+            "path": "par"
+           }
           }
          ],
          "api": "faux-probe",
@@ -46866,7 +47062,9 @@
            "type": "toolCall",
            "id": "fauxread1",
            "name": "read",
-           "arguments": {}
+           "arguments": {
+            "path": "parity-"
+           }
           }
          ],
          "api": "faux-probe",
@@ -46913,7 +47111,9 @@
            "type": "toolCall",
            "id": "fauxread1",
            "name": "read",
-           "arguments": {}
+           "arguments": {
+            "path": "parity-read"
+           }
           }
          ],
          "api": "faux-probe",
@@ -46960,7 +47160,9 @@
            "type": "toolCall",
            "id": "fauxread1",
            "name": "read",
-           "arguments": {}
+           "arguments": {
+            "path": "parity-read-tar"
+           }
           }
          ],
          "api": "faux-probe",
@@ -47007,7 +47209,9 @@
            "type": "toolCall",
            "id": "fauxread1",
            "name": "read",
-           "arguments": {}
+           "arguments": {
+            "path": "parity-read-target."
+           }
           }
          ],
          "api": "faux-probe",
@@ -47054,7 +47258,9 @@
            "type": "toolCall",
            "id": "fauxread1",
            "name": "read",
-           "arguments": {}
+           "arguments": {
+            "path": "parity-read-target.txt"
+           }
           }
          ],
          "api": "faux-probe",
@@ -48184,7 +48390,9 @@
             "type": "toolCall",
             "id": "fauxread1",
             "name": "read",
-            "arguments": {}
+            "arguments": {
+             "path": "par"
+            }
            }
           ],
           "api": "faux-probe",
@@ -48224,7 +48432,9 @@
            "type": "toolCall",
            "id": "fauxread1",
            "name": "read",
-           "arguments": {}
+           "arguments": {
+            "path": "par"
+           }
           }
          ],
          "api": "faux-probe",
@@ -48273,7 +48483,9 @@
             "type": "toolCall",
             "id": "fauxread1",
             "name": "read",
-            "arguments": {}
+            "arguments": {
+             "path": "parity-"
+            }
            }
           ],
           "api": "faux-probe",
@@ -48313,7 +48525,9 @@
            "type": "toolCall",
            "id": "fauxread1",
            "name": "read",
-           "arguments": {}
+           "arguments": {
+            "path": "parity-"
+           }
           }
          ],
          "api": "faux-probe",
@@ -48362,7 +48576,9 @@
             "type": "toolCall",
             "id": "fauxread1",
             "name": "read",
-            "arguments": {}
+            "arguments": {
+             "path": "parity-read"
+            }
            }
           ],
           "api": "faux-probe",
@@ -48402,7 +48618,9 @@
            "type": "toolCall",
            "id": "fauxread1",
            "name": "read",
-           "arguments": {}
+           "arguments": {
+            "path": "parity-read"
+           }
           }
          ],
          "api": "faux-probe",
@@ -48451,7 +48669,9 @@
             "type": "toolCall",
             "id": "fauxread1",
             "name": "read",
-            "arguments": {}
+            "arguments": {
+             "path": "parity-read-tar"
+            }
            }
           ],
           "api": "faux-probe",
@@ -48491,7 +48711,9 @@
            "type": "toolCall",
            "id": "fauxread1",
            "name": "read",
-           "arguments": {}
+           "arguments": {
+            "path": "parity-read-tar"
+           }
           }
          ],
          "api": "faux-probe",
@@ -48540,7 +48762,9 @@
             "type": "toolCall",
             "id": "fauxread1",
             "name": "read",
-            "arguments": {}
+            "arguments": {
+             "path": "parity-read-target."
+            }
            }
           ],
           "api": "faux-probe",
@@ -48580,7 +48804,9 @@
            "type": "toolCall",
            "id": "fauxread1",
            "name": "read",
-           "arguments": {}
+           "arguments": {
+            "path": "parity-read-target."
+           }
           }
          ],
          "api": "faux-probe",
@@ -48629,7 +48855,9 @@
             "type": "toolCall",
             "id": "fauxread1",
             "name": "read",
-            "arguments": {}
+            "arguments": {
+             "path": "parity-read-target.txt"
+            }
            }
           ],
           "api": "faux-probe",
@@ -48669,7 +48897,9 @@
            "type": "toolCall",
            "id": "fauxread1",
            "name": "read",
-           "arguments": {}
+           "arguments": {
+            "path": "parity-read-target.txt"
+           }
           }
          ],
          "api": "faux-probe",
@@ -49443,7 +49673,9 @@
            "type": "toolCall",
            "id": "fauxread1",
            "name": "read",
-           "arguments": {}
+           "arguments": {
+            "path": "par"
+           }
           }
          ],
          "api": "faux-probe",
@@ -49490,7 +49722,9 @@
            "type": "toolCall",
            "id": "fauxread1",
            "name": "read",
-           "arguments": {}
+           "arguments": {
+            "path": "parity-"
+           }
           }
          ],
          "api": "faux-probe",
@@ -49537,7 +49771,9 @@
            "type": "toolCall",
            "id": "fauxread1",
            "name": "read",
-           "arguments": {}
+           "arguments": {
+            "path": "parity-read"
+           }
           }
          ],
          "api": "faux-probe",
@@ -49584,7 +49820,9 @@
            "type": "toolCall",
            "id": "fauxread1",
            "name": "read",
-           "arguments": {}
+           "arguments": {
+            "path": "parity-read-tar"
+           }
           }
          ],
          "api": "faux-probe",
@@ -49631,7 +49869,9 @@
            "type": "toolCall",
            "id": "fauxread1",
            "name": "read",
-           "arguments": {}
+           "arguments": {
+            "path": "parity-read-target."
+           }
           }
          ],
          "api": "faux-probe",
@@ -49678,7 +49918,9 @@
            "type": "toolCall",
            "id": "fauxread1",
            "name": "read",
-           "arguments": {}
+           "arguments": {
+            "path": "parity-read-target.txt"
+           }
           }
          ],
          "api": "faux-probe",
@@ -50808,7 +51050,9 @@
             "type": "toolCall",
             "id": "fauxread1",
             "name": "read",
-            "arguments": {}
+            "arguments": {
+             "path": "par"
+            }
            }
           ],
           "api": "faux-probe",
@@ -50848,7 +51092,9 @@
            "type": "toolCall",
            "id": "fauxread1",
            "name": "read",
-           "arguments": {}
+           "arguments": {
+            "path": "par"
+           }
           }
          ],
          "api": "faux-probe",
@@ -50897,7 +51143,9 @@
             "type": "toolCall",
             "id": "fauxread1",
             "name": "read",
-            "arguments": {}
+            "arguments": {
+             "path": "parity-"
+            }
            }
           ],
           "api": "faux-probe",
@@ -50937,7 +51185,9 @@
            "type": "toolCall",
            "id": "fauxread1",
            "name": "read",
-           "arguments": {}
+           "arguments": {
+            "path": "parity-"
+           }
           }
          ],
          "api": "faux-probe",
@@ -50986,7 +51236,9 @@
             "type": "toolCall",
             "id": "fauxread1",
             "name": "read",
-            "arguments": {}
+            "arguments": {
+             "path": "parity-read"
+            }
            }
           ],
           "api": "faux-probe",
@@ -51026,7 +51278,9 @@
            "type": "toolCall",
            "id": "fauxread1",
            "name": "read",
-           "arguments": {}
+           "arguments": {
+            "path": "parity-read"
+           }
           }
          ],
          "api": "faux-probe",
@@ -51075,7 +51329,9 @@
             "type": "toolCall",
             "id": "fauxread1",
             "name": "read",
-            "arguments": {}
+            "arguments": {
+             "path": "parity-read-tar"
+            }
            }
           ],
           "api": "faux-probe",
@@ -51115,7 +51371,9 @@
            "type": "toolCall",
            "id": "fauxread1",
            "name": "read",
-           "arguments": {}
+           "arguments": {
+            "path": "parity-read-tar"
+           }
           }
          ],
          "api": "faux-probe",
@@ -51164,7 +51422,9 @@
             "type": "toolCall",
             "id": "fauxread1",
             "name": "read",
-            "arguments": {}
+            "arguments": {
+             "path": "parity-read-target."
+            }
            }
           ],
           "api": "faux-probe",
@@ -51204,7 +51464,9 @@
            "type": "toolCall",
            "id": "fauxread1",
            "name": "read",
-           "arguments": {}
+           "arguments": {
+            "path": "parity-read-target."
+           }
           }
          ],
          "api": "faux-probe",
@@ -51253,7 +51515,9 @@
             "type": "toolCall",
             "id": "fauxread1",
             "name": "read",
-            "arguments": {}
+            "arguments": {
+             "path": "parity-read-target.txt"
+            }
            }
           ],
           "api": "faux-probe",
@@ -51293,7 +51557,9 @@
            "type": "toolCall",
            "id": "fauxread1",
            "name": "read",
-           "arguments": {}
+           "arguments": {
+            "path": "parity-read-target.txt"
+           }
           }
          ],
          "api": "faux-probe",
@@ -52067,7 +52333,9 @@
            "type": "toolCall",
            "id": "fauxread1",
            "name": "read",
-           "arguments": {}
+           "arguments": {
+            "path": "par"
+           }
           }
          ],
          "api": "faux-probe",
@@ -52114,7 +52382,9 @@
            "type": "toolCall",
            "id": "fauxread1",
            "name": "read",
-           "arguments": {}
+           "arguments": {
+            "path": "parity-"
+           }
           }
          ],
          "api": "faux-probe",
@@ -52161,7 +52431,9 @@
            "type": "toolCall",
            "id": "fauxread1",
            "name": "read",
-           "arguments": {}
+           "arguments": {
+            "path": "parity-read"
+           }
           }
          ],
          "api": "faux-probe",
@@ -52208,7 +52480,9 @@
            "type": "toolCall",
            "id": "fauxread1",
            "name": "read",
-           "arguments": {}
+           "arguments": {
+            "path": "parity-read-tar"
+           }
           }
          ],
          "api": "faux-probe",
@@ -52255,7 +52529,9 @@
            "type": "toolCall",
            "id": "fauxread1",
            "name": "read",
-           "arguments": {}
+           "arguments": {
+            "path": "parity-read-target."
+           }
           }
          ],
          "api": "faux-probe",
@@ -52302,7 +52578,9 @@
            "type": "toolCall",
            "id": "fauxread1",
            "name": "read",
-           "arguments": {}
+           "arguments": {
+            "path": "parity-read-target.txt"
+           }
           }
          ],
          "api": "faux-probe",
@@ -53432,7 +53710,9 @@
             "type": "toolCall",
             "id": "fauxread1",
             "name": "read",
-            "arguments": {}
+            "arguments": {
+             "path": "par"
+            }
            }
           ],
           "api": "faux-probe",
@@ -53472,7 +53752,9 @@
            "type": "toolCall",
            "id": "fauxread1",
            "name": "read",
-           "arguments": {}
+           "arguments": {
+            "path": "par"
+           }
           }
          ],
          "api": "faux-probe",
@@ -53521,7 +53803,9 @@
             "type": "toolCall",
             "id": "fauxread1",
             "name": "read",
-            "arguments": {}
+            "arguments": {
+             "path": "parity-"
+            }
            }
           ],
           "api": "faux-probe",
@@ -53561,7 +53845,9 @@
            "type": "toolCall",
            "id": "fauxread1",
            "name": "read",
-           "arguments": {}
+           "arguments": {
+            "path": "parity-"
+           }
           }
          ],
          "api": "faux-probe",
@@ -53610,7 +53896,9 @@
             "type": "toolCall",
             "id": "fauxread1",
             "name": "read",
-            "arguments": {}
+            "arguments": {
+             "path": "parity-read"
+            }
            }
           ],
           "api": "faux-probe",
@@ -53650,7 +53938,9 @@
            "type": "toolCall",
            "id": "fauxread1",
            "name": "read",
-           "arguments": {}
+           "arguments": {
+            "path": "parity-read"
+           }
           }
          ],
          "api": "faux-probe",
@@ -53699,7 +53989,9 @@
             "type": "toolCall",
             "id": "fauxread1",
             "name": "read",
-            "arguments": {}
+            "arguments": {
+             "path": "parity-read-tar"
+            }
            }
           ],
           "api": "faux-probe",
@@ -53739,7 +54031,9 @@
            "type": "toolCall",
            "id": "fauxread1",
            "name": "read",
-           "arguments": {}
+           "arguments": {
+            "path": "parity-read-tar"
+           }
           }
          ],
          "api": "faux-probe",
@@ -53788,7 +54082,9 @@
             "type": "toolCall",
             "id": "fauxread1",
             "name": "read",
-            "arguments": {}
+            "arguments": {
+             "path": "parity-read-target."
+            }
            }
           ],
           "api": "faux-probe",
@@ -53828,7 +54124,9 @@
            "type": "toolCall",
            "id": "fauxread1",
            "name": "read",
-           "arguments": {}
+           "arguments": {
+            "path": "parity-read-target."
+           }
           }
          ],
          "api": "faux-probe",
@@ -53877,7 +54175,9 @@
             "type": "toolCall",
             "id": "fauxread1",
             "name": "read",
-            "arguments": {}
+            "arguments": {
+             "path": "parity-read-target.txt"
+            }
            }
           ],
           "api": "faux-probe",
@@ -53917,7 +54217,9 @@
            "type": "toolCall",
            "id": "fauxread1",
            "name": "read",
-           "arguments": {}
+           "arguments": {
+            "path": "parity-read-target.txt"
+           }
           }
          ],
          "api": "faux-probe",
@@ -58765,7 +59067,7 @@
         },
         "stopReason": "error",
         "errorMessage": "scripted factory failure",
-        "timestamp": 1792787543529,
+        "timestamp": 1792877059339,
         "durationMs": 1,
         "thinkingLevel": "off"
        }
@@ -58798,7 +59100,7 @@
         },
         "stopReason": "error",
         "errorMessage": "scripted factory failure",
-        "timestamp": 1792787543529,
+        "timestamp": 1792877059339,
         "durationMs": 1,
         "thinkingLevel": "off"
        }
@@ -58838,7 +59140,7 @@
          },
          "stopReason": "error",
          "errorMessage": "scripted factory failure",
-         "timestamp": 1792787543536,
+         "timestamp": 1792877059346,
          "durationMs": 0
         }
        }
@@ -58867,7 +59169,7 @@
         },
         "stopReason": "error",
         "errorMessage": "scripted factory failure",
-        "timestamp": 1792787543536,
+        "timestamp": 1792877059346,
         "durationMs": 0
        }
       }
@@ -58903,7 +59205,7 @@
          },
          "stopReason": "error",
          "errorMessage": "scripted factory failure",
-         "timestamp": 1792787543536,
+         "timestamp": 1792877059346,
          "durationMs": 0,
          "thinkingLevel": "off"
         }
@@ -58935,7 +59237,7 @@
          },
          "stopReason": "error",
          "errorMessage": "scripted factory failure",
-         "timestamp": 1792787543536,
+         "timestamp": 1792877059346,
          "durationMs": 0,
          "thinkingLevel": "off"
         }
@@ -58974,7 +59276,7 @@
          },
          "stopReason": "error",
          "errorMessage": "scripted factory failure",
-         "timestamp": 1792787543536,
+         "timestamp": 1792877059346,
          "durationMs": 0
         }
        }
@@ -59003,7 +59305,7 @@
         },
         "stopReason": "error",
         "errorMessage": "scripted factory failure",
-        "timestamp": 1792787543536,
+        "timestamp": 1792877059346,
         "durationMs": 0
        }
       }
@@ -59039,7 +59341,7 @@
          },
          "stopReason": "error",
          "errorMessage": "scripted factory failure",
-         "timestamp": 1792787543536,
+         "timestamp": 1792877059346,
          "durationMs": 0,
          "thinkingLevel": "off"
         }
@@ -59071,7 +59373,7 @@
          },
          "stopReason": "error",
          "errorMessage": "scripted factory failure",
-         "timestamp": 1792787543536,
+         "timestamp": 1792877059346,
          "durationMs": 0,
          "thinkingLevel": "off"
         }
@@ -59110,7 +59412,7 @@
          },
          "stopReason": "error",
          "errorMessage": "scripted factory failure",
-         "timestamp": 1792787543536,
+         "timestamp": 1792877059346,
          "durationMs": 0
         }
        }
@@ -59139,7 +59441,7 @@
         },
         "stopReason": "error",
         "errorMessage": "scripted factory failure",
-        "timestamp": 1792787543536,
+        "timestamp": 1792877059346,
         "durationMs": 0
        }
       }
@@ -59175,7 +59477,7 @@
          },
          "stopReason": "error",
          "errorMessage": "scripted factory failure",
-         "timestamp": 1792787543536,
+         "timestamp": 1792877059346,
          "durationMs": 0,
          "thinkingLevel": "off"
         }
@@ -59207,7 +59509,7 @@
          },
          "stopReason": "error",
          "errorMessage": "scripted factory failure",
-         "timestamp": 1792787543536,
+         "timestamp": 1792877059346,
          "durationMs": 0,
          "thinkingLevel": "off"
         }
@@ -62356,8 +62658,8 @@
         },
         "stopReason": "error",
         "errorMessage": "Faux response ended without a stop reason",
-        "timestamp": 1792787544772,
-        "durationMs": 5,
+        "timestamp": 1792877060548,
+        "durationMs": 4,
         "thinkingLevel": "off"
        }
       }
@@ -62394,7 +62696,7 @@
         },
         "stopReason": "error",
         "errorMessage": "No more faux responses queued",
-        "timestamp": 1792787546781,
+        "timestamp": 1792877062557,
         "durationMs": 0,
         "thinkingLevel": "off"
        }
@@ -62427,7 +62729,7 @@
         },
         "stopReason": "error",
         "errorMessage": "No more faux responses queued",
-        "timestamp": 1792787546781,
+        "timestamp": 1792877062557,
         "durationMs": 0,
         "thinkingLevel": "off"
        }
@@ -62675,7 +62977,7 @@
          },
          "stopReason": "error",
          "errorMessage": "Faux response ended without a stop reason",
-         "timestamp": 1792787546788,
+         "timestamp": 1792877062563,
          "durationMs": 3
         }
        }
@@ -62704,7 +63006,7 @@
         },
         "stopReason": "error",
         "errorMessage": "Faux response ended without a stop reason",
-        "timestamp": 1792787546788,
+        "timestamp": 1792877062563,
         "durationMs": 3
        }
       }
@@ -63103,7 +63405,7 @@
          },
          "stopReason": "error",
          "errorMessage": "Faux response ended without a stop reason",
-         "timestamp": 1792787546791,
+         "timestamp": 1792877062567,
          "durationMs": 3,
          "thinkingLevel": "off"
         }
@@ -63350,7 +63652,7 @@
          },
          "stopReason": "error",
          "errorMessage": "Faux response ended without a stop reason",
-         "timestamp": 1792787546794,
+         "timestamp": 1792877062570,
          "durationMs": 3
         }
        }
@@ -63379,7 +63681,7 @@
         },
         "stopReason": "error",
         "errorMessage": "Faux response ended without a stop reason",
-        "timestamp": 1792787546794,
+        "timestamp": 1792877062570,
         "durationMs": 3
        }
       }
@@ -63778,7 +64080,7 @@
          },
          "stopReason": "error",
          "errorMessage": "Faux response ended without a stop reason",
-         "timestamp": 1792787546798,
+         "timestamp": 1792877062574,
          "durationMs": 3,
          "thinkingLevel": "off"
         }
@@ -64025,7 +64327,7 @@
          },
          "stopReason": "error",
          "errorMessage": "Faux response ended without a stop reason",
-         "timestamp": 1792787546801,
+         "timestamp": 1792877062577,
          "durationMs": 3
         }
        }
@@ -64054,7 +64356,7 @@
         },
         "stopReason": "error",
         "errorMessage": "Faux response ended without a stop reason",
-        "timestamp": 1792787546801,
+        "timestamp": 1792877062577,
         "durationMs": 3
        }
       }
@@ -64453,7 +64755,7 @@
          },
          "stopReason": "error",
          "errorMessage": "Faux response ended without a stop reason",
-         "timestamp": 1792787546804,
+         "timestamp": 1792877062580,
          "durationMs": 3,
          "thinkingLevel": "off"
         }
@@ -64591,7 +64893,7 @@
         },
         "stopReason": "error",
         "errorMessage": "No more faux responses queued",
-        "timestamp": 1792787547408,
+        "timestamp": 1792877063160,
         "durationMs": 1,
         "thinkingLevel": "off"
        }
@@ -64624,7 +64926,7 @@
         },
         "stopReason": "error",
         "errorMessage": "No more faux responses queued",
-        "timestamp": 1792787547408,
+        "timestamp": 1792877063160,
         "durationMs": 1,
         "thinkingLevel": "off"
        }
@@ -64664,7 +64966,7 @@
          },
          "stopReason": "error",
          "errorMessage": "No more faux responses queued",
-         "timestamp": 1792787547415,
+         "timestamp": 1792877063167,
          "durationMs": 0
         }
        }
@@ -64693,7 +64995,7 @@
         },
         "stopReason": "error",
         "errorMessage": "No more faux responses queued",
-        "timestamp": 1792787547415,
+        "timestamp": 1792877063167,
         "durationMs": 0
        }
       }
@@ -64729,7 +65031,7 @@
          },
          "stopReason": "error",
          "errorMessage": "No more faux responses queued",
-         "timestamp": 1792787547415,
+         "timestamp": 1792877063167,
          "durationMs": 0,
          "thinkingLevel": "off"
         }
@@ -64761,7 +65063,7 @@
          },
          "stopReason": "error",
          "errorMessage": "No more faux responses queued",
-         "timestamp": 1792787547415,
+         "timestamp": 1792877063167,
          "durationMs": 0,
          "thinkingLevel": "off"
         }
@@ -64800,7 +65102,7 @@
          },
          "stopReason": "error",
          "errorMessage": "No more faux responses queued",
-         "timestamp": 1792787547415,
+         "timestamp": 1792877063167,
          "durationMs": 0
         }
        }
@@ -64829,7 +65131,7 @@
         },
         "stopReason": "error",
         "errorMessage": "No more faux responses queued",
-        "timestamp": 1792787547415,
+        "timestamp": 1792877063167,
         "durationMs": 0
        }
       }
@@ -64865,7 +65167,7 @@
          },
          "stopReason": "error",
          "errorMessage": "No more faux responses queued",
-         "timestamp": 1792787547415,
+         "timestamp": 1792877063167,
          "durationMs": 0,
          "thinkingLevel": "off"
         }
@@ -64897,7 +65199,7 @@
          },
          "stopReason": "error",
          "errorMessage": "No more faux responses queued",
-         "timestamp": 1792787547415,
+         "timestamp": 1792877063167,
          "durationMs": 0,
          "thinkingLevel": "off"
         }
@@ -64936,7 +65238,7 @@
          },
          "stopReason": "error",
          "errorMessage": "No more faux responses queued",
-         "timestamp": 1792787547415,
+         "timestamp": 1792877063167,
          "durationMs": 0
         }
        }
@@ -64965,7 +65267,7 @@
         },
         "stopReason": "error",
         "errorMessage": "No more faux responses queued",
-        "timestamp": 1792787547415,
+        "timestamp": 1792877063167,
         "durationMs": 0
        }
       }
@@ -65001,7 +65303,7 @@
          },
          "stopReason": "error",
          "errorMessage": "No more faux responses queued",
-         "timestamp": 1792787547415,
+         "timestamp": 1792877063167,
          "durationMs": 0,
          "thinkingLevel": "off"
         }
@@ -65033,7 +65335,7 @@
          },
          "stopReason": "error",
          "errorMessage": "No more faux responses queued",
-         "timestamp": 1792787547415,
+         "timestamp": 1792877063167,
          "durationMs": 0,
          "thinkingLevel": "off"
         }
@@ -65329,10 +65631,10 @@
      "provider": "faux-probe",
      "modelId": "faux-1",
      "api": "faux-probe",
-     "id": "deferred:1792787547416:m2b2kcss19",
+     "id": "deferred:1792877063168:mh82f0o8dbq",
      "pollAfterMs": 5
     },
-    "timestamp": 1792787547416,
+    "timestamp": 1792877063168,
     "durationMs": 0
    },
    {
@@ -65360,10 +65662,10 @@
      "provider": "faux-probe",
      "modelId": "faux-1",
      "api": "faux-probe",
-     "id": "deferred:1792787547416:m2b2kcss19",
+     "id": "deferred:1792877063168:mh82f0o8dbq",
      "pollAfterMs": 5
     },
-    "timestamp": 1792787547416,
+    "timestamp": 1792877063168,
     "durationMs": 0
    },
    {
@@ -65416,7 +65718,7 @@
     },
     "stopReason": "error",
     "errorMessage": "Unknown faux deferred response: unknown",
-    "timestamp": 1792787547416,
+    "timestamp": 1792877063168,
     "durationMs": 0
    }
   ]

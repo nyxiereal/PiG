@@ -768,5 +768,17 @@
    "old": "ORDER BY started_ms, id\", string(encoded))",
    "new": "ORDER BY started_ms DESC, id\", string(encoded))"
   }
+ ],
+ "packages/durable/src/harness/partial-changes.ts": [
+  {
+   "file": "durable/harness/partial_changes.go",
+   "old": "\t\tpending.text = append(pending.text, delta...)\n",
+   "new": "\t\tpending.text = []byte(delta)\n"
+  },
+  {
+   "file": "durable/harness/partial_changes.go",
+   "old": "\t\t\tcall.changes = append(call.changes, change)\n",
+   "new": "\t\t\tcall.changes = append(call.changes[:0], change)\n"
+  }
  ]
 }

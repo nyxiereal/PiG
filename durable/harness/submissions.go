@@ -15,9 +15,9 @@ import (
 )
 
 // commitOnLine runs change on the Session line and returns its typed result.
-func commitOnLine[T any](ctx context.Context, line *session.SessionImpl, scope session.TransactionScope, change func(tx *session.Transaction) (T, error)) (T, error) {
+func commitOnLine[T any](ctx context.Context, line *session.SessionImpl, scope session.TransactionScope, change func(tx *session.Transaction) (T, error), options ...durable.CommitOptions) (T, error) {
 	var zero T
-	value, err := line.CommitWith(ctx, func(tx *session.Transaction) (any, error) { return change(tx) }, scope)
+	value, err := line.CommitWith(ctx, func(tx *session.Transaction) (any, error) { return change(tx) }, scope, options...)
 	if err != nil {
 		return zero, err
 	}
@@ -60,7 +60,7 @@ func NewSubmissions(line *session.SessionImpl, storage durable.Storage, now func
 		root = telemetry.NoopTelemetryContext
 	}
 	submissions := &Submissions{telemetry: root, line: line, storage: storage, now: now, queueModes: queueModes, resume: resume}
-	line.ObserveCommits(func(ctx context.Context, publication durable.CommitPublication) {
+	line.ObserveCommits(func(ctx context.Context, publication session.ObservedCommit) {
 		submissions.observe(publication)
 	})
 	line.SubscribeClose(func() {
@@ -214,7 +214,11 @@ func (submissions *Submissions) Abort(ctx context.Context, id durable.Submission
 	})
 }
 
-func (submissions *Submissions) observe(publication durable.CommitPublication) {
+func (submissions *Submissions) observe(publication session.ObservedCommit) {
+	// A commit held in memory changes documents only.
+	if publication.Memory {
+		return
+	}
 	for _, change := range publication.Changes {
 		write, ok := change.(durable.SubmissionWrite)
 		if !ok || !isSettledSubmission(write.Value) {

@@ -232,7 +232,7 @@ type HarnessInspection struct {
 	Submissions []durable.SubmissionRecord
 }
 
-// ConversationWatch is a serialized exact-frame watch of the structural view.
+// ConversationWatch is a serialized watch of the structural view.
 type ConversationWatch = durable.WatchHandle[ConversationView]
 
 // Conversation is a stateless handle for one conversation, bound to the Harness that returned it. Compare handles by Id.
@@ -248,8 +248,8 @@ type Conversation interface {
 	Reset(ctx context.Context, handoff *string) error
 	// Compact admits a manual compaction task and returns its ID (spec §8.7).
 	Compact(ctx context.Context, instructions *string) (durable.TaskId, error)
-	// Commit runs a Session commit whose tx.CreateTask defaults to this conversation.
-	Commit(ctx context.Context, change func(tx durable.Tx) (any, error)) (any, error)
+	// Commit runs a Session commit whose tx.CreateTask defaults to this conversation; options are as for Session.Commit.
+	Commit(ctx context.Context, change func(tx durable.Tx) (any, error), options ...durable.CommitOptions) (any, error)
 	// Context returns the committed raw active transcript and model context. With options.At, it returns the context as
 	// of that visible entry: the same view Fork(at) would start with, without creating a conversation.
 	Context(ctx context.Context, options *durable.ContextOptions) (durable.ContextView, error)
@@ -261,7 +261,7 @@ type Conversation interface {
 	Abort(ctx context.Context, options *durable.ConversationAbortOptions) error
 	// WaitForIdle returns when the ordinary ownership scope has no live non-background task.
 	WaitForIdle(ctx context.Context) error
-	// Watch returns the structural view (spec §9.3) as a serialized exact-frame watch with bounded pending frames.
+	// Watch returns the structural view (spec §9.3) as a serialized watch; commits made while its listener runs arrive folded.
 	Watch(ctx context.Context) (ConversationWatch, error)
 }
 
@@ -301,7 +301,7 @@ type Harness interface {
 	// Usage is the Session total: every conversation's pi.usage summed.
 	Usage(ctx context.Context) (UsageState, error)
 	// WatchTaskGraph returns every live task with its owner edge, status, and owned conversations (spec §9.5), as a
-	// serialized exact-frame watch with bounded pending frames.
+	// serialized watch; commits made while its listener runs arrive folded.
 	WatchTaskGraph(ctx context.Context) (TaskGraphWatch, error)
 }
 

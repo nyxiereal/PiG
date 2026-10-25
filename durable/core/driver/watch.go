@@ -21,8 +21,8 @@ import (
 // core answers watch.open with the committed value at the acquisition boundary and then publishes every later frame of that
 // watch in a `published` notice {watchId, frame: {value?, ops}}, in commit order, with no overlap with the first value and no
 // gap. A document frame carries its value; a view or graph frame carries only ops, which the driver applies to the value it
-// holds. Frames are delivered through chord.Watch, the serialized exact-frame observer of the Go port of
-// chord/src/watch.ts, so Start, Stop, cancellation and the bounded pending queue are Pi's. A frame whose value is null
+// holds. Frames are delivered through chord.Watch, the serialized observer of the Go port of
+// chord/src/watch.ts, so Start, Stop, cancellation and the folding of pending ops are Pi's. A frame whose value is null
 // is the retirement of a document: the driver retires the watch, which delivers [["r", null]] and ends retired.
 
 // rawFrame is one frame as the core published it; value is nil when the frame carries only ops.
@@ -314,7 +314,7 @@ func typed[T any](v any) (T, error) {
 // watchOf wraps a mount in a chord.Watch delivering on the session's scheduler.
 func watchOf[T any](ctx context.Context, m *mountSource[T]) *chord.Watch[T] {
 	var once sync.Once
-	watch := chord.NewWatch(m.first, func() { once.Do(func() { m.hub.release(m.id); m.closeCore() }) }, m.hub.report, nil).On(m.hub.sched)
+	watch := chord.NewWatch(m.first, func() { once.Do(func() { m.hub.release(m.id); m.closeCore() }) }, m.hub.report).On(m.hub.sched)
 	m.hub.bind(m.id, func(f rawFrame) {
 		// The core's frame of a retired document carries the value null: the source's explicit retirement.
 		if f.retires() {
@@ -366,7 +366,7 @@ func (c *conversation) Watch(ctx context.Context) (harness.ConversationWatch, er
 	return watchOf(ctx, m), nil
 }
 
-// WatchTaskGraph is a serialized exact-frame watch of the task graph.
+// WatchTaskGraph is a serialized watch of the task graph.
 func (s *coreSession) WatchTaskGraph(ctx context.Context) (harness.TaskGraphWatch, error) {
 	m, err := openWatch(ctx, s, map[string]any{"kind": "graph"}, typed[harness.TaskGraph], reduceTaskGraph)
 	if err != nil || m == nil {

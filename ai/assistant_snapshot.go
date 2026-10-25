@@ -8,11 +8,11 @@ import (
 	"unicode/utf8"
 )
 
-// cloneAssistantMessageFrom is cloneAssistantMessage for the next snapshot of a message whose previous snapshot is previous. A tool call whose arguments equal the previous snapshot's shares its immutable copy instead of copying again, so publishing an event copies only what changed since the last event. settled may be nil: see cloneAssistantContentFrom.
-func cloneAssistantMessageFrom(message AssistantMessage, previous, settled []AssistantContentBlock) AssistantMessage {
+// cloneAssistantMessageFrom is cloneAssistantMessage for the next snapshot of a message whose previous snapshot is previous. A tool call whose arguments equal the previous snapshot's shares its immutable copy instead of copying again, so publishing an event copies only what changed since the last event.
+func cloneAssistantMessageFrom(message AssistantMessage, previous []AssistantContentBlock) AssistantMessage {
 	content := message.Content
 	message = cloneAssistantMessage(withoutContent(message))
-	message.Content = cloneAssistantContentFrom(content, previous, settled)
+	message.Content = cloneAssistantContentFrom(content, previous)
 	return message
 }
 
@@ -22,8 +22,8 @@ func withoutContent(message AssistantMessage) AssistantMessage {
 	return message
 }
 
-// cloneAssistantContentFrom copies blocks as cloneAssistantContent does, reusing what the previous snapshot, previous, already holds of a block that has not changed; a block it has to copy it boxes once, and a block it reuses it does not box at all. settled, when it is not nil, holds at the index of a tool call that still defers its argument text the block that settling the call would make, or nil: a snapshot that holds it needs no copy of the call and no later settlement.
-func cloneAssistantContentFrom(blocks, previous, settled []AssistantContentBlock) []AssistantContentBlock {
+// cloneAssistantContentFrom copies blocks as cloneAssistantContent does, reusing what the previous snapshot, previous, already holds of a block that has not changed; a block it has to copy it boxes once, and a block it reuses it does not box at all.
+func cloneAssistantContentFrom(blocks, previous []AssistantContentBlock) []AssistantContentBlock {
 	if blocks == nil || len(previous) == 0 {
 		return cloneAssistantContent(blocks)
 	}
@@ -45,10 +45,6 @@ func cloneAssistantContentFrom(blocks, previous, settled []AssistantContentBlock
 				}
 			}
 		case ToolCall:
-			if value.deferredArguments != "" && i < len(settled) && settled[i] != nil {
-				out[i] = settled[i]
-				continue
-			}
 			var earlier ToolCall
 			hasEarlier := false
 			if i < len(previous) {
@@ -156,7 +152,7 @@ func identicalPlainJSON(left, right any) bool {
 
 // sameToolCall reports whether the snapshot of a tool call is the same value as an earlier snapshot, which holds when its arguments and member order are the very objects the earlier one holds.
 func sameToolCall(earlier, call ToolCall) bool {
-	return sameToolCallIdentity(earlier, call) && earlier.deferredArguments == call.deferredArguments &&
+	return sameToolCallIdentity(earlier, call) &&
 		reflect.ValueOf(earlier.argumentOrder).Pointer() == reflect.ValueOf(call.argumentOrder).Pointer() &&
 		bytes.Equal(earlier.nonObjectArguments, call.nonObjectArguments) &&
 		(earlier.Arguments == nil) == (call.Arguments == nil) &&
@@ -165,6 +161,6 @@ func sameToolCall(earlier, call ToolCall) bool {
 
 // sameToolCallIdentity reports whether two tool calls agree in everything but their arguments, member order and deferred argument text.
 func sameToolCallIdentity(a, b ToolCall) bool {
-	return a.scratch == b.scratch && a.ID == b.ID && a.Name == b.Name && a.ThoughtSignature == b.ThoughtSignature &&
+	return a.ID == b.ID && a.Name == b.Name && a.ThoughtSignature == b.ThoughtSignature &&
 		a.Namespace == b.Namespace && a.ArgumentsError == b.ArgumentsError
 }

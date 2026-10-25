@@ -66,8 +66,9 @@ type PiMessagesEvent struct {
 }
 
 type piMessagesEventConverter struct {
-	partial  *AssistantMessage
-	toolJSON map[int]string
+	partial *AssistantMessage
+	// toolArguments reads the argument deltas of each open tool call, off the content block.
+	toolArguments map[int]*ToolCallArgumentsStream
 	// streamed appends deltas to the open blocks without copying their earlier bytes again.
 	streamed streamedBlocks
 	// observe is the bound OnProviderStreamEvent callback, or nil.
@@ -82,7 +83,7 @@ func newPiMessagesEventConverter(providerID, modelID string) *piMessagesEventCon
 			Content: []AssistantContentBlock{}, API: APIPiMessages, Provider: providerID, Model: modelID,
 			StopReason: StopReasonPending, Timestamp: time.Now().UnixMilli(),
 		},
-		toolJSON: map[int]string{},
+		toolArguments: map[int]*ToolCallArgumentsStream{},
 	}
 }
 
@@ -196,7 +197,7 @@ func (c *piMessagesEventConverter) startBlock(event PiMessagesEvent) (AssistantM
 		block, result = ThinkingContent{}, ThinkingStartEvent{ContentIndex: index, Partial: c.partial}
 	default:
 		block, result = ToolCall{ID: event.ID, Name: event.ToolName, Arguments: JsonObject{}}, ToolCallStartEvent{ContentIndex: index, Partial: c.partial}
-		c.toolJSON[index] = ""
+		c.toolArguments[index] = NewToolCallArgumentsStream()
 		c.streamed.release(index)
 	}
 	if index == len(c.partial.Content) {
@@ -230,9 +231,11 @@ func (c *piMessagesEventConverter) deltaBlock(event PiMessagesEvent) (AssistantM
 		c.partial.Content[index] = block
 		return ThinkingDeltaEvent{ContentIndex: index, Delta: event.Delta, Partial: c.partial}, nil
 	case ToolCall:
-		c.toolJSON[index] = c.streamed.appendArguments(index, c.toolJSON[index], event.Delta)
-		block.setParsedArguments(c.streamed.streamingArguments(index, c.toolJSON[index]))
-		c.partial.Content[index] = block
+		if arguments := c.toolArguments[index]; arguments != nil {
+			parsed, order := arguments.Append(event.Delta)
+			block.setParsedArguments(parsed, order, nil)
+			c.partial.Content[index] = block
+		}
 		return ToolCallDeltaEvent{ContentIndex: index, Delta: event.Delta, Partial: c.partial}, nil
 	}
 	return nil, fmt.Errorf("pi-messages %s does not match content block %d", event.Type, index)
@@ -258,7 +261,7 @@ func (c *piMessagesEventConverter) endBlock(event PiMessagesEvent) (AssistantMes
 			block = mergeToolCall(block, *event.ToolCall)
 		}
 		c.partial.Content[index] = block
-		delete(c.toolJSON, index)
+		delete(c.toolArguments, index)
 		c.streamed.release(index)
 		return ToolCallEndEvent{ContentIndex: index, ToolCall: block, Partial: c.partial}, nil
 	}

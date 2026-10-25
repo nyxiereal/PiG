@@ -1344,7 +1344,7 @@ func (state *googleStreamState) handle(chunk *geminiStreamChunk) error {
 
 					// Pi builds the whole tool call, arguments included, before it pushes toolcall_start (google-generative-ai.ts:200-215).
 					builder.toolCallDelta(streamToolCallDelta{
-						index: partIdx, id: toolID, name: fc.Name, argumentsDelta: string(argsJSON), initialArguments: parsed.Arguments, thoughtSignature: part.ThoughtSignature,
+						index: partIdx, id: toolID, name: fc.Name, argumentsDelta: string(argsJSON), initialArguments: parsed.Arguments, thoughtSignature: part.ThoughtSignature, recordOnly: true,
 					})
 					builder.endToolCall(partIdx)
 				}

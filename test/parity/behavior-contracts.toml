@@ -1,4 +1,4 @@
-upstream_version = "1.4.0+acf83acf"
+upstream_version = "1.4.0+38ff9917"
 
 [[contract]]
 id = "coding-agent/extension-input/remapped-confirm"
@@ -4659,9 +4659,9 @@ evidence = [
 
 [contract.upstream]
 path = "packages/coding-agent/src/modes/interactive/components/tool-execution.ts"
-start = "\toverride render(width: number): string[] {\n\t\tif (this.hideComponent)"
+start = "\toverride render(width: number): string[] {\n\t\tif (this.argsPending) this.updateDisplay();\n\t\tif (this.hideComponent)"
 end = "\toverride handleMouse(event: TuiMouseEvent)"
-sha256 = "a6329e2d1691e0985c355d4b431bf358bfab627ad11d8075c33b1fb16cae1556"
+sha256 = "e3930d4b11d5a99a498b9893a2eb1f7f12cba5ad03f9b4a147f2f45c889fe9b8"
 keybindings = []
 
 [[contract]]

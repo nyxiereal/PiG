@@ -21,11 +21,15 @@ import (
 // what the base (b02c2ceabc) allocated. Delivering each update to the Agent and Session listeners, which do nothing with
 // it, was most of the base's cost; on openai-completions the eager parse of the partial arguments was most of the rest.
 //
-//	faux    the faux provider: the publication of the delta, its event, the consumer's await of it (13.5 after lw-quiet)
+//	faux    the faux provider: the publication of the delta, its event, the consumer's await of it, and since Pi f715a15c1 the
+//	        provider's own ToolCallArgumentsStream.Append of the delta (faux.ts:429-439), whose partial arguments every
+//	        snapshot of the partial message carries (13.5 after lw-quiet, 12.5 at 63e93632d6 before f715a15c1, 22.5 with
+//	        the incremental parse: the +10 are Append, its open-path copy and the clones of the arguments each snapshot takes,
+//	        all in streamWithDeltas, none in the consumer; the ceiling keeps its 7.5 of room above the measured cost)
 //	openai  openai-completions over local HTTP, one SSE record per delta: the record's decoding too (21.7 after lw-quiet)
 const (
 	printTextFauxDeltaAllocsBase      = 45
-	printTextFauxDeltaAllocsCeiling   = 20
+	printTextFauxDeltaAllocsCeiling   = 30
 	printTextOpenAIDeltaAllocsBase    = 71.5
 	printTextOpenAIDeltaAllocsCeiling = 35
 )

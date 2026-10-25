@@ -12,8 +12,8 @@ Use counts (`uses`) are the number of the 255 scanned npm packages that import t
 |---|---|---|---|---|---|---|
 | `pi-coding-agent` | 920 | 306 | 910 | 392 | 392 | 392 |
 | `pi-tui` | 365 | 85 | 364 | 147 | 147 | 147 |
-| `pi-ai` | 97 | 197 | 97 | 67 | 67 | 67 |
-| `pi-ai/compat` | 156 | 204 | 156 | 123 | 123 | 123 |
+| `pi-ai` | 105 | 199 | 105 | 75 | 75 | 75 |
+| `pi-ai/compat` | 164 | 206 | 164 | 131 | 131 | 131 |
 | `pi-agent-core` | 45 | 34 | 45 | 45 | 45 | 45 |
 
 ## Lanes that own gaps
@@ -22,7 +22,7 @@ Use counts (`uses`) are the number of the 255 scanned npm packages that import t
 |---|---|---|---|---|
 | C2Sessions | C2Sessions lane (createAgentSession family, E1/E6) | 0.5.2 | 405 | Conformance rows for createAgentSession, createAgentSessionRuntime and the pi-agent-core Agent loop in all four SDKs (branch feat/sdk-child-agent-sessions) |
 | SdkExportsLedger | SdkExportsLedger lane (Pi application internals no extension scan imports) | 0.5.2 | 1158 | Owner decision per export, listed with usage counts in handoffs/0.5.2/sdk-exports-internals.md: a numbered divergence in docs/parity/DIVERGENCES.md (cells become divergence:D<n>), or a real lane with a port and a conformance row |
-| SdkPiAiHelpers | SdkPiAiHelpers lane (pi-ai pure helpers, StringEnum, host getters, E17-E22) | 0.5.2 | 150 | Pure helpers with vector tests from Pi at the pin; host getters and the pi-ai compat calls with a conformance row per SDK |
+| SdkPiAiHelpers | SdkPiAiHelpers lane (pi-ai pure helpers, StringEnum, host getters, E17-E22) | 0.5.2 | 198 | Pure helpers with vector tests from Pi at the pin; host getters and the pi-ai compat calls with a conformance row per SDK |
 | SdkSessionGraph | SdkSessionGraph lane (SessionManager/SettingsManager/ModelRuntime/resource loader, E2-E5) | 0.5.2 | 360 | Host calls for session open/list/inMemory, scoped settings, standalone model runtime, resource loader and package manager, with a conformance row per SDK |
 | SdkTuiHelpers | SdkTuiHelpers lane (pi-tui helpers, keys, keybindings, theme and rendering helpers, E8-E16) | 0.5.2 | 249 | Pure helpers ported per SDK with vector tests from Pi at the pin (test/parity/sdk-vectors), keybinding and theme helpers with a conformance row per SDK |
 
@@ -1380,7 +1380,15 @@ None.
 | `ModelsError.stack` | 0 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
 | `PI_AI_VERSION` | 0 | served | gap:SdkExportsLedger | gap:SdkExportsLedger | gap:SdkExportsLedger |
 | `PI_ATTRIBUTION` | 0 | served | gap:SdkExportsLedger | gap:SdkExportsLedger | gap:SdkExportsLedger |
+| `StreamingJsonParser` | 0 | served | gap:SdkPiAiHelpers | gap:SdkPiAiHelpers | gap:SdkPiAiHelpers |
+| `StreamingJsonParser.append` | 0 | served | gap:SdkPiAiHelpers | gap:SdkPiAiHelpers | gap:SdkPiAiHelpers |
+| `StreamingJsonParser.snapshot` | 0 | served | gap:SdkPiAiHelpers | gap:SdkPiAiHelpers | gap:SdkPiAiHelpers |
 | `StringEnum` | 28 | served | native:StringEnum | native:string_enum | native:string_enum |
+| `ToolCallArgumentsStream` | 0 | served | gap:SdkPiAiHelpers | gap:SdkPiAiHelpers | gap:SdkPiAiHelpers |
+| `ToolCallArgumentsStream.append` | 0 | served | gap:SdkPiAiHelpers | gap:SdkPiAiHelpers | gap:SdkPiAiHelpers |
+| `ToolCallArgumentsStream.finish` | 0 | served | gap:SdkPiAiHelpers | gap:SdkPiAiHelpers | gap:SdkPiAiHelpers |
+| `ToolCallArgumentsStream.replace` | 0 | served | gap:SdkPiAiHelpers | gap:SdkPiAiHelpers | gap:SdkPiAiHelpers |
+| `ToolCallArgumentsStream.text` | 0 | served | gap:SdkPiAiHelpers | gap:SdkPiAiHelpers | gap:SdkPiAiHelpers |
 | `Type` | 14 | served | gap:SdkPiAiHelpers | gap:SdkPiAiHelpers | gap:SdkPiAiHelpers |
 | `appendAssistantMessageDiagnostic` | 1 | served | gap:SdkExportsLedger | gap:SdkExportsLedger | gap:SdkExportsLedger |
 | `calculateCost` | 8 | served | native:CalculateCost | native:calculate_cost | native:calculate_cost |
@@ -1490,7 +1498,15 @@ None.
 | `ModelsError.stack` | 0 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
 | `PI_AI_VERSION` | 0 | served | gap:SdkExportsLedger | gap:SdkExportsLedger | gap:SdkExportsLedger |
 | `PI_ATTRIBUTION` | 0 | served | gap:SdkExportsLedger | gap:SdkExportsLedger | gap:SdkExportsLedger |
+| `StreamingJsonParser` | 0 | served | gap:SdkPiAiHelpers | gap:SdkPiAiHelpers | gap:SdkPiAiHelpers |
+| `StreamingJsonParser.append` | 0 | served | gap:SdkPiAiHelpers | gap:SdkPiAiHelpers | gap:SdkPiAiHelpers |
+| `StreamingJsonParser.snapshot` | 0 | served | gap:SdkPiAiHelpers | gap:SdkPiAiHelpers | gap:SdkPiAiHelpers |
 | `StringEnum` | 28 | served | native:StringEnum | native:string_enum | native:string_enum |
+| `ToolCallArgumentsStream` | 0 | served | gap:SdkPiAiHelpers | gap:SdkPiAiHelpers | gap:SdkPiAiHelpers |
+| `ToolCallArgumentsStream.append` | 0 | served | gap:SdkPiAiHelpers | gap:SdkPiAiHelpers | gap:SdkPiAiHelpers |
+| `ToolCallArgumentsStream.finish` | 0 | served | gap:SdkPiAiHelpers | gap:SdkPiAiHelpers | gap:SdkPiAiHelpers |
+| `ToolCallArgumentsStream.replace` | 0 | served | gap:SdkPiAiHelpers | gap:SdkPiAiHelpers | gap:SdkPiAiHelpers |
+| `ToolCallArgumentsStream.text` | 0 | served | gap:SdkPiAiHelpers | gap:SdkPiAiHelpers | gap:SdkPiAiHelpers |
 | `Type` | 14 | served | gap:SdkPiAiHelpers | gap:SdkPiAiHelpers | gap:SdkPiAiHelpers |
 | `anthropicMessagesApi` | 3 | served | gap:SdkExportsLedger | gap:SdkExportsLedger | gap:SdkExportsLedger |
 | `appendAssistantMessageDiagnostic` | 1 | served | gap:SdkExportsLedger | gap:SdkExportsLedger | gap:SdkExportsLedger |

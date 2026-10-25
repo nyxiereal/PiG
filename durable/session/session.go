@@ -23,6 +23,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"slices"
 	"sync"
 	"time"
 
@@ -55,6 +56,9 @@ type Hooks struct {
 	SetTimer durable.SetTimer
 	// ReadOnly refuses every commit with writes (HarnessOptions.ReadOnly).
 	ReadOnly bool
+	// PersistWithinMs is the default window of a deferred commit, read at each use (HarnessOptions.settings.progress.persistWithinMs);
+	// nil selects the default, 1,000 ms.
+	PersistWithinMs func() *float64
 }
 
 type commitListener struct {
@@ -97,9 +101,14 @@ type SessionImpl struct {
 	commitOrder     []*commitListener
 	// internalOrder is the Session's own listeners, such as its scheduler's: they keep memory in step with storage, so a
 	// failure in one fails the Session. They run before the host's.
-	internalOrder []*commitListener
-	closeOrder    []*closeListener
-	closing       chan struct{}
+	internalOrder []*internalListener
+	// holds are the documents with held changes (durable.CommitPersistence), by incarnation (record ID), each pinned in the
+	// cache until they are stored; holdOrder is the same in the order they were first held. holdTimer is the armed store.
+	holds      map[durable.DocumentId]*heldDocument
+	holdOrder  []*heldDocument
+	holdTimer  *holdTimer
+	closeOrder []*closeListener
+	closing    chan struct{}
 	// listenersRan is closed once the close listeners ran; set together with closing.
 	listenersRan chan struct{}
 	closeErr     error
@@ -122,12 +131,17 @@ type CreateSessionOptions struct {
 	DocumentRetentionMs *float64
 	// SetTimer arms the timers that evict idle documents; nil selects Go timers (see durable.SetTimer).
 	SetTimer durable.SetTimer
+	// PersistWithinMs is the default window of a deferred commit (durable.CommitPersistence): how long it may stay in
+	// memory before it is stored. Nil selects the default, 1,000 ms; +Inf waits for a reading or writing commit or close.
+	// Anything else that is not a number of milliseconds, 0 or more, means the default.
+	PersistWithinMs *float64
 }
 
 // CreateSession opens a Session kernel over one storage backend.
 func CreateSession(storage durable.Storage, options ...CreateSessionOptions) *SessionImpl {
 	var now func() float64
 	var retention func() *float64
+	var persistWithin func() *float64
 	var setTimer durable.SetTimer
 	if len(options) > 0 {
 		now = options[0].Now
@@ -135,8 +149,11 @@ func CreateSession(storage durable.Storage, options ...CreateSessionOptions) *Se
 		if ms := options[0].DocumentRetentionMs; ms != nil {
 			retention = func() *float64 { return ms }
 		}
+		if ms := options[0].PersistWithinMs; ms != nil {
+			persistWithin = func() *float64 { return ms }
+		}
 	}
-	return NewSessionImpl(storage, Hooks{SetTimer: setTimer}, now, retention)
+	return NewSessionImpl(storage, Hooks{SetTimer: setTimer, PersistWithinMs: persistWithin}, now, retention)
 }
 
 // NewSessionImpl opens a Session kernel with extension hooks. now is the wall clock in milliseconds for task times;
@@ -146,7 +163,7 @@ func NewSessionImpl(storage durable.Storage, hooks Hooks, now func() float64, do
 	if now == nil {
 		now = func() float64 { return float64(time.Now().UnixMilli()) }
 	}
-	session := &SessionImpl{hooks: hooks, scheduler: chord.NewDeliveryScheduler(), documents: map[string]*LoadedDocument{}, cache: newDocumentCache(), now: now, retentionSource: documentRetentionMs, failed: make(chan struct{}), closed: make(chan struct{})}
+	session := &SessionImpl{hooks: hooks, scheduler: chord.NewDeliveryScheduler(), documents: map[string]*LoadedDocument{}, holds: map[durable.DocumentId]*heldDocument{}, cache: newDocumentCache(), now: now, retentionSource: documentRetentionMs, failed: make(chan struct{}), closed: make(chan struct{})}
 	session.timers = durable.HostTimers(hooks.SetTimer, func(err error) {
 		session.report(unscoped, err, durable.ReportInfo{Type: durable.ReportHostError, Callback: durable.HostCallbackSetTimer})
 	})
@@ -353,19 +370,34 @@ func (session *SessionImpl) failIn(ctx context.Context, err error) {
 	session.report(ctx, err, durable.ReportInfo{Type: durable.ReportSessionFailed})
 }
 
-// Commit runs one atomic transaction on the Session mutation line.
-func (session *SessionImpl) Commit(ctx context.Context, change func(tx durable.Tx) (any, error)) (any, error) {
-	return session.CommitWith(ctx, func(tx *Transaction) (any, error) { return change(tx) }, TransactionScope{})
+// Commit runs one atomic transaction on the Session mutation line. options.Persistence may defer storing it
+// (durable.CommitPersistence).
+func (session *SessionImpl) Commit(ctx context.Context, change func(tx durable.Tx) (any, error), options ...durable.CommitOptions) (any, error) {
+	return session.CommitWith(ctx, func(tx *Transaction) (any, error) { return change(tx) }, TransactionScope{}, options...)
+}
+
+// admitCommit is the admission check of a commit: the Session must be usable, and the options valid. It returns how long
+// the commit may stay in memory before it is stored; nil when it is immediate.
+func (session *SessionImpl) admitCommit(options []durable.CommitOptions) (*float64, error) {
+	if err := session.assertUsable(); err != nil {
+		return nil, err
+	}
+	single, err := durable.SingleCommitOptions(options)
+	if err != nil {
+		return nil, err
+	}
+	return session.deferral(single.Persistence), nil
 }
 
 // CommitWith is the internal commit exposing the concrete transaction and its internal operations, such as the
 // reserved-ID root bootstrap and task replacement. scope sets the default task conversation and the task attributed
 // to appended entries.
-func (session *SessionImpl) CommitWith(ctx context.Context, change func(tx *Transaction) (any, error), scope TransactionScope) (any, error) {
-	if err := session.assertUsable(); err != nil {
+func (session *SessionImpl) CommitWith(ctx context.Context, change func(tx *Transaction) (any, error), scope TransactionScope, options ...durable.CommitOptions) (any, error) {
+	withinMs, err := session.admitCommit(options)
+	if err != nil {
 		return nil, err
 	}
-	result, err := enqueue(session, true, lineadmission.From(ctx), func() (any, error) { return session.runCommit(ctx, change, scope) })
+	result, err := enqueue(session, true, lineadmission.From(ctx), func() (any, error) { return session.runCommit(ctx, change, scope, withinMs) })
 	return result, err
 }
 
@@ -421,19 +453,20 @@ func (ticket *LineTicket) Release() {
 }
 
 // CommitWithTicket runs a commit at the ticket's position and releases it.
-func (session *SessionImpl) CommitWithTicket(ticket *LineTicket, ctx context.Context, change func(tx *Transaction) (any, error), scope TransactionScope) (any, error) {
+func (session *SessionImpl) CommitWithTicket(ticket *LineTicket, ctx context.Context, change func(tx *Transaction) (any, error), scope TransactionScope, options ...durable.CommitOptions) (any, error) {
 	if ticket == nil {
-		return session.CommitWith(ctx, change, scope)
+		return session.CommitWith(ctx, change, scope, options...)
 	}
 	result, err := func() (any, error) {
 		defer ticket.Release()
 		if ticket.previous != nil {
 			<-ticket.previous
 		}
-		if err := session.assertUsable(); err != nil {
+		withinMs, err := session.admitCommit(options)
+		if err != nil {
 			return nil, err
 		}
-		return session.runCommit(ctx, change, scope)
+		return session.runCommit(ctx, change, scope, withinMs)
 	}()
 	return result, err
 }
@@ -663,6 +696,12 @@ func (session *SessionImpl) beginClose(ctx context.Context) <-chan struct{} {
 			}
 			session.cache.sweep = nil
 		}
+		if timer := session.holdTimer; timer != nil {
+			if timer.disarm != nil {
+				timer.disarm()
+			}
+			session.holdTimer = nil
+		}
 		listeners := session.closeOrder
 		session.closeOrder = nil
 		session.mu.Unlock()
@@ -678,14 +717,25 @@ func (session *SessionImpl) beginClose(ctx context.Context) <-chan struct{} {
 				session.hooks.BeforeClose()
 			}
 			_, err := enqueue(session, false, nil, func() (struct{}, error) {
+				// Last, after the writes at close (BeforeClose), while the trackers are still here. A failed Session writes
+				// nothing; a failing store fails it, and the backend still closes.
+				var unstored error
+				if session.failure() == nil {
+					unstored = session.storeHolds(cleanup, session.allHolds())
+				}
 				session.mu.Lock()
 				session.commitOrder = nil
 				session.internalOrder = nil
 				clear(session.documents)
 				session.cache.clearIdle()
 				clear(session.cache.attached)
+				clear(session.holds)
+				session.holdOrder = nil
 				session.mu.Unlock()
-				return struct{}{}, session.storage.Close(cleanup)
+				if err := session.storage.Close(cleanup); err != nil {
+					return struct{}{}, err
+				}
+				return struct{}{}, unstored
 			})
 			session.mu.Lock()
 			session.closeErr = err
@@ -767,13 +817,22 @@ func (session *SessionImpl) subscribeCommits(listener func(ctx context.Context, 
 	}, nil
 }
 
-// ObserveCommits is SubscribeCommits for the Session's own components, whose state follows each commit. A panic leaves
-// that state behind storage, so it fails the Session instead of being reported. They run before the host's listeners.
-func (session *SessionImpl) ObserveCommits(listener func(ctx context.Context, publication durable.CommitPublication)) func() {
-	if err := session.assertUsable(); err != nil {
+// ObserveCommits observes every commit as memory adopts it (ObservedCommit), for the Session's own components, whose state
+// follows memory. A panic leaves that state behind, so it fails the Session instead of being reported. They run before the
+// host's listeners.
+func (session *SessionImpl) ObserveCommits(listener func(ctx context.Context, commit ObservedCommit)) func() {
+	unsubscribe, err := session.observeCommits(listener)
+	if err != nil {
 		panic(err)
 	}
-	entry := &commitListener{listener: listener}
+	return unsubscribe
+}
+
+func (session *SessionImpl) observeCommits(listener func(ctx context.Context, commit ObservedCommit)) (func(), error) {
+	if err := session.assertUsable(); err != nil {
+		return nil, err
+	}
+	entry := &internalListener{listener: listener}
 	session.mu.Lock()
 	session.internalOrder = append(session.internalOrder, entry)
 	session.mu.Unlock()
@@ -786,7 +845,7 @@ func (session *SessionImpl) ObserveCommits(listener func(ctx context.Context, pu
 				return
 			}
 		}
-	}
+	}, nil
 }
 
 // CommitSubscriptions reports the number of live commit subscriptions. Upstream tests count them by wrapping
@@ -795,6 +854,14 @@ func (session *SessionImpl) CommitSubscriptions() int {
 	session.mu.Lock()
 	defer session.mu.Unlock()
 	return len(session.commitOrder)
+}
+
+// ObserverSubscriptions reports the number of live observers of the Session's own (ObserveCommits): a document watch holds
+// one, which sees a commit held in memory when it is adopted.
+func (session *SessionImpl) ObserverSubscriptions() int {
+	session.mu.Lock()
+	defer session.mu.Unlock()
+	return len(session.internalOrder)
 }
 
 // LineJobs reports the number of admitted line jobs that have not finished, so a caller can wait until work is queued
@@ -835,9 +902,15 @@ func (session *SessionImpl) subscribeClose(listener func()) (func(), error) {
 	}, nil
 }
 
-// UnloadDocuments drops every loaded tracker on the mutation line; later access cold-loads from Storage.
+// UnloadDocuments drops every loaded tracker on the mutation line, held changes stored first; later access cold-loads from
+// Storage.
 func (session *SessionImpl) UnloadDocuments() error {
 	_, err := enqueue(session, false, nil, func() (struct{}, error) {
+		if session.failure() == nil {
+			if err := session.storeHolds(unscoped, session.allHolds()); err != nil {
+				return struct{}{}, err
+			}
+		}
 		session.mu.Lock()
 		clear(session.documents)
 		session.cache.clearIdle()
@@ -859,7 +932,7 @@ func (session *SessionImpl) AwaitDeliveriesEntered(ctx context.Context) error {
 	return session.scheduler.AwaitEntered(ctx)
 }
 
-func (session *SessionImpl) runCommit(ctx context.Context, change func(tx *Transaction) (any, error), scope TransactionScope) (result any, err error) {
+func (session *SessionImpl) runCommit(ctx context.Context, change func(tx *Transaction) (any, error), scope TransactionScope, withinMs *float64) (result any, err error) {
 	if err := session.assertHealthy(); err != nil {
 		return nil, err
 	}
@@ -903,6 +976,23 @@ func (session *SessionImpl) runCommit(ctx context.Context, change func(tx *Trans
 		session.sweepDocuments()
 		return nil, durable.NewReadOnlySession("a commit with writes")
 	}
+	if withinMs != nil {
+		if held, ok := tx.holdable(writes); ok {
+			if err := session.hold(ctx, tx, held, *withinMs); err != nil {
+				return nil, err
+			}
+			session.sweepDocuments()
+			return result, nil
+		}
+	}
+	// The last step before Storage: held changes leave their queue only once nothing but Storage can fail.
+	var taken []*heldDocument
+	session.mu.Lock()
+	holding := len(session.holds) > 0
+	session.mu.Unlock()
+	if holding {
+		writes, taken = tx.takeHeld(writes, session.heldOf)
+	}
 	// Storage adopts the batch synchronously once it is durable, before its next commit; a panic here would reach
 	// Storage, so the callback keeps its own error.
 	var adoption *commitAdoption
@@ -939,7 +1029,10 @@ func (session *SessionImpl) runCommit(ctx context.Context, change func(tx *Trans
 		return nil, adoption.err
 	}
 	documents := adoption.documents
-	session.touchChanged(documents)
+	if len(taken) > 0 {
+		session.release(taken)
+	}
+	session.touchChanged(documents.stored)
 	session.publish(ctx, seq, writes, documents)
 	session.sweepDocuments()
 	return result, nil
@@ -948,13 +1041,13 @@ func (session *SessionImpl) runCommit(ctx context.Context, change func(tx *Trans
 // commitAdoption is what the Session's adopt callback made of one batch: the document changes, or the error that
 // failed the adoption.
 type commitAdoption struct {
-	documents []durable.DocumentCommitChange
+	documents adoptedDocuments
 	err       error
 }
 
-func (session *SessionImpl) publish(ctx context.Context, seq durable.Seq, writes []durable.StorageWrite, documents []durable.DocumentCommitChange) {
+func (session *SessionImpl) publish(ctx context.Context, seq durable.Seq, writes []durable.StorageWrite, documents adoptedDocuments) {
 	session.mu.Lock()
-	internal := append([]*commitListener(nil), session.internalOrder...)
+	internal := append([]*internalListener(nil), session.internalOrder...)
 	listeners := append([]*commitListener(nil), session.commitOrder...)
 	session.mu.Unlock()
 	observed := len(listeners) > 0 || len(internal) > 0
@@ -962,7 +1055,7 @@ func (session *SessionImpl) publish(ctx context.Context, seq durable.Seq, writes
 	traced := span != telemetry.NoopTelemetryContext
 	var changes []durable.CommitChange
 	if observed {
-		changes = make([]durable.CommitChange, 0, len(writes)+len(documents))
+		changes = make([]durable.CommitChange, 0, len(writes)+len(documents.stored))
 	}
 	for _, staged := range writes {
 		table, ok := staged.(durable.TableCommitChange)
@@ -997,16 +1090,37 @@ func (session *SessionImpl) publish(ctx context.Context, seq durable.Seq, writes
 	if !observed {
 		return
 	}
+	tables := len(changes)
+	for _, document := range documents.observed {
+		changes = append(changes, document)
+	}
+	commit := ObservedCommit{Seq: seq, Changes: changes}
+	// One publication for both, unless the commit also stored held changes, which only durable listeners get.
+	stored := durable.CommitPublication{Seq: seq, Changes: changes}
+	if documents.split {
+		stored.Changes = append(slices.Clone(changes[:tables]), documentChanges(documents.stored)...)
+	}
+	session.deliver(ctx, internal, listeners, commit, stored)
+}
+
+// documentChanges is documents as commit changes.
+func documentChanges(documents []durable.DocumentCommitChange) []durable.CommitChange {
+	changes := make([]durable.CommitChange, 0, len(documents))
 	for _, document := range documents {
 		changes = append(changes, document)
 	}
-	publication := durable.CommitPublication{Seq: seq, Changes: changes}
+	return changes
+}
+
+// deliver runs the Session's own observers with observed, then the host's listeners with stored. The commit is durable
+// (or, for a held one, adopted): a failing listener neither fails the commit nor skips the others, and the Session's own
+// observers fail the Session. Waiters that earlier listeners settled wake once the loop ends, and later publications start
+// clean.
+func (session *SessionImpl) deliver(ctx context.Context, internal []*internalListener, listeners []*commitListener, observed ObservedCommit, stored durable.CommitPublication) {
 	session.deferMu.Lock()
 	session.publishing = true
 	session.deferred = nil
 	session.deferMu.Unlock()
-	// The commit is durable: a failing listener neither fails the commit nor skips the others. Waiters that earlier
-	// listeners settled wake once the loop ends, and later publications start clean.
 	defer func() {
 		session.deferMu.Lock()
 		deferred := session.deferred
@@ -1017,10 +1131,10 @@ func (session *SessionImpl) publish(ctx context.Context, seq durable.Seq, writes
 		}
 	}()
 	for _, listener := range internal {
-		contained(func() { listener.listener(ctx, publication) }, func(err error) { session.failIn(ctx, err) })
+		contained(func() { listener.listener(ctx, observed) }, func(err error) { session.failIn(ctx, err) })
 	}
 	for _, listener := range listeners {
-		contained(func() { listener.listener(ctx, publication) }, session.reportListenerIn(ctx))
+		contained(func() { listener.listener(ctx, stored) }, session.reportListenerIn(ctx))
 	}
 }
 
@@ -1060,10 +1174,10 @@ func (session *SessionImpl) attachDocument(definition *durable.AnyDocDefinition,
 		closer()
 		unpin()
 	}
-	watch := NewSessionWatch(session, loaded.Tracker.Value(), detach, nil)
+	watch := NewSessionWatch(session, loaded.Tracker.Value(), detach)
 	observed := loaded.ValueVersion
 	recordId := loaded.Record.Id
-	commit, err := session.subscribeCommits(func(ctx context.Context, publication durable.CommitPublication) {
+	commit, err := session.observeCommits(func(ctx context.Context, publication ObservedCommit) {
 		for _, change := range publication.Changes {
 			document, ok := change.(durable.DocumentChange)
 			if !ok || document.Record.Id != recordId {
@@ -1119,10 +1233,18 @@ func (session *SessionImpl) loadDocument(ctx context.Context, definition *durabl
 		session.touchDocument(addressId)
 		return cached, nil
 	}
-	if cached != nil {
-		session.dropDocumentLocked(addressId)
-	}
 	session.mu.Unlock()
+	if cached != nil {
+		// The reload must find what memory holds: held changes are stored before their tracker goes.
+		if hold := session.heldOf(cached.Record.Id); hold != nil {
+			if err := session.storeHolds(ctx, []*heldDocument{hold}); err != nil {
+				return nil, err
+			}
+		}
+		session.mu.Lock()
+		session.dropDocumentLocked(addressId)
+		session.mu.Unlock()
+	}
 	record, err := session.storage.FindDocument(ctx, address, durable.CurrentPoint)
 	if err != nil || record == nil {
 		return nil, err

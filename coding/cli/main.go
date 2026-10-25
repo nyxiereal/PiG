@@ -278,29 +278,37 @@ func runPigPreSessionCommand(args []string) int {
 	return -1
 }
 
-// Seams for the Piglet Binary identity, replaced by tests that run the guard in-process; a Binary's values come from what
-// the build embedded.
-var (
-	isPigletBinary    = binarypiglet.IsPigletBinary
-	pigletOverlayBase = binarypiglet.OverlayBase
-	pigletBinaryName  = binarypiglet.Name
-)
+// pigletBinary is what the running executable says about its baked Piglet. The production path passes runningPigletBinary();
+// tests pass their own value, so the guard and the overlay resolution run unchanged without package state to swap.
+type pigletBinary struct {
+	// Is reports whether the executable is a Piglet Binary.
+	Is bool
+	// Name is the baked Piglet's name; it is read only to word a refusal.
+	Name func() string
+	// OverlayBase is the baked Piglet as the base of an overlay when the Binary accepts overlays (D202), else nil. It is read
+	// only when a Piglet was selected.
+	OverlayBase func() *piglet.OverlayBase
+}
+
+func runningPigletBinary() pigletBinary {
+	return pigletBinary{Is: binarypiglet.IsPigletBinary(), Name: binarypiglet.Name, OverlayBase: binarypiglet.OverlayBase}
+}
 
 // pigletBinaryOverlayRefusal returns the refusal for a Piglet requested from a Piglet Binary that does not accept
 // overlays, or "" when the run may go on. A Piglet Binary is bound to one immutable composition unless its Piglet set
 // build.allowOverlays (D202); otherwise running another Piglet is out of scope, so it names the Binary and points at the
 // setting and at raw pig.
-func pigletBinaryOverlayRefusal(flags map[string]any) string {
-	if !isPigletBinary() || !pigletWasRequested(flags) || pigletOverlayBase() != nil {
+func pigletBinaryOverlayRefusal(flags map[string]any, binary pigletBinary) string {
+	if !binary.Is || !pigletWasRequested(flags) || binary.OverlayBase() != nil {
 		return ""
 	}
-	return fmt.Sprintf("pig: this Piglet Binary (%s) runs only its built-in Piglet and does not accept --piglet overlays (nor PIG_PIGLET_PATH or PIG_PIGLET_NAME); build its Piglet with build.allowOverlays: true to accept them, or run the Piglet with stock pig (pig --piglet <name|path>)", pigletBinaryName())
+	return fmt.Sprintf("pig: this Piglet Binary (%s) runs only its built-in Piglet and does not accept --piglet overlays (nor PIG_PIGLET_PATH or PIG_PIGLET_NAME); build its Piglet with build.allowOverlays: true to accept them, or run the Piglet with stock pig (pig --piglet <name|path>)", binary.Name())
 }
 
 // enforcePigletBinaryScope fails closed when a Piglet Binary is asked to run a
 // different Piglet than the one it was built with and does not accept overlays.
 func enforcePigletBinaryScope(flags map[string]any) {
-	if message := pigletBinaryOverlayRefusal(flags); message != "" {
+	if message := pigletBinaryOverlayRefusal(flags, runningPigletBinary()); message != "" {
 		fmt.Fprintln(os.Stderr, message)
 		exitProcess(1)
 	}
@@ -322,11 +330,16 @@ func requestedPigletName(unknownFlags map[string]any) string {
 }
 
 func resolvePiglet(unknownFlags map[string]any, trustOverride *bool) (*piglet.Piglet, bool) {
+	return resolvePigletOn(unknownFlags, trustOverride, runningPigletBinary())
+}
+
+// resolvePigletOn is resolvePiglet for the given Piglet Binary identity.
+func resolvePigletOn(unknownFlags map[string]any, trustOverride *bool, binary pigletBinary) (*piglet.Piglet, bool) {
 	// pig additive (D202): a Piglet Binary that accepts overlays resolves the selected Piglet on top of its baked one. A run that
 	// selects no Piglet does no overlay work.
 	var base *piglet.OverlayBase
-	if pigletWasRequested(unknownFlags) {
-		base = pigletOverlayBase()
+	if binary.Is && pigletWasRequested(unknownFlags) {
+		base = binary.OverlayBase()
 	}
 	// Find the piglet path from flag or env.
 	var pigletPath string

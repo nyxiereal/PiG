@@ -9,23 +9,23 @@ import (
 	"github.com/MichaelKinsy/PiG/coding/piglet"
 )
 
-// asPigletBinary makes the guard and resolvePiglet see a Piglet Binary named name whose baked Piglet is bakedYAML, which
-// accepts overlays when its build block says so (D202).
-func asPigletBinary(t *testing.T, name, bakedYAML string) {
+// bakedPigletBinary is a Piglet Binary named name whose baked Piglet is bakedYAML; it accepts overlays when the baked
+// Piglet's build block says so (D202).
+func bakedPigletBinary(t *testing.T, name, bakedYAML string) pigletBinary {
 	t.Helper()
 	baked, err := piglet.ParseBytes([]byte(bakedYAML))
 	if err != nil {
 		t.Fatal(err)
 	}
-	oldBinary, oldBase, oldName := isPigletBinary, pigletOverlayBase, pigletBinaryName
-	t.Cleanup(func() { isPigletBinary, pigletOverlayBase, pigletBinaryName = oldBinary, oldBase, oldName })
-	isPigletBinary = func() bool { return true }
-	pigletBinaryName = func() string { return name }
-	pigletOverlayBase = func() *piglet.OverlayBase {
-		if baked.Build == nil || !baked.Build.AllowOverlays {
-			return nil
-		}
-		return &piglet.OverlayBase{Piglet: baked, Digest: "sha256:" + strings.Repeat("ab", 32)}
+	return pigletBinary{
+		Is:   true,
+		Name: func() string { return name },
+		OverlayBase: func() *piglet.OverlayBase {
+			if baked.Build == nil || !baked.Build.AllowOverlays {
+				return nil
+			}
+			return &piglet.OverlayBase{Piglet: baked, Digest: "sha256:" + strings.Repeat("ab", 32)}
+		},
 	}
 }
 
@@ -38,8 +38,8 @@ func clearPigletEnv(t *testing.T) {
 
 func TestPigletBinaryWithoutAllowOverlaysRefusesEverySelector(t *testing.T) {
 	clearPigletEnv(t)
-	asPigletBinary(t, "pig-tern", "name: pig-tern\nstrip:\n  tools: [edit]\n")
-	if got := pigletBinaryOverlayRefusal(map[string]any{}); got != "" {
+	binary := bakedPigletBinary(t, "pig-tern", "name: pig-tern\nstrip:\n  tools: [edit]\n")
+	if got := pigletBinaryOverlayRefusal(map[string]any{}, binary); got != "" {
 		t.Fatalf("no selector refused: %q", got)
 	}
 	selectors := map[string]func(){
@@ -54,7 +54,7 @@ func TestPigletBinaryWithoutAllowOverlaysRefusesEverySelector(t *testing.T) {
 			if name == "--piglet" {
 				flags["piglet"] = "extra.yaml"
 			}
-			got := pigletBinaryOverlayRefusal(flags)
+			got := pigletBinaryOverlayRefusal(flags, binary)
 			for _, want := range []string{"Piglet Binary (pig-tern)", "does not accept --piglet overlays", "build.allowOverlays: true", "stock pig"} {
 				if !strings.Contains(got, want) {
 					t.Fatalf("refusal %q lacks %q", got, want)
@@ -66,10 +66,10 @@ func TestPigletBinaryWithoutAllowOverlaysRefusesEverySelector(t *testing.T) {
 
 func TestPigletBinaryWithAllowOverlaysAcceptsEverySelector(t *testing.T) {
 	clearPigletEnv(t)
-	asPigletBinary(t, "pig-tern", "name: pig-tern\nstrip:\n  tools: [edit]\nbuild:\n  allowOverlays: true\n")
+	binary := bakedPigletBinary(t, "pig-tern", "name: pig-tern\nstrip:\n  tools: [edit]\nbuild:\n  allowOverlays: true\n")
 	for _, flags := range []map[string]any{{"piglet": "extra.yaml"}, {}} {
 		t.Setenv("PIG_PIGLET_NAME", "extra")
-		if got := pigletBinaryOverlayRefusal(flags); got != "" {
+		if got := pigletBinaryOverlayRefusal(flags, binary); got != "" {
 			t.Fatalf("an accepting Binary refused %v: %q", flags, got)
 		}
 	}
@@ -77,17 +77,17 @@ func TestPigletBinaryWithAllowOverlaysAcceptsEverySelector(t *testing.T) {
 
 func TestResolvePigletLaysAnOverlayOnAnAcceptingBinary(t *testing.T) {
 	clearPigletEnv(t)
-	asPigletBinary(t, "pig-tern", "name: pig-tern\nextensions:\n  - name: core\nstrip:\n  tools: [edit]\nbuild:\n  allowOverlays: true\n")
+	binary := bakedPigletBinary(t, "pig-tern", "name: pig-tern\nextensions:\n  - name: core\nstrip:\n  tools: [edit]\nbuild:\n  allowOverlays: true\n")
 	dir := t.TempDir()
 	overlay := filepath.Join(dir, "extra.yaml")
 	if err := os.WriteFile(overlay, []byte("name: extra\nextensions:\n  - name: extra\n    origins: [local:./extra]\nstrip:\n  tools: [grep]\n"), 0o644); err != nil {
 		t.Fatal(err)
 	}
 	for name, run := range map[string]func() (*piglet.Piglet, bool){
-		"flag": func() (*piglet.Piglet, bool) { return resolvePiglet(map[string]any{"piglet": overlay}, nil) },
+		"flag": func() (*piglet.Piglet, bool) { return resolvePigletOn(map[string]any{"piglet": overlay}, nil, binary) },
 		"path": func() (*piglet.Piglet, bool) {
 			t.Setenv("PIG_PIGLET_PATH", overlay)
-			return resolvePiglet(map[string]any{}, nil)
+			return resolvePigletOn(map[string]any{}, nil, binary)
 		},
 	} {
 		t.Run(name, func(t *testing.T) {
@@ -104,20 +104,20 @@ func TestResolvePigletLaysAnOverlayOnAnAcceptingBinary(t *testing.T) {
 
 func TestResolvePigletNeverFallsBackToTheBinaryWhenAnOverlayDoesNotResolve(t *testing.T) {
 	clearPigletEnv(t)
-	asPigletBinary(t, "pig-tern", "name: pig-tern\nextensions:\n  - name: core\nbuild:\n  allowOverlays: true\n")
+	binary := bakedPigletBinary(t, "pig-tern", "name: pig-tern\nextensions:\n  - name: core\nbuild:\n  allowOverlays: true\n")
 	dir := t.TempDir()
 	conflict := filepath.Join(dir, "conflict.yaml")
 	if err := os.WriteFile(conflict, []byte("name: conflict\nextensions:\n  - name: core\n    origins: [local:./other]\n"), 0o644); err != nil {
 		t.Fatal(err)
 	}
-	if p, _ := resolvePiglet(map[string]any{"piglet": conflict}, nil); p != nil {
+	if p, _ := resolvePigletOn(map[string]any{"piglet": conflict}, nil, binary); p != nil {
 		t.Fatalf("a refused overlay resolved to %#v", p)
 	}
-	if p, _ := resolvePiglet(map[string]any{"piglet": filepath.Join(dir, "missing.yaml")}, nil); p != nil {
+	if p, _ := resolvePigletOn(map[string]any{"piglet": filepath.Join(dir, "missing.yaml")}, nil, binary); p != nil {
 		t.Fatalf("a missing overlay resolved to %#v", p)
 	}
 	t.Setenv("PIG_PIGLET_NAME", "no-such-piglet")
-	if p, _ := resolvePiglet(map[string]any{}, nil); p != nil {
+	if p, _ := resolvePigletOn(map[string]any{}, nil, binary); p != nil {
 		t.Fatalf("an unresolvable PIG_PIGLET_NAME fell back to %#v", p)
 	}
 }

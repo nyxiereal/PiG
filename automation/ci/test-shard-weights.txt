@@ -62,49 +62,37 @@ shards 8
 8 TestResourceLoaderUpstreamRPCFileURLs
 8 TestSharedSubprocessExecAcrossModes
 
+# The extension host package runs in three shards on Linux (SHARDED_SPEC) and on Windows (ci.yml, extension-host-1 to
+# -3). Its pins had been packed for two, a count nothing runs, so they never applied and the shards were placed by name
+# hash (196, 132 and 157 s at 4 CPUs on a loaded host). The 24 tests of 5 s or more are packed to an equal load, the
+# hash-placed rest included, by their median duration over two measured runs (a serial test counts its elapsed time, a
+# t.Parallel test about half of it).
 package ./coding/extension/host/subprocess
-shards 2
-1 TestAC59PackedSDKFocusedComponentsOwnInput
+shards 3
 1 TestContextResultShapesCrossSDKTransports
-1 TestDrainSpansIsolatedNodeProcesses
-1 TestGitMergeAndResolveExample
 1 TestHostClosedConnectionKeepsItsProcessRetained
-1 TestHostLoadAndReloadPreserveConfiguredGuardOrder
-1 TestNodeCommandReturnDoesNotCancelItsHostCalls
-1 TestNodeIssuePackageForms
-1 TestNodeRecoveryKeepsOriginalOwnerCancellation
-1 TestNodeRepeatedUnknownCrashBisectsAndRejoinsHealthyMembers
-1 TestPackedStderrLogLifecycle
-1 TestReloadAcrossAPlacementChangeStartsAFreshProcess
-1 TestSlowNodeFactoryLoads
-1 TestToolRenderersAcrossSDKs
-1 TestUnknownEventHandlerIsAnErrorInEverySDK
+1 TestPackedMemberStoppingDoesNotReleaseAnotherMembersFileMutationTurn
+1 TestPackedPromptHandlerBodyFIFO
+1 TestPackedProviderResponseAndToolPrompts
+1 TestPackedSDKFocusedComponentAndSessionActionsMatch
+1 TestTurnBoundaryPackedFactoriesMatchIsolated
 1 TestUpstreamExtensionFactoryCache
-1 TestXrefEventBusCloneMatchesPi
-1 TestXrefEventBusInspectMatchesPi
-1 TestXrefEventBusListenerOrderMatchesPi
-1 TestXrefEventBusMaxListenersWarningIsSilentLikePi
-2 TestConcurrentIsolatedStartsClaimOnlyCompleteProcesses
-2 TestEmbeddedPackedOwnerActivationByLanguage
-2 TestHostProviderQueueBindsToRunnerRegistry
 2 TestHost_ReloadPlansPackedRustAndFissionsQuarantinedCell
-2 TestInputTransformStreamingExample
-2 TestNodeCrashAfterRetainedReloadRecoversWithoutReplay
-2 TestNodeCrashQuarantinesOnlyCulpritAndDoesNotReplay
-2 TestOAuthSubscriptionSDKPlacements
-2 TestPackedMemberFactoryFailureEndsTheLoad
+2 TestNodeRepeatedUnknownCrashBisectsAndRejoinsHealthyMembers
 2 TestPackedMessageOutputPadAcrossSDKs
-2 TestPackedPromptHandlerBodyFIFO
-2 TestPackedProviderResponseAndToolPrompts
-2 TestPackedSDKFocusedComponentAndSessionActionsMatch
 2 TestPackedUserMessageContentAcrossSDKs
+2 TestRecoveredExtensionTakesItsNewToolRegistration
 2 TestRustFactoryReloadReinvokesFactoryInTheRetainedProcess
-2 TestTurnBoundaryPackedFactoriesMatchIsolated
-2 TestXrefEventBusForeignPrefixMutationMatchesPi
-2 TestXrefEventBusMatchesPiAcrossRealms
-2 TestXrefEventBusPayloadLifetimeMatchesPi
-2 TestXrefEventBusReentrantDispatchMatchesPi
-2 TestXrefEventBusSymbolLifetimeMatchesPi
+2 TestRustFactoryReloadWithControlCharactersInNameAndSocketDirectory
+2 TestToolRenderersAcrossSDKs
+3 TestAC59PackedSDKFocusedComponentsOwnInput
+3 TestAbortedToolCallSettlesCooperativelyOrFailsAfterTheGrace
+3 TestEmbeddedPackedOwnerActivationByLanguage
+3 TestOAuthSubscriptionSDKPlacements
+3 TestPackedMemberFactoryFailureEndsTheLoad
+3 TestPackedStderrLogLifecycle
+3 TestSlowNodeFactoryLoads
+3 TestXrefEventBusInspectMatchesPi
 
 package ./test/extension-conformance
 shards 2

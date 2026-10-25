@@ -10,7 +10,7 @@ Use counts (`uses`) are the number of the 255 scanned npm packages that import t
 
 | Module | Rows | type-only (identity by kind) | Node served | Go gaps | Rust gaps | Python gaps |
 |---|---|---|---|---|---|---|
-| `pi-coding-agent` | 920 | 305 | 910 | 342 | 342 | 342 |
+| `pi-coding-agent` | 920 | 305 | 910 | 326 | 326 | 326 |
 | `pi-tui` | 365 | 85 | 364 | 147 | 147 | 147 |
 | `pi-ai` | 97 | 197 | 97 | 66 | 66 | 66 |
 | `pi-ai/compat` | 156 | 204 | 156 | 122 | 122 | 122 |
@@ -20,22 +20,21 @@ Use counts (`uses`) are the number of the 255 scanned npm packages that import t
 
 | Lane | Owner | Opened | Gap cells | Closing row |
 |---|---|---|---|---|
-| C2Sessions | C2Sessions lane (createAgentSession family, E1/E6) | 0.5.2 | 399 | Conformance rows for createAgentSession, createAgentSessionRuntime and the pi-agent-core Agent loop in all four SDKs (branch feat/sdk-child-agent-sessions) |
+| C2Sessions | C2Sessions lane (createAgentSession family, E1/E6) | 0.5.2 | 354 | Conformance rows for createAgentSession, createAgentSessionRuntime and the pi-agent-core Agent loop in all four SDKs (branch feat/sdk-child-agent-sessions) |
 | SdkExportsLedger | SdkExportsLedger lane (Pi application internals no extension scan imports) | 0.5.2 | 1158 | Owner decision per export, listed with usage counts in handoffs/0.5.2/sdk-exports-internals.md: a numbered divergence in docs/parity/DIVERGENCES.md (cells become divergence:D<n>), or a real lane with a port and a conformance row |
 | SdkPiAiHelpers | SdkPiAiHelpers lane (pi-ai pure helpers, StringEnum, host getters, E17-E22) | 0.5.2 | 150 | Pure helpers with vector tests from Pi at the pin; host getters and the pi-ai compat calls with a conformance row per SDK |
-| SdkSessionGraph | SdkSessionGraph lane (SessionManager/SettingsManager/ModelRuntime/resource loader, E2-E5) | 0.5.2 | 210 | Host calls for session open/list/inMemory, scoped settings, standalone model runtime, resource loader and package manager, with a conformance row per SDK |
+| SdkSessionGraph | SdkSessionGraph lane (SessionManager/SettingsManager/ModelRuntime/resource loader, E2-E5) | 0.5.2 | 207 | Host calls for session open/list/inMemory, scoped settings, standalone model runtime, resource loader and package manager, with a conformance row per SDK |
 | SdkTuiHelpers | SdkTuiHelpers lane (pi-tui helpers, keys, keybindings, theme and rendering helpers, E8-E16) | 0.5.2 | 249 | Pure helpers ported per SDK with vector tests from Pi at the pin (test/parity/sdk-vectors), keybinding and theme helpers with a conformance row per SDK |
 
 ## High-use gaps (block the release gate)
 
-7 exports imported by 5 or more scanned packages have a gap.
+6 exports imported by 5 or more scanned packages have a gap.
 
 | Export | uses | Gaps |
 |---|---|---|
 | `pi-coding-agent: buildSessionContext` | 19 | Go SdkSessionGraph; Rust SdkSessionGraph; Python SdkSessionGraph |
 | `pi-ai: Type` | 14 | Go SdkPiAiHelpers; Rust SdkPiAiHelpers; Python SdkPiAiHelpers |
 | `pi-ai/compat: Type` | 14 | Go SdkPiAiHelpers; Rust SdkPiAiHelpers; Python SdkPiAiHelpers |
-| `pi-coding-agent: createAgentSessionRuntime` | 6 | Go SdkSessionGraph; Rust SdkSessionGraph; Python SdkSessionGraph |
 | `pi-coding-agent: createMcpExtension` | 6 | Go C2Sessions; Rust C2Sessions; Python C2Sessions |
 | `pi-tui: TuiAltScreen` | 6 | Go SdkTuiHelpers; Rust SdkTuiHelpers; Python SdkTuiHelpers |
 | `pi-coding-agent: ModelRegistry` | 5 | Go SdkSessionGraph; Rust SdkSessionGraph; Python SdkSessionGraph |
@@ -97,7 +96,7 @@ None.
 | `AgentSession.prompt` | 0 | served | native:AgentSession.Prompt | native:AgentSession::prompt | native:AgentSession.prompt |
 | `AgentSession.promptTemplates` | 0 | served | gap:C2Sessions | gap:C2Sessions | gap:C2Sessions |
 | `AgentSession.recordBashResult` | 0 | served | gap:C2Sessions | gap:C2Sessions | gap:C2Sessions |
-| `AgentSession.refreshContext` | 0 | served | gap:C2Sessions | gap:C2Sessions | gap:C2Sessions |
+| `AgentSession.refreshContext` | 0 | served | native:AgentSession.RefreshContext | native:AgentSession::refresh_context | native:AgentSession.refresh_context |
 | `AgentSession.reload` | 0 | served | gap:C2Sessions | gap:C2Sessions | gap:C2Sessions |
 | `AgentSession.resourceLoader` | 0 | served | gap:C2Sessions | gap:C2Sessions | gap:C2Sessions |
 | `AgentSession.retryAttempt` | 0 | served | gap:C2Sessions | gap:C2Sessions | gap:C2Sessions |
@@ -107,7 +106,7 @@ None.
 | `AgentSession.sendUserMessage` | 0 | served | gap:C2Sessions | gap:C2Sessions | gap:C2Sessions |
 | `AgentSession.sessionFile` | 0 | served | gap:C2Sessions | gap:C2Sessions | gap:C2Sessions |
 | `AgentSession.sessionId` | 0 | served | gap:C2Sessions | gap:C2Sessions | gap:C2Sessions |
-| `AgentSession.sessionManager` | 0 | served | gap:C2Sessions | gap:C2Sessions | gap:C2Sessions |
+| `AgentSession.sessionManager` | 0 | served | native:AgentSession.SessionManager | native:AgentSession::session_manager | native:AgentSession.session_manager |
 | `AgentSession.sessionName` | 0 | served | gap:C2Sessions | gap:C2Sessions | gap:C2Sessions |
 | `AgentSession.setActiveToolsByName` | 0 | served | gap:C2Sessions | gap:C2Sessions | gap:C2Sessions |
 | `AgentSession.setAutoCompactionEnabled` | 0 | served | gap:C2Sessions | gap:C2Sessions | gap:C2Sessions |
@@ -129,19 +128,19 @@ None.
 | `AgentSession.systemPrompt` | 0 | served | gap:C2Sessions | gap:C2Sessions | gap:C2Sessions |
 | `AgentSession.thinkingLevel` | 0 | served | gap:C2Sessions | gap:C2Sessions | gap:C2Sessions |
 | `AgentSession.waitForIdle` | 0 | served | gap:C2Sessions | gap:C2Sessions | gap:C2Sessions |
-| `AgentSessionRuntime` | 1 | served | gap:C2Sessions | gap:C2Sessions | gap:C2Sessions |
-| `AgentSessionRuntime.cwd` | 0 | served | gap:C2Sessions | gap:C2Sessions | gap:C2Sessions |
-| `AgentSessionRuntime.diagnostics` | 0 | served | gap:C2Sessions | gap:C2Sessions | gap:C2Sessions |
-| `AgentSessionRuntime.dispose` | 0 | served | gap:C2Sessions | gap:C2Sessions | gap:C2Sessions |
-| `AgentSessionRuntime.fork` | 0 | served | gap:C2Sessions | gap:C2Sessions | gap:C2Sessions |
-| `AgentSessionRuntime.importFromJsonl` | 0 | served | gap:C2Sessions | gap:C2Sessions | gap:C2Sessions |
-| `AgentSessionRuntime.modelFallbackMessage` | 0 | served | gap:C2Sessions | gap:C2Sessions | gap:C2Sessions |
-| `AgentSessionRuntime.newSession` | 0 | served | gap:C2Sessions | gap:C2Sessions | gap:C2Sessions |
-| `AgentSessionRuntime.services` | 0 | served | gap:C2Sessions | gap:C2Sessions | gap:C2Sessions |
-| `AgentSessionRuntime.session` | 0 | served | gap:C2Sessions | gap:C2Sessions | gap:C2Sessions |
-| `AgentSessionRuntime.setBeforeSessionInvalidate` | 0 | served | gap:C2Sessions | gap:C2Sessions | gap:C2Sessions |
-| `AgentSessionRuntime.setRebindSession` | 0 | served | gap:C2Sessions | gap:C2Sessions | gap:C2Sessions |
-| `AgentSessionRuntime.switchSession` | 0 | served | gap:C2Sessions | gap:C2Sessions | gap:C2Sessions |
+| `AgentSessionRuntime` | 1 | served | native:AgentSessionRuntime | native:AgentSessionRuntime | native:AgentSessionRuntime |
+| `AgentSessionRuntime.cwd` | 0 | served | native:AgentSessionRuntime.Cwd | native:AgentSessionRuntime::cwd | native:AgentSessionRuntime.cwd |
+| `AgentSessionRuntime.diagnostics` | 0 | served | native:AgentSessionRuntime.Diagnostics | native:AgentSessionRuntime::diagnostics | native:AgentSessionRuntime.diagnostics |
+| `AgentSessionRuntime.dispose` | 0 | served | native:AgentSessionRuntime.Dispose | native:AgentSessionRuntime::dispose | native:AgentSessionRuntime.dispose |
+| `AgentSessionRuntime.fork` | 0 | served | native:AgentSessionRuntime.Fork | native:AgentSessionRuntime::fork | native:AgentSessionRuntime.fork |
+| `AgentSessionRuntime.importFromJsonl` | 0 | served | native:AgentSessionRuntime.ImportFromJsonl | native:AgentSessionRuntime::import_from_jsonl | native:AgentSessionRuntime.import_from_jsonl |
+| `AgentSessionRuntime.modelFallbackMessage` | 0 | served | native:AgentSessionRuntime.ModelFallbackMessage | native:AgentSessionRuntime::model_fallback_message | native:AgentSessionRuntime.model_fallback_message |
+| `AgentSessionRuntime.newSession` | 0 | served | native:AgentSessionRuntime.NewSession | native:AgentSessionRuntime::new_session | native:AgentSessionRuntime.new_session |
+| `AgentSessionRuntime.services` | 0 | served | native:AgentSessionRuntime.Services | native:AgentSessionRuntime::services | native:AgentSessionRuntime.services |
+| `AgentSessionRuntime.session` | 0 | served | native:AgentSessionRuntime.Session | native:AgentSessionRuntime::session | native:AgentSessionRuntime.session |
+| `AgentSessionRuntime.setBeforeSessionInvalidate` | 0 | served | native:AgentSessionRuntime.SetBeforeSessionInvalidate | native:AgentSessionRuntime::set_before_session_invalidate | native:AgentSessionRuntime.set_before_session_invalidate |
+| `AgentSessionRuntime.setRebindSession` | 0 | served | native:AgentSessionRuntime.SetRebindSession | native:AgentSessionRuntime::set_rebind_session | native:AgentSessionRuntime.set_rebind_session |
+| `AgentSessionRuntime.switchSession` | 0 | served | native:AgentSessionRuntime.SwitchSession | native:AgentSessionRuntime::switch_session | native:AgentSessionRuntime.switch_session |
 | `ArminComponent` | 0 | served | gap:SdkExportsLedger | gap:SdkExportsLedger | gap:SdkExportsLedger |
 | `ArminComponent.dispose` | 0 | served | gap:SdkExportsLedger | gap:SdkExportsLedger | gap:SdkExportsLedger |
 | `ArminComponent.invalidate` | 0 | served | gap:SdkExportsLedger | gap:SdkExportsLedger | gap:SdkExportsLedger |
@@ -869,7 +868,7 @@ None.
 | `copyToClipboard` | 8 | served | native:CopyToClipboard | native:copy_to_clipboard | native:copy_to_clipboard |
 | `createAgentSession` | 20 | served | host:Context.CreateAgentSession | host:Context::create_agent_session | host:Context.create_agent_session |
 | `createAgentSessionFromServices` | 8 | served | native:CreateAgentSessionFromServices | native:create_agent_session_from_services | native:create_agent_session_from_services |
-| `createAgentSessionRuntime` | 6 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
+| `createAgentSessionRuntime` | 6 | served | native:CreateAgentSessionRuntime | native:create_agent_session_runtime | native:create_agent_session_runtime |
 | `createAgentSessionServices` | 9 | served | native:CreateAgentSessionServices | native:create_agent_session_services | native:create_agent_session_services |
 | `createBashTool` | 2 | served | native:CreateBashTool | native:create_bash_tool | native:create_bash_tool |
 | `createBashToolDefinition` | 12 | served | native:CreateBashToolDefinition | native:create_bash_tool_definition | native:create_bash_tool_definition |

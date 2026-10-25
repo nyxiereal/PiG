@@ -35975,6 +35975,10 @@
       "id": "D190",
       "title": "The built-in file mutation queue also orders mutations of one existing file reached through a hard link or a…",
       "entry": "BF-648ff3e-13"
+    },
+    {
+      "id": "D199",
+      "title": "PiG lists OpenRouter's :nitro and :floor routing variants beside every OpenRouter model, where Pi lists only…"
     }
   ],
   "exemptCommits": {

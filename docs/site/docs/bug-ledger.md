@@ -16979,6 +16979,7 @@ Each divergence record is accounted for here. A divergence that fixes a Pi defec
 | D187 | A native SDK holds a batch's first host calls and responses in call and answer order, where Pi's single… | deliberate difference |
 | D188 | Opening a store at an older Durable schema version keeps a copy of it first, where Pi upgrades it in place | deliberate difference |
 | D190 | The built-in file mutation queue also orders mutations of one existing file reached through a hard link or a… | [BF-648ff3e-13](#bf-648ff3e-13) |
+| D199 | PiG lists OpenRouter's :nitro and :floor routing variants beside every OpenRouter model, where Pi lists only… | deliberate difference |
 
 ## Fix-titled commits that are not bugs in a release
 

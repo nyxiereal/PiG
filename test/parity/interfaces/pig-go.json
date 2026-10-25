@@ -77355,17 +77355,6 @@
       "shapeHash": "sha256:321680ee46c4a0f45a5be83a13a18383fa9efbfe0593819bdad691b1d0fe0ddb"
     },
     {
-      "id": "go:github.com/MichaelKinsy/PiG/coding#decodeFactoryOptions",
-      "package": "github.com/MichaelKinsy/PiG/coding",
-      "name": "decodeFactoryOptions",
-      "kind": "function",
-      "exported": false,
-      "shape": {
-        "type": "func(f graphExtensionFactory, into any) error"
-      },
-      "shapeHash": "sha256:2508ae7d38cc0f727c65128f536d2ab389568667ca1b8893669e57b2ade91116"
-    },
-    {
       "id": "go:github.com/MichaelKinsy/PiG/coding#decodeNestedArguments",
       "package": "github.com/MichaelKinsy/PiG/coding",
       "name": "decodeNestedArguments",
@@ -77848,6 +77837,28 @@
         "type": "func(agentDir string) (github.com/MichaelKinsy/PiG/coding/extension.InlineExtension, error)"
       },
       "shapeHash": "sha256:e1bd9148089649228e60824318afc37c3d34a1da71cb047c85a3faf04b062740"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/coding#graphExtensionFactory.hasOptions",
+      "package": "github.com/MichaelKinsy/PiG/coding",
+      "name": "graphExtensionFactory.hasOptions",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func() bool"
+      },
+      "shapeHash": "sha256:f632619397f10a7f0e472ad47d2824ec7e080d15ac9eb0994e24800757b3fb96"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/coding#graphExtensionFactory.optionsError",
+      "package": "github.com/MichaelKinsy/PiG/coding",
+      "name": "graphExtensionFactory.optionsError",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func(err error) error"
+      },
+      "shapeHash": "sha256:757366f347b77fab18c96d624ec5206676e19d18aa9ceb4a88a9343171f303d5"
     },
     {
       "id": "go:github.com/MichaelKinsy/PiG/coding#graphExtensionsOf",

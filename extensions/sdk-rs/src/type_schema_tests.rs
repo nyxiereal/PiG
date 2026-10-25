@@ -383,3 +383,28 @@ fn a_schema_holds_a_bigint_and_only_writing_it_as_json_fails() {
     assert_eq!(wire["e"]["const"], json!({"\u{0}": "n", "v": "123456789012345678901234567890"}));
     assert_eq!(crate::type_engine::decode_wire(&wire, &[]).unwrap(), TValue::Schema(literal));
 }
+
+/// Time of `Type::pick` through a host (the socket PIG_EXT_SOCKET names); run by TestTypePickRoundTripReport: `cargo test --lib engine_pick_round_trip -- --ignored --nocapture`.
+#[test]
+#[ignore]
+fn engine_pick_round_trip() {
+    let s = Type::string(None);
+    let base = Type::object(
+        vec![
+            ("id".to_string(), TValue::Schema(s.clone())),
+            ("name".to_string(), TValue::Schema(Type::optional(&s))),
+            ("n".to_string(), TValue::Schema(Type::integer(None))),
+            ("tags".to_string(), TValue::Schema(Type::array(s.clone(), None))),
+        ],
+        None,
+    );
+    for _ in 0..200 {
+        Type::pick(base.clone(), ["id", "name"], None).unwrap();
+    }
+    let n = 5000;
+    let start = std::time::Instant::now();
+    for _ in 0..n {
+        Type::pick(base.clone(), ["id", "name"], None).unwrap();
+    }
+    println!("US_PER_CALL={:.1}", start.elapsed().as_secs_f64() / f64::from(n) * 1e6);
+}

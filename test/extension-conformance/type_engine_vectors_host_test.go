@@ -15,6 +15,7 @@ import (
 	"time"
 
 	"github.com/MichaelKinsy/PiG/coding/extension/host/subprocess"
+	sdk "github.com/MichaelKinsy/PiG/extensions/sdk"
 	"github.com/MichaelKinsy/PiG/internal/typebox/engine"
 )
 
@@ -80,7 +81,7 @@ func TestTypeEngineVectorsThroughTheHost(t *testing.T) {
 
 // serveTypeEngineSocket listens on a unix socket that answers every type.engine call of the extension protocol with the host's engine and nothing else (a ping is answered, as the
 // SDKs expect while a call waits); it stops with the test.
-func serveTypeEngineSocket(t *testing.T) string {
+func serveTypeEngineSocket(t testing.TB) string {
 	t.Helper()
 	dir, err := os.MkdirTemp("", "pig-te-")
 	if err != nil {
@@ -125,4 +126,47 @@ func serveTypeEngineSocket(t *testing.T) string {
 		}
 	}()
 	return path
+}
+
+// BenchmarkTypePickRoundTrip is one Go SDK `Type.Pick` of a four-property object over a socket to the host's engine handler: the encode, the frame, the engine, the frame and the
+// decode of an isolated extension (a packed one dials the same socket protocol; the fused path has no socket, see BenchmarkTypeBuildThroughEngine in fusepack).
+func BenchmarkTypePickRoundTrip(b *testing.B) {
+	socket := serveTypeEngineSocket(b)
+	b.Setenv("PIG_EXT_SOCKET", socket)
+	base := sdk.Type.Object(sdk.NewOrderedObject("id", sdk.Type.String(), "name", sdk.Type.Optional(sdk.Type.String()), "n", sdk.Type.Integer(), "tags", sdk.Type.Array(sdk.Type.String())))
+	_ = sdk.Type.Pick(base, []string{"id", "name"})
+	b.ReportAllocs()
+	b.ResetTimer()
+	for range b.N {
+		_ = sdk.Type.Pick(base, []string{"id", "name"})
+	}
+}
+
+// TestTypePickRoundTripReport times the Python and Rust SDKs' `Type.pick` over the same socket (PIG_BENCH_TYPE_ENGINE=1, not part of the gates) and logs microseconds per call.
+func TestTypePickRoundTripReport(t *testing.T) {
+	if os.Getenv("PIG_BENCH_TYPE_ENGINE") != "1" {
+		t.Skip("set PIG_BENCH_TYPE_ENGINE=1 to time the Python and Rust SDKs")
+	}
+	root := findModuleRoot(t)
+	for name, build := range map[string]func() *exec.Cmd{
+		"python": func() *exec.Cmd {
+			cmd := exec.Command(testPythonExecutable(), filepath.Join("tests", "bench_engine_pick.py"))
+			cmd.Dir = filepath.Join(root, "extensions", "sdk-py")
+			cmd.Env = append(os.Environ(), "PYTHONPATH="+cmd.Dir)
+			return cmd
+		},
+		"rust": func() *exec.Cmd {
+			cmd := exec.Command("cargo", "test", "--quiet", "--release", "--lib", "engine_pick_round_trip", "--", "--ignored", "--nocapture")
+			cmd.Dir = filepath.Join(root, "extensions", "sdk-rs")
+			return cmd
+		},
+	} {
+		cmd := build()
+		cmd.Env = append(append([]string(nil), cmd.Environ()...), "PIG_EXT_SOCKET="+serveTypeEngineSocket(t))
+		out, err := cmd.CombinedOutput()
+		if err != nil {
+			t.Fatalf("%s: %v\n%s", name, err, out)
+		}
+		t.Logf("%s %s", name, regexp.MustCompile(`US_PER_CALL=\S+`).Find(out))
+	}
 }

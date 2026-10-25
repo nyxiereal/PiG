@@ -63,6 +63,7 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 | [BF-0b85f55](#bf-0b85f55) | The Rust SDK keeps every session entry when one entry of the session file holds an unpaired surrogate (it… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-0bbe365](#bf-0bbe365) | fix(codingagent): footer context usage refreshes on a context_edit entry (Pi getContextUsage) | PiG's own defect | All platforms | Unreleased |
 | [BF-0bc05bf](#bf-0bc05bf) | Fixed `!` and RPC `bash` output keeping fragments of color codes, such as a stray `m`, when a code was split… | PiG's own defect | All platforms | 0.5.0 |
+| [BF-0cd1934](#bf-0cd1934) | fix(env): a native watch ignores the nameless event kqueue sends after a watched directory is removed | PiG's own defect | All platforms | Unreleased |
 | [BF-0ce459e](#bf-0ce459e) | `/login` offers a provider object's own login methods (Pi's `registerNativeProvider`, the… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-0d0a3ef](#bf-0d0a3ef) | A turn through OpenRouter (Chat Completions or Anthropic Messages) now reports the cost OpenRouter billed… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-0d13b01](#bf-0d13b01) | `SettingsManager.getTransport` and fifteen sibling getters (settings-manager.ts: getSteeringMode… | PiG's own defect | All platforms | 0.5.0 |
@@ -1811,6 +1812,19 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 - **Fix commits:** `0bc05bf8de` (2026-10-07)
 - **Tests:** `coding/session_bash_persistence_upstream_test.go::TestUpstreamBashEscapeSequencesSplitAcrossChunks`, `internal/codingagent/tools/sanitize_split_ansi_test.go::TestExecuteBashWithOperationsFlushesPendingANSIAtExit`
 - **Release note:** Fixed `!` and RPC `bash` output keeping fragments of color codes, such as a stray `m`, when a code was split across output chunks.
+
+### BF-0cd1934
+
+**fix(env): a native watch ignores the nameless event kqueue sends after a watched directory is removed**
+
+- **Source:** PiG's own defect
+- **Symptom:** fix(env): a native watch ignores the nameless event kqueue sends after a watched directory is removed
+- **Root cause:** fsnotify's kqueue backend names an event for a descriptor whose watch it already removed, such as a directory deleted under a recursive watch, with an empty path ("." once cleaned). A diagnostic run on macos-15 showed the events ("" and ".") ahead of the extra path in each failing round, and none in the passing ones. An event whose path is not absolute names no entry, so it only schedules a rescan, which finds what changed.
+- **User impact:** Behavior differed from Pi
+- **Platform:** All platforms
+- **Fixed in:** Unreleased
+- **Fix commits:** `0cd1934768` (2026-10-25)
+- **Tests:** `durable/env/node/watch_nameless_event_test.go::TestNodeFileWatcherReportsNoPathForAnEventWithoutAnAbsolutePath`
 
 ### BF-0ce459e
 

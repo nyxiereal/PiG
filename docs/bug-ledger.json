@@ -1310,6 +1310,27 @@
       ]
     },
     {
+      "id": "BF-0cd1934",
+      "title": "fix(env): a native watch ignores the nameless event kqueue sends after a watched directory is removed",
+      "symptom": "fix(env): a native watch ignores the nameless event kqueue sends after a watched directory is removed",
+      "rootCause": "fsnotify's kqueue backend names an event for a descriptor whose watch it already removed, such as a directory deleted under a recursive watch, with an empty path (\".\" once cleaned). A diagnostic run on macos-15 showed the events (\"\" and \".\") ahead of the extra path in each failing round, and none in the passing ones. An event whose path is not absolute names no entry, so it only schedules a rescan, which finds what changed.",
+      "rootCauseSource": "commit",
+      "userImpact": "Behavior differed from Pi",
+      "platform": "All platforms",
+      "class": "own",
+      "fixedIn": "Unreleased",
+      "origin": "commit",
+      "commits": [
+        {
+          "hash": "0cd1934768",
+          "date": "2026-10-25"
+        }
+      ],
+      "tests": [
+        "durable/env/node/watch_nameless_event_test.go::TestNodeFileWatcherReportsNoPathForAnEventWithoutAnAbsolutePath"
+      ]
+    },
+    {
       "id": "BF-0ce459e",
       "title": "`/login` offers a provider object's own login methods (Pi's `registerNativeProvider`, the…",
       "symptom": "`/login` offers a provider object's own login methods (Pi's `registerNativeProvider`, the `registerProvider(provider)` overload).",

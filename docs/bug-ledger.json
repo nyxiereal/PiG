@@ -24301,6 +24301,35 @@
       ]
     },
     {
+      "id": "BF-b6d8ab0",
+      "title": "Fix changelog fragment and bug ledger naming the pre-squash commit of #307 (#317)",
+      "symptom": "Fix changelog fragment and bug ledger naming the pre-squash commit of #307 (#317)",
+      "rootCause": "",
+      "rootCauseSource": "",
+      "userImpact": "Behavior differed from Pi",
+      "platform": "All platforms",
+      "class": "own",
+      "fixedIn": "Unreleased",
+      "origin": "commit",
+      "commits": [
+        {
+          "hash": "b6d8ab0bfa",
+          "date": "2026-10-24",
+          "pr": "317"
+        }
+      ],
+      "tests": [
+        "ai/socket_read_monitor_linux_norace_test.go::TestSocketWriterHelper",
+        "ai/socket_read_monitor_linux_norace_test.go::TestStreamingTransportReadDoesNotWakeTheRuntimeMonitor",
+        "coding/extension/host/subprocess/conn_close_test.go::TestCloseAfterThePeerClosedSucceeds",
+        "coding/extension/host/subprocess/conn_close_test.go::TestCloseReturnsARealTransportCloseFailure",
+        "coding/extension/host/subprocess/conn_close_test.go::TestTransportAlreadyClosedClasses",
+        "tui/config_selector_oracle_test.go::TestConfigSelectorMatchesPi",
+        "tui/terminal_negotiation_stop_test.go::TestTerminalInputCarriesOnlyWhatIsSent",
+        "tui/terminal_split_reply_test.go::TestForwardTerminalConsumesAnOwedReplySplitAcrossSlowReads"
+      ]
+    },
+    {
       "id": "BF-b730205",
       "title": "OpenRouter image models that only the Images API serves (for example `openai/gpt-image-2.5-flare`) now…",
       "symptom": "OpenRouter image models that only the Images API serves (for example `openai/gpt-image-2.5-flare`) now generate: when `chat/completions` refuses the model, PiG retries through `/images` (D128, pi-mono #10652).",

@@ -32,6 +32,8 @@ func BenchmarkExtensionAppendEntry(b *testing.B) {
 		b.Fatal(err)
 	}
 	b.Cleanup(func() { _ = session.Close() })
+	// The listener below is the only sink, as it is for a child session: nothing reads Events.
+	session.DiscardEvents()
 	current := func() (*icodingagent.Session, error) { return session.Inner(), nil }
 	delivered := make(chan struct{}, 1)
 	session.Subscribe(func(event agent.AgentEvent) {

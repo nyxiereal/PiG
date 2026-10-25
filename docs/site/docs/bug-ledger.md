@@ -803,6 +803,7 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 | [BF-aa69959](#bf-aa69959) | Key matching follows Pi for more terminal inputs and key identifiers | PiG's own defect | All platforms | 0.5.0 |
 | [BF-aabd300](#bf-aabd300) | An OpenAI Responses, Azure OpenAI Responses or Google stream event whose JSON is a number, string, boolean or… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-ab0ee71](#bf-ab0ee71) | Hiding an overlay whose preFocus is another overlay, such as a panel focused when the overlay was shown over… | PiG's own defect | All platforms | 0.5.0 |
+| [BF-ab1d070](#bf-ab1d070) | fix(durable/codemode): journal one acknowledgment commit per delivered batch, none after the script ended… | PiG's own defect | All platforms | Unreleased |
 | [BF-ab5be97](#bf-ab5be97) | Long streamed answers render each frame faster: the Markdown view re-wraps and re-renders only the lines and… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-ac0dc3b](#bf-ac0dc3b) | An empty list item ends its list: a following unindented line is no longer taken for its lazy continuation… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-ac6fcea](#bf-ac6fcea) | A `session_start` handler that calls `ctx.shutdown()` during `/reload` ends the session and exits 0, as Pi… | PiG's own defect | All platforms | 0.5.0 |
@@ -1021,6 +1022,7 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 | [BF-df0b21c](#bf-df0b21c) | A Go, Rust or Python extension that calls `parseFrontmatter` or `Date.parse` while its factory runs, in a… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-df96b6a](#bf-df96b6a) | Fix in shipped code | PiG's own defect | All platforms | Unreleased |
 | [BF-dfa57b3](#bf-dfa57b3) | An OpenAI Responses request for a conversation with no messages sends `"input": []` instead of `"input": null` | PiG's own defect | All platforms | 0.5.0 |
+| [BF-e045fa5](#bf-e045fa5) | fix(durable/codemode): count image blocks in a generateImages result as Pi does, and compare the code mode… | PiG's own defect | All platforms | Unreleased |
 | [BF-e098463](#bf-e098463) | A Gemini stream chunk with a member of an unexpected type is read as Pi's JavaScript reads it instead of… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-e1764c3](#bf-e1764c3) | A live `/skill:` message renders as the collapsed `[skill] name` block instead of the raw `<skill>` XML | PiG's own defect | All platforms | 0.5.0 |
 | [BF-e1ad272](#bf-e1ad272) | The xAI, Kimi Code, Meta, Radius, OpenAI Codex, Sign in with ChatGPT and GitHub Copilot OAuth requests send… | PiG's own defect | All platforms | 0.5.0 |
@@ -12062,6 +12064,19 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 - **Tests:** `coding/extension/host/subprocess/node_library_bundle_test.go::TestNodeLibraryBundlesKeepSharedIdentitiesWithoutRawCatalogLoads`, `coding/extension/host/subprocess/runtime_node_overlay_handle_test.go::TestNodeFactoryTuiShowOverlayHandleIsSynchronous`, `coding/extension/host/subprocess/runtime_node_prompt_end_test.go::TestNodePromptEndWaitEndsWhenAnotherProcessTurnsTheLoop`, `coding/extension/host/subprocess/ui_bridge_raw_overlay_test.go::TestRawOverlayEndsWithItsConnection`, `coding/extension/host/subprocess/ui_bridge_raw_overlay_test.go::TestRawOverlayShowsAtOnceAndEndsWithItsHide`, `coding/extension/host/subprocess/ui_bridge_raw_overlay_test.go::TestRawOverlayWithoutTUIIsNotShown`, `coding/extension/host/subprocess/ui_bridge_test.go::TestFocusedCustomComponentsStack`, `coding/extension/host/subprocess/ui_bridge_test.go::TestInteractiveDialogOpensOverFocusedOverlay` and 17 more in docs/bug-ledger.json
 - **Release note:** Hiding an overlay whose preFocus is another overlay, such as a panel focused when the overlay was shown over it, focuses that panel as an overlay, as Pi does: its handle reports `isFocused()` and its own `hide()` moves focus on.
 
+### BF-ab1d070
+
+**fix(durable/codemode): journal one acknowledgment commit per delivered batch, none after the script ended…**
+
+- **Source:** PiG's own defect
+- **Symptom:** fix(durable/codemode): journal one acknowledgment commit per delivered batch, none after the script ended, and finish replayed rows before the script's end decides the outcome
+- **Root cause:** Not recorded.
+- **User impact:** Behavior differed from Pi
+- **Platform:** All platforms
+- **Fixed in:** Unreleased
+- **Fix commits:** `ab1d07097c` (2026-10-24)
+- **Tests:** `durable/codemode/call_restart_scenarios_pi_test.go::TestAResumedScriptThatEndsInItsFirstRunDivergesOnlyWhereTheLiveRunWentOn`, `durable/codemode/call_test.go::TestAScriptsEndWaitsForTheReplayedCallsItIssued`, `durable/codemode/call_test.go::TestOnlyTheFirstDivergenceOrFailureOfACallDecidesItsEnd`
+
 ### BF-ab5be97
 
 **Long streamed answers render each frame faster: the Markdown view re-wraps and re-renders only the lines and…**
@@ -15091,6 +15106,19 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 - **Fix commits:** `dfa57b3253` (2026-10-06)
 - **Tests:** `ai/openai_responses_empty_input_test.go::TestConvertAnchoredMessagesEncodesAnEmptyInputAsAnArray`
 - **Release note:** An OpenAI Responses request for a conversation with no messages sends `"input": []` instead of `"input": null`.
+
+### BF-e045fa5
+
+**fix(durable/codemode): count image blocks in a generateImages result as Pi does, and compare the code mode…**
+
+- **Source:** PiG's own defect
+- **Symptom:** fix(durable/codemode): count image blocks in a generateImages result as Pi does, and compare the code mode helpers with Pi
+- **Root cause:** Not recorded.
+- **User impact:** Behavior differed from Pi
+- **Platform:** All platforms
+- **Fixed in:** Unreleased
+- **Fix commits:** `e045fa5ed8` (2026-10-24)
+- **Tests:** `durable/codemode/codemode_helpers_pi_oracle_test.go::TestCodemodeHelpersMatchPi`, `durable/codemode/codemode_helpers_pi_oracle_test.go::TestNestedCallDetailsCutArgumentsAndErrorsToTheirPreviewLengths`, `durable/codemode/codemode_helpers_pi_oracle_test.go::TestTheHeaderShowsTheWallTimeFromTheHarnessClock`
 
 ### BF-e098463
 

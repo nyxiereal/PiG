@@ -23563,6 +23563,29 @@
       ]
     },
     {
+      "id": "BF-ab1d070",
+      "title": "fix(durable/codemode): journal one acknowledgment commit per delivered batch, none after the script ended…",
+      "symptom": "fix(durable/codemode): journal one acknowledgment commit per delivered batch, none after the script ended, and finish replayed rows before the script's end decides the outcome",
+      "rootCause": "",
+      "rootCauseSource": "",
+      "userImpact": "Behavior differed from Pi",
+      "platform": "All platforms",
+      "class": "own",
+      "fixedIn": "Unreleased",
+      "origin": "commit",
+      "commits": [
+        {
+          "hash": "ab1d07097c",
+          "date": "2026-10-24"
+        }
+      ],
+      "tests": [
+        "durable/codemode/call_restart_scenarios_pi_test.go::TestAResumedScriptThatEndsInItsFirstRunDivergesOnlyWhereTheLiveRunWentOn",
+        "durable/codemode/call_test.go::TestAScriptsEndWaitsForTheReplayedCallsItIssued",
+        "durable/codemode/call_test.go::TestOnlyTheFirstDivergenceOrFailureOfACallDecidesItsEnd"
+      ]
+    },
+    {
       "id": "BF-ab5be97",
       "title": "Long streamed answers render each frame faster: the Markdown view re-wraps and re-renders only the lines and…",
       "symptom": "Long streamed answers render each frame faster: the Markdown view re-wraps and re-renders only the lines and inline text that changed since the last frame, with the same output.",
@@ -31253,6 +31276,29 @@
       ],
       "tests": [
         "ai/openai_responses_empty_input_test.go::TestConvertAnchoredMessagesEncodesAnEmptyInputAsAnArray"
+      ]
+    },
+    {
+      "id": "BF-e045fa5",
+      "title": "fix(durable/codemode): count image blocks in a generateImages result as Pi does, and compare the code mode…",
+      "symptom": "fix(durable/codemode): count image blocks in a generateImages result as Pi does, and compare the code mode helpers with Pi",
+      "rootCause": "",
+      "rootCauseSource": "",
+      "userImpact": "Behavior differed from Pi",
+      "platform": "All platforms",
+      "class": "own",
+      "fixedIn": "Unreleased",
+      "origin": "commit",
+      "commits": [
+        {
+          "hash": "e045fa5ed8",
+          "date": "2026-10-24"
+        }
+      ],
+      "tests": [
+        "durable/codemode/codemode_helpers_pi_oracle_test.go::TestCodemodeHelpersMatchPi",
+        "durable/codemode/codemode_helpers_pi_oracle_test.go::TestNestedCallDetailsCutArgumentsAndErrorsToTheirPreviewLengths",
+        "durable/codemode/codemode_helpers_pi_oracle_test.go::TestTheHeaderShowsTheWallTimeFromTheHarnessClock"
       ]
     },
     {

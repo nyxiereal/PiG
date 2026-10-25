@@ -361,7 +361,7 @@ impl From<i32> for LiteralValue {
 /// `Type.Unsafe` is `unsafe_`; the guards are `is_string` and so on. The JSON Schema each returns is what Pi's `Type` returns, member order included
 /// (test/parity/sdk-vectors/pi-ai/Type.json).
 ///
-/// The Codec family is absent (divergence D198); a call does not compile:
+/// The Codec family is absent (pig divergence (D198)); a call does not compile:
 ///
 /// ```compile_fail
 /// let _ = pig_sdk::Type::codec;

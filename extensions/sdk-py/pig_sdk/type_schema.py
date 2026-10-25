@@ -4,7 +4,7 @@ A :class:`TSchema` is a ``dict`` whose items are the JSON Schema TypeBox wrote, 
 Pi's value is. It also carries TypeBox's hidden members (``~kind``, ``~optional``, ``~readonly``, ``~immutable``, ``~unsafe``), which JSON drops but which the constructors and
 the guards read: ``Type.object`` builds ``required`` from the properties that are not ``~optional``, and ``Type.is_string`` is true for ``Type.string()`` and false for the JSON
 ``{"type": "string"}``. A TSchema is not changed after it is built: every constructor returns a new one. The Codec family (``Codec``, ``Decode``, ``Encode``, ``DecodeBuilder``,
-``EncodeBuilder``, ``IsCodec``) is a numbered divergence (D198) and is absent.
+``EncodeBuilder``, ``IsCodec``) is a numbered divergence (pig divergence (D198)) and is absent.
 """
 import json
 import math

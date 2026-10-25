@@ -734,7 +734,7 @@ def model_registry_script(ctx, args):
     registry.unregister_provider("reg-prov")
     r["registered"]["after"] = {"ids": registry.get_registered_provider_ids(), "models": len(of(registry.get_all(), "reg-prov")), "config": registry.get_registered_provider_config("reg-prov") is None}
 
-    native_model = {"id": "n1", "name": "N One", "api": "nat-api", "provider": "nreg", "baseUrl": "https://ext.invalid", "reasoning": False, "input": ["text"], "cost": {"input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0}, "contextWindow": 4000, "maxTokens": 500}
+    native_model = {"id": "n1", "name": "N One", "api": "nat-api", "provider": "nreg", "reasoning": False, "input": ["text"], "cost": {"input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0}, "contextWindow": 4000, "maxTokens": 500}
 
     def message(model, text):
         return {
@@ -759,6 +759,7 @@ def model_registry_script(ctx, args):
     native_stream = registry.stream_simple(native_model, conversation, {})
     native_events = [event["type"] for event in native_stream.events()]
     native_message = native_stream.result()
+    registry.refresh({"allowNetwork": False})
 
     def provider_id(found):
         return None if found is None else found.id
@@ -770,9 +771,24 @@ def model_registry_script(ctx, args):
         "ids": registry.get_registered_provider_ids(), "displayName": registry.get_provider_display_name("nreg"), "models": [m["id"] for m in of(registry.get_all(), "nreg")],
         "auth": registry.get_provider_auth("nreg"), "request": registry.get_api_key_and_headers(native_model),
         "events": native_events, "text": message_text(native_message), "stopReason": native_message["stopReason"], "completed": registry.complete(native_model, conversation, {})["stopReason"],
+        "configured": registry.has_configured_auth(native_model),
     }
     registry.unregister_provider("nreg")
     r["native"]["after"] = {"registered": registry.get_registered_native_provider("nreg") is None, "provider": registry.get_provider("nreg") is None, "models": len(of(registry.get_all(), "nreg"))}
+    # A stored credential makes registration mark the provider configured at once (model-runtime.ts markProvisionallyConfigured); its auth check finds no key, so the availability refresh the registration launched replaces the mark and the settled state is unconfigured.
+    stored_model = dict(native_model, provider="stored-prov")
+    stored_provider = pig_sdk.create_provider(
+        id="stored-prov", name="Stored Native", auth=pig_sdk.ProviderAuth(api_key=pig_sdk.APIKeyAuth(name="Key", check=lambda _input: None, resolve=lambda _input: None)),
+        models=[stored_model], api={"nat-api": pig_sdk.ProviderStreams(stream=scripted("s.stream"), stream_simple=scripted("s.simple"))},
+    )
+    registry.register_provider(stored_provider)
+    registry.refresh({"allowNetwork": False})
+    r["native"]["storedSettled"] = {
+        "configured": registry.has_configured_auth(stored_model), "status": registry.get_provider_auth_status("stored-prov"),
+        "available": any(model["provider"] == "stored-prov" for model in registry.get_available()),
+    }
+    registry.unregister_provider("stored-prov")
+    registry.refresh({"allowNetwork": False})
     builtin = {}
     try:
         builtin["provider"] = registry.get_provider("anthropic").id

@@ -69358,6 +69358,17 @@
       "shapeHash": "sha256:a732c0c22add4e0239abb10d086bd69a5a10c42e972fdab2c97a92a3f6cbf594"
     },
     {
+      "id": "go:github.com/MichaelKinsy/PiG/coding#ModelRegistry.composeCarrierProvider",
+      "package": "github.com/MichaelKinsy/PiG/coding",
+      "name": "ModelRegistry.composeCarrierProvider",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func(base *github.com/MichaelKinsy/PiG/ai.ModelsProvider, extension *github.com/MichaelKinsy/PiG/internal/codingagent.ProviderConfigInput) (*github.com/MichaelKinsy/PiG/ai.ModelsProvider, error)"
+      },
+      "shapeHash": "sha256:4e75b9729ae181b1f8505566aa589c2a6977e6541a918d343c98805019806867"
+    },
+    {
       "id": "go:github.com/MichaelKinsy/PiG/coding#ModelRegistry.composeNativeProvider",
       "package": "github.com/MichaelKinsy/PiG/coding",
       "name": "ModelRegistry.composeNativeProvider",
@@ -69367,6 +69378,17 @@
         "type": "func(base *github.com/MichaelKinsy/PiG/ai.ModelsProvider, extension *github.com/MichaelKinsy/PiG/internal/codingagent.ProviderConfigInput) (*github.com/MichaelKinsy/PiG/ai.ModelsProvider, error)"
       },
       "shapeHash": "sha256:4e75b9729ae181b1f8505566aa589c2a6977e6541a918d343c98805019806867"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/coding#ModelRegistry.composeProvider",
+      "package": "github.com/MichaelKinsy/PiG/coding",
+      "name": "ModelRegistry.composeProvider",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func(base *github.com/MichaelKinsy/PiG/ai.ModelsProvider, extension *github.com/MichaelKinsy/PiG/internal/codingagent.ProviderConfigInput, carrier bool) (*github.com/MichaelKinsy/PiG/ai.ModelsProvider, error)"
+      },
+      "shapeHash": "sha256:83d0e0eb4a34f9d34c5314f8d58f2b4b4fb7cdbf182a0fbdab650f1a4a44b637"
     },
     {
       "id": "go:github.com/MichaelKinsy/PiG/coding#ModelRegistry.composeRequestHeadersLocked",
@@ -245589,6 +245611,17 @@
       "shapeHash": "sha256:a732c0c22add4e0239abb10d086bd69a5a10c42e972fdab2c97a92a3f6cbf594"
     },
     {
+      "id": "go:github.com/MichaelKinsy/PiG/internal/codingagent#ModelRegistry.composeCarrierProvider",
+      "package": "github.com/MichaelKinsy/PiG/internal/codingagent",
+      "name": "ModelRegistry.composeCarrierProvider",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func(base *github.com/MichaelKinsy/PiG/ai.ModelsProvider, extension *ProviderConfigInput) (*github.com/MichaelKinsy/PiG/ai.ModelsProvider, error)"
+      },
+      "shapeHash": "sha256:eecbb180fe3702c144c5532550080392318bf2b2986001e9f794e75b3ed59147"
+    },
+    {
       "id": "go:github.com/MichaelKinsy/PiG/internal/codingagent#ModelRegistry.composeNativeProvider",
       "package": "github.com/MichaelKinsy/PiG/internal/codingagent",
       "name": "ModelRegistry.composeNativeProvider",
@@ -245598,6 +245631,17 @@
         "type": "func(base *github.com/MichaelKinsy/PiG/ai.ModelsProvider, extension *ProviderConfigInput) (*github.com/MichaelKinsy/PiG/ai.ModelsProvider, error)"
       },
       "shapeHash": "sha256:eecbb180fe3702c144c5532550080392318bf2b2986001e9f794e75b3ed59147"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/internal/codingagent#ModelRegistry.composeProvider",
+      "package": "github.com/MichaelKinsy/PiG/internal/codingagent",
+      "name": "ModelRegistry.composeProvider",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func(base *github.com/MichaelKinsy/PiG/ai.ModelsProvider, extension *ProviderConfigInput, carrier bool) (*github.com/MichaelKinsy/PiG/ai.ModelsProvider, error)"
+      },
+      "shapeHash": "sha256:dc67ff932ad5993353189c9ae9aedb6871d0267deddf1a6f9ceb52ebe35c2ba0"
     },
     {
       "id": "go:github.com/MichaelKinsy/PiG/internal/codingagent#ModelRegistry.composeRequestHeadersLocked",
@@ -258047,9 +258091,9 @@
       "kind": "function",
       "exported": false,
       "shape": {
-        "type": "func(id string, base []*github.com/MichaelKinsy/PiG/ai.Model, anyDefinitions []github.com/MichaelKinsy/PiG/ai.AnyModel, extension ProviderConfigInput) ([]*github.com/MichaelKinsy/PiG/ai.Model, error)"
+        "type": "func(id string, base []*github.com/MichaelKinsy/PiG/ai.Model, anyDefinitions []github.com/MichaelKinsy/PiG/ai.AnyModel, extension ProviderConfigInput, carrier bool) ([]*github.com/MichaelKinsy/PiG/ai.Model, error)"
       },
-      "shapeHash": "sha256:feeeba122b7f0a3647afc1c96ddbf2c5aa194da8c3713f7946e9a7dfe214e1db"
+      "shapeHash": "sha256:17a0fa861c38f56565b12ccf5cf18b3320e4fe0a6a95e3e59e5ded436195fa10"
     },
     {
       "id": "go:github.com/MichaelKinsy/PiG/internal/codingagent#applyOverrides",
@@ -259876,6 +259920,17 @@
         "type": "func(path string) string"
       },
       "shapeHash": "sha256:864bd81dd802775a1a082d7f99fe261c8f3185dea2a3f45bbeae79e27ef91e07"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/internal/codingagent#carrierModelInput",
+      "package": "github.com/MichaelKinsy/PiG/internal/codingagent",
+      "name": "carrierModelInput",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func(id string, config providerConfig) ProviderConfigInput"
+      },
+      "shapeHash": "sha256:c98c3b8087d1924337c1271e252be9da7c314ee2d1ebcfe98c952b133a18568d"
     },
     {
       "id": "go:github.com/MichaelKinsy/PiG/internal/codingagent#catalogJSONData",
@@ -266143,9 +266198,9 @@
       "kind": "function",
       "exported": false,
       "shape": {
-        "type": "func(id string, models []github.com/MichaelKinsy/PiG/ai.AnyModel, extension ProviderConfigInput, definition github.com/MichaelKinsy/PiG/ai.AnyModel) (github.com/MichaelKinsy/PiG/ai.AnyModel, error)"
+        "type": "func(id string, models []github.com/MichaelKinsy/PiG/ai.AnyModel, extension ProviderConfigInput, definition github.com/MichaelKinsy/PiG/ai.AnyModel, carrier bool) (github.com/MichaelKinsy/PiG/ai.AnyModel, error)"
       },
-      "shapeHash": "sha256:2e97598ab8d09d7ad4d9c0f0ca88836be7112e3666acac15c8784b623395b105"
+      "shapeHash": "sha256:26e83fab083092ae9b7014f1c93e393e9906285d6a61e1ac49a59dd252081aac"
     },
     {
       "id": "go:github.com/MichaelKinsy/PiG/internal/codingagent#extensionRegistryState",

@@ -3707,6 +3707,29 @@
       ]
     },
     {
+      "id": "BF-286d303",
+      "title": "A native Provider object an extension registers (`registerNativeProvider`, `pi.registerProvider(provider)`)…",
+      "symptom": "Such a provider never composed (no models, its name replaced by its id, every stream an error), and a provider-level `baseUrl` was copied onto its models, which Pi does not do (it is only the context of `refreshModels`).",
+      "rootCause": "A Provider object an extension registers (registerNativeProvider, through its carrier) was composed through the extension-configuration rules: a model without a baseUrl failed Pi's 'baseUrl is required when defining custom models' check, so the provider never reached the catalog (no models, its name lost, its streams an error), and the provider's own baseUrl was copied onto its models. Pi composes the Provider object untouched (model-runtime.ts composeProvider), so its models keep the base URL they declare, or none, and the provider's baseUrl is only the refresh context's. The carrier's models are now composed that way (composeCarrierProvider, carrierModelInput) on the Session path and the…",
+      "rootCauseSource": "commit",
+      "userImpact": "An operation failed or was rejected",
+      "platform": "All platforms",
+      "class": "own",
+      "fixedIn": "Unreleased",
+      "releaseNote": "A native Provider object an extension registers (`registerNativeProvider`, `pi.registerProvider(provider)`) whose models declare no `baseUrl` now reaches the model catalog, as in Pi: the host composes the Provider object untouched, so its models keep the base URL they declare (or none) and its name, models and streams work. Before, such a provider never composed (no models, its name replaced by its id, every stream an error), and a provider-level `baseUrl` was copied onto its models, which Pi does not do (it is only the context of `refreshModels`).",
+      "origin": "release note",
+      "commits": [
+        {
+          "hash": "286d303e8f",
+          "date": "2026-10-25"
+        }
+      ],
+      "tests": [
+        "coding/extension_native_bare_provider_test.go::TestExtensionNativeProviderWithoutBaseURLComposesAndSettlesLikePi",
+        "internal/codingagent/native_provider_without_base_url_test.go::TestNativeProviderObjectWithoutBaseURLComposesUntouched"
+      ]
+    },
+    {
       "id": "BF-28b8425",
       "title": "Blank-key detection for compat API keys, the Vertex API key and the Vertex custom base URL trim whitespace…",
       "symptom": "Blank-key detection for compat API keys, the Vertex API key and the Vertex custom base URL trim whitespace the way JavaScript does: a value that is only a byte-order mark counts as blank, and a leading or trailing U+0085 is kept, as in Pi.",

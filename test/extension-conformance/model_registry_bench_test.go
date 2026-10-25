@@ -32,13 +32,12 @@ func BenchmarkModelRegistryOverRuntime(b *testing.B) {
 						return nil, err
 					}
 					registry := sdk.NewModelRegistry(rt)
-					baseURL := "https://bench.invalid"
 					provider, err := sdk.CreateProvider(sdk.CreateProviderOptions{
-						ID: "bench-prov", BaseURL: &baseURL,
+						ID: "bench-prov",
 						Auth: sdk.ProviderAuth{APIKey: &sdk.APIKeyAuth{Name: "Key", Resolve: func(sdk.APIKeyAuthInput) (*sdk.AuthResult, error) {
 							return &sdk.AuthResult{Auth: map[string]any{"apiKey": "k"}}, nil
 						}}},
-						Models: []map[string]any{{"id": "m", "name": "m", "api": "bench-api", "provider": "bench-prov", "baseUrl": baseURL}},
+						Models: []map[string]any{{"id": "m", "name": "m", "api": "bench-api", "provider": "bench-prov"}},
 						APIs:   map[string]sdk.ProviderStreams{"bench-api": {Stream: unusedBenchStream}},
 					})
 					if err != nil {

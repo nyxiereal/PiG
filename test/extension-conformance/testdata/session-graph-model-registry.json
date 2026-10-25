@@ -104,6 +104,7 @@
 			}
 		},
 		"completed": "stop",
+		"configured": true,
 		"displayName": "Native Reg",
 		"events": [
 			"done"
@@ -123,6 +124,14 @@
 		},
 		"same": true,
 		"stopReason": "stop",
+		"storedSettled": {
+			"available": false,
+			"configured": false,
+			"status": {
+				"configured": true,
+				"source": "stored"
+			}
+		},
 		"text": "n.simple:n1",
 		"viaGetProvider": "nreg",
 		"viaRuntime": "nreg",

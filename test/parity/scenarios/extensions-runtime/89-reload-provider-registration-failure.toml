@@ -9,6 +9,9 @@
 # files` and the widget `reload-provider-calls=2` (the extension is loaded), and neither prints the registry's message (the runner binds before interactive mode attaches
 # its error listener, so Pi's emitError reaches no one). PiG once failed the reloaded extension's load with `Failed to load extension` in the
 # same situation. Startup shows the diagnostic (scenario 88).
+#
+# Upstream evidence: pinned Pi 1.4.0 (loader.ts:217-218, runner.ts:471-487, agent-session.ts reload) probed 2026-10-25 against PiG: the pane between the reload status
+# and the editor is identical in 3 of 3 pairs, and a build before the fix fails the load with `Failed to load extension: Provider reload-provider, model reload-model: no "api" specified.`
 
 name = "89-reload-provider-registration-failure"
 description = "A provider registration rejected on /reload is the extension error and the extension stays loaded"

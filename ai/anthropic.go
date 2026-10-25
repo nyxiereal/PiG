@@ -2124,8 +2124,7 @@ func (p *anthropicProvider) parseAnthropicSSE(ctx context.Context, r io.Reader, 
 						return
 					}
 					arguments, order := open.args.Append(ev.Delta.PartialJSON)
-					block.setParsedArguments(arguments, order, nil)
-					builder.noteStreamedArguments(index, open.args, arguments)
+					builder.showStreamedArguments(index, &block, open.args, arguments, order)
 					output.Content[index] = block
 					builder.push(ToolCallDeltaEvent{ContentIndex: index, Delta: ev.Delta.PartialJSON, Partial: output})
 				}

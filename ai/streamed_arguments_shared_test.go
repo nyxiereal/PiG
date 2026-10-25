@@ -8,10 +8,10 @@ import (
 	"testing"
 )
 
-// A snapshot the parser calls Valid is what cloneJSONValue returns for it, so a holder may keep it as its own immutable copy: for every
-// snapshot of random, often malformed, often non-UTF-8 text, Valid implies that a plain clone succeeds and equals the value. The parser
-// is allowed to call a valid value not Valid (a string it cannot place counts against the stream), never the other way round.
-func TestStreamingSnapshotValidImpliesCloneJSONValueEqualsIt(t *testing.T) {
+// A snapshot the parser calls valid is what cloneArgumentsValue returns for it, so a holder may keep it as its own immutable copy: for
+// every snapshot of random, often malformed, often non-UTF-8 text, valid implies that the copy equals the value. The parser is allowed to
+// call a valid value not valid (a string it cannot place counts against the stream), never the other way round.
+func TestStreamingSnapshotValidImpliesTheArgumentCopyEqualsIt(t *testing.T) {
 	alphabet := []string{`{`, `}`, `[`, `]`, `"`, `:`, `,`, ` `, `\u00e9`, `\ud83d`, `\ude00`, `\ud800`, `\n`, `\q`, "é", "\xff", "\xe2\x82", "\xac", "\xed\xa0\x80", `1`, `-`, `e`, `1e999`, `true`, `nul`, `null`, `a`, `"k":`, "\"a\xff\":"}
 	sawValid, sawInvalid := 0, 0
 	for seed := range uint64(400) {
@@ -33,9 +33,9 @@ func TestStreamingSnapshotValidImpliesCloneJSONValueEqualsIt(t *testing.T) {
 				continue
 			}
 			sawValid++
-			copied, ok := clonePlainJSON(snapshot.Value, &plainWalk{})
-			if !ok || !reflect.DeepEqual(copied, snapshot.Value) {
-				t.Fatalf("seed %d: a Valid snapshot %#v is not what a plain clone returns (%v, %#v)", seed, snapshot.Value, ok, copied)
+			copied := cloneArgumentsValue(snapshot.Value)
+			if !reflect.DeepEqual(copied, snapshot.Value) {
+				t.Fatalf("seed %d: a valid snapshot %#v is not what the argument copy returns (%#v)", seed, snapshot.Value, copied)
 			}
 		}
 	}
@@ -45,7 +45,7 @@ func TestStreamingSnapshotValidImpliesCloneJSONValueEqualsIt(t *testing.T) {
 }
 
 // Validity follows the clone's rules: a lone surrogate in a value is valid (WTF-8) but not in a key, a split character is not valid until
-// it is complete, an invalid byte in a finished string spoils the stream for good, and a number that is not finite does too.
+// it is complete, and an invalid byte in a finished string spoils the stream for good.
 func TestStreamingSnapshotValidityRules(t *testing.T) {
 	for _, tc := range []struct {
 		name   string
@@ -59,7 +59,7 @@ func TestStreamingSnapshotValidityRules(t *testing.T) {
 		{"an invalid byte in the string being read spoils the stream once the string ends", []string{"{\"a\":\"ok\xff", `","b":1}`}, []bool{false, false}},
 		{"an invalid key is permanent", []string{"{\"a\xff\":1,", `"b":2}`}, []bool{false, false}},
 		{"a lone surrogate key is not valid", []string{`{"\ud800":1,`, `"b":2}`}, []bool{false, false}},
-		{"a number that is not finite", []string{`{"n":1e999,`, `"b":2}`}, []bool{false, false}},
+		{"a number that is not finite is copied as it is", []string{`{"n":1e999,`, `"b":2}`}, []bool{true, true}},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			var parser StreamingJSONParser
@@ -85,8 +85,8 @@ var streamedArgumentsRuns = map[string]streamedArgumentsRun{
 	"invalid key":          {[]string{"{\"a\xff\":1,", `"b":2}`}, []bool{false, false}},
 	"split character":      {[]string{"{\"c\":\"\xe2\x82", "\xac and more\"}"}, []bool{false, true}},
 	"nested and lone high": {[]string{`{"list":["a",{"b":"\ud83d`, `\ude00"}],"c":[1,2`, `]}`}, []bool{true, true, true}},
-	// A number that is not finite is kept as it is (a tool call's arguments write it as null); the stream is not shared, as it never was.
-	"number not finite": {[]string{`{"n":1e999,`, `"m":2}`}, []bool{false, false}},
+	// A number that is not finite is copied as it is (a tool call's arguments write it as null), so it does not stop the stream sharing.
+	"number not finite": {[]string{`{"n":1e999,`, `"m":2}`}, []bool{true, true}},
 }
 
 // publishedArguments is the arguments of the first tool call of what the view's cell published last, as the cell holds them.

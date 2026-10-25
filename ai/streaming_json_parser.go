@@ -2,7 +2,6 @@ package ai
 
 import (
 	"maps"
-	"math"
 	"slices"
 	"strconv"
 	"strings"
@@ -146,8 +145,8 @@ type StreamingJSONParser struct {
 	snapshotOrder   schemaObjectOrder
 	snapshotVersion uint64
 	snapshotValid   bool
-	// invalid is set once a finished string or key is not valid UTF-8 (or WTF-8, for a value) or a number is not finite; every
-	// later snapshot is then not Valid.
+	// invalid is set once a finished string or key is not valid UTF-8 (or WTF-8, for a value); every later snapshot is then not
+	// valid.
 	invalid bool
 	// quiet stops the parser from recording the changes Append returns, for a caller that reads only Snapshot.
 	quiet bool
@@ -164,8 +163,9 @@ type StreamingJSONSnapshot struct {
 	Defined bool
 	// Order is the member order of the objects in Value that are not in sorted order, by path.
 	Order schemaObjectOrder
-	// valid is true when every string in Value is valid UTF-8 or WTF-8, every key is valid UTF-8 and every number is finite: Value is
-	// then what cloneJSONValue returns for it, so a holder in this package may keep it as the immutable copy of itself.
+	// valid is true when every string in Value is valid UTF-8 or WTF-8 and every key is valid UTF-8: Value is then what
+	// cloneArgumentsValue returns for it (a number that is not finite is copied as it is), so a holder in this package may keep it as
+	// the immutable copy of itself.
 	valid bool
 	// Version changes whenever Snapshot made a fresh copy.
 	Version uint64
@@ -219,23 +219,21 @@ func (p *StreamingJSONParser) Snapshot() StreamingJSONSnapshot {
 			p.credit -= cost
 			p.dirty = false
 			p.snapshotValue, p.snapshotDefined, p.snapshotOrder = p.copyOpenPath(pending)
-			p.snapshotValid = p.valueIsValid(pending)
+			p.snapshotValid = p.valueIsValid()
 			p.snapshotVersion++
 		}
 	}
 	return StreamingJSONSnapshot{Value: p.snapshotValue, Defined: p.snapshotDefined, Order: p.snapshotOrder, valid: p.snapshotValid, Version: p.snapshotVersion}
 }
 
-// valueIsValid reports whether the snapshot just copied holds only what cloneJSONValue copies as it is: every finished string valid
-// UTF-8 or WTF-8 (invalid is sticky once one is not), the string being read valid so far, and no number that is not finite.
-func (p *StreamingJSONParser) valueIsValid(pending *streamingPending) bool {
+// valueIsValid reports whether the snapshot just copied holds only what cloneArgumentsValue copies as it is: every finished string
+// valid UTF-8 or WTF-8 (invalid is sticky once one is not) and the string being read valid so far. A number that is not finite is
+// copied as it is too, so it does not count.
+func (p *StreamingJSONParser) valueIsValid() bool {
 	if p.invalid {
 		return false
 	}
-	if p.str != nil && !p.str.isKey && p.str.slot != nil && !p.str.valid() {
-		return false
-	}
-	return pending == nil || finiteJSONValue(pending.value)
+	return p.str == nil || p.str.isKey || p.str.slot == nil || p.str.valid()
 }
 
 // readString reads string characters from start until the string ends or the text does; it returns the next index.
@@ -534,13 +532,10 @@ func (p *StreamingJSONParser) endString(open *streamingOpenString) {
 
 // valid reports whether the string read so far is valid UTF-8, or WTF-8 (the form a lone UTF-16 surrogate takes), as
 // isWTF8 reports it. It reads only what follows the prefix an earlier call found valid, so checking a growing string at
-// every snapshot costs the new text, not the whole string.
+// every snapshot costs the new text, not the whole string. A pending high surrogate shows as a lone unit, which is not
+// strictly valid until its low surrogate arrives, so that text takes the full check.
 func (open *streamingOpenString) valid() bool {
-	if open.high != 0 {
-		// A pending high surrogate shows as a lone unit: the text is not strictly valid until its low surrogate arrives.
-		return isWTF8(open.current())
-	}
-	text := open.text.String()
+	text := open.current()
 	if utf8.ValidString(text[open.validLen:]) {
 		open.validLen = len(text)
 		return true
@@ -553,20 +548,11 @@ func (p *StreamingJSONParser) endScalar() {
 	p.scalar, p.scalarSl = "", nil
 	if value, ok := streamingScalarValue(token); ok {
 		p.place(slot, value)
-		if !finiteJSONValue(value) {
-			p.invalid = true
-		}
 		if path, has := p.reportedPath(slot); has {
 			p.report(&streamingOpenChange{kind: jsonChangeSet, path: path, value: value})
 		}
 	}
 	p.valueEnded(p.top())
-}
-
-// finiteJSONValue is false for the one scalar a snapshot could hold that cloneJSONValue refuses: a number that is not finite.
-func finiteJSONValue(value any) bool {
-	number, isNumber := value.(float64)
-	return !isNumber || !(math.IsNaN(number) || math.IsInf(number, 0))
 }
 
 type streamingPending struct {

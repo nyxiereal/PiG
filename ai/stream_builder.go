@@ -320,8 +320,7 @@ func (builder *assistantStreamBuilder) toolCallDelta(delta streamToolCallDelta) 
 		state.args.Record(delta.argumentsDelta)
 	case delta.argumentsDelta != "" || !delta.skipEmpty:
 		arguments, order := state.args.Append(delta.argumentsDelta)
-		block.setParsedArguments(arguments, order, nil)
-		builder.noteStreamedArguments(state.contentIndex, state.args, arguments)
+		builder.showStreamedArguments(state.contentIndex, &block, state.args, arguments, order)
 	}
 	builder.partial.Content[state.contentIndex] = block
 	builder.push(ToolCallDeltaEvent{ContentIndex: state.contentIndex, Delta: delta.argumentsDelta, Partial: builder.partial})
@@ -350,15 +349,16 @@ func (builder *assistantStreamBuilder) replaceToolCallArguments(index int, text 
 	}
 	delta, hasDelta, arguments, order := state.args.Replace(text)
 	block := builder.partial.Content[state.contentIndex].(ToolCall)
-	block.setParsedArguments(arguments, order, nil)
-	builder.noteStreamedArguments(state.contentIndex, state.args, arguments)
+	builder.showStreamedArguments(state.contentIndex, &block, state.args, arguments, order)
 	builder.partial.Content[state.contentIndex] = block
 	return delta, hasDelta
 }
 
-// noteStreamedArguments records the partial arguments stream returned for the call at contentIndex, which the call now holds, as the
-// snapshot the cell may keep as it is (streamedArguments) when the stream says it is immutable, and forgets any earlier one otherwise.
-func (builder *assistantStreamBuilder) noteStreamedArguments(contentIndex int, stream *ToolCallArgumentsStream, arguments JsonObject) {
+// showStreamedArguments makes the call at contentIndex show the partial arguments stream returned (arguments and their member order),
+// and records them as the snapshot the cell may keep as it is (streamedArguments) when the stream says it is immutable, forgetting any
+// earlier one otherwise.
+func (builder *assistantStreamBuilder) showStreamedArguments(contentIndex int, call *ToolCall, stream *ToolCallArgumentsStream, arguments JsonObject, order schemaObjectOrder) {
+	call.setParsedArguments(arguments, order, nil)
 	if !stream.immutable() {
 		delete(builder.streamedArguments, contentIndex)
 		return

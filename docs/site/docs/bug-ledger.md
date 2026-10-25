@@ -12653,14 +12653,14 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 **Go embedding hosts can bind extension appends through `coding.Session.AppendExtensionEntry`, retaining…**
 
 - **Source:** PiG's own defect
-- **Symptom:** Previously, calling `AppendCustomEntry` allocated a new identity instead of retaining the subprocess ID and timestamp, leaving duplicate entries in the Node session mirror.
-- **Root cause:** Add Session.AppendExtensionEntry over the existing native append helper so public-only hosts preserve subprocess IDs, timestamps and event semantics. Cover identity, rejection, concurrent writers and isolated/packed Node hosts.
+- **Symptom:** Previously, calling `AppendCustomEntry` allocated a new identity instead of retaining the subprocess ID and timestamp because the public Session API lacked a way to pass them through, leaving duplicate entries in the Node session mirror.
+- **Root cause:** Previously, calling `AppendCustomEntry` allocated a new identity instead of retaining the subprocess ID and timestamp because the public Session API lacked a way to pass them through, leaving duplicate entries in the Node session mirror.
 - **User impact:** Wrong output or ordering
 - **Platform:** All platforms
 - **Fixed in:** Unreleased
 - **Fix commits:** `bf453203b6` (2026-10-23)
 - **Tests:** `coding/session_custom_entries_test.go::TestAppendExtensionEntryPreservesIdentityAndEventSemantics`, `coding/session_custom_entries_test.go::TestAppendExtensionEntryRejectsWithoutChangingTheLog`, `coding/session_custom_entries_test.go::TestAppendExtensionEntrySharesTheNativeAppendLock`, `coding/session_custom_entries_test.go::TestAppendExtensionEntryThroughNodeHost`
-- **Release note:** Go embedding hosts can bind extension appends through `coding.Session.AppendExtensionEntry`, retaining subprocess IDs and timestamps through the native Session writer and preserving `entry_appended` semantics. Previously, calling `AppendCustomEntry` allocated a new identity instead of retaining the subprocess ID and timestamp, leaving duplicate entries in the Node session mirror.
+- **Release note:** Go embedding hosts can bind extension appends through `coding.Session.AppendExtensionEntry`, retaining subprocess IDs and timestamps through the native Session writer and preserving `entry_appended` semantics. Previously, calling `AppendCustomEntry` allocated a new identity instead of retaining the subprocess ID and timestamp because the public Session API lacked a way to pass them through, leaving duplicate entries in the Node session mirror.
 
 ### BF-c1055c4
 

@@ -24920,14 +24920,14 @@
     {
       "id": "BF-bf45320",
       "title": "Go embedding hosts can bind extension appends through `coding.Session.AppendExtensionEntry`, retaining…",
-      "symptom": "Previously, calling `AppendCustomEntry` allocated a new identity instead of retaining the subprocess ID and timestamp, leaving duplicate entries in the Node session mirror.",
-      "rootCause": "Add Session.AppendExtensionEntry over the existing native append helper so public-only hosts preserve subprocess IDs, timestamps and event semantics. Cover identity, rejection, concurrent writers and isolated/packed Node hosts.",
-      "rootCauseSource": "commit",
+      "symptom": "Previously, calling `AppendCustomEntry` allocated a new identity instead of retaining the subprocess ID and timestamp because the public Session API lacked a way to pass them through, leaving duplicate entries in the Node session mirror.",
+      "rootCause": "Previously, calling `AppendCustomEntry` allocated a new identity instead of retaining the subprocess ID and timestamp because the public Session API lacked a way to pass them through, leaving duplicate entries in the Node session mirror.",
+      "rootCauseSource": "release note",
       "userImpact": "Wrong output or ordering",
       "platform": "All platforms",
       "class": "own",
       "fixedIn": "Unreleased",
-      "releaseNote": "Go embedding hosts can bind extension appends through `coding.Session.AppendExtensionEntry`, retaining subprocess IDs and timestamps through the native Session writer and preserving `entry_appended` semantics. Previously, calling `AppendCustomEntry` allocated a new identity instead of retaining the subprocess ID and timestamp, leaving duplicate entries in the Node session mirror.",
+      "releaseNote": "Go embedding hosts can bind extension appends through `coding.Session.AppendExtensionEntry`, retaining subprocess IDs and timestamps through the native Session writer and preserving `entry_appended` semantics. Previously, calling `AppendCustomEntry` allocated a new identity instead of retaining the subprocess ID and timestamp because the public Session API lacked a way to pass them through, leaving duplicate entries in the Node session mirror.",
       "origin": "release note",
       "commits": [
         {

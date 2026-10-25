@@ -213414,6 +213414,28 @@
       "shapeHash": "sha256:c1f5e62c046a3890a218805dbb9817e75c76785483920a44b0b85f6622169fab"
     },
     {
+      "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk/tui/internal/jsstring#LowerContains",
+      "package": "github.com/MichaelKinsy/PiG/extensions/sdk/tui/internal/jsstring",
+      "name": "LowerContains",
+      "kind": "function",
+      "exported": true,
+      "shape": {
+        "type": "func(s string, lowerNeedle string) bool"
+      },
+      "shapeHash": "sha256:c79af9c1711d2c861567d88d241d5c31ff3e9ba8fdb13dee057d9e0edb6b143e"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk/tui/internal/jsstring#LowerEquals",
+      "package": "github.com/MichaelKinsy/PiG/extensions/sdk/tui/internal/jsstring",
+      "name": "LowerEquals",
+      "kind": "function",
+      "exported": true,
+      "shape": {
+        "type": "func(s string, lowerText string) bool"
+      },
+      "shapeHash": "sha256:45b619e8a07dc6f175f88508102094a4bc61e3c67e63e58f93711254170d2aa1"
+    },
+    {
       "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk/tui/internal/jsstring#Slice",
       "package": "github.com/MichaelKinsy/PiG/extensions/sdk/tui/internal/jsstring",
       "name": "Slice",
@@ -213478,6 +213500,17 @@
         "type": "func(text string) []byte"
       },
       "shapeHash": "sha256:4449a88b752360c93f3e8d4033e9a37f2ae74c94f2f72d2e71c487c0598a80af"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk/tui/internal/jsstring#asciiLowerPrefix",
+      "package": "github.com/MichaelKinsy/PiG/extensions/sdk/tui/internal/jsstring",
+      "name": "asciiLowerPrefix",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func(s string, lowerPrefix string) bool"
+      },
+      "shapeHash": "sha256:916c56341dd2f420e830d2a81ee668ee5ad72ad653931bc4dc15a97caa9a23c1"
     },
     {
       "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk/tui/internal/jsstring#byteOffset",

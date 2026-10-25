@@ -1,6 +1,6 @@
 package ai
 
-import "encoding/json"
+import "errors"
 
 // anthStartInput is the input member of a content_block_start record, read as JSON.parse reads it. encoding/json refuses a number out of float64 range
 // where an interface is wanted and ends the turn; JSON.parse reads it as an infinity, which the stream keeps in the call's arguments until the streamed
@@ -8,14 +8,9 @@ import "encoding/json"
 type anthStartInput struct{ value any }
 
 func (input *anthStartInput) UnmarshalJSON(data []byte) error {
-	var value any
-	err := json.Unmarshal(data, &value)
-	if err != nil {
-		parsed, ok := jsonParseValue(string(data))
-		if !ok {
-			return err
-		}
-		value = parsed
+	value, ok := jsonParseValue(string(data))
+	if !ok {
+		return errors.New("invalid JSON in a tool_use input")
 	}
 	input.value = value
 	return nil

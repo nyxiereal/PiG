@@ -137,6 +137,8 @@ type DefaultResourceLoader struct {
 	files LoadExtensionsResult
 	// filesConfigs are the Host configurations of files, which the final pass of a trust reload does not attempt again.
 	filesConfigs []subprocess.ExtConfig
+	// cliExtensionPaths are the canonical paths of the extensions AdditionalExtensionPaths named in the last load; an extension at one of them has the source "cli" (resource-loader.ts :562-569).
+	cliExtensionPaths map[string]bool
 	// factoryRuntime is the runtime of the current reload: the Host adopts it and the factory extensions register against it. eventBus is the factories' bus.
 	factoryRuntime *extension.ExtensionRuntime
 	eventBus       extension.EventBus

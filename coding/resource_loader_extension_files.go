@@ -31,6 +31,10 @@ func (l *DefaultResourceLoader) loadExtensionFiles(ctx context.Context, request 
 		return LoadExtensionsResult{}, fmt.Errorf("coding: %w", err)
 	}
 	enabled := enabledExtensionPaths(cli.Extensions)
+	l.cliExtensionPaths = map[string]bool{}
+	for _, path := range enabled {
+		l.cliExtensionPaths[icodingagent.CanonicalizePath(path)] = true
+	}
 	packageRoots := map[string]string{}
 	if !l.options.NoExtensions {
 		resolved, err := manager.Resolve(nil)
@@ -213,6 +217,12 @@ func (l *DefaultResourceLoader) loadExtensionFiles(ctx context.Context, request 
 		}
 		if _, statErr := os.Stat(resolved); statErr != nil {
 			result.Errors = append(result.Errors, ExtensionLoadError{Path: resolved, Error: "Extension path does not exist: " + resolved})
+		}
+	}
+	// resource-loader.ts addExtensionConflictDiagnostics: the final set lists a tool or flag two extensions register as an error of the result; both extensions stay loaded.
+	if !request.Bootstrap {
+		for _, conflict := range icodingagent.DetectExtensionConflicts(result.Extensions) {
+			result.Errors = append(result.Errors, ExtensionLoadError{Path: conflict.Path, Error: conflict.Message})
 		}
 	}
 	return result, nil

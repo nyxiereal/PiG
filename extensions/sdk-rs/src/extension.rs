@@ -3222,6 +3222,7 @@ mod tests {
                 msg_type: "request".to_string(),
                 id: Some("r1".to_string()),
                 request: Some(RequestMsg {
+                    refine: None,
                     child_session: None, terminal_input: None,
                     stream: None,
                     stream_error: None,
@@ -3306,6 +3307,7 @@ mod tests {
                 msg_type: "request".to_string(),
                 id: Some("req-1".to_string()),
                 request: Some(RequestMsg {
+                    refine: None,
                     child_session: None, terminal_input: None,
                     stream: None,
                     stream_error: None,
@@ -3473,6 +3475,7 @@ mod tests {
                 msg_type: "request".to_string(),
                 id: Some("login-1".to_string()),
                 request: Some(RequestMsg {
+                    refine: None,
                     child_session: None, terminal_input: None,
                     stream: None,
                     stream_error: None,
@@ -3541,6 +3544,7 @@ mod tests {
                 msg_type: "request".to_string(),
                 id: Some("key-1".to_string()),
                 request: Some(RequestMsg {
+                    refine: None,
                     child_session: None, terminal_input: None,
                     stream: None,
                     stream_error: None,
@@ -3567,6 +3571,7 @@ mod tests {
                 msg_type: "request".to_string(),
                 id: Some("ref-1".to_string()),
                 request: Some(RequestMsg {
+                    refine: None,
                     child_session: None, terminal_input: None,
                     stream: None,
                     stream_error: None,
@@ -3594,6 +3599,7 @@ mod tests {
                 msg_type: "request".to_string(),
                 id: Some("store-1".to_string()),
                 request: Some(RequestMsg {
+                    refine: None,
                     child_session: None, terminal_input: None,
                     stream: None,
                     stream_error: None,
@@ -3618,6 +3624,7 @@ mod tests {
                 msg_type: "request".to_string(),
                 id: Some("status-1".to_string()),
                 request: Some(RequestMsg {
+                    refine: None,
                     child_session: None, terminal_input: None,
                     stream: None,
                     stream_error: None,
@@ -3712,6 +3719,7 @@ mod tests {
                 msg_type: "request".to_string(),
                 id: Some("req-state".to_string()),
                 request: Some(RequestMsg {
+                    refine: None,
                     child_session: None, terminal_input: None,
                     stream: None,
                     stream_error: None,
@@ -3746,6 +3754,7 @@ mod tests {
                 msg_type: "request".to_string(),
                 id: Some("req-user".to_string()),
                 request: Some(RequestMsg {
+                    refine: None,
                     child_session: None, terminal_input: None,
                     stream: None,
                     stream_error: None,
@@ -3816,6 +3825,7 @@ mod tests {
                 msg_type: "request".to_string(),
                 id: Some("req-title".to_string()),
                 request: Some(RequestMsg {
+                    refine: None,
                     child_session: None, terminal_input: None,
                     stream: None,
                     stream_error: None,
@@ -3875,6 +3885,7 @@ mod tests {
                 msg_type: "request".to_string(),
                 id: Some("req-panic".to_string()),
                 request: Some(RequestMsg {
+                    refine: None,
                     child_session: None, terminal_input: None,
                     stream: None,
                     stream_error: None,
@@ -3956,6 +3967,7 @@ mod tests {
                 msg_type: "request".to_string(),
                 id: Some("req-label".to_string()),
                 request: Some(RequestMsg {
+                    refine: None,
                     child_session: None, terminal_input: None,
                     stream: None,
                     stream_error: None,
@@ -4020,6 +4032,7 @@ mod tests {
             msg_type: "request".to_string(),
             id: Some(id.to_string()),
             request: Some(RequestMsg {
+                refine: None,
                 child_session: None, terminal_input: None,
                 stream: None,
                 stream_error: None,

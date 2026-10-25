@@ -155,13 +155,14 @@ func TestValidateToolArgumentsRefinedMatchesPi(t *testing.T) {
 			if calls == nil {
 				calls = []string{}
 			}
-			if c.Result.Error != nil {
+			switch {
+			case c.Result.Error != nil:
 				if err == nil || err.Error() != *c.Result.Error {
 					t.Errorf("error %v\n want %q", err, *c.Result.Error)
 				}
-			} else if err != nil {
+			case err != nil:
 				t.Errorf("error %v, Pi accepts", err)
-			} else {
+			default:
 				var got, want any
 				_ = json.Unmarshal(validated, &got)
 				_ = json.Unmarshal(c.Result.Args, &want)

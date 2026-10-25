@@ -27,8 +27,7 @@ func (s sharedDirFS) ReadDir(name string) ([]fs.DirEntry, error) {
 		return nil, &fs.PathError{Op: "readdir", Path: name, Err: fs.ErrInvalid}
 	}
 	entries, err := ReadDirShared(filepath.Join(s.root, filepath.FromSlash(name)))
-	var pathErr *fs.PathError
-	if errors.As(err, &pathErr) {
+	if pathErr, ok := errors.AsType[*fs.PathError](err); ok {
 		pathErr.Path = name
 	}
 	return entries, err
@@ -42,8 +41,7 @@ func (s sharedDirFS) Stat(name string) (fs.FileInfo, error) {
 		return nil, &fs.PathError{Op: "stat", Path: name, Err: fs.ErrInvalid}
 	}
 	info, err := os.Stat(filepath.Join(s.root, filepath.FromSlash(name))) //perf:ok one stat per directory that failed to list mid-walk
-	var pathErr *fs.PathError
-	if errors.As(err, &pathErr) {
+	if pathErr, ok := errors.AsType[*fs.PathError](err); ok {
 		pathErr.Path = name
 	}
 	return info, err

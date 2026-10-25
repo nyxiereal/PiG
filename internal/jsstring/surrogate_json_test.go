@@ -1,6 +1,7 @@
 package jsstring
 
 import (
+	"bytes"
 	stdjson "encoding/json"
 	"math"
 	"testing"
@@ -67,7 +68,7 @@ func TestUnmarshalKeepingSurrogatesReadsALoneSurrogateEscapeAsItsUnit(t *testing
 func equalJSONValues(a, b any) bool {
 	x, _ := stdjson.Marshal(a)
 	y, _ := stdjson.Marshal(b)
-	return string(x) == string(y)
+	return bytes.Equal(x, y)
 }
 
 func TestHasSurrogateEscape(t *testing.T) {

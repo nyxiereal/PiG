@@ -24,13 +24,15 @@ func (f graphExtensionFactory) factory(agentDir string) (extension.InlineExtensi
 	switch f.Builtin {
 	case "codemode":
 		// index.ts CodemodeExtensionOptions: mode, inlineBudget and models (default true).
-		options, err := decodeFactoryOptions[struct {
+		var options struct {
 			Mode         string   `json:"mode"`
 			InlineBudget *float64 `json:"inlineBudget"`
 			Models       *bool    `json:"models"`
-		}](f)
-		if err != nil {
-			return nil, err
+		}
+		if f.hasOptions() {
+			if err := json.Unmarshal(f.Options, &options); err != nil {
+				return nil, f.optionsError(err)
+			}
 		}
 		if options.Mode != "" && options.Mode != codemode.ModeOn && options.Mode != codemode.ModeOnly {
 			return nil, fmt.Errorf(`createCodemodeExtension option mode must be "on" or "only", got %q`, options.Mode)
@@ -45,12 +47,14 @@ func (f graphExtensionFactory) factory(agentDir string) (extension.InlineExtensi
 		return toolsearch.CreateToolSearchExtension(), nil
 	case "mcp":
 		// index.ts McpExtensionOptions: the data options logPath and startupWaitMs. The function options (loadConfig, createTransport, credentials, openUrl, updateConfig) run caller code and are not served.
-		options, err := decodeFactoryOptions[struct {
+		var options struct {
 			LogPath       string   `json:"logPath"`
 			StartupWaitMs *float64 `json:"startupWaitMs"`
-		}](f)
-		if err != nil {
-			return nil, err
+		}
+		if f.hasOptions() {
+			if err := json.Unmarshal(f.Options, &options); err != nil {
+				return nil, f.optionsError(err)
+			}
 		}
 		built := mcpext.Options{LogPath: options.LogPath, AgentDir: agentDir, ConfigDirName: icodingagent.ConfigDirName()}
 		if options.StartupWaitMs != nil {
@@ -62,13 +66,10 @@ func (f graphExtensionFactory) factory(agentDir string) (extension.InlineExtensi
 	return nil, fmt.Errorf("the host serves no compiled-in extension named %q", f.Builtin)
 }
 
-func decodeFactoryOptions[T any](f graphExtensionFactory) (T, error) {
-	var options T
-	if len(f.Options) == 0 || string(f.Options) == "null" {
-		return options, nil
-	}
-	if err := json.Unmarshal(f.Options, &options); err != nil {
-		return options, fmt.Errorf("options of the %s extension: %w", f.Builtin, err)
-	}
-	return options, nil
+func (f graphExtensionFactory) hasOptions() bool {
+	return len(f.Options) != 0 && string(f.Options) != "null"
+}
+
+func (f graphExtensionFactory) optionsError(err error) error {
+	return fmt.Errorf("options of the %s extension: %w", f.Builtin, err)
 }

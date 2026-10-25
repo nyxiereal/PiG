@@ -435,11 +435,19 @@ func TestDaemonWatchMatchesPisDaemon(t *testing.T) {
 				if test.single {
 					changes = test.changes
 				}
+				// Pi's daemon reports a native event's path whenever the event arrives, besides the paths its rescan found, and on macOS
+				// FSEvents delivers an event after the flush that already reported its path: a change's window can open with the paths of an
+				// earlier change and its sentinel (a spurious call, which Watch's contract allows). Such a re-report is dropped for both
+				// daemons: a path an earlier window reported that this change did not touch, and an earlier change's sentinel. What the
+				// change touched, and every path reported for the first time, stays, so an extra path still differs.
+				reported := map[string]bool{}
 				for index, change := range changes {
 					sentinel := fmt.Sprintf("watched/zz-sentinel-%d", index)
+					before := treeState(root)
 					if change != nil {
 						change(t, root)
 					}
+					touched := changedEntries(before, treeState(root))
 					if !test.single {
 						mustDo(os.WriteFile(filepath.Join(root, sentinel), nil, 0o644))
 					}
@@ -456,10 +464,13 @@ func TestDaemonWatchMatchesPisDaemon(t *testing.T) {
 							continue
 						}
 						for _, path := range event["paths"].([]any) {
-							if path.(string) == filepath.Join(root, sentinel) {
+							switch name := path.(string); {
+							case name == filepath.Join(root, sentinel):
 								done = true
-							} else {
-								paths = append(paths, strings.ReplaceAll(path.(string), root, "{ROOT}"))
+							case oldSentinel.MatchString(name), reported[name] && !touched[name]:
+							default:
+								paths = append(paths, strings.ReplaceAll(name, root, "{ROOT}"))
+								reported[name] = true
 							}
 						}
 						if test.single {
@@ -511,4 +522,44 @@ func TestDaemonWatchRequestsMatchPisDaemon(t *testing.T) {
 			compareWire(t, test.name, pi, pig)
 		})
 	}
+}
+
+var oldSentinel = regexp.MustCompile(`/watched/zz-sentinel-\d+$`)
+
+// treeState is what each entry below root is, for telling what a change touched: a file by size and modification time, a directory by
+// its kind alone (its own times change with every entry below it).
+func treeState(root string) map[string]string {
+	state := map[string]string{}
+	_ = filepath.WalkDir(root, func(path string, entry os.DirEntry, err error) error {
+		if err != nil || path == root {
+			return nil
+		}
+		info, err := entry.Info()
+		if err != nil {
+			return nil
+		}
+		if info.IsDir() {
+			state[path] = "dir"
+		} else {
+			state[path] = fmt.Sprintf("%d %d", info.Size(), info.ModTime().UnixNano())
+		}
+		return nil
+	})
+	return state
+}
+
+// changedEntries is every path that exists in only one of the states or differs between them.
+func changedEntries(before, after map[string]string) map[string]bool {
+	changed := map[string]bool{}
+	for path, value := range after {
+		if before[path] != value {
+			changed[path] = true
+		}
+	}
+	for path := range before {
+		if _, ok := after[path]; !ok {
+			changed[path] = true
+		}
+	}
+	return changed
 }

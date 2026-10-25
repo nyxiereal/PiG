@@ -978,6 +978,15 @@ def new_extension() -> pig_sdk.Extension:
                 report["diff"], report["firstChangedLine"] = diff.diff, diff.first_changed_line
             diffs.append(report)
         entries = [pig_sdk.session_entry_to_context_messages(case["entry"]) for case in golden["entries"]]
+        contexts = []
+        for case in golden["contexts"]:
+            entries_arg, *rest = case["args"]
+            leaf = rest[0] if rest else pig_sdk.SESSION_LEAF_LAST
+            by_id = dict(rest[1]) if len(rest) > 1 else None
+            try:
+                contexts.append({"result": pig_sdk.build_session_context(entries_arg, leaf, by_id)})
+            except TypeError as error:
+                contexts.append({"throws": str(error)})
         images = []
         for case in golden["images"]:
             if case["op"] == "convert":
@@ -994,7 +1003,7 @@ def new_extension() -> pig_sdk.Extension:
             "notJSON": pig_sdk.read_stored_credential("anthropic", auth_path + ".bad"),
         }
         ctx.copy_to_clipboard(text)
-        ctx.notify("host_helpers:" + json.dumps({"diffs": diffs, "entries": entries, "images": images, "creds": creds}) + ":end", "info")
+        ctx.notify("host_helpers:" + json.dumps({"diffs": diffs, "entries": entries, "contexts": contexts, "images": images, "creds": creds}) + ":end", "info")
 
     ext.command("host_helpers_probe", "Run the host-served pi helpers over the golden inputs", host_helpers_probe)
     # pi_ai_helpers_probe runs every call of the vector calls (test/parity/sdk-vectors, Pi's own answers at the pin, listed in one file by the test) through this SDK's pi-ai

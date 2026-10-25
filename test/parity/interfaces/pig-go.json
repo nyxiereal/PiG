@@ -177015,6 +177015,17 @@
       "shapeHash": "sha256:1bd2c70581b9e6febf7430a35a4498cc9a5119ddd1763c0e5574ba297b2023cf"
     },
     {
+      "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#BuildSessionContext",
+      "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
+      "name": "BuildSessionContext",
+      "kind": "function",
+      "exported": true,
+      "shape": {
+        "type": "func(entries []map[string]any, leaf SessionLeaf, byID map[string]map[string]any) (map[string]any, error)"
+      },
+      "shapeHash": "sha256:f30e87dc0496ea6c03ea94f1d0f827defa1d28261d8571c7511bf34183ed3f6c"
+    },
+    {
       "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#BuiltinTool",
       "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
       "name": "BuiltinTool",
@@ -188598,6 +188609,50 @@
       "shapeHash": "sha256:c975b51cee63d26634a3177d9ac7bcf26c1449e31dbacf4fe1ebc7958886b84e"
     },
     {
+      "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#SessionLeaf",
+      "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
+      "name": "SessionLeaf",
+      "kind": "type",
+      "exported": true,
+      "shape": {
+        "type": "SessionLeaf"
+      },
+      "shapeHash": "sha256:49c94cf38c33165c9b16cf40a78789863e2aca3f2c80c80680d8e413d4f493c2"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#SessionLeafAt",
+      "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
+      "name": "SessionLeafAt",
+      "kind": "function",
+      "exported": true,
+      "shape": {
+        "type": "func(id string) SessionLeaf"
+      },
+      "shapeHash": "sha256:2f194202ce22445fa55672e89505dd56194f02f88b4210ba6590f94345bc05c9"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#SessionLeafLast",
+      "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
+      "name": "SessionLeafLast",
+      "kind": "variable",
+      "exported": true,
+      "shape": {
+        "type": "SessionLeaf"
+      },
+      "shapeHash": "sha256:49c94cf38c33165c9b16cf40a78789863e2aca3f2c80c80680d8e413d4f493c2"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#SessionLeafNone",
+      "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
+      "name": "SessionLeafNone",
+      "kind": "variable",
+      "exported": true,
+      "shape": {
+        "type": "SessionLeaf"
+      },
+      "shapeHash": "sha256:49c94cf38c33165c9b16cf40a78789863e2aca3f2c80c80680d8e413d4f493c2"
+    },
+    {
       "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#SessionListProgress",
       "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
       "name": "SessionListProgress",
@@ -192591,6 +192646,17 @@
       "shapeHash": "sha256:96dce52cff311286b339ab7b9b420de2e1d0c6e940b967b8825446ca16e27dc7"
     },
     {
+      "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#applyContextEdit",
+      "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
+      "name": "applyContextEdit",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func(messages []any, edit map[string]any) ([]any, error)"
+      },
+      "shapeHash": "sha256:7292abd781f3295448662ae2170c09bedb19b3572cd7f52929a8f0726ae4b2ae"
+    },
+    {
       "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#applyHostTuiState",
       "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
       "name": "applyHostTuiState",
@@ -192787,6 +192853,28 @@
         "type": "untyped string"
       },
       "shapeHash": "sha256:7eabd192b9f1c379102c8dc793881875f1f949f6b752e15a20b93080cb0b311d"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#buildContextEntries",
+      "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
+      "name": "buildContextEntries",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func(path []map[string]any) []map[string]any"
+      },
+      "shapeHash": "sha256:5e7610bf8b3882dc2765c62a267da38f9cda33a49b316981c8e4bbe0ad81ca5b"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#buildSessionPath",
+      "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
+      "name": "buildSessionPath",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func(entries []map[string]any, leaf SessionLeaf, byID map[string]map[string]any) []map[string]any"
+      },
+      "shapeHash": "sha256:32489aa1e3a7c367b744a4feeeebdf6a3942d1ca93e45d9905a9fdede28c1b2f"
     },
     {
       "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#builtinCallbacks",
@@ -194263,6 +194351,17 @@
       "shapeHash": "sha256:9ea59e550fcb3de2c3bf26c5f41cbe519b86b8ff443d579e9cc55d1cd0b360c0"
     },
     {
+      "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#definedMembers",
+      "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
+      "name": "definedMembers",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func(source map[string]any, names map[string]string) map[string]any"
+      },
+      "shapeHash": "sha256:e0860eee0298236eb5f6b38643db51bda2c94b6c6012304fd6723a6a81e44247"
+    },
+    {
       "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#dialLocked",
       "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
       "name": "dialLocked",
@@ -194514,6 +194613,17 @@
         "type": "func(entries []map[string]any, index int) map[string]any"
       },
       "shapeHash": "sha256:bb42d50a08a6ab2d3e0069b83ca38a238da16f59a3b3ac1e04c0c94a6af5d0aa"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#entryMessageRole",
+      "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
+      "name": "entryMessageRole",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func(entry map[string]any) (string, bool)"
+      },
+      "shapeHash": "sha256:c477ca7a0bb49760665e54de7a25d615e0b361a5015607f1808bab922f16051c"
     },
     {
       "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#entryMeta",
@@ -195781,6 +195891,17 @@
       "shapeHash": "sha256:e7be7cf4aa1dd4043b4836052775cbe948cc24e1fc15ebeb5a5265d7f9c44073"
     },
     {
+      "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#idKey",
+      "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
+      "name": "idKey",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func(value any) (any, bool)"
+      },
+      "shapeHash": "sha256:e6b6d5a45f3357b811e7427b1d6e67b89691c9e4daa9b179fb1523eca808d529"
+    },
+    {
       "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#imageErrorResult",
       "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
       "name": "imageErrorResult",
@@ -196516,6 +196637,17 @@
         "type": "func(entry map[string]any) (map[string]any, error)"
       },
       "shapeHash": "sha256:2cfaadc93f02ede39004835adc37769986bf26c513b79d477afa24e89e641151"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#messageRole",
+      "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
+      "name": "messageRole",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func(entry map[string]any) (string, error)"
+      },
+      "shapeHash": "sha256:25ac55fe7d0d514d91e3c033de41b9ba3b6a7043dd4f1b027e00cd7e20dc7ad6"
     },
     {
       "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#methodEventsDispatch",
@@ -198707,6 +198839,17 @@
       "shapeHash": "sha256:b82fe9c2452fbdcae7c3f4cfd6401bbf0d779cd78ed49b2f9af485b64abbffa3"
     },
     {
+      "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#sameID",
+      "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
+      "name": "sameID",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func(a map[string]any, b map[string]any, aKey string, bKey string) bool"
+      },
+      "shapeHash": "sha256:b9c3154100e5a8493eb9785f716322a444a76dde2ff80bdf4cad376fd311c8a7"
+    },
+    {
       "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#sameOverlayComponent",
       "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
       "name": "sameOverlayComponent",
@@ -198782,6 +198925,17 @@
         "type": "func(message *jsObject) ([]string, error)"
       },
       "shapeHash": "sha256:6400916a252e2d6b35d7213b02a79a28cb929b34264c93cea28e5d76d31bc787"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#sessionContextSettings",
+      "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
+      "name": "sessionContextSettings",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func(path []map[string]any) (thinking any, thinkingDefined bool, model map[string]any, err error)"
+      },
+      "shapeHash": "sha256:5e27e6d522fee26dc2a56a18fefc59a75922bc9893ac2561d581163c9292c10e"
     },
     {
       "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#sessionEntryToContextMessages",

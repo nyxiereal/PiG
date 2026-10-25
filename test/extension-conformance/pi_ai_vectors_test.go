@@ -18,6 +18,7 @@ type piVectorCase struct {
 	Name   string            `json:"name"`
 	Args   []json.RawMessage `json:"args"`
 	Result json.RawMessage   `json:"result"`
+	Throws *string           `json:"throws"`
 }
 
 func piVectorCases(t *testing.T, module, export string) []piVectorCase {
@@ -168,6 +169,16 @@ func piVectorsFile(t *testing.T) string {
 	for _, c := range piVectorCases(t, "pi-coding-agent", "sessionEntryToContextMessages") {
 		entries = append(entries, map[string]any{"entry": c.Args[0], "messages": c.Result})
 	}
+	var contexts []map[string]any
+	for _, c := range piVectorCases(t, "pi-coding-agent", "buildSessionContext") {
+		context := map[string]any{"name": c.Name, "args": c.Args}
+		if c.Throws != nil {
+			context["throws"] = *c.Throws
+		} else {
+			context["result"] = c.Result
+		}
+		contexts = append(contexts, context)
+	}
 	var images []map[string]any
 	for _, export := range []string{"convertToPng", "resizeImage"} {
 		op := map[string]string{"convertToPng": "convert", "resizeImage": "resize"}[export]
@@ -184,7 +195,7 @@ func piVectorsFile(t *testing.T) string {
 		}
 	}
 
-	encoded, err := json.Marshal(map[string]any{"cases": cases, "timing": timing, "auth": map[string]any{"cases": authCases, "login": login}, "diffs": diffs, "entries": entries, "images": images})
+	encoded, err := json.Marshal(map[string]any{"cases": cases, "timing": timing, "auth": map[string]any{"cases": authCases, "login": login}, "diffs": diffs, "entries": entries, "contexts": contexts, "images": images})
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -7,7 +7,7 @@ import * as piTui from "@earendil-works/pi-tui";
 import * as piCodingAgent from "@earendil-works/pi-coding-agent";
 const { Container } = piTui;
 import {
-  createBashToolDefinition, createGrepToolDefinition, createLsToolDefinition, createReadToolDefinition, CONFIG_DIR_NAME, isToolCallEventType, CustomEditor, getAgentDir, getPackageDir, getShellConfig, generateDiffString, generateUnifiedPatch, sessionEntryToContextMessages, convertToPng, resizeImage, readStoredCredential, VERSION, formatSize, DEFAULT_MAX_LINES, DEFAULT_MAX_BYTES, truncateHead, truncateLine, truncateTail, withFileMutationQueue, isBashToolResult, isEditToolResult, isFindToolResult, isGrepToolResult, isLsToolResult, isPowerShellToolResult, isReadToolResult, isWriteToolResult,
+  createBashToolDefinition, createGrepToolDefinition, createLsToolDefinition, createReadToolDefinition, CONFIG_DIR_NAME, isToolCallEventType, CustomEditor, getAgentDir, getPackageDir, getShellConfig, generateDiffString, generateUnifiedPatch, sessionEntryToContextMessages, buildSessionContext, convertToPng, resizeImage, readStoredCredential, VERSION, formatSize, DEFAULT_MAX_LINES, DEFAULT_MAX_BYTES, truncateHead, truncateLine, truncateTail, withFileMutationQueue, isBashToolResult, isEditToolResult, isFindToolResult, isGrepToolResult, isLsToolResult, isPowerShellToolResult, isReadToolResult, isWriteToolResult,
   getMarkdownTheme, getSelectListTheme, getSettingsListTheme, renderDiff,
 } from "@earendil-works/pi-coding-agent";
 
@@ -935,6 +935,10 @@ export default function (pi) {
       return report;
     });
     const entries = golden.entries.map((c) => sessionEntryToContextMessages(c.entry));
+    const contexts = golden.contexts.map((c) => {
+      const [entries, leafId, pairs] = c.args;
+      try { return { result: JSON.parse(JSON.stringify(buildSessionContext(entries, leafId, pairs === undefined ? undefined : new Map(pairs)))) }; } catch (error) { return { throws: error.message }; }
+    });
     const meta = (image) => (image ? { mimeType: image.mimeType, ...(image.originalWidth === undefined ? {} : { originalWidth: image.originalWidth, originalHeight: image.originalHeight, width: image.width, height: image.height, wasResized: image.wasResized }), decodes: image.data.length > 0 } : null);
     const images = [];
     for (const c of golden.images) {
@@ -943,7 +947,7 @@ export default function (pi) {
     }
     const read = (provider, path) => readStoredCredential(provider, path) ?? null;
     const creds = { explicit: read("anthropic", authPath), default: read("anthropic"), absentProvider: read("nobody", authPath), missingFile: read("anthropic", `${authPath}.missing`), notJSON: read("anthropic", `${authPath}.bad`) };
-    ctx.ui.notify(`host_helpers:${JSON.stringify({ diffs, entries, images, creds })}:end`, "info");
+    ctx.ui.notify(`host_helpers:${JSON.stringify({ diffs, entries, contexts, images, creds })}:end`, "info");
   } });
   // pi_ai_helpers_probe runs every call of the vector calls (test/parity/sdk-vectors, Pi's own answers at the pin, listed in one file by the test) through the runtime's pi-ai and
   // reports each answer as JSON (TestConformance_PiAiHelpersAgreeAcrossSDKs).

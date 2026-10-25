@@ -14,7 +14,7 @@ import (
 func TestStreamingSnapshotValidImpliesCloneJSONValueEqualsIt(t *testing.T) {
 	alphabet := []string{`{`, `}`, `[`, `]`, `"`, `:`, `,`, ` `, `\u00e9`, `\ud83d`, `\ude00`, `\ud800`, `\n`, `\q`, "é", "\xff", "\xe2\x82", "\xac", "\xed\xa0\x80", `1`, `-`, `e`, `1e999`, `true`, `nul`, `null`, `a`, `"k":`, "\"a\xff\":"}
 	sawValid, sawInvalid := 0, 0
-	for seed := uint64(0); seed < 400; seed++ {
+	for seed := range uint64(400) {
 		random := rand.New(rand.NewPCG(seed, 1))
 		var parser StreamingJSONParser
 		parser.quiet = seed%2 == 0
@@ -28,7 +28,7 @@ func TestStreamingSnapshotValidImpliesCloneJSONValueEqualsIt(t *testing.T) {
 			if !snapshot.Defined {
 				continue
 			}
-			if !snapshot.Valid {
+			if !snapshot.valid {
 				sawInvalid++
 				continue
 			}
@@ -65,7 +65,7 @@ func TestStreamingSnapshotValidityRules(t *testing.T) {
 			var parser StreamingJSONParser
 			for i, piece := range tc.pieces {
 				parser.Append(piece)
-				if got := parser.Snapshot().Valid; got != tc.valid[i] {
+				if got := parser.Snapshot().valid; got != tc.valid[i] {
 					t.Fatalf("after %q: Valid = %v, want %v", piece, got, tc.valid[i])
 				}
 			}
@@ -216,16 +216,14 @@ func TestSubscribersMutatingConcurrentlyDoNotRaceWithAStreamingProducer(t *testi
 	views := make(chan *AssistantMessage, len(pieces))
 	var subscribers sync.WaitGroup
 	for range 4 {
-		subscribers.Add(1)
-		go func() {
-			defer subscribers.Done()
+		subscribers.Go(func() {
 			for view := range views {
 				for _, handout := range []*AssistantMessage{view.Observe(), view.ShallowCopy(), view.Observe().ShallowCopy()} {
 					mutateHandout(handout)
 				}
 				publishedArguments(view) // the cell's own, read while the producer publishes the next one
 			}
-		}()
+		})
 	}
 	runManagedBuilder(builder, func() {
 		builder.start()

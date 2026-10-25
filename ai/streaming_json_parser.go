@@ -164,9 +164,9 @@ type StreamingJSONSnapshot struct {
 	Defined bool
 	// Order is the member order of the objects in Value that are not in sorted order, by path.
 	Order schemaObjectOrder
-	// Valid is true when every string in Value is valid UTF-8 or WTF-8, every key is valid UTF-8 and every number is finite: Value is
-	// then what cloneJSONValue returns for it, so a holder may keep it as the immutable copy of itself.
-	Valid bool
+	// valid is true when every string in Value is valid UTF-8 or WTF-8, every key is valid UTF-8 and every number is finite: Value is
+	// then what cloneJSONValue returns for it, so a holder in this package may keep it as the immutable copy of itself.
+	valid bool
 	// Version changes whenever Snapshot made a fresh copy.
 	Version uint64
 }
@@ -223,7 +223,7 @@ func (p *StreamingJSONParser) Snapshot() StreamingJSONSnapshot {
 			p.snapshotVersion++
 		}
 	}
-	return StreamingJSONSnapshot{Value: p.snapshotValue, Defined: p.snapshotDefined, Order: p.snapshotOrder, Valid: p.snapshotValid, Version: p.snapshotVersion}
+	return StreamingJSONSnapshot{Value: p.snapshotValue, Defined: p.snapshotDefined, Order: p.snapshotOrder, valid: p.snapshotValid, Version: p.snapshotVersion}
 }
 
 // valueIsValid reports whether the snapshot just copied holds only what cloneJSONValue copies as it is: every finished string valid
@@ -1011,7 +1011,7 @@ func (stream *ToolCallArgumentsStream) partial() (JsonObject, schemaObjectOrder)
 	stream.version = snapshot.Version
 	// Tool arguments are an object; any other partial value shows as no arguments yet.
 	if object, ok := snapshot.Value.(map[string]any); ok && snapshot.Defined {
-		stream.arguments, stream.order, stream.valid = JsonObject(object), snapshot.Order, snapshot.Valid
+		stream.arguments, stream.order, stream.valid = JsonObject(object), snapshot.Order, snapshot.valid
 	} else {
 		stream.arguments, stream.order, stream.valid = JsonObject{}, nil, true
 	}

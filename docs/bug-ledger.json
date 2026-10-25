@@ -309,6 +309,30 @@
       ]
     },
     {
+      "id": "BF-0387059",
+      "title": "The pi-env daemon runs a command whose `timeoutMs` is above 2^31-1 ms without a deadline, as Pi's daemon…",
+      "symptom": "The pi-env daemon runs a command whose `timeoutMs` is above 2^31-1 ms without a deadline, as Pi's daemon does, instead of refusing it; the clients still refuse such a timeout, as Pi's do.",
+      "rootCause": "Pi refuses a timeout above 2^31-1 ms in the clients (durable env/node.ts and env remote-env.ts, both ported and unchanged); only a raw request reaches the daemon, which Pi runs without a deadline. Regression: the TestDaemonExecMatchesPisDaemon case \"timeout above what Node can arm\" (red before, green after). Also clears the lint findings of the earlier test files.",
+      "rootCauseSource": "commit",
+      "userImpact": "An operation failed or was rejected",
+      "platform": "All platforms",
+      "class": "own",
+      "fixedIn": "Unreleased",
+      "releaseNote": "The pi-env daemon runs a command whose `timeoutMs` is above 2^31-1 ms without a deadline, as Pi's daemon does, instead of refusing it; the clients still refuse such a timeout, as Pi's do.",
+      "origin": "release note",
+      "commits": [
+        {
+          "hash": "0387059efb",
+          "date": "2026-10-24"
+        }
+      ],
+      "tests": [
+        "durable/env/node/rename_directory_pi_test.go::TestRenameFileReportsTheErrorOfRename2ForADirectoryDestination",
+        "env/daemon_wire_exec_oracle_test.go::TestDaemonExecMatchesPisDaemon",
+        "env/daemon_wire_exec_oracle_test.go::TestDaemonWatchMatchesPisDaemon"
+      ]
+    },
+    {
       "id": "BF-03ad544",
       "title": "fix(tui): card of an unregistered tool is Pi's formatToolExecution",
       "symptom": "fix(tui): card of an unregistered tool is Pi's formatToolExecution",
@@ -22236,6 +22260,31 @@
       ]
     },
     {
+      "id": "BF-D197",
+      "title": "The env daemon's limit of open files is the hard limit, where Pi's daemon keeps the soft limit it inherited",
+      "symptom": "none. Pi's daemon leaves the limit alone (no `setrlimit` call in any file of `packages/env/daemon/src`) and maps the system's `EMFILE` as it should (`src/sys/unix.rs:35`). The two counts differ because the two runtimes differ.",
+      "rootCause": "nothing in PiG reaches the limit on purpose. The Go runtime's raise is the toolchain's own behavior (every Go program on Unix has it), and undoing it to give a program Pi's smaller limit would make PiG fail on workloads that succeed, in a daemon whose handle table already caps the count.",
+      "rootCauseSource": "divergence record",
+      "userImpact": "Behavior differed from Pi",
+      "platform": "All platforms",
+      "class": "ahead-of-pi",
+      "divergence": "D197",
+      "removeWhen": "the Go runtime lets a program keep its inherited soft limit, or Pi's daemon raises its own soft limit to the hard limit at start, or an owner decision reverses this one; then the marker, the two tests and this record go.",
+      "fixedIn": "Unreleased",
+      "origin": "divergence",
+      "commits": [
+        {
+          "hash": "9868e242c6",
+          "date": "2026-10-24"
+        }
+      ],
+      "tests": [
+        "env/daemon/descriptor_limit_linux_test.go::TestDescriptorLimitIsTheHardLimit",
+        "env/daemon_descriptor_limit_divergence_test.go::TestDaemonDescriptorLimitIsTheHardLimitUnlikePisDaemon",
+        "env/daemon_wire_oracle_test.go::TestDaemonHandlesAreLimitedLikePisDaemon"
+      ]
+    },
+    {
       "id": "BF-a076a50",
       "title": "A model request on a reused connection gets the full HTTP idle timeout to receive its first response bytes…",
       "symptom": "The time the connection had spent idle in the pool was deducted from the next request's timeout.",
@@ -23802,6 +23851,29 @@
       ]
     },
     {
+      "id": "BF-aec0042",
+      "title": "fix(env): the daemon runs a command whose timeoutMs Node cannot arm, as Pi's daemon does",
+      "symptom": "fix(env): the daemon runs a command whose timeoutMs Node cannot arm, as Pi's daemon does",
+      "rootCause": "Pi refuses a timeout above 2^31-1 ms in the clients (durable env/node.ts and env remote-env.ts, both ported and unchanged); only a raw request reaches the daemon, which Pi runs without a deadline. Regression: the TestDaemonExecMatchesPisDaemon case \"timeout above what Node can arm\" (red before, green after). Also clears the lint findings of the earlier test files.",
+      "rootCauseSource": "commit",
+      "userImpact": "An operation failed or was rejected",
+      "platform": "All platforms",
+      "class": "own",
+      "fixedIn": "Unreleased",
+      "origin": "commit",
+      "commits": [
+        {
+          "hash": "aec0042260",
+          "date": "2026-10-24"
+        }
+      ],
+      "tests": [
+        "durable/env/node/rename_directory_pi_test.go::TestRenameFileReportsTheErrorOfRename2ForADirectoryDestination",
+        "env/daemon_wire_exec_oracle_test.go::TestDaemonExecMatchesPisDaemon",
+        "env/daemon_wire_exec_oracle_test.go::TestDaemonWatchMatchesPisDaemon"
+      ]
+    },
+    {
       "id": "BF-af1fe1a",
       "title": "Cycling models in the interactive UI goes through the Session as in Pi: the new model persists as the…",
       "symptom": "Cycling models in the interactive UI goes through the Session as in Pi: the new model persists as the default, extends a non-empty `enabledModels` scope, keeps scope keys for model IDs that start with their provider, and checks Anthropic subscription auth after the switch.",
@@ -24044,6 +24116,43 @@
       ],
       "tests": [
         "coding/session_compact_extension_test.go::TestCompactForExtensionReturnsUpstreamResultShape"
+      ]
+    },
+    {
+      "id": "BF-b1ff77a",
+      "title": "fix(env): the daemon answers as Pi's daemon does on file, command and error paths",
+      "symptom": "fix(env): the daemon answers as Pi's daemon does on file, command and error paths",
+      "rootCause": "A differential test of the daemon against Pi's own Rust daemon (every file operation, exec, watch, hello, framing) found nine differences: the error JSON omitted an empty path; realpath of a symlink loop was UNKNOWN, not ELOOP; a directory renamed over a non-empty directory was EEXIST, not ENOTEMPTY (Node and the daemon now call rename(2) through nodeerrno.Rename); opendir of an unreadable file was EACCES, not ENOTDIR; errors outside the daemon's table (ENXIO) were named, not UNKNOWN; an empty write to a full device failed; an exec timeout read timeout:\u003cs\u003e and a timeout of 0 was refused; spawn and spill failures did not use the text of Rust's io::Error; and commands were process-group…",
+      "rootCauseSource": "commit",
+      "userImpact": "An operation failed or was rejected",
+      "platform": "All platforms",
+      "class": "own",
+      "fixedIn": "Unreleased",
+      "origin": "commit",
+      "commits": [
+        {
+          "hash": "b1ff77a5e2",
+          "date": "2026-10-24"
+        }
+      ],
+      "tests": [
+        "durable/env/node/exec_session_leader_test.go::TestShellCommandRunsAsTheLeaderOfANewSession",
+        "durable/env/node/rename_directory_pi_test.go::TestRenameFileReportsTheErrorOfRename2ForADirectoryDestination",
+        "env/daemon_wire_exec_oracle_test.go::TestDaemonCancelRightBehindItsRequestMatchesPisDaemon",
+        "env/daemon_wire_exec_oracle_test.go::TestDaemonExecCancelMatchesPisDaemon",
+        "env/daemon_wire_exec_oracle_test.go::TestDaemonExecMatchesPisDaemon",
+        "env/daemon_wire_exec_oracle_test.go::TestDaemonHelloMatchesPisDaemon",
+        "env/daemon_wire_exec_oracle_test.go::TestDaemonRepliesBeforeBulkOutputLikePisDaemon",
+        "env/daemon_wire_exec_oracle_test.go::TestDaemonWatchMatchesPisDaemon",
+        "env/daemon_wire_exec_oracle_test.go::TestDaemonWatchRequestsMatchPisDaemon",
+        "env/daemon_wire_oracle_test.go::TestDaemonAnswersAFrameWhoseJSONDoesNotParseLikePisDaemon",
+        "env/daemon_wire_oracle_test.go::TestDaemonEndsOnAFramingErrorLikePisDaemon",
+        "env/daemon_wire_oracle_test.go::TestDaemonFileOperationsMatchPisDaemon",
+        "env/daemon_wire_oracle_test.go::TestDaemonHandlesAreLimitedLikePisDaemon",
+        "env/daemon_wire_oracle_test.go::TestDaemonNameEncodingsMatchPisDaemon",
+        "env/daemon_wire_oracle_test.go::TestDaemonOpensASocketLikePisDaemon",
+        "env/daemon_wire_oracle_test.go::TestDaemonPoisonsAWriteHandleAfterAFailedChunkLikePisDaemon",
+        "env/daemon_wire_oracle_test.go::TestDaemonStatReportsTheFilesIdentityLikePisDaemon"
       ]
     },
     {
@@ -34984,6 +35093,44 @@
       ]
     },
     {
+      "id": "BF-fa131b5",
+      "title": "The pi-env daemon answers as Pi's daemon does where a differential test found it did not: an error for an…",
+      "symptom": "The pi-env daemon answers as Pi's daemon does where a differential test found it did not: an error for an empty path carries `path`, `realpath` of a symbolic link loop is `ELOOP`, a directory renamed over a non-empty directory is `ENOTEMPTY` and a file over a directory `EISDIR` (also in the Durable Node environment's `renameFile`), `opendir` of a file is `ENOTDIR` before any permission check, errors the daemon's table does not name are `UNKNOWN` with the system's text, an empty write to a full device succeeds, an exec timeout is `timeout` and `timeoutMs: 0` times out at once, spawn and spill failures read as Rust's `io::Error`, and a command is the leader of a new session as Node's detached spawn makes it.",
+      "rootCause": "A differential test of the daemon against Pi's own Rust daemon (every file operation, exec, watch, hello, framing) found nine differences: the error JSON omitted an empty path; realpath of a symlink loop was UNKNOWN, not ELOOP; a directory renamed over a non-empty directory was EEXIST, not ENOTEMPTY (Node and the daemon now call rename(2) through nodeerrno.Rename); opendir of an unreadable file was EACCES, not ENOTDIR; errors outside the daemon's table (ENXIO) were named, not UNKNOWN; an empty write to a full device failed; an exec timeout read timeout:\u003cs\u003e and a timeout of 0 was refused; spawn and spill failures did not use the text of Rust's io::Error; and commands were process-group…",
+      "rootCauseSource": "commit",
+      "userImpact": "Credential or permission exposure",
+      "platform": "All platforms",
+      "class": "own",
+      "fixedIn": "Unreleased",
+      "releaseNote": "The pi-env daemon answers as Pi's daemon does where a differential test found it did not: an error for an empty path carries `path`, `realpath` of a symbolic link loop is `ELOOP`, a directory renamed over a non-empty directory is `ENOTEMPTY` and a file over a directory `EISDIR` (also in the Durable Node environment's `renameFile`), `opendir` of a file is `ENOTDIR` before any permission check, errors the daemon's table does not name are `UNKNOWN` with the system's text, an empty write to a full device succeeds, an exec timeout is `timeout` and `timeoutMs: 0` times out at once, spawn and spill failures read as Rust's `io::Error`, and a command is the leader of a new session as Node's detached spawn makes it.",
+      "origin": "release note",
+      "commits": [
+        {
+          "hash": "fa131b5961",
+          "date": "2026-10-24"
+        }
+      ],
+      "tests": [
+        "durable/env/node/exec_session_leader_test.go::TestShellCommandRunsAsTheLeaderOfANewSession",
+        "durable/env/node/rename_directory_pi_test.go::TestRenameFileReportsTheErrorOfRename2ForADirectoryDestination",
+        "env/daemon_wire_exec_oracle_test.go::TestDaemonCancelRightBehindItsRequestMatchesPisDaemon",
+        "env/daemon_wire_exec_oracle_test.go::TestDaemonExecCancelMatchesPisDaemon",
+        "env/daemon_wire_exec_oracle_test.go::TestDaemonExecMatchesPisDaemon",
+        "env/daemon_wire_exec_oracle_test.go::TestDaemonHelloMatchesPisDaemon",
+        "env/daemon_wire_exec_oracle_test.go::TestDaemonRepliesBeforeBulkOutputLikePisDaemon",
+        "env/daemon_wire_exec_oracle_test.go::TestDaemonWatchMatchesPisDaemon",
+        "env/daemon_wire_exec_oracle_test.go::TestDaemonWatchRequestsMatchPisDaemon",
+        "env/daemon_wire_oracle_test.go::TestDaemonAnswersAFrameWhoseJSONDoesNotParseLikePisDaemon",
+        "env/daemon_wire_oracle_test.go::TestDaemonEndsOnAFramingErrorLikePisDaemon",
+        "env/daemon_wire_oracle_test.go::TestDaemonFileOperationsMatchPisDaemon",
+        "env/daemon_wire_oracle_test.go::TestDaemonHandlesAreLimitedLikePisDaemon",
+        "env/daemon_wire_oracle_test.go::TestDaemonNameEncodingsMatchPisDaemon",
+        "env/daemon_wire_oracle_test.go::TestDaemonOpensASocketLikePisDaemon",
+        "env/daemon_wire_oracle_test.go::TestDaemonPoisonsAWriteHandleAfterAFailedChunkLikePisDaemon",
+        "env/daemon_wire_oracle_test.go::TestDaemonStatReportsTheFilesIdentityLikePisDaemon"
+      ]
+    },
+    {
       "id": "BF-fa3da97",
       "title": "A wake the scheduler took at a change is still delivered to `OnWake` when the Session fails and seals before…",
       "symptom": "A wake the scheduler took at a change is still delivered to `OnWake` when the Session fails and seals before the goroutine publishing it runs, as Pi's microtask ran first; a failing recovery pass no longer loses the host's active wake.",
@@ -36861,6 +37008,11 @@
       "id": "D190",
       "title": "The built-in file mutation queue also orders mutations of one existing file reached through a hard link or a…",
       "entry": "BF-648ff3e-13"
+    },
+    {
+      "id": "D197",
+      "title": "The env daemon's limit of open files is the hard limit, where Pi's daemon keeps the soft limit it inherited",
+      "entry": "BF-D197"
     }
   ],
   "exemptCommits": {

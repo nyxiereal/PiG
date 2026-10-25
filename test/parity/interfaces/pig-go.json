@@ -197965,9 +197965,9 @@
       "kind": "variable",
       "exported": false,
       "shape": {
-        "type": "*regexp.Regexp"
+        "type": "func() *regexp.Regexp"
       },
-      "shapeHash": "sha256:71d5e3591899cd0c396770073cb9dff2078549477cfe54a8adbee9e0bbd77653"
+      "shapeHash": "sha256:21787f1fb3e3c248949f1cbb62f58e39220aca70eca91cd918b41dcefd3a8917"
     },
     {
       "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#jsObject",

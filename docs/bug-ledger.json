@@ -7360,6 +7360,54 @@
       "tests": []
     },
     {
+      "id": "BF-46b2263",
+      "title": "A durable code mode script's journal now records the calls a script had issued after a batch of results in…",
+      "symptom": "A durable code mode script's journal now records the calls a script had issued after a batch of results in one commit, as Pi does, and none after the script ended.",
+      "rootCause": "A batch of results delivered to the script was acknowledged in two or more commits, because the VM reports each result on its own goroutine, and a script that ended on the last result of a batch still had the acknowledgment of the one before it written after its end.",
+      "rootCauseSource": "release note",
+      "userImpact": "Behavior differed from Pi",
+      "platform": "All platforms",
+      "class": "own",
+      "fixedIn": "Unreleased",
+      "releaseNote": "A durable code mode script's journal now records the calls a script had issued after a batch of results in one commit, as Pi does, and none after the script ended. A batch of results delivered to the script was acknowledged in two or more commits, because the VM reports each result on its own goroutine, and a script that ended on the last result of a batch still had the acknowledgment of the one before it written after its end.",
+      "origin": "release note",
+      "commits": [
+        {
+          "hash": "46b2263428",
+          "date": "2026-10-24"
+        }
+      ],
+      "tests": [
+        "durable/codemode/call_restart_scenarios_pi_test.go::TestAResumedScriptThatEndsInItsFirstRunDivergesOnlyWhereTheLiveRunWentOn",
+        "durable/codemode/call_test.go::TestAScriptsEndWaitsForTheReplayedCallsItIssued",
+        "durable/codemode/call_test.go::TestOnlyTheFirstDivergenceOrFailureOfACallDecidesItsEnd"
+      ]
+    },
+    {
+      "id": "BF-46b2263-2",
+      "title": "A script that ends in its first run while a journaled tool call replays after a restart no longer shows that…",
+      "symptom": "A script that ends in its first run while a journaled tool call replays after a restart no longer shows that call as `cancelled` in the error result of a divergence (\"it ended after result 0, where it went on before\").",
+      "rootCause": "",
+      "rootCauseSource": "",
+      "userImpact": "An operation failed or was rejected",
+      "platform": "All platforms",
+      "class": "own",
+      "fixedIn": "Unreleased",
+      "releaseNote": "A script that ends in its first run while a journaled tool call replays after a restart no longer shows that call as `cancelled` in the error result of a divergence (\"it ended after result 0, where it went on before\"). The script's end decided the outcome before the replayed call's row had finished, where Pi finishes the row first; the end now waits for the replayed calls the VM issued.",
+      "origin": "release note",
+      "commits": [
+        {
+          "hash": "46b2263428",
+          "date": "2026-10-24"
+        }
+      ],
+      "tests": [
+        "durable/codemode/call_restart_scenarios_pi_test.go::TestAResumedScriptThatEndsInItsFirstRunDivergesOnlyWhereTheLiveRunWentOn",
+        "durable/codemode/call_test.go::TestAScriptsEndWaitsForTheReplayedCallsItIssued",
+        "durable/codemode/call_test.go::TestOnlyTheFirstDivergenceOrFailureOfACallDecidesItsEnd"
+      ]
+    },
+    {
       "id": "BF-471c46e",
       "title": "An MCP tool or resource link with an explicit empty `title` keeps it, as Pi does, instead of falling back to…",
       "symptom": "An MCP tool or resource link with an explicit empty `title` keeps it, as Pi does, instead of falling back to the annotation title or the name.",
@@ -8817,6 +8865,29 @@
         "coding/extension/builtin/codemode/run_test.go::TestDiscoveryReadsTheCatalogOnceAndKeepsTheFirstEntryOfAName",
         "coding/extension/builtin/codemode/run_test.go::TestDiscoveryStopsWhenItsContextIsCancelled",
         "coding/mcpext/extension_test.go::TestAgentSessionMCPNamesCollidingToolsAcrossTheWholeCatalog"
+      ]
+    },
+    {
+      "id": "BF-5379ab4",
+      "title": "fix(durable/codemode): count image blocks in a generateImages result as Pi does, and compare the code mode…",
+      "symptom": "fix(durable/codemode): count image blocks in a generateImages result as Pi does, and compare the code mode helpers with Pi",
+      "rootCause": "",
+      "rootCauseSource": "",
+      "userImpact": "Behavior differed from Pi",
+      "platform": "All platforms",
+      "class": "own",
+      "fixedIn": "Unreleased",
+      "origin": "commit",
+      "commits": [
+        {
+          "hash": "5379ab4607",
+          "date": "2026-10-24"
+        }
+      ],
+      "tests": [
+        "durable/codemode/codemode_helpers_pi_oracle_test.go::TestCodemodeHelpersMatchPi",
+        "durable/codemode/codemode_helpers_pi_oracle_test.go::TestNestedCallDetailsCutArgumentsAndErrorsToTheirPreviewLengths",
+        "durable/codemode/codemode_helpers_pi_oracle_test.go::TestTheHeaderShowsTheWallTimeFromTheHarnessClock"
       ]
     },
     {
@@ -23613,6 +23684,29 @@
       ]
     },
     {
+      "id": "BF-ab1d070",
+      "title": "fix(durable/codemode): journal one acknowledgment commit per delivered batch, none after the script ended…",
+      "symptom": "fix(durable/codemode): journal one acknowledgment commit per delivered batch, none after the script ended, and finish replayed rows before the script's end decides the outcome",
+      "rootCause": "",
+      "rootCauseSource": "",
+      "userImpact": "Behavior differed from Pi",
+      "platform": "All platforms",
+      "class": "own",
+      "fixedIn": "Unreleased",
+      "origin": "commit",
+      "commits": [
+        {
+          "hash": "ab1d07097c",
+          "date": "2026-10-24"
+        }
+      ],
+      "tests": [
+        "durable/codemode/call_restart_scenarios_pi_test.go::TestAResumedScriptThatEndsInItsFirstRunDivergesOnlyWhereTheLiveRunWentOn",
+        "durable/codemode/call_test.go::TestAScriptsEndWaitsForTheReplayedCallsItIssued",
+        "durable/codemode/call_test.go::TestOnlyTheFirstDivergenceOrFailureOfACallDecidesItsEnd"
+      ]
+    },
+    {
       "id": "BF-ab5be97",
       "title": "Long streamed answers render each frame faster: the Markdown view re-wraps and re-renders only the lines and…",
       "symptom": "Long streamed answers render each frame faster: the Markdown view re-wraps and re-renders only the lines and inline text that changed since the last frame, with the same output.",
@@ -31564,6 +31658,29 @@
       ],
       "tests": [
         "ai/openai_responses_empty_input_test.go::TestConvertAnchoredMessagesEncodesAnEmptyInputAsAnArray"
+      ]
+    },
+    {
+      "id": "BF-e045fa5",
+      "title": "fix(durable/codemode): count image blocks in a generateImages result as Pi does, and compare the code mode…",
+      "symptom": "fix(durable/codemode): count image blocks in a generateImages result as Pi does, and compare the code mode helpers with Pi",
+      "rootCause": "",
+      "rootCauseSource": "",
+      "userImpact": "Behavior differed from Pi",
+      "platform": "All platforms",
+      "class": "own",
+      "fixedIn": "Unreleased",
+      "origin": "commit",
+      "commits": [
+        {
+          "hash": "e045fa5ed8",
+          "date": "2026-10-24"
+        }
+      ],
+      "tests": [
+        "durable/codemode/codemode_helpers_pi_oracle_test.go::TestCodemodeHelpersMatchPi",
+        "durable/codemode/codemode_helpers_pi_oracle_test.go::TestNestedCallDetailsCutArgumentsAndErrorsToTheirPreviewLengths",
+        "durable/codemode/codemode_helpers_pi_oracle_test.go::TestTheHeaderShowsTheWallTimeFromTheHarnessClock"
       ]
     },
     {

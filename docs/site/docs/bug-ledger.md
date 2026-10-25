@@ -249,6 +249,8 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 | [BF-4610c9f](#bf-4610c9f) | A `!` or `!!` command's block draws the bytes Pi's `BashExecutionComponent` draws: its rows are padded to the… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-4649166](#bf-4649166) | fix(sdk): place the arrival-order start in the request scope so a tool_call round trip keeps its 68… | PiG's own defect | All platforms | Unreleased |
 | [BF-46abed3](#bf-46abed3) | Fix in shipped code | PiG's own defect | All platforms | Unreleased |
+| [BF-46b2263](#bf-46b2263) | A durable code mode script's journal now records the calls a script had issued after a batch of results in… | PiG's own defect | All platforms | Unreleased |
+| [BF-46b2263-2](#bf-46b2263-2) | A script that ends in its first run while a journaled tool call replays after a restart no longer shows that… | PiG's own defect | All platforms | Unreleased |
 | [BF-471c46e](#bf-471c46e) | An MCP tool or resource link with an explicit empty `title` keeps it, as Pi does, instead of falling back to… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-4741f6a](#bf-4741f6a) | Fix in shipped code | PiG's own defect | All platforms | Unreleased |
 | [BF-4789fa5](#bf-4789fa5) | `thinking_level_select` and `turn_start` handlers are covered through the production Session: a handler sees… | PiG's own defect | All platforms | 0.5.0 |
@@ -296,6 +298,7 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 | [BF-52858aa](#bf-52858aa) | `setWorkingMessage` with no message restores the default working label and an empty string shows an empty… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-530bf3e](#bf-530bf3e) | Fix in shipped code | PiG's own defect | All platforms | Unreleased |
 | [BF-53385a3](#bf-53385a3) | Registering a large MCP catalog, building a CodeMode sandbox from one, and CodeMode tool discovery were… | PiG's own defect | All platforms | 0.5.2 |
+| [BF-5379ab4](#bf-5379ab4) | fix(durable/codemode): count image blocks in a generateImages result as Pi does, and compare the code mode… | PiG's own defect | All platforms | Unreleased |
 | [BF-5380e0a](#bf-5380e0a) | fix(extension): load failure shows the extension's own cause; registration edge-case rows | PiG's own defect | All platforms | Unreleased |
 | [BF-54283ce](#bf-54283ce) | fix(extension): Shutdown closes live child sessions and releases the objects they hold | PiG's own defect | All platforms | Unreleased |
 | [BF-542b536](#bf-542b536) | fix(cli): PIG_VERSION_FORMAT=pi prints the pinned Pi package version | PiG's own defect | All platforms | Unreleased |
@@ -801,6 +804,7 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 | [BF-aa69959](#bf-aa69959) | Key matching follows Pi for more terminal inputs and key identifiers | PiG's own defect | All platforms | 0.5.0 |
 | [BF-aabd300](#bf-aabd300) | An OpenAI Responses, Azure OpenAI Responses or Google stream event whose JSON is a number, string, boolean or… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-ab0ee71](#bf-ab0ee71) | Hiding an overlay whose preFocus is another overlay, such as a panel focused when the overlay was shown over… | PiG's own defect | All platforms | 0.5.0 |
+| [BF-ab1d070](#bf-ab1d070) | fix(durable/codemode): journal one acknowledgment commit per delivered batch, none after the script ended… | PiG's own defect | All platforms | Unreleased |
 | [BF-ab5be97](#bf-ab5be97) | Long streamed answers render each frame faster: the Markdown view re-wraps and re-renders only the lines and… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-ac0dc3b](#bf-ac0dc3b) | An empty list item ends its list: a following unindented line is no longer taken for its lazy continuation… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-ac6fcea](#bf-ac6fcea) | A `session_start` handler that calls `ctx.shutdown()` during `/reload` ends the session and exits 0, as Pi… | PiG's own defect | All platforms | 0.5.0 |
@@ -1029,6 +1033,7 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 | [BF-df0b21c](#bf-df0b21c) | A Go, Rust or Python extension that calls `parseFrontmatter` or `Date.parse` while its factory runs, in a… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-df96b6a](#bf-df96b6a) | Fix in shipped code | PiG's own defect | All platforms | Unreleased |
 | [BF-dfa57b3](#bf-dfa57b3) | An OpenAI Responses request for a conversation with no messages sends `"input": []` instead of `"input": null` | PiG's own defect | All platforms | 0.5.0 |
+| [BF-e045fa5](#bf-e045fa5) | fix(durable/codemode): count image blocks in a generateImages result as Pi does, and compare the code mode… | PiG's own defect | All platforms | Unreleased |
 | [BF-e098463](#bf-e098463) | A Gemini stream chunk with a member of an unexpected type is read as Pi's JavaScript reads it instead of… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-e1764c3](#bf-e1764c3) | A live `/skill:` message renders as the collapsed `[skill] name` block instead of the raw `<skill>` XML | PiG's own defect | All platforms | 0.5.0 |
 | [BF-e1ad272](#bf-e1ad272) | The xAI, Kimi Code, Meta, Radius, OpenAI Codex, Sign in with ChatGPT and GitHub Copilot OAuth requests send… | PiG's own defect | All platforms | 0.5.0 |
@@ -4364,6 +4369,34 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 - **Fix commits:** `46abed3453` (2026-10-21)
 - **Tests:** None recorded.
 
+### BF-46b2263
+
+**A durable code mode script's journal now records the calls a script had issued after a batch of results in…**
+
+- **Source:** PiG's own defect
+- **Symptom:** A durable code mode script's journal now records the calls a script had issued after a batch of results in one commit, as Pi does, and none after the script ended.
+- **Root cause:** A batch of results delivered to the script was acknowledged in two or more commits, because the VM reports each result on its own goroutine, and a script that ended on the last result of a batch still had the acknowledgment of the one before it written after its end.
+- **User impact:** Behavior differed from Pi
+- **Platform:** All platforms
+- **Fixed in:** Unreleased
+- **Fix commits:** `46b2263428` (2026-10-24)
+- **Tests:** `durable/codemode/call_restart_scenarios_pi_test.go::TestAResumedScriptThatEndsInItsFirstRunDivergesOnlyWhereTheLiveRunWentOn`, `durable/codemode/call_test.go::TestAScriptsEndWaitsForTheReplayedCallsItIssued`, `durable/codemode/call_test.go::TestOnlyTheFirstDivergenceOrFailureOfACallDecidesItsEnd`
+- **Release note:** A durable code mode script's journal now records the calls a script had issued after a batch of results in one commit, as Pi does, and none after the script ended. A batch of results delivered to the script was acknowledged in two or more commits, because the VM reports each result on its own goroutine, and a script that ended on the last result of a batch still had the acknowledgment of the one before it written after its end.
+
+### BF-46b2263-2
+
+**A script that ends in its first run while a journaled tool call replays after a restart no longer shows that…**
+
+- **Source:** PiG's own defect
+- **Symptom:** A script that ends in its first run while a journaled tool call replays after a restart no longer shows that call as `cancelled` in the error result of a divergence ("it ended after result 0, where it went on before").
+- **Root cause:** Not recorded.
+- **User impact:** An operation failed or was rejected
+- **Platform:** All platforms
+- **Fixed in:** Unreleased
+- **Fix commits:** `46b2263428` (2026-10-24)
+- **Tests:** `durable/codemode/call_restart_scenarios_pi_test.go::TestAResumedScriptThatEndsInItsFirstRunDivergesOnlyWhereTheLiveRunWentOn`, `durable/codemode/call_test.go::TestAScriptsEndWaitsForTheReplayedCallsItIssued`, `durable/codemode/call_test.go::TestOnlyTheFirstDivergenceOrFailureOfACallDecidesItsEnd`
+- **Release note:** A script that ends in its first run while a journaled tool call replays after a restart no longer shows that call as `cancelled` in the error result of a divergence ("it ended after result 0, where it went on before"). The script's end decided the outcome before the replayed call's row had finished, where Pi finishes the row first; the end now waits for the replayed calls the VM issued.
+
 ### BF-471c46e
 
 **An MCP tool or resource link with an explicit empty `title` keeps it, as Pi does, instead of falling back to…**
@@ -5011,6 +5044,19 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 - **Fix commits:** `53385a3d93` (2026-10-21, #268)
 - **Tests:** `codemode/sandbox_scaling_test.go::TestSandboxConstructionKeepsOrderAndRejectsDuplicates`, `coding/extension/builtin/codemode/run_test.go::TestDiscoveryDoesNotKeepReadingTheCatalogAfterCancellation`, `coding/extension/builtin/codemode/run_test.go::TestDiscoveryReadsTheCatalogOnceAndKeepsTheFirstEntryOfAName`, `coding/extension/builtin/codemode/run_test.go::TestDiscoveryStopsWhenItsContextIsCancelled`, `coding/mcpext/extension_test.go::TestAgentSessionMCPNamesCollidingToolsAcrossTheWholeCatalog`
 - **Release note:** Registering a large MCP catalog, building a CodeMode sandbox from one, and CodeMode tool discovery were quadratic in the number of tools, so a 100,000-tool server took tens of seconds to register after its last `tools/list` page, `NewSandbox` took 27 seconds, and every `searchTools()` or `describeNamespace()` call rescanned the whole host catalog once per tool. Tool names are now assigned from a per-server count of the sanitized names, the sandbox keeps a name index beside its tool list, and a discovery call reads the host catalog once and resolves each tool's namespace by lookup. Names, collision suffixes, registration order, duplicate-tool errors and the first-entry-wins namespace of a repeated name are unchanged. Discovery also now stops when its context is cancelled and returns the context's error; before, it kept scanning. Pi resolves the same way for the sandbox (a `Map` by name) but scans per tool in the MCP extension and in codemode discovery; PiG's results match Pi's.
+
+### BF-5379ab4
+
+**fix(durable/codemode): count image blocks in a generateImages result as Pi does, and compare the code mode…**
+
+- **Source:** PiG's own defect
+- **Symptom:** fix(durable/codemode): count image blocks in a generateImages result as Pi does, and compare the code mode helpers with Pi
+- **Root cause:** Not recorded.
+- **User impact:** Behavior differed from Pi
+- **Platform:** All platforms
+- **Fixed in:** Unreleased
+- **Fix commits:** `5379ab4607` (2026-10-24)
+- **Tests:** `durable/codemode/codemode_helpers_pi_oracle_test.go::TestCodemodeHelpersMatchPi`, `durable/codemode/codemode_helpers_pi_oracle_test.go::TestNestedCallDetailsCutArgumentsAndErrorsToTheirPreviewLengths`, `durable/codemode/codemode_helpers_pi_oracle_test.go::TestTheHeaderShowsTheWallTimeFromTheHarnessClock`
 
 ### BF-5380e0a
 
@@ -12045,6 +12091,19 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 - **Tests:** `coding/extension/host/subprocess/node_library_bundle_test.go::TestNodeLibraryBundlesKeepSharedIdentitiesWithoutRawCatalogLoads`, `coding/extension/host/subprocess/runtime_node_overlay_handle_test.go::TestNodeFactoryTuiShowOverlayHandleIsSynchronous`, `coding/extension/host/subprocess/runtime_node_prompt_end_test.go::TestNodePromptEndWaitEndsWhenAnotherProcessTurnsTheLoop`, `coding/extension/host/subprocess/ui_bridge_raw_overlay_test.go::TestRawOverlayEndsWithItsConnection`, `coding/extension/host/subprocess/ui_bridge_raw_overlay_test.go::TestRawOverlayShowsAtOnceAndEndsWithItsHide`, `coding/extension/host/subprocess/ui_bridge_raw_overlay_test.go::TestRawOverlayWithoutTUIIsNotShown`, `coding/extension/host/subprocess/ui_bridge_test.go::TestFocusedCustomComponentsStack`, `coding/extension/host/subprocess/ui_bridge_test.go::TestInteractiveDialogOpensOverFocusedOverlay` and 17 more in docs/bug-ledger.json
 - **Release note:** Hiding an overlay whose preFocus is another overlay, such as a panel focused when the overlay was shown over it, focuses that panel as an overlay, as Pi does: its handle reports `isFocused()` and its own `hide()` moves focus on.
 
+### BF-ab1d070
+
+**fix(durable/codemode): journal one acknowledgment commit per delivered batch, none after the script ended…**
+
+- **Source:** PiG's own defect
+- **Symptom:** fix(durable/codemode): journal one acknowledgment commit per delivered batch, none after the script ended, and finish replayed rows before the script's end decides the outcome
+- **Root cause:** Not recorded.
+- **User impact:** Behavior differed from Pi
+- **Platform:** All platforms
+- **Fixed in:** Unreleased
+- **Fix commits:** `ab1d07097c` (2026-10-24)
+- **Tests:** `durable/codemode/call_restart_scenarios_pi_test.go::TestAResumedScriptThatEndsInItsFirstRunDivergesOnlyWhereTheLiveRunWentOn`, `durable/codemode/call_test.go::TestAScriptsEndWaitsForTheReplayedCallsItIssued`, `durable/codemode/call_test.go::TestOnlyTheFirstDivergenceOrFailureOfACallDecidesItsEnd`
+
 ### BF-ab5be97
 
 **Long streamed answers render each frame faster: the Markdown view re-wraps and re-renders only the lines and…**
@@ -15212,6 +15271,19 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 - **Fix commits:** `dfa57b3253` (2026-10-06)
 - **Tests:** `ai/openai_responses_empty_input_test.go::TestConvertAnchoredMessagesEncodesAnEmptyInputAsAnArray`
 - **Release note:** An OpenAI Responses request for a conversation with no messages sends `"input": []` instead of `"input": null`.
+
+### BF-e045fa5
+
+**fix(durable/codemode): count image blocks in a generateImages result as Pi does, and compare the code mode…**
+
+- **Source:** PiG's own defect
+- **Symptom:** fix(durable/codemode): count image blocks in a generateImages result as Pi does, and compare the code mode helpers with Pi
+- **Root cause:** Not recorded.
+- **User impact:** Behavior differed from Pi
+- **Platform:** All platforms
+- **Fixed in:** Unreleased
+- **Fix commits:** `e045fa5ed8` (2026-10-24)
+- **Tests:** `durable/codemode/codemode_helpers_pi_oracle_test.go::TestCodemodeHelpersMatchPi`, `durable/codemode/codemode_helpers_pi_oracle_test.go::TestNestedCallDetailsCutArgumentsAndErrorsToTheirPreviewLengths`, `durable/codemode/codemode_helpers_pi_oracle_test.go::TestTheHeaderShowsTheWallTimeFromTheHarnessClock`
 
 ### BF-e098463
 

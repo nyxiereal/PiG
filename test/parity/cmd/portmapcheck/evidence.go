@@ -360,7 +360,7 @@ func runGroup(root, bin, scratchRoot string, g *group) {
 	// go test also points PWD at the package directory the binary runs in.
 	cmd.Env = append(evidenceEnv(scratch), "GOCOVERDIR="+coverDir, "PWD="+cmd.Dir)
 	if out, err := cmd.CombinedOutput(); err != nil {
-		fmt.Fprintf(os.Stderr, "portmap: evidence tests of %s failed: %v\n%s\n", g.dir, err, lastLines(out, 40))
+		fmt.Fprintf(os.Stderr, "portmap: evidence tests of %s failed: %v\n%s\n", g.dir, err, failureReport(root, g.dir, out))
 		g.failed = true
 		return
 	}

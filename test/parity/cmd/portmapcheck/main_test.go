@@ -836,3 +836,20 @@ func TestWidget(t *testing.T) {
 		t.Fatalf("err=%v res=%+v", err, res)
 	}
 }
+
+// A failed evidence run names the tests that failed even when a test's large output pushes its own lines out of the tail, and the full
+// output is kept in a file the report names.
+func TestFailureReportNamesTheFailingTestsAndKeepsTheFullOutput(t *testing.T) {
+	root := t.TempDir()
+	out := []byte("=== RUN   TestA\n--- FAIL: TestA (0.00s)\n    a_test.go:7: got a value\n" + strings.Repeat("      \"noise\": 1,\n", 200) + "FAIL\n")
+	report := failureReport(root, "pkg/sub", out)
+	for _, want := range []string{"--- FAIL: TestA (0.00s)", "\nFAIL", "full output: " + filepath.Join(root, "build", "portmap-failures")} {
+		if !strings.Contains(report, want) {
+			t.Fatalf("report lacks %q:\n%s", want, report)
+		}
+	}
+	_, file, _ := strings.Cut(report, "full output: ")
+	if kept, err := os.ReadFile(file); err != nil || string(kept) != string(out) {
+		t.Fatalf("kept output %q, err %v", kept, err)
+	}
+}

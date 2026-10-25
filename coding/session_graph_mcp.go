@@ -1,5 +1,7 @@
 // pig-specific: the function options of createMcpExtension (extensions/mcp/index.ts McpExtensionOptions: loadConfig, createTransport, credentials, openUrl, updateConfig) for an extension that passes the compiled-in MCP extension to a DefaultResourceLoader it constructs. Pi's options are functions of the caller; they stay in the caller's process and the host calls them over the wire that exists, the session graph callback (subprocess.RequestSessionGraphCallback), with JSON in and JSON out. No request kind is added.
 
+//go:build !pig_strip_mcp
+
 package coding
 
 import (
@@ -16,9 +18,31 @@ import (
 	"github.com/MichaelKinsy/PiG/coding/extension/host/subprocess"
 	"github.com/MichaelKinsy/PiG/coding/mcpext"
 	"github.com/MichaelKinsy/PiG/extensions/sdk/json"
+	icodingagent "github.com/MichaelKinsy/PiG/internal/codingagent"
 	"github.com/MichaelKinsy/PiG/mcp"
 	"github.com/MichaelKinsy/PiG/mcp/oauth"
 )
+
+// mcpFactory is createMcpExtension: the data options logPath and startupWaitMs, and the function options (loadConfig, createTransport, credentials, openUrl, updateConfig), which the extension names by callback id.
+func (f graphExtensionFactory) mcpFactory(scope subprocess.SessionGraphScope, agentDir string) (extension.InlineExtension, error) {
+	var options struct {
+		LogPath       string   `json:"logPath"`
+		StartupWaitMs *float64 `json:"startupWaitMs"`
+		graphMcpFunctions
+	}
+	if f.hasOptions() {
+		if err := json.Unmarshal(f.Options, &options); err != nil {
+			return nil, f.optionsError(err)
+		}
+	}
+	built := mcpext.Options{LogPath: options.LogPath, AgentDir: agentDir, ConfigDirName: icodingagent.ConfigDirName()}
+	if options.StartupWaitMs != nil {
+		wait := int(*options.StartupWaitMs)
+		built.StartupWaitMs = &wait
+	}
+	options.apply(scope, &built)
+	return mcpext.CreateMcpExtension(built), nil
+}
 
 // graphMcpFunctions are the callback ids of the function options, as the extension named them in the option object.
 type graphMcpFunctions struct {

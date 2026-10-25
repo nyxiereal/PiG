@@ -5460,6 +5460,25 @@
       ]
     },
     {
+      "id": "BF-36e82ad",
+      "title": "fix(durable): a non-finite number is a strict JSON error whichever JSON package a value's own encoder used",
+      "symptom": "fix(durable): a non-finite number is a strict JSON error whichever JSON package a value's own encoder used",
+      "rootCause": "Fix-Commit:",
+      "rootCauseSource": "commit",
+      "userImpact": "An operation failed or was rejected",
+      "platform": "All platforms",
+      "class": "own",
+      "fixedIn": "Unreleased",
+      "origin": "commit",
+      "commits": [
+        {
+          "hash": "36e82ade57",
+          "date": "2026-10-24"
+        }
+      ],
+      "tests": []
+    },
+    {
       "id": "BF-37c6048",
       "title": "fix(tui): a streamed Markdown never resumes past a paragraph clipped before a LaTeX start",
       "symptom": "fix(tui): a streamed Markdown never resumes past a paragraph clipped before a LaTeX start",
@@ -6486,6 +6505,25 @@
         "tui/highlight_resume_scaling_norace_test.go::TestScalingStreamedCodeBlockHighlight",
         "tui/internal/hljs/resume_test.go::TestPatternReach"
       ]
+    },
+    {
+      "id": "BF-4312595",
+      "title": "fix(ai,durable): keep a value that is not JSON an error when a message or a nested result is encoded",
+      "symptom": "fix(ai,durable): keep a value that is not JSON an error when a message or a nested result is encoded",
+      "rootCause": "Fix-Commit:",
+      "rootCauseSource": "commit",
+      "userImpact": "An operation failed or was rejected",
+      "platform": "All platforms",
+      "class": "own",
+      "fixedIn": "Unreleased",
+      "origin": "commit",
+      "commits": [
+        {
+          "hash": "43125951f9",
+          "date": "2026-10-24"
+        }
+      ],
+      "tests": []
     },
     {
       "id": "BF-432ab7f",
@@ -9065,6 +9103,25 @@
         }
       ],
       "commitsFrom": "release note",
+      "tests": []
+    },
+    {
+      "id": "BF-579b4d2",
+      "title": "fix(durable): a non-finite number is a strict JSON error whichever JSON package a value's own encoder used",
+      "symptom": "fix(durable): a non-finite number is a strict JSON error whichever JSON package a value's own encoder used",
+      "rootCause": "",
+      "rootCauseSource": "",
+      "userImpact": "An operation failed or was rejected",
+      "platform": "All platforms",
+      "class": "own",
+      "fixedIn": "Unreleased",
+      "origin": "commit",
+      "commits": [
+        {
+          "hash": "579b4d240a",
+          "date": "2026-10-24"
+        }
+      ],
       "tests": []
     },
     {
@@ -17687,6 +17744,25 @@
       ]
     },
     {
+      "id": "BF-87a6ac5",
+      "title": "Fix in shipped code",
+      "symptom": "Fix in shipped code",
+      "rootCause": "UnmarshalKeepingSurrogates is generic over its destination, so the call sites decode into their own concrete types. The perf-lint entry for FromJsonValue's typed decode keeps its count and follows the callee's new name. unmarshalOrdered is generic for the same reason.",
+      "rootCauseSource": "commit",
+      "userImpact": "Behavior differed from Pi",
+      "platform": "All platforms",
+      "class": "own",
+      "fixedIn": "Unreleased",
+      "origin": "commit",
+      "commits": [
+        {
+          "hash": "87a6ac512c",
+          "date": "2026-10-25"
+        }
+      ],
+      "tests": []
+    },
+    {
       "id": "BF-88177e8",
       "title": "fix(cli): type the validate-only scratch-fetch marker as D28 and extend the record",
       "symptom": "fix(cli): type the validate-only scratch-fetch marker as D28 and extend the record",
@@ -23712,6 +23788,25 @@
       ]
     },
     {
+      "id": "BF-b2b0c63",
+      "title": "Fix in shipped code",
+      "symptom": "Fix in shipped code",
+      "rootCause": "The lone-surrogate fidelity moves to the root: chordjson's default string unquote reads a surrogate escape as its unit, so delta.DecodeJson callers need no wrapper, durable/json.go and nested_result.go are back to main's calls (the nested result decodes with delta.DecodeJson and so keeps document order), NestedToolCallRecord is main's text again, and the stale any-trap entries are deleted.",
+      "rootCauseSource": "commit",
+      "userImpact": "Behavior differed from Pi",
+      "platform": "All platforms",
+      "class": "own",
+      "fixedIn": "Unreleased",
+      "origin": "commit",
+      "commits": [
+        {
+          "hash": "b2b0c63c54",
+          "date": "2026-10-25"
+        }
+      ],
+      "tests": []
+    },
+    {
       "id": "BF-b2c219f",
       "title": "fix(runtimecell): satisfy the divergence, port and perf gates for the usage-lease and fingerprint changes",
       "symptom": "fix(runtimecell): satisfy the divergence, port and perf gates for the usage-lease and fingerprint changes",
@@ -28702,6 +28797,33 @@
       ]
     },
     {
+      "id": "BF-db1ee65",
+      "title": "A lone UTF-16 surrogate in a tool result's details, in a nested tool call's result, or in a code mode call's…",
+      "symptom": "It became three U+FFFD characters (`encoding/json` has no lone-surrogate string), so the preview bytes in a stored result differed from Pi's.",
+      "rootCause": "",
+      "rootCauseSource": "",
+      "userImpact": "An operation failed or was rejected",
+      "platform": "All platforms",
+      "class": "own",
+      "fixedIn": "Unreleased",
+      "releaseNote": "A lone UTF-16 surrogate in a tool result's details, in a nested tool call's result, or in a code mode call's argument or error preview now stays a lone surrogate through the Durable entry and its stored values, written as the `\\ud83d` escape that Pi's `JSON.stringify` writes, with `\u003c`, `\u003e` and `\u0026` left as they are. Before, it became three U+FFFD characters (`encoding/json` has no lone-surrogate string), so the preview bytes in a stored result differed from Pi's. The session file, JSON mode and RPC mode already wrote the escape and are unchanged.",
+      "origin": "release note",
+      "commits": [
+        {
+          "hash": "db1ee65be2",
+          "date": "2026-10-24"
+        }
+      ],
+      "tests": [
+        "ai/lone_surrogate_json_pi_oracle_test.go::TestMessagesKeepALoneSurrogateAsPiDoes",
+        "coding/cli/lone_surrogate_json_lines_pi_oracle_test.go::TestJSONLinesOfAMessageWithALoneSurrogateAreWhatPisJSONStringifyWrites",
+        "durable/codemode/lone_surrogate_preview_test.go::TestAPreviewCutInsideASurrogatePairKeepsItsEscapeLikePi",
+        "durable/codemode/lone_surrogate_tool_result_test.go::TestAToolResultWithALoneSurrogateKeepsItThroughTheHarnessAndTheEntry",
+        "durable/json_lone_surrogate_test.go::TestToJsonValueAndFromJsonValueKeepALoneSurrogate",
+        "internal/codingagent/lone_surrogate_session_pi_oracle_test.go::TestSessionLinesWithALoneSurrogateAreWhatPisJSONStringifyWrites"
+      ]
+    },
+    {
       "id": "BF-db7007d",
       "title": "A Radius gateway model's `samplingParamsByThinkingLevel` now reaches the `pi-messages` model and the composed…",
       "symptom": "A Radius gateway model's `samplingParamsByThinkingLevel` now reaches the `pi-messages` model and the composed catalog entry (Pi's `getRadiusModelsFromConfig` spreads each gateway model); it was dropped before.",
@@ -30665,6 +30787,32 @@
         "test/perfgate/process_test.go::TestRPCTurnProcessGate",
         "tui/perf_gate_norace_test.go::TestKeystrokeToFrameAllocationGate",
         "tui/perf_gate_norace_test.go::TestStreamingMarkdownFrameAllocationGate"
+      ]
+    },
+    {
+      "id": "BF-de38ce2",
+      "title": "fix(ai,durable): a lone UTF-16 surrogate survives the JSON of a tool result, a nested call result and a…",
+      "symptom": "fix(ai,durable): a lone UTF-16 surrogate survives the JSON of a tool result, a nested call result and a stored value, as in Pi",
+      "rootCause": "Fix-Commit:",
+      "rootCauseSource": "commit",
+      "userImpact": "Behavior differed from Pi",
+      "platform": "All platforms",
+      "class": "own",
+      "fixedIn": "Unreleased",
+      "origin": "commit",
+      "commits": [
+        {
+          "hash": "de38ce2324",
+          "date": "2026-10-24"
+        }
+      ],
+      "tests": [
+        "ai/lone_surrogate_json_pi_oracle_test.go::TestMessagesKeepALoneSurrogateAsPiDoes",
+        "coding/cli/lone_surrogate_json_lines_pi_oracle_test.go::TestJSONLinesOfAMessageWithALoneSurrogateAreWhatPisJSONStringifyWrites",
+        "durable/codemode/lone_surrogate_preview_test.go::TestAPreviewCutInsideASurrogatePairKeepsItsEscapeLikePi",
+        "durable/codemode/lone_surrogate_tool_result_test.go::TestAToolResultWithALoneSurrogateKeepsItThroughTheHarnessAndTheEntry",
+        "durable/json_lone_surrogate_test.go::TestToJsonValueAndFromJsonValueKeepALoneSurrogate",
+        "internal/codingagent/lone_surrogate_session_pi_oracle_test.go::TestSessionLinesWithALoneSurrogateAreWhatPisJSONStringifyWrites"
       ]
     },
     {
@@ -34195,6 +34343,25 @@
         "internal/codingagent/compaction/context_edit_retry_anchor_test.go::TestEstimateKeepsUsageAnchorWhenARetryOmissionEditsOnlyTheTrailingSuffix",
         "internal/codingagent/compaction/context_edit_retry_anchor_test.go::TestEstimateKeepsUsageAnchorWhenTrailingInputIsReplaced"
       ]
+    },
+    {
+      "id": "BF-f992050",
+      "title": "fix(ai,durable): keep a value that is not JSON an error when a message or a nested result is encoded",
+      "symptom": "fix(ai,durable): keep a value that is not JSON an error when a message or a nested result is encoded",
+      "rootCause": "",
+      "rootCauseSource": "",
+      "userImpact": "An operation failed or was rejected",
+      "platform": "All platforms",
+      "class": "own",
+      "fixedIn": "Unreleased",
+      "origin": "commit",
+      "commits": [
+        {
+          "hash": "f992050b6d",
+          "date": "2026-10-24"
+        }
+      ],
+      "tests": []
     },
     {
       "id": "BF-fa3da97",

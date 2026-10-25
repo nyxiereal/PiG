@@ -3655,7 +3655,7 @@ class = "hot-kept: a MarshalJSON re-encodes a nested value the outer encoder com
 file = "durable/json.go"
 func = "FromJsonValue"
 pattern = "decode-own-encode"
-detail = "durable.marshalStrict->delta.DecodeJson"
+detail = "durable.marshalStrict->durable.decodeJsonText"
 count = 2
 class = "hot-kept: durable store per record; needs its own byte oracle, not attempted"
 
@@ -3663,7 +3663,7 @@ class = "hot-kept: durable store per record; needs its own byte oracle, not atte
 file = "durable/json.go"
 func = "FromJsonValue"
 pattern = "decode-own-encode"
-detail = "durable.marshalStrict->json.NewDecoder"
+detail = "durable.marshalStrict->jsstring.UnmarshalKeepingSurrogates"
 count = 1
 class = "hot-kept: durable store per record; needs its own byte oracle, not attempted"
 
@@ -3671,7 +3671,7 @@ class = "hot-kept: durable store per record; needs its own byte oracle, not atte
 file = "durable/json.go"
 func = "ToJsonValue"
 pattern = "decode-own-encode"
-detail = "durable.marshalStrict->delta.DecodeJson"
+detail = "durable.marshalStrict->durable.decodeJsonText"
 count = 1
 class = "hot-kept: durable store per record; needs its own byte oracle, not attempted"
 

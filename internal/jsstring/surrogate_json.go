@@ -32,7 +32,7 @@ func MarshalKeepingSurrogates(value any) ([]byte, error) {
 
 // UnmarshalKeepingSurrogates is encoding/json's Unmarshal, except that the escape of a lone surrogate (`\ud83d`) is read as
 // that unit, as JSON.parse does, instead of as U+FFFD.
-func UnmarshalKeepingSurrogates(data []byte, value any) error {
+func UnmarshalKeepingSurrogates[T any](data []byte, value *T) error {
 	if !HasSurrogateEscape(data) {
 		return stdjson.Unmarshal(data, value)
 	}

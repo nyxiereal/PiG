@@ -1,7 +1,6 @@
 package durable
 
 import (
-	"bytes"
 	stdjson "encoding/json"
 	"errors"
 	"fmt"
@@ -90,8 +89,7 @@ func FromJsonValue[T any](value JsonValue) (T, error) {
 		}
 		return typed, nil
 	}
-	decoder := sdkjson.NewDecoder(bytes.NewReader(encoded))
-	if err := decoder.Decode(&decoded); err != nil {
+	if err := jsstring.UnmarshalKeepingSurrogates(encoded, &decoded); err != nil {
 		return decoded, err
 	}
 	if ordered.HasDynamic(reflect.TypeFor[T]()) {
@@ -141,18 +139,18 @@ func CopyJson(value JsonValue) (JsonValue, error) {
 }
 
 // unmarshalOrdered decodes data into target, then gives target's JsonValue members the text's key order, as JSON.parse gives Pi.
-func unmarshalOrdered(data []byte, target any) error {
-	if dynamic, ok := target.(*JsonValue); ok {
+func unmarshalOrdered[T any](data []byte, target *T) error {
+	if dynamic, ok := any(target).(*JsonValue); ok {
 		value, err := delta.DecodeJson(data)
 		if err == nil {
 			*dynamic = value
 		}
 		return err
 	}
-	if err := sdkjson.Unmarshal(data, target); err != nil {
+	if err := jsstring.UnmarshalKeepingSurrogates(data, target); err != nil {
 		return err
 	}
-	if ordered.HasDynamic(reflect.TypeOf(target).Elem()) {
+	if ordered.HasDynamic(reflect.TypeFor[T]()) {
 		tree, err := delta.DecodeJson(data)
 		if err != nil {
 			return err

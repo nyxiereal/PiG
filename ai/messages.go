@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+
 	sdkjson "github.com/MichaelKinsy/PiG/extensions/sdk/json"
 )
 

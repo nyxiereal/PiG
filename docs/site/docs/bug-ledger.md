@@ -49,6 +49,7 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 | [BF-0a3e8ce](#bf-0a3e8ce) | In print and JSON mode, SIGTERM or SIGHUP no longer hangs when a Go, Python or Rust extension's… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-0aa31c4](#bf-0aa31c4) | Extensions that import `@earendil-works/pi-ai/models` (for example for `clampThinkingLevel`) load in the Node… | A fix Pi shipped that PiG ported | All platforms | 0.5.2 |
 | [BF-0aba908](#bf-0aba908) | Extensions' `ctx.ui.setHiddenThinkingLabel()` now changes the collapsed thinking label of every assistant… | PiG's own defect | All platforms | 0.5.0 |
+| [BF-0adc7a6](#bf-0adc7a6) | A provider that an extension registers while it loads no longer fails the load when the model registry… | PiG's own defect | All platforms | Unreleased |
 | [BF-0ae3fcf](#bf-0ae3fcf) | The login provider list selects with Enter when `tui.select.confirm` is rebound, as Pi's search input submits… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-0ae4683](#bf-0ae4683) | PiG, the extension SDKs and the sprite selection use one configuration root: `PIG_HOME`, else… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-0b13d8b](#bf-0b13d8b) | `pig auth --help` names `pig auth ...` instead of `pi auth ...` | PiG's own defect | All platforms | 0.5.0 |
@@ -99,6 +100,7 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 | [BF-19a07f0](#bf-19a07f0) | fix(sdk-rs): give the request-start wire test's RequestMsg the batch, child_session, tool_call_index and… | PiG's own defect | All platforms | Unreleased |
 | [BF-1a855cd](#bf-1a855cd) | The `/session` block now follows a later theme change and shows the cache-warming countdown as of each… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-1b5540a](#bf-1b5540a) | `client.Client.Disconnect` takes the reason string as Pi's `Client.disconnect(reason)` does (it was an… | PiG's own defect | All platforms | 0.5.0 |
+| [BF-1c6b864](#bf-1c6b864) | A Session that an extension creates with `createAgentSession`, or that `coding.CreateAgentSession` returns… | PiG's own defect | All platforms | Unreleased |
 | [BF-1ca0e2f](#bf-1ca0e2f) | fix(codingagent): the terminal reader yields to the main loop it readied before it polls again | PiG's own defect | All platforms | Unreleased |
 | [BF-1cc7519](#bf-1cc7519) | fix(sdk): a command, shortcut, flag or renderer registered after load reaches the host in every SDK | PiG's own defect | All platforms | Unreleased |
 | [BF-1ce00b0](#bf-1ce00b0) | Fix in shipped code | PiG's own defect | All platforms | Unreleased |
@@ -194,6 +196,7 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 | [BF-3840820](#bf-3840820) | MCP tool results whose content blocks carry members of another type than the protocol's (a numeric `text`, a… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-38b0f0c](#bf-38b0f0c) | Syntax highlighting keeps its colors after the first line of multiline strings and comments in fenced code… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-397866f](#bf-397866f) | A Go MCP client that declares an empty capability, such as `sampling` or `elicitation`, now sends it as `{}` | PiG's own defect | All platforms | 0.5.0 |
+| [BF-3a0d0e1](#bf-3a0d0e1) | A `Provider` object that an extension registers while it loads is now applied after every extension has… | PiG's own defect | All platforms | Unreleased |
 | [BF-3ad9ec8](#bf-3ad9ec8) | fix(tui): tree label prompt gives its input width-2 cells (Pi LabelInput) | PiG's own defect | All platforms | Unreleased |
 | [BF-3b009a3](#bf-3b009a3) | `chord/host`: a child host forked by `ForkDriver` no longer inherits its parent's `CHORD2_LOCK` | PiG's own defect | All platforms | 0.5.0 |
 | [BF-3b3dba6](#bf-3b3dba6) | A streamed tool argument of `-0` is held as `0`, so the serialized arguments write `0` as Pi's… | PiG's own defect | All platforms | 0.5.0 |
@@ -840,6 +843,7 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 | [BF-ba9c37b](#bf-ba9c37b) | Starting `pig` no longer waits for the daily cleanup of the extension cache | PiG's own defect | All platforms | 0.5.0 |
 | [BF-bada2af](#bf-bada2af) | Session and crash timestamps are read like Date.parse of a JavaScript string: U+00A0 and U+FEFF between… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-bb324f7](#bf-bb324f7) | A JavaScript or TypeScript extension loads when its `registerCommand` options carry a member Pi does not… | PiG's own defect | All platforms | 0.5.0 |
+| [BF-bb3d661](#bf-bb3d661) | An extension served in-process now refuses to serve a second connection while it serves one, with the error… | PiG's own defect | All platforms | Unreleased |
 | [BF-bb888ae](#bf-bb888ae) | The `/model` picker now keeps its model list when the catalog refresh times out, as in Pi | PiG's own defect | All platforms | 0.5.0 |
 | [BF-bb9e9d8](#bf-bb9e9d8) | fix(extensions): parallel Node runtime linking reports the walk-order first failure under every schedule | PiG's own defect | All platforms | Unreleased |
 | [BF-bc24321](#bf-bc24321) | fix(mem M3): arm the idle collection at run end and run it after 500 ms | PiG's own defect | All platforms | Unreleased |
@@ -1575,6 +1579,20 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 - **Tests:** `internal/codingagent/hidden_thinking_label_test.go::TestExtensionHiddenThinkingLabelReachesAssistantBlocks`, `tui/assistant_message_label_oracle_test.go::TestAssistantMessageHiddenThinkingLabelMatchesPi`
 - **Release note:** Extensions' `ctx.ui.setHiddenThinkingLabel()` now changes the collapsed thinking label of every assistant block (it was stored but never read) and is reset when the session is replaced.
 
+### BF-0adc7a6
+
+**A provider that an extension registers while it loads no longer fails the load when the model registry…**
+
+- **Source:** PiG's own defect
+- **Symptom:** A provider that an extension registers while it loads no longer fails the load when the model registry rejects it.
+- **Root cause:** The Extension Host asked the model registry at once for each provider an extension registered while it loaded, and failed the whole extension load with the registry's message when the registry rejected it ("Failed to load extension: Provider x, model y: no "api" specified."). Pi's loader queues the registration; the services that bind the model runtime apply the queue after every extension loaded and report a rejection as the diagnostic `Extension "<path>" error: <message>`, and the extension stays loaded (loader.ts:217-218, agent-session-services.ts:157-169, runner.ts:471-487).
+- **User impact:** An operation failed or was rejected
+- **Platform:** All platforms
+- **Fixed in:** Unreleased
+- **Fix commits:** `0adc7a6152` (2026-10-25)
+- **Tests:** `coding/cli/extension_host_wiring_guard_test.go::TestBuildFlushesTheExtensionHostProviderRegistrations`, `test/extension-conformance/provider_registration_diagnostic_test.go::TestProviderRegistrationFailureIsADiagnosticAcrossSDKs`, `test/parity/scenarios/extensions-runtime/88-startup-provider-registration-failure.toml`
+- **Release note:** A provider that an extension registers while it loads no longer fails the load when the model registry rejects it. The host asked the registry at once and reported `Failed to load extension: Provider x, model y: no "api" specified.`, with the `pig -ne` hint. Pi queues the registration and applies it after every extension has loaded. PiG now does the same: the extension stays loaded, the other registrations apply, and startup reports `Error: Extension "<path>" error: Provider x, model y: no "api" specified. Set it at model level or provider level.` as Pi does. A registration that an extension makes after it loaded still applies at once and returns its error to the extension.
+
 ### BF-0ae3fcf
 
 **The login provider list selects with Enter when `tui.select.confirm` is rebound, as Pi's search input submits…**
@@ -2264,6 +2282,20 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 - **Fix commits:** `1b5540aec7` (2026-10-07)
 - **Tests:** `durable/storage/jsonl/jsonl_storage_reads_test.go::TestJsonlStorageReadsCommittedRecordsRecoversThemAndFailsAfterClose`, `durable/tools/bash_input_test.go::TestBashToolInputIsTheBashSchemaArguments`
 - **Release note:** `client.Client.Disconnect` takes the reason string as Pi's `Client.disconnect(reason)` does (it was an `error`); the connection fails with a `DisconnectedError` carrying it.
+
+### BF-1c6b864
+
+**A Session that an extension creates with `createAgentSession`, or that `coding.CreateAgentSession` returns…**
+
+- **Source:** PiG's own defect
+- **Symptom:** A Session that an extension creates with `createAgentSession`, or that `coding.CreateAgentSession` returns, now reports `entry_appended` to its listeners when an extension that its resource loader loaded calls `pi.appendEntry`, as Pi does.
+- **Root cause:** A Session whose resource loader started the extensions (a child session an extension creates, or coding.CreateAgentSession) wrote the entry that pi.appendEntry appended to the log and told no listener. Pi's appendEntry action also emits entry_appended (agent-session.ts:3321-3327), before the event the extension was handling reaches the listeners; ctx.sessionManager. appendCustomEntry emits none. The loader host's appendEntry action now emits the event the same way every mode's action does.
+- **User impact:** Behavior differed from Pi
+- **Platform:** All platforms
+- **Fixed in:** Unreleased
+- **Fix commits:** `1c6b8643ab` (2026-10-25)
+- **Tests:** None recorded.
+- **Release note:** A Session that an extension creates with `createAgentSession`, or that `coding.CreateAgentSession` returns, now reports `entry_appended` to its listeners when an extension that its resource loader loaded calls `pi.appendEntry`, as Pi does. The event arrives before the event the extension was handling, and `ctx.sessionManager.appendCustomEntry` still writes the log without an event. The Session wrote the entry and told no listener.
 
 ### BF-1ca0e2f
 
@@ -3583,6 +3615,20 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 - **Fix commits:** `397866f7f2` (2026-10-06)
 - **Tests:** `mcp/client_options_test.go::TestClientInitializeCarriesTheConfiguredClientOptions`
 - **Release note:** A Go MCP client that declares an empty capability, such as `sampling` or `elicitation`, now sends it as `{}`. The capability used to be left out of `initialize`, so a server could not see that the client supports it.
+
+### BF-3a0d0e1
+
+**A `Provider` object that an extension registers while it loads is now applied after every extension has…**
+
+- **Source:** PiG's own defect
+- **Symptom:** A `Provider` object that an extension registers while it loads is now applied after every extension has loaded, like a provider configuration, instead of at once.
+- **Root cause:** Pi's loader queues a Provider object as it queues a configuration, and its model runtime stores nothing of a registration it refuses. The host now queues a Provider object declared while an extension loads, whatever registry is bound, and a registration the registry refuses when the queue drains gives back what the host recorded at load: the replica record, the claim on the provider's callbacks, the bridged OAuth login, a Provider object's proxy. A superseded owner is told only when the registry accepts. A scenario reloads an extension whose registration is rejected and compares with Pi.
+- **User impact:** Wrong output or ordering
+- **Platform:** All platforms
+- **Fixed in:** Unreleased
+- **Fix commits:** `3a0d0e1711` (2026-10-25)
+- **Tests:** `coding/cli/extension_host_wiring_guard_test.go::TestBuildFlushesTheExtensionHostProviderRegistrations`, `coding/extension/host/subprocess/native_provider_callback_context_test.go::TestNodeNativeProviderReceivesTheCallersOnResponseAndOnPayloadByName`, `coding/extension/host/subprocess/native_provider_oauth_test.go::TestNativeProviderOAuthRefreshAndLogin`, `coding/extension/host/subprocess/provider_load_rejection_rollback_test.go::TestRejectedLoadRegistrationLeavesAnEarlierRegistrationIntact`, `coding/extension/host/subprocess/provider_object_load_queue_test.go::TestProviderObjectRegisteredWhileLoadingIsQueuedForABoundRegistry`, `test/parity/scenarios/extensions-runtime/89-reload-provider-registration-failure.toml`
+- **Release note:** A `Provider` object that an extension registers while it loads is now applied after every extension has loaded, like a provider configuration, instead of at once. When the model registry rejects a registration, PiG now leaves nothing of it behind: the login it declared, its entry in the model list that extensions read, and its claim on the provider are given back, so a registration of the same provider by another extension stays as it was. Pi's registry validates a registration before it stores anything of it.
 
 ### BF-3ad9ec8
 
@@ -12566,6 +12612,20 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 - **Fix commits:** `bb324f78bc` (2026-10-09), `d3b72472fe` (2026-10-09)
 - **Tests:** `coding/extension/host/subprocess/command_extra_option_test.go::TestNodeCommandWithAnUnknownOptionLoadsLikePi`, `coding/extension/host/subprocess/register_declaration_fields_wiring_test.go::TestRegistrationDeclarationFieldsReachTheRegistry`
 - **Release note:** A JavaScript or TypeScript extension loads when its `registerCommand` options carry a member Pi does not define, such as `args`. Pi ignores such members; PiG forwarded `args` to the host, which rejected a value that was not a string, and the extension failed to load.
+
+### BF-bb3d661
+
+**An extension served in-process now refuses to serve a second connection while it serves one, with the error…**
+
+- **Source:** PiG's own defect
+- **Symptom:** A second serve of the same `sdk.Extension` used to overwrite the first one's state and leave the second host waiting for a registration that never came.
+- **Root cause:** An Extension holds one connection, run context, tool lock and event bus. A second RunWithConn while the first ran overwrote that state and left the second host waiting for a register that never came: BenchmarkLoadInProcessProviders reused one Extension across a Host per iteration without waiting for the previous serve to end, and died with 'expected ready message, got shutdown' and then hung. The failure reproduces on origin/main with the same benchmark, so it is not the provider-queue change. The SDK now returns an error for the overlap; the benchmark waits for each serve to end.
+- **User impact:** Lost or altered data
+- **Platform:** All platforms
+- **Fixed in:** Unreleased
+- **Fix commits:** `bb3d661967` (2026-10-25)
+- **Tests:** `extensions/sdk/extension_serve_overlap_test.go::TestExtensionRefusesASecondConcurrentServe`
+- **Release note:** An extension served in-process now refuses to serve a second connection while it serves one, with the error `this extension is already serving a connection; an Extension serves one connection at a time, so build a new one per connection`. A second serve of the same `sdk.Extension` used to overwrite the first one's state and leave the second host waiting for a registration that never came.
 
 ### BF-bb888ae
 

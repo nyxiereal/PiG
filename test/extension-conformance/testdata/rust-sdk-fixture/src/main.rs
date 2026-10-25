@@ -647,6 +647,47 @@ fn main() {
         );
         ext.tool("type-schema-tool", "Parameters built with Type", parameters.to_value(), |_, _| ToolResult::text("ok"));
     }
+    {
+        // refine-probe (TestConformance_RefinedToolArgumentsAgreeAcrossSDKs): the schema of the "probe" cases of validateToolArguments.json; every predicate and message function logs its call.
+        use pig_sdk::Type;
+        use std::sync::{Arc, Mutex};
+        let log: Arc<Mutex<Vec<String>>> = Arc::new(Mutex::new(Vec::new()));
+        let checked = |tag: &'static str, log: Arc<Mutex<Vec<String>>>, check: Box<dyn Fn(&Value) -> Result<bool, String> + Send + Sync>| {
+            move |value: &Value| -> Result<bool, String> {
+                log.lock().unwrap().push(format!("check:{tag}"));
+                check(value)
+            }
+        };
+        let worded = |tag: &'static str, log: Arc<Mutex<Vec<String>>>, message: Box<dyn Fn(&Value) -> String + Send + Sync>| -> Option<Box<dyn Fn(&Value) -> Result<String, String> + Send + Sync>> {
+            Some(Box::new(move |value: &Value| {
+                log.lock().unwrap().push(format!("error:{tag}"));
+                Ok(message(value))
+            }))
+        };
+        let equals = |tag: &'static str, message_tag: &'static str, want: &'static str, log: Arc<Mutex<Vec<String>>>| {
+            Type::refine(Type::string(None), checked(tag, log.clone(), Box::new(move |value| Ok(value.as_str() == Some(want)))), worded(message_tag, log, Box::new(move |_| format!("not {want}"))))
+        };
+        let name = Type::refine(Type::string(None), checked("len", log.clone(), Box::new(|value| Ok(value.as_str().is_some_and(|text| text.len() >= 3)))), worded("lenmsg", log.clone(), Box::new(|_| "name is too short".to_string())));
+        let qty = Type::optional(Type::refine(
+            Type::integer(None),
+            checked("even", log.clone(), Box::new(|value| Ok(value.as_f64().is_some_and(|n| n % 2.0 == 0.0)))),
+            worded("evenmsg", log.clone(), Box::new(|value| format!("qty must be even, got {}", value.as_f64().unwrap_or(0.0)))),
+        ));
+        let pick = Type::union([equals("u1", "u1m", "a", log.clone()), equals("u2", "u2m", "b", log.clone())], None);
+        let boom = Type::optional(Type::refine(Type::string(None), checked("boom", log.clone(), Box::new(|_| Err("kaboom".to_string()))), None));
+        let root = Type::refine(
+            Type::object([("name", name), ("qty", qty), ("pick", pick), ("boom", boom)], None),
+            checked("root", log.clone(), Box::new(|_| Ok(true))),
+            worded("rootmsg", log.clone(), Box::new(|_| "root refused".to_string())),
+        );
+        ext.tool_typed("refine-probe", "Arguments checked by refinements", &root, |_, _| ToolResult::text("ok"));
+        let reported = log.clone();
+        ext.command("refine_log", "Report and clear the refinement call log", move |ctx, _args| {
+            let calls: Vec<String> = std::mem::take(&mut *reported.lock().unwrap());
+            ctx.notify(&format!("refine_log:{}:end", json!(calls)), "info");
+            CommandResult::Ok
+        });
+    }
     ext.command("language_probe", "Report the highlight language of a path", |ctx, args| {
         let case: serde_json::Value = match serde_json::from_str(args) { Ok(case) => case, Err(err) => return CommandResult::Error(err.to_string()) };
         let language = pig_sdk::get_language_from_path(case["path"].as_str().unwrap_or(""));

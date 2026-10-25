@@ -4417,6 +4417,334 @@
    }
   },
   {
+   "name": "refine of a string",
+   "args": [
+    {
+     "$call": "Refine",
+     "args": [
+      {
+       "$call": "String",
+       "args": []
+      },
+      {
+       "$fn": "always"
+      }
+     ]
+    }
+   ],
+   "result": {
+    "json": "{\"type\":\"string\"}",
+    "hidden": {
+     "~kind": "String",
+     "~refine": {
+      "count": 1
+     }
+    }
+   }
+  },
+  {
+   "name": "refine twice",
+   "args": [
+    {
+     "$call": "Refine",
+     "args": [
+      {
+       "$call": "Refine",
+       "args": [
+        {
+         "$call": "String",
+         "args": []
+        },
+        {
+         "$fn": "always"
+        }
+       ]
+      },
+      {
+       "$fn": "never"
+      }
+     ]
+    }
+   ],
+   "result": {
+    "json": "{\"type\":\"string\"}",
+    "hidden": {
+     "~kind": "String",
+     "~refine": {
+      "count": 2
+     }
+    }
+   }
+  },
+  {
+   "name": "refine with an error function",
+   "args": [
+    {
+     "$call": "Refine",
+     "args": [
+      {
+       "$call": "String",
+       "args": []
+      },
+      {
+       "$fn": "never"
+      },
+      {
+       "$fn": "text",
+       "text": "no"
+      }
+     ]
+    }
+   ],
+   "result": {
+    "json": "{\"type\":\"string\"}",
+    "hidden": {
+     "~kind": "String",
+     "~refine": {
+      "count": 1
+     }
+    }
+   }
+  },
+  {
+   "name": "refine keeps the other markers",
+   "args": [
+    {
+     "$call": "Refine",
+     "args": [
+      {
+       "$call": "Optional",
+       "args": [
+        {
+         "$call": "String",
+         "args": []
+        }
+       ]
+      },
+      {
+       "$fn": "always"
+      }
+     ]
+    }
+   ],
+   "result": {
+    "json": "{\"type\":\"string\"}",
+    "hidden": {
+     "~kind": "String",
+     "~optional": true,
+     "~refine": {
+      "count": 1
+     }
+    }
+   }
+  },
+  {
+   "name": "optional keeps the refinement",
+   "args": [
+    {
+     "$call": "Optional",
+     "args": [
+      {
+       "$call": "Refine",
+       "args": [
+        {
+         "$call": "String",
+         "args": []
+        },
+        {
+         "$fn": "always"
+        }
+       ]
+      }
+     ]
+    }
+   ],
+   "result": {
+    "json": "{\"type\":\"string\"}",
+    "hidden": {
+     "~kind": "String",
+     "~refine": {
+      "count": 1
+     },
+     "~optional": true
+    }
+   }
+  },
+  {
+   "name": "refine of an object",
+   "args": [
+    {
+     "$call": "Refine",
+     "args": [
+      {
+       "$call": "Object",
+       "args": [
+        {
+         "a": {
+          "$call": "String",
+          "args": []
+         }
+        }
+       ]
+      },
+      {
+       "$fn": "always"
+      }
+     ]
+    }
+   ],
+   "result": {
+    "json": "{\"type\":\"object\",\"required\":[\"a\"],\"properties\":{\"a\":{\"type\":\"string\"}}}",
+    "hidden": {
+     "~kind": "Object",
+     "~refine": {
+      "count": 1
+     }
+    }
+   }
+  },
+  {
+   "name": "refine of an array keeps ~refine and length",
+   "args": [
+    {
+     "$call": "Refine",
+     "args": [
+      [
+       1,
+       2
+      ],
+      {
+       "$fn": "always"
+      }
+     ]
+    }
+   ],
+   "result": {
+    "json": "[1,2]",
+    "hidden": {
+     "length": 2,
+     "~refine": {
+      "count": 1
+     }
+    }
+   }
+  },
+  {
+   "name": "IsRefine of a refined schema",
+   "args": [
+    {
+     "$call": "IsRefine",
+     "args": [
+      {
+       "$call": "Refine",
+       "args": [
+        {
+         "$call": "String",
+         "args": []
+        },
+        {
+         "$fn": "always"
+        }
+       ]
+      }
+     ]
+    }
+   ],
+   "result": true
+  },
+  {
+   "name": "IsRefine of a plain schema",
+   "args": [
+    {
+     "$call": "IsRefine",
+     "args": [
+      {
+       "$call": "String",
+       "args": []
+      }
+     ]
+    }
+   ],
+   "result": false
+  },
+  {
+   "name": "IsRefine of an optional refined schema",
+   "args": [
+    {
+     "$call": "IsRefine",
+     "args": [
+      {
+       "$call": "Optional",
+       "args": [
+        {
+         "$call": "Refine",
+         "args": [
+          {
+           "$call": "String",
+           "args": []
+          },
+          {
+           "$fn": "always"
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   ],
+   "result": true
+  },
+  {
+   "name": "IsRefine of null",
+   "args": [
+    {
+     "$call": "IsRefine",
+     "args": [
+      null
+     ]
+    }
+   ],
+   "result": false
+  },
+  {
+   "name": "refine does not change the JSON of a union",
+   "args": [
+    {
+     "$call": "Refine",
+     "args": [
+      {
+       "$call": "Union",
+       "args": [
+        [
+         {
+          "$call": "String",
+          "args": []
+         },
+         {
+          "$call": "Number",
+          "args": []
+         }
+        ]
+       ]
+      },
+      {
+       "$fn": "always"
+      }
+     ]
+    }
+   ],
+   "result": {
+    "json": "{\"anyOf\":[{\"type\":\"string\"},{\"type\":\"number\"}]}",
+    "hidden": {
+     "~kind": "Union",
+     "~refine": {
+      "count": 1
+     }
+    }
+   }
+  },
+  {
    "name": "conformance tool parameters",
    "args": [
     {

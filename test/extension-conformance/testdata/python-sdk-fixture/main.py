@@ -530,6 +530,41 @@ def new_extension() -> pig_sdk.Extension:
         "tags": Type.optional(Type.array(Type.string())),
         "filter": Type.optional(Type.record(Type.string(), Type.number())),
     }, {"additionalProperties": False}), lambda ctx, args: "ok")
+    # refine-probe (TestConformance_RefinedToolArgumentsAgreeAcrossSDKs): the schema of the "probe" cases of validateToolArguments.json; every predicate and message function logs its call.
+    refine_log: list = []
+
+    def checked(tag, check):
+        def run(value):
+            refine_log.append(f"check:{tag}")
+            return check(value)
+        return run
+
+    def worded(tag, message):
+        def run(value):
+            refine_log.append(f"error:{tag}")
+            return message(value)
+        return run
+
+    def equals(tag, want):
+        return Type.refine(Type.string(), checked(tag, lambda value: value == want), worded(tag + "m", lambda value: "not " + want))
+
+    def must_throw(value):
+        raise RuntimeError("kaboom")
+
+    probe = Type.refine(Type.object({
+        "name": Type.refine(Type.string(), checked("len", lambda value: len(value) >= 3), worded("lenmsg", lambda value: "name is too short")),
+        "qty": Type.optional(Type.refine(Type.integer(), checked("even", lambda value: value % 2 == 0), worded("evenmsg", lambda value: "qty must be even, got " + str(value)))),
+        "pick": Type.union([equals("u1", "a"), equals("u2", "b")]),
+        "boom": Type.optional(Type.refine(Type.string(), checked("boom", must_throw))),
+    }), checked("root", lambda value: True), worded("rootmsg", lambda value: "root refused"))
+    ext.tool("refine-probe", "Arguments checked by refinements", probe, lambda ctx, args: "ok")
+
+    def refine_log_probe(ctx, args):
+        calls = list(refine_log)
+        refine_log.clear()
+        ctx.notify("refine_log:" + json.dumps(calls) + ":end", "info")
+
+    ext.command("refine_log", "Report and clear the refinement call log", refine_log_probe)
     class ConformanceEditor(pig_sdk.EditorComponent):
         """Swallows "q", rewrites "a" to "A", upper-cases the host's setText, and frames super.render."""
 

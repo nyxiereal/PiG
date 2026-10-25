@@ -1435,6 +1435,17 @@ func makeInprocFixture(ui extension.UIContext, actions *[]string) extension.Exte
 				},
 				Source: inprocFixtureName,
 			},
+			"refine-probe": {
+				Definition: extension.ToolDefinition{
+					Name:        "refine-probe",
+					Description: "Arguments checked by refinements",
+					Parameters:  refineProbeParameters(),
+					Execute: func(context.Context, string, json.RawMessage, extension.AgentToolUpdateCallback) (extension.AgentToolResult, error) {
+						return agent.AgentToolResult{Content: []ai.ToolResultMessageContent{ai.TextContent{Text: "ok"}}}, nil
+					},
+				},
+				Source: inprocFixtureName,
+			},
 			"prepared_tool": {
 				Definition: extension.ToolDefinition{
 					Name:        "prepared_tool",

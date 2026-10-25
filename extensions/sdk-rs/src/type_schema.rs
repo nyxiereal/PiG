@@ -8,6 +8,35 @@
 use serde::{Serialize, Serializer};
 use serde_json::{Map, Number, Value, json};
 use std::collections::BTreeMap;
+use std::sync::Arc;
+
+/// One entry of a schema's hidden `~refine` list (TypeBox's `{check, error}`): `check` decides whether a value passes and `error` words the failure (`None` is TypeBox's
+/// "Refine Error"). Pi runs them while it validates a tool call's arguments; an extension tool's refinements run in this process when the host asks for them. An `Err` is what a
+/// thrown JavaScript error is: it ends the validation and the tool call fails with its message.
+#[derive(Clone)]
+pub struct Refinement {
+    pub check: Arc<dyn Fn(&Value) -> Result<bool, String> + Send + Sync>,
+    pub error: Option<Arc<dyn Fn(&Value) -> Result<String, String> + Send + Sync>>,
+}
+
+impl std::fmt::Debug for Refinement {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str("Refinement")
+    }
+}
+
+impl PartialEq for Refinement {
+    fn eq(&self, other: &Self) -> bool {
+        Arc::ptr_eq(&self.check, &other.check)
+    }
+}
+
+/// A schema node that carries refinements: its path in the schema (the keywords that lead to it: `/properties/a`, `/anyOf/1`, `/items`) and the refinements in the order added.
+#[derive(Clone, Debug, PartialEq)]
+pub struct RefinementSite {
+    pub path: String,
+    pub refinements: Vec<Refinement>,
+}
 
 /// A member of a schema: a plain JSON value, a schema (which keeps its hidden members), a list or an object of members.
 #[derive(Clone, Debug, PartialEq)]
@@ -78,6 +107,8 @@ impl TValue {
 pub struct TSchema {
     fields: Vec<(String, TValue)>,
     hidden: BTreeMap<String, Value>,
+    /// The hidden `~refine` list.
+    refine: Vec<Refinement>,
     /// The list a schema made of a JavaScript array is (`Type::unsafe_`, `Type::optional` and the other updates accept an array, whose own members JSON.stringify ignores).
     items: Option<Vec<TValue>>,
 }
@@ -95,6 +126,27 @@ impl TSchema {
             return Value::Array(items.iter().map(TValue::to_value).collect());
         }
         Value::Object(self.fields.iter().map(|(key, value)| (key.clone(), value.to_value())).collect())
+    }
+
+    /// The schema as the host validates arguments with it: the JSON with TypeBox's `~kind` appended to every node that has one (the Node runtime sends the same form as
+    /// `validation_parameters`).
+    pub fn to_validation_value(&self) -> Value {
+        fn convert(value: &TValue) -> Value {
+            match value {
+                TValue::Schema(schema) => schema.to_validation_value(),
+                TValue::List(items) => Value::Array(items.iter().map(convert).collect()),
+                TValue::Object(pairs) => Value::Object(pairs.iter().map(|(key, member)| (key.clone(), convert(member))).collect()),
+                TValue::Json(value) => value.clone(),
+            }
+        }
+        if let Some(items) = &self.items {
+            return Value::Array(items.iter().map(convert).collect());
+        }
+        let mut object: Map<String, Value> = self.fields.iter().map(|(key, value)| (key.clone(), convert(value))).collect();
+        if let Some(kind) = self.hidden.get("~kind") {
+            object.insert("~kind".into(), kind.clone());
+        }
+        Value::Object(object)
     }
 
     /// What JSON.stringify of the TypeBox value writes: the members in order, numbers as JavaScript prints them (`1e21`, `1e-7`, `0` for -0) through the SDK's one JavaScript
@@ -118,6 +170,31 @@ impl TSchema {
     /// The hidden member `name`: the kind as a string, `true` for a marker, null for `~unsafe`.
     pub fn hidden(&self, name: &str) -> Option<&Value> {
         self.hidden.get(name)
+    }
+
+    /// The refinements, in the order they were added.
+    pub fn refinements(&self) -> &[Refinement] {
+        &self.refine
+    }
+
+    /// How many refinements the schema has anywhere: more than [`TSchema::refinement_sites`] finds means a refinement sits under a keyword whose refinements the host does not run.
+    pub fn refinement_count(&self) -> usize {
+        fn count_value(value: &TValue) -> usize {
+            match value {
+                TValue::Schema(schema) => schema.refinement_count(),
+                TValue::List(items) => items.iter().map(count_value).sum(),
+                TValue::Object(pairs) => pairs.iter().map(|(_, member)| count_value(member)).sum(),
+                TValue::Json(_) => 0,
+            }
+        }
+        self.refine.len() + self.fields.iter().map(|(_, value)| count_value(value)).sum::<usize>() + self.items.iter().flatten().map(count_value).sum::<usize>()
+    }
+
+    /// The nodes of the schema that carry refinements, in the order they are found, with the path of each.
+    pub fn refinement_sites(&self) -> Vec<RefinementSite> {
+        let mut sites = Vec::new();
+        visit_refinements(self, "", &mut sites);
+        sites
     }
 
     /// Every hidden member, by name.
@@ -198,7 +275,7 @@ fn create(kind: &str, enumerable: Vec<(&str, TValue)>, options: Option<&Map<Stri
     for (key, value) in options.into_iter().flatten() {
         set(&mut fields, key, TValue::Json(value.clone()));
     }
-    TSchema { fields: js_order(fields), hidden: BTreeMap::from([("~kind".to_string(), json!(kind))]), items: None }
+    TSchema { fields: js_order(fields), hidden: BTreeMap::from([("~kind".to_string(), json!(kind))]), items: None, refine: Vec::new() }
 }
 
 /// TypeBox's `Memory.Update`: a copy of `current` with the hidden members set and the enumerable ones assigned (replaced in place, or appended).
@@ -216,8 +293,12 @@ fn update(current: &TValue, hidden: &[(&str, Value)], enumerable: Option<&Map<St
         for (name, value) in hidden.iter().filter(|(name, _)| *name == "~unsafe") {
             kept.insert((*name).to_string(), value.clone());
         }
-        return Ok(TSchema { fields: Vec::new(), hidden: kept, items: Some(items) });
+        return Ok(TSchema { fields: Vec::new(), hidden: kept, items: Some(items), refine: Vec::new() });
     }
+    let refine = match current {
+        TValue::Schema(schema) => schema.refine.clone(),
+        _ => Vec::new(),
+    };
     let (mut fields, mut kept) = match current {
         TValue::Schema(schema) => (schema.fields.clone(), schema.hidden.clone()),
         TValue::Json(Value::Object(map)) => (map.iter().map(|(key, value)| (key.clone(), TValue::Json(value.clone()))).collect(), BTreeMap::new()),
@@ -230,7 +311,7 @@ fn update(current: &TValue, hidden: &[(&str, Value)], enumerable: Option<&Map<St
     for (key, value) in enumerable.into_iter().flatten() {
         set(&mut fields, key, TValue::Json(value.clone()));
     }
-    Ok(TSchema { fields: js_order(fields), hidden: kept, items: None })
+    Ok(TSchema { fields: js_order(fields), hidden: kept, items: None, refine })
 }
 
 fn mark(mut schema: TSchema, name: &str) -> TSchema {
@@ -317,6 +398,41 @@ fn flatten_union(any_of: Option<TValue>) -> Vec<TValue> {
         }
     }
     out
+}
+
+const KEYWORDS_WITH_CHILD: [&str; 11] = ["additionalProperties", "additionalItems", "contains", "propertyNames", "not", "if", "then", "else", "items", "unevaluatedItems", "unevaluatedProperties"];
+const KEYWORDS_WITH_MEMBERS: [&str; 6] = ["properties", "patternProperties", "dependentSchemas", "dependencies", "$defs", "definitions"];
+const KEYWORDS_WITH_LIST: [&str; 5] = ["allOf", "anyOf", "oneOf", "prefixItems", "items"];
+
+fn pointer_segment(key: &str) -> String {
+    key.replace('~', "~0").replace('/', "~1")
+}
+
+fn visit_refinements(schema: &TSchema, path: &str, sites: &mut Vec<RefinementSite>) {
+    if !schema.refine.is_empty() {
+        sites.push(RefinementSite { path: path.to_string(), refinements: schema.refine.clone() });
+    }
+    for (key, value) in &schema.fields {
+        let key = key.as_str();
+        match value {
+            TValue::Object(members) if KEYWORDS_WITH_MEMBERS.contains(&key) => {
+                for (name, member) in members {
+                    if let TValue::Schema(child) = member {
+                        visit_refinements(child, &format!("{path}/{key}/{}", pointer_segment(name)), sites);
+                    }
+                }
+            }
+            TValue::List(members) if KEYWORDS_WITH_LIST.contains(&key) => {
+                for (index, member) in members.iter().enumerate() {
+                    if let TValue::Schema(child) = member {
+                        visit_refinements(child, &format!("{path}/{key}/{index}"), sites);
+                    }
+                }
+            }
+            TValue::Schema(child) if KEYWORDS_WITH_CHILD.contains(&key) => visit_refinements(child, &format!("{path}/{key}"), sites),
+            _ => {}
+        }
+    }
 }
 
 /// What `Type.Literal` takes: a string, a boolean or a number.
@@ -487,6 +603,37 @@ impl Type {
         mark(schema.into(), "~immutable")
     }
     /// `Type.Optional(value)` of a value that is not a [`TSchema`]: a plain JSON object, or a list (whose copy loses the marker, see [`Type::unsafe_`]). Any other value is an error.
+    /// `Type.Refine(type, check, error?)`: a copy of the schema whose hidden `~refine` list has the refinement appended; the schema's JSON does not change. The refinements run when
+    /// the host validates a tool call's arguments (see [`crate::Extension::tool`]).
+    pub fn refine(
+        schema: impl Into<TSchema>,
+        check: impl Fn(&Value) -> Result<bool, String> + Send + Sync + 'static,
+        error: Option<Box<dyn Fn(&Value) -> Result<String, String> + Send + Sync>>,
+    ) -> TSchema {
+        let mut schema: TSchema = schema.into();
+        schema.refine.push(Refinement { check: Arc::new(check), error: error.map(|error| Arc::from(error) as Arc<dyn Fn(&Value) -> Result<String, String> + Send + Sync>) });
+        schema
+    }
+
+    /// `Type.Refine(value, check, error?)` of a value that is not a [`TSchema`]: a plain JSON object or a list. Any other value is an error.
+    pub fn refine_value(
+        value: impl Into<TValue>,
+        check: impl Fn(&Value) -> Result<bool, String> + Send + Sync + 'static,
+        error: Option<Box<dyn Fn(&Value) -> Result<String, String> + Send + Sync>>,
+    ) -> Result<TSchema, String> {
+        let mut schema = match value.into() {
+            TValue::Schema(schema) => schema,
+            other => update(&other, &[], None)?,
+        };
+        schema.refine.push(Refinement { check: Arc::new(check), error: error.map(|error| Arc::from(error) as Arc<dyn Fn(&Value) -> Result<String, String> + Send + Sync>) });
+        Ok(schema)
+    }
+
+    /// `Type.IsRefine`: the value carries a `~refine` list.
+    pub fn is_refine(value: &TSchema) -> bool {
+        !value.refine.is_empty()
+    }
+
     pub fn optional_value(value: impl Into<TValue>) -> Result<TSchema, String> {
         mark_value(value.into(), "~optional")
     }

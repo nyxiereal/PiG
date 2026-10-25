@@ -5,7 +5,9 @@
 // An argument is JSON, except {"$call": "<member of Type>", "args": [...]}, which is the value that call returns (arguments are resolved first). A case's result is what
 // the answer is: a guard's boolean, or for a schema {"json": JSON.stringify(schema), "hidden": {<non-enumerable own members>}}, so the key order, the numbers' text and the hidden
 // markers are all compared.
+// {"$fn": "<name>", ...} is a predicate or message function (see predicateFor below), for Type.Refine; each SDK's test builds the same function from the same spec.
 const t = (name, ...args) => ({ $call: name, args });
+const fn = (name, spec = {}) => ({ $fn: name, ...spec });
 const S = t("String"), N = t("Number"), I = t("Integer"), B = t("Boolean");
 const opt = (x) => t("Optional", x);
 const cases = [];
@@ -126,6 +128,19 @@ add("string with DEL", t("String", { description: "a\u007fb" }));
 add("property names that need escapes", t("Object", { 'a"b': S, "c\\d": N, "e\nf": B, "<>": S }));
 
 // The tool parameters the conformance fixtures register in every SDK (TestConformance_TypeSchemaToolParametersAgreeAcrossSDKs): what the host holds must equal Pi's.
+// Refine: the hidden ~refine list (the vector records how many entries it has; a function has no JSON form) and the guard.
+add("refine of a string", t("Refine", S, fn("always")));
+add("refine twice", t("Refine", t("Refine", S, fn("always")), fn("never")));
+add("refine with an error function", t("Refine", S, fn("never"), fn("text", { text: "no" })));
+add("refine keeps the other markers", t("Refine", opt(S), fn("always")));
+add("optional keeps the refinement", opt(t("Refine", S, fn("always"))));
+add("refine of an object", t("Refine", t("Object", { a: S }), fn("always")));
+add("refine of an array keeps ~refine and length", t("Refine", [1, 2], fn("always")));
+add("IsRefine of a refined schema", t("IsRefine", t("Refine", S, fn("always"))));
+add("IsRefine of a plain schema", t("IsRefine", S));
+add("IsRefine of an optional refined schema", t("IsRefine", opt(t("Refine", S, fn("always")))));
+add("IsRefine of null", t("IsRefine", null));
+add("refine does not change the JSON of a union", t("Refine", t("Union", [S, N]), fn("always")));
 add("conformance tool parameters", t("Object", {
   query: t("String", { description: "What to look up" }),
   limit: opt(t("Integer", { minimum: 1, maximum: 50 })),
@@ -181,8 +196,34 @@ add("IsEnumValue of null", t("IsEnumValue", null));
 add("IsEnumValue of an object", t("IsEnumValue", {}));
 export { cases };
 
+// The predicate and message functions a case names. A spec's "tag" labels the call in the log of validateToolArguments vectors (the same function there); here only the shape matters.
+export const calls = [];
+export const specOf = new WeakMap();
+export function predicateFor(spec) {
+  const fn = predicateFunction(spec);
+  specOf.set(fn, spec);
+  return fn;
+}
+function predicateFunction(spec) {
+  const log = (kind) => calls.push(`${kind}:${spec.tag ?? spec.$fn}`);
+  switch (spec.$fn) {
+    case "always": return () => { log("check"); return true; };
+    case "never": return () => { log("check"); return false; };
+    case "lengthAtLeast": return (v) => { log("check"); return String(v).length >= spec.n; };
+    case "equals": return (v) => { log("check"); return v === spec.value; };
+    case "even": return (v) => { log("check"); return v % 2 === 0; };
+    case "greaterThan": return (v) => { log("check"); return v > spec.n; };
+    case "throws": return () => { log("check"); throw new Error(spec.message); };
+    case "throwsText": return () => { log("check"); throw spec.message; };
+    case "text": return () => { log("error"); return spec.text; };
+    case "textWithValue": return (v) => { log("error"); return spec.prefix + String(v); };
+    case "errorThrows": return () => { log("error"); throw new Error(spec.message); };
+    default: throw new Error(`no predicate ${spec.$fn}`);
+  }
+}
+
 // Resolve {"$call"} nodes, then report the answer. JSON.parse keeps the order of the keys a JavaScript object has (array indexes first), which is what Pi's callers pass.
-const resolve = (Type, node) => {
+export const resolve = (Type, node) => {
   if (Array.isArray(node)) return node.map((x) => resolve(Type, x));
   if (node && typeof node === "object") {
     if (typeof node.$call === "string") {
@@ -190,6 +231,7 @@ const resolve = (Type, node) => {
       if (typeof fn !== "function") throw new Error(`Type has no ${node.$call}`);
       return fn(...node.args.map((x) => resolve(Type, x)));
     }
+    if (typeof node.$fn === "string") return predicateFor(node);
     return Object.fromEntries(Object.entries(node).map(([k, v]) => [k, resolve(Type, v)]));
   }
   return node;
@@ -198,6 +240,10 @@ export const call = (Type, node) => {
   const value = resolve(Type, node);
   if (typeof value !== "object" || value === null) return value;
   const hidden = {};
-  for (const key of Reflect.ownKeys(value)) if (!Object.keys(value).includes(key)) hidden[String(key)] = value[key];
+  for (const key of Reflect.ownKeys(value)) {
+    if (Object.keys(value).includes(key)) continue;
+    // ~refine holds functions, which JSON cannot carry: the vector records how many there are.
+    hidden[String(key)] = key === "~refine" ? { count: value[key].length } : value[key];
+  }
   return { json: JSON.stringify(value), hidden };
 };

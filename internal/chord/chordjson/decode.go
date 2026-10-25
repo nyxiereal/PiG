@@ -3,8 +3,6 @@ package chordjson
 import (
 	"encoding/json"
 	"errors"
-	sdkjson "github.com/MichaelKinsy/PiG/extensions/sdk/json"
-	"github.com/MichaelKinsy/PiG/internal/jsstring"
 	"reflect"
 	"strconv"
 	"unicode/utf8"
@@ -49,15 +47,7 @@ type decoder struct {
 	unquote func(raw []byte, text *string) error
 }
 
-// unquoteJSON reads a string token. encoding/json turns the escape of a lone surrogate (`\ud83d`) into U+FFFD; JSON.parse
-// keeps the unit, which a Go string holds as WTF-8, so a token with such an escape is read with the SDK's JavaScript
-// semantics. Every other token is encoding/json's.
-func unquoteJSON(raw []byte, text *string) error {
-	if jsstring.HasSurrogateEscape(raw) {
-		return sdkjson.Unmarshal(raw, text)
-	}
-	return json.Unmarshal(raw, text)
-}
+func unquoteJSON(raw []byte, text *string) error { return json.Unmarshal(raw, text) }
 
 func (parser *decoder) space() {
 	for parser.at < len(parser.data) {

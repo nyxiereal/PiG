@@ -3,7 +3,6 @@ package sdk
 import (
 	"context"
 	"errors"
-	"sync"
 	"testing"
 	"time"
 
@@ -25,9 +24,6 @@ func mcpArgs(t *testing.T, values ...any) []json.RawMessage {
 
 type mcpTestTransport struct {
 	McpTransportEvents
-	mu       sync.Mutex
-	ordered  bool
-	release  chan struct{}
 	version  string
 	aborted  chan struct{}
 	blockOn  string
@@ -142,8 +138,7 @@ func TestMcpTransportShimSend(t *testing.T) {
 }
 
 type mcpTestServerStore struct {
-	lockedDuring []bool
-	held         bool
+	held bool
 }
 
 func (s *mcpTestServerStore) Load() (McpOAuthState, error) { return nil, nil }

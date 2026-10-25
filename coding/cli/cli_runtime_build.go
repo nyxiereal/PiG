@@ -393,8 +393,9 @@ func (b *cliRuntimeBuilder) buildResources(ctx context.Context, in cliBuildInput
 	if b.activePiglet != nil {
 		pigletExtConfigs := resolvePigletExtConfigs(b.activePiglet)
 		if b.activePigletBaked && len(b.activePiglet.Extensions) > 0 {
+			// A Binary's own extensions are fused or embedded; an overlay's (D202) have origins and resolve like a stock --piglet's.
 			flags.NoExtensions = true
-			extraExtConfigs = mergeExtConfigs(append(fusedConfigsForPiglet(b.activePiglet), extraExtConfigs...))
+			extraExtConfigs = mergeExtConfigs(append(append(fusedConfigsForPiglet(b.activePiglet), pigletExtConfigs...), extraExtConfigs...))
 		} else if len(pigletExtConfigs) > 0 {
 			flags.NoExtensions = true
 			extraExtConfigs = mergeExtConfigs(append(pigletExtConfigs, extraExtConfigs...))

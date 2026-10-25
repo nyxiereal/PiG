@@ -181,14 +181,39 @@ jobs:
         run: make upstream-mirror
       - name: Run the bookkeeping gates
         id: gates
+        # The step's failure is reported by the last step, after the autofix step has looked at the log.
+        continue-on-error: true
         env:
           CI: '1'
         shell: bash
         run: |
           set -o pipefail
-          status=0
-          make -k -j4 -O ci-bookkeeping 2>&1 | tee "$RUNNER_TEMP/bookkeeping.log" || status=$?
-          exit "$status"
+          make -k -j4 -O ci-bookkeeping 2>&1 | tee "$RUNNER_TEMP/bookkeeping.log"
+      # When every failed gate is one whose remedy is regenerating committed files (automation/ci/autofix-gates.txt), regenerate
+      # them here, check the failed gates pass on the result, and keep the changed files as an artifact. This job holds a read-only
+      # token and runs the pull request's own code; the autofix workflow, which holds the write token, runs none of it. It reads
+      # the artifact, checks every path against the default branch's allowlist, and creates the commit.
+      - name: Regenerate stale derived files
+        id: autofix
+        if: steps.gates.outcome == 'failure' && (github.event_name == 'pull_request' || (github.event_name == 'workflow_dispatch' && github.ref_name != github.event.repository.default_branch))
+        env:
+          LOG: ${{ runner.temp }}/bookkeeping.log
+          HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+          ARTIFACT: ${{ runner.temp }}/autofix
+        run: python3 automation/ci/autofix.py prepare --log "$LOG" --out "$ARTIFACT" --head-sha "$HEAD_SHA"
+      - name: Keep the regenerated files for the autofix workflow
+        if: steps.autofix.outputs.eligible == 'true'
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: autofix
+          path: ${{ runner.temp }}/autofix/
+          if-no-files-found: error
+          retention-days: 3
+      - name: Fail the job when a gate failed
+        if: steps.gates.outcome == 'failure'
+        run: |
+          echo "::error::bookkeeping gates failed; see the Run the bookkeeping gates step"
+          exit 1
 
   preflight:
     name: Linux / preflight

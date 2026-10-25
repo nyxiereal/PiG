@@ -261,7 +261,7 @@ type commitApi struct {
 	commits atomic.Int32
 }
 
-func (a *commitApi) Commit(context.Context, func(durable.Tx) (any, error)) (any, error) {
+func (a *commitApi) Commit(context.Context, func(durable.Tx) (any, error), ...durable.CommitOptions) (any, error) {
 	a.commits.Add(1)
 	return nil, nil
 }

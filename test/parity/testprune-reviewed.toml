@@ -45,8 +45,8 @@ reason = "Pi 6c2fd73b0 builds a document watch on observeCommits(), the Session'
 path = "durable/harness/harness_inbox_test.go"
 commit = "8153bc7a9e2627452f2460cb96c9edd75098fcf6"
 class = "CITE"
-cite = "packages/coding-agent/src/utils/tools-manager.ts:33"
-reason = "Pi c8ec752cf (#11209) replaces getAssetName's per-platform arm64-or-x86_64 choice with getReleaseTarget (tools-manager.ts:33-41), which maps only x64 and arm64 and returns undefined for any other architecture or platform. TestArchStr, which asserted that riscv64 and 386 select the x86_64 archive, becomes TestReleaseTarget, which asserts that they select nothing."
+cite = "packages/durable/src/harness/generation.ts:729"
+reason = "Pi 38ff99177 makes a tool round that requests a handoff append the handoff's reset and continue the run in the new context (generation.ts:729-741), ending it only when the round also terminates: the cases that expected the run to end on the tool-calling answer expect the continuing run's answer, the transcript with the new generation's answer, and the follow-ups after it."
 
 [[entry]]
 path = "codemode/deterministic_test.go"
@@ -54,5 +54,3 @@ commit = "d1af7aece304c704c75b1bc32e8690dbeedf0d8f"
 class = "CITE"
 cite = "packages/codemode/src/runtime/vm.ts:212"
 reason = "A deterministic VM that is told a result number it cannot take crashes with crashMessage of the Error vm.ts:212 throws, `Error: Result 2 has sequence number 5, expected 1 or later, once` (crashMessage, vm.ts:156-158, names the error). The test expected the message without `Error: `; Pi's own frames, recorded by TestWireBehaviorMatchesPi, carry the prefix."
-cite = "packages/durable/src/harness/generation.ts:729"
-reason = "Pi 38ff99177 makes a tool round that requests a handoff append the handoff's reset and continue the run in the new context (generation.ts:729-741), ending it only when the round also terminates: the cases that expected the run to end on the tool-calling answer expect the continuing run's answer, the transcript with the new generation's answer, and the follow-ups after it."

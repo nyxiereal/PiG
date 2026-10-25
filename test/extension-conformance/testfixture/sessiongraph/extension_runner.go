@@ -86,16 +86,17 @@ func extensionRunnerScript(ctx sdk.Context, args map[string]any) map[string]any 
 		panic(err)
 	}
 	loaded := ok(loader.GetExtensions())
-	paths, tools := []string{}, [][]string{}
+	paths, tools, sources := []string{}, [][]string{}, []string{}
 	for _, ext := range loaded.Extensions {
 		paths = append(paths, ext.Path)
 		tools = append(tools, ext.Tools)
+		sources = append(sources, ext.SourceInfo.Source)
 	}
 	loadErrors := []any{}
 	for _, loadErr := range loaded.Errors {
 		loadErrors = append(loadErrors, map[string]any{"path": loadErr.Path, "error": loadErr.Error})
 	}
-	r["loaded"] = map[string]any{"paths": paths, "tools": tools, "errors": loadErrors, "runtime": runtimeView(loaded.Runtime)}
+	r["loaded"] = map[string]any{"paths": paths, "tools": tools, "errors": loadErrors, "sources": sources, "runtime": runtimeView(loaded.Runtime)}
 
 	manager := ok(sdk.SessionManagerInMemory(ctx, cwd, nil, nil))
 	runner := ok(sdk.NewExtensionRunner(ctx, loaded.Extensions, loaded.Runtime, cwd, &manager, rt))

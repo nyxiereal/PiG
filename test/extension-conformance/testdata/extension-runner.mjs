@@ -42,7 +42,7 @@ export async function extensionRunnerScript({ cwd, agentDir, runnerProbeA, runne
   await loader.reload();
   const loaded = loader.getExtensions();
   r.loaded = {
-    paths: loaded.extensions.map((ext) => ext.path), tools: loaded.extensions.map((ext) => [...ext.tools.keys()]), errors: loaded.errors.filter((entry) => !entry.error.includes("conflicts with")), runtime: runtimeView(loaded.runtime),
+    paths: loaded.extensions.map((ext) => ext.path), tools: loaded.extensions.map((ext) => [...ext.tools.keys()]), errors: loaded.errors, sources: loaded.extensions.map((ext) => ext.sourceInfo.source), runtime: runtimeView(loaded.runtime),
   };
   const manager = SessionManager.inMemory(cwd);
   const runner = new ExtensionRunner(loaded.extensions, loaded.runtime, cwd, manager, registry);

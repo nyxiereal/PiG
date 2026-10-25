@@ -212,7 +212,12 @@
 		}
 	],
 	"loaded": {
-		"errors": [],
+		"errors": [
+			{
+				"error": "Tool \"shared\" conflicts with \u003croot\u003e/probe/runner-a.mjs",
+				"path": "\u003croot\u003e/probe/runner-b.mjs"
+			}
+		],
 		"paths": [
 			"\u003croot\u003e/probe/runner-a.mjs",
 			"\u003croot\u003e/probe/runner-b.mjs"
@@ -227,6 +232,10 @@
 			"providers": 0,
 			"virtualModels": 0
 		},
+		"sources": [
+			"cli",
+			"cli"
+		],
 		"tools": [
 			[
 				"alpha",

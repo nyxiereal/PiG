@@ -1000,6 +1000,311 @@ def extension_refs_tool(ctx, params):
     return json.dumps(extension_refs_script(ctx, params))
 
 
+def _call_view(found):
+    return "function" if found else "undefined"
+
+
+def _renderers_view(found):
+    if found is None:
+        return None
+    return {"renderShell": found.get("renderShell"), "renderCall": _call_view(found.get("renderCall") is True), "renderResult": _call_view(found.get("renderResult") is True)}
+
+
+def _runtime_view(runtime):
+    return {
+        "flagValues": runtime.get_flag_values(), "providers": len(runtime.pending_provider_registrations()), "nativeProviders": len(runtime.pending_native_provider_registrations()),
+        "virtualModels": len(runtime.pending_virtual_model_registrations()), "mcpServers": len(runtime.mcp_servers()),
+    }
+
+
+def extension_runner_script(ctx, args):
+    import time
+
+    cwd, agent_dir = args["cwd"], args["agentDir"]
+    r = {}
+
+    fresh = pig_sdk.create_extension_runtime(ctx)
+    runtime_report = {"initial": _runtime_view(fresh), "active": error_text(fresh.assert_active)}
+    fresh.set_flag_value("x", True)
+    fresh.set_flag_value("a", "b")
+    runtime_report["afterSet"] = _runtime_view(fresh)
+    fresh.invalidate("runtime is stale")
+    fresh.invalidate("a second message is ignored")
+    runtime_report["stale"] = error_text(fresh.assert_active)
+    r["runtime"] = runtime_report
+
+    rt = ModelRuntime.create(ctx, auth_path=args["mrAuth"], models_path=args["mrModels"], models_store_path=args["mrStore"])
+    settings = SettingsManager.in_memory(ctx, {"compaction": {"enabled": False}, "retry": {"enabled": False}, "defaultProvider": "mr-local", "defaultModel": "m1"})
+    loader_runtime = pig_sdk.create_extension_runtime(ctx)
+    loader = DefaultResourceLoader(
+        ctx, cwd=cwd, agent_dir=agent_dir, settings_manager=settings, runtime=loader_runtime, no_extensions=True, no_skills=True, no_prompt_templates=True, no_themes=True,
+        no_context_files=True, additional_extension_paths=[args["runnerProbeA"], args["runnerProbeB"]],
+    )
+    loader.reload()
+    loaded = loader.get_extensions()
+    r["loaded"] = {"paths": [ext["path"] for ext in loaded.extensions], "tools": [ext["tools"] for ext in loaded.extensions], "errors": loaded["errors"], "sources": [ext["sourceInfo"]["source"] for ext in loaded.extensions], "runtime": _runtime_view(loaded.runtime)}
+
+    manager = SessionManager.in_memory(ctx, cwd)
+    runner = pig_sdk.ExtensionRunner(ctx, loaded.extensions, loaded.runtime, cwd, manager, rt)
+
+    keybindings = {"app.interrupt": ["ctrl+c"], "app.other": ["ctrl+k"], "app.exit": ["ctrl+d"]}
+    noop = runner.get_ui_context()
+    tool_views = [
+        {"name": tool["definition"]["name"], "description": tool["definition"]["description"], "scope": tool["sourceInfo"]["scope"], "origin": tool["sourceInfo"]["origin"], "path": tool["sourceInfo"]["path"]}
+        for tool in runner.get_all_registered_tools()
+    ]
+    shared = runner.get_tool_definition("shared")
+    shortcuts = [{"key": entry[0], "description": entry[1].get("description"), "extensionPath": entry[1]["extensionPath"]} for entry in runner.get_shortcuts(keybindings)]
+    commands = [{"name": c["name"], "invocationName": c["invocationName"], "description": c.get("description"), "path": c["sourceInfo"]["path"]} for c in runner.get_registered_commands()]
+
+    def invocation(name):
+        found = runner.get_command(name)
+        return None if found is None else found["invocationName"]
+
+    # An extension process answers a tool renderer resolution on a later turn (D89): ask until the answer is the extension's.
+    alpha = None
+    for _ in range(100):
+        alpha = runner.resolve_tool_renderers("alpha", lambda: None)
+        if alpha is not None:
+            break
+        time.sleep(0.05)
+    context_of = runner.create_context()
+    registry_same = context_of.model_registry() is rt
+    manager_same = context_of.session_manager() is manager
+    command_before = runner.create_command_context()
+    command_before.wait_for_idle()
+    new_before = command_before.new_session()
+    command_before.reload()
+    nested_before = runner.create_tool_context("call-0").execute_tool("alpha", {})
+    twin2 = runner.get_command("twin:2")
+    reads = {
+        "extensionPaths": runner.get_extension_paths(), "tools": tool_views, "toolDefinition": shared["description"], "missingTool": runner.get_tool_definition("nope"),
+        "flags": runner.get_flags(), "flagValues": runner.get_flag_values(), "shortcuts": shortcuts, "shortcutDiagnostics": runner.get_shortcut_diagnostics(),
+        "commands": commands, "commandDiagnostics": runner.get_command_diagnostics(),
+        "commandByName": {"hello": invocation("hello"), "twin": invocation("twin"), "twin:2": None if twin2 is None else twin2.get("description"), "nope": invocation("nope")},
+        "hasHandlers": {"tool_call": runner.has_handlers("tool_call"), "session_shutdown": runner.has_handlers("session_shutdown")},
+        "renderers": {
+            "message": _call_view(runner.get_message_renderer("probe-message")), "missingMessage": _call_view(runner.get_message_renderer("nope")),
+            "entry": _call_view(runner.get_entry_renderer("probe-entry")), "missingEntry": _call_view(runner.get_entry_renderer("nope")), "markdownTransformers": runner.get_markdown_transformers(),
+        },
+        "toolRenderers": {
+            "alpha": _renderers_view(alpha),
+            "other": _renderers_view(runner.resolve_tool_renderers("other", lambda: {"renderResult": True})),
+            "none": _renderers_view(runner.resolve_tool_renderers("other", lambda: None)),
+        },
+        "hasUI": runner.has_ui(),
+        "noUI": {"select": noop.select("t", ["a"]), "confirm": noop.confirm("t", "m"), "input": noop.input("t"), "editorText": noop.get_editor_text()},
+        "registryIsSame": runner.get_model_registry() is rt,
+        "activeTools": error_text(runner.get_active_tools), "mode": context_of.mode(), "cwd": context_of.cwd(),
+        "sessionManagerIsSame": manager_same, "modelRegistryIsSame": registry_same,
+        "commandContextBeforeBind": {"newSession": new_before}, "toolContextBeforeBind": nested_before["result"]["content"][0]["text"],
+    }
+    runner.set_flag_value("probe-flag", "changed")
+    reads["flagValuesAfterSet"] = runner.get_flag_values()
+    runner.set_flag_value("probe-bool", True)
+    reads["flagValuesAfterBool"] = runner.get_flag_values()
+    r["reads"] = reads
+
+    log = []
+
+    def record(name, *call_args):
+        log.append([name, *call_args])
+
+    model = rt.get_model("mr-local", "m1")
+    source_info = {"path": "p", "source": "local", "scope": "temporary", "origin": "top-level"}
+    actions = {
+        "send_message": lambda message, options=None: record("sendMessage", message, options),
+        "send_user_message": lambda content, options=None: record("sendUserMessage", content, options),
+        "append_entry": lambda custom_type, data=None: record("appendEntry", custom_type, data),
+        "set_session_name": lambda name: record("setSessionName", name),
+        "get_session_name": lambda: "session-name",
+        "set_label": lambda entry_id, label=None: record("setLabel", entry_id, label),
+        "get_active_tools": lambda: ["alpha", "beta"],
+        "get_all_tools": lambda: [{"name": "alpha", "description": "Alpha tool", "parameters": {"type": "object"}, "sourceInfo": source_info}],
+        "get_settings": lambda: {"theme": "dark"},
+        "set_active_tools": lambda names: record("setActiveTools", names),
+        "refresh_tools": lambda: record("refreshTools"),
+        "get_commands": lambda: [{"name": "hello", "description": "d", "source": "extension", "sourceInfo": source_info}],
+        "set_model": lambda m: (record("setModel", m["id"]), True)[1],
+        "get_thinking_level": lambda: "medium",
+        "set_thinking_level": lambda level: record("setThinkingLevel", level),
+    }
+    context_actions = {
+        "get_model": lambda: model,
+        "get_scoped_models": lambda: [{"model": model, "thinkingLevel": "low"}],
+        "is_idle": lambda: False,
+        "is_project_trusted": lambda: True,
+        "get_signal": lambda: None,
+        "abort": lambda: record("abort"),
+        "has_pending_messages": lambda: True,
+        "shutdown": lambda: record("shutdown"),
+        "get_context_usage": lambda: {"tokens": 10, "contextWindow": 100, "percent": 10.0},
+        "compact": lambda options=None: record("compact", (options or {}).get("customInstructions")),
+        "get_system_prompt": lambda: "bound system prompt",
+        "get_system_prompt_options": lambda: {"cwd": cwd, "customPrompt": "custom"},
+        "execute_tool": lambda caller_id, name, params, _options=None: {"toolCall": {"type": "toolCall", "id": f"{caller_id}/1", "name": name, "arguments": params}, "result": {"content": [{"type": "text", "text": f"ran {name}"}], "details": {}}, "isError": False},
+        "get_callable_tools": lambda: [{"name": "alpha", "label": "Alpha", "description": "Alpha tool", "parameters": {"type": "object"}}],
+    }
+    runner.bind_core(actions, context_actions)
+    r["bound"] = {"activeTools": runner.get_active_tools(), "errors": []}
+    reported = []
+    off = runner.on_error(lambda report: reported.append({"extensionPath": report["extensionPath"], "event": report["event"], "error": report["error"]}))
+
+    emits = {}
+
+    def put(key, value):
+        if value is not None:
+            emits[key] = value
+
+    runner.emit({"type": "session_start", "reason": "startup"})
+    emits["sessionBeforeSwitch"] = runner.emit({"type": "session_before_switch", "reason": "new"})
+    runner.emit({"type": "agent_start"})
+    put("toolCall", runner.emit_tool_call({"type": "tool_call", "toolCallId": "t1", "toolName": "bash", "input": {"command": "ls"}}))
+    put("toolCallBlocked", runner.emit_tool_call({"type": "tool_call", "toolCallId": "t2", "toolName": "bash", "input": {"command": "forbidden"}}))
+    put("toolResult", runner.emit_tool_result({"type": "tool_result", "toolCallId": "t1", "toolName": "bash", "input": {"command": "ls"}, "content": [{"type": "text", "text": "out"}], "isError": False}))
+    emits["inputTransform"] = runner.emit_input("t:x", None, "interactive")
+    emits["inputHandled"] = runner.emit_input("handled-me", None, "interactive")
+    emits["inputContinue"] = runner.emit_input("plain", None, "rpc")
+    emits["context"] = runner.emit_context([{"role": "user", "content": "keep", "timestamp": 1}, {"role": "user", "content": "drop-me", "timestamp": 2}])
+    started = runner.emit_before_agent_start({"messageType": "user", "prompt": "do it"}, {"cwd": cwd, "customPrompt": "base"})
+    forced = started["systemPromptOptions"].get("forceSystemPrompt") or ""
+    emits["beforeAgentStart"] = {"messages": started["messages"], "forced": {"startsWithBase": forced.startswith("base"), "endsWithA": forced.endswith("[A]")}, "customPrompt": started["systemPromptOptions"].get("customPrompt")}
+    put("messageEnd", runner.emit_message_end({"type": "message_end", "message": {"role": "user", "content": "hi", "timestamp": 1}}))
+    emits["providerRequest"] = runner.emit_before_provider_request({"model": "m"})
+    emits["providerHeaders"] = runner.emit_before_provider_headers({"x-del": "d", "x-keep": "k"})
+    put("userBash", runner.emit_user_bash({"type": "user_bash", "command": "ls", "excludeFromContext": False, "cwd": cwd}))
+    emits["resourcesDiscover"] = runner.emit_resources_discover(cwd, "startup")
+    emits["cacheWarming"] = runner.emit_cache_warming_decision({"type": "cache_warming_decision", "warmCost": 1, "missCost": 2, "continuationProbability": 0.5, "action": "warm"})
+    built = []
+
+    def build_context(entries):
+        built.append(len(entries))
+        return {"contextEntries": [], "contextMessages": [], "llmMessages": [], "pendingMessages": [], "canContinue": True}
+
+    emits["boundary"] = runner.emit_boundary(
+        {"type": "turn_end", "turnIndex": 0, "message": {"role": "user", "content": "x", "timestamp": 1}, "toolResults": [], "messageEntryId": "m1", "toolResultEntryIds": [], "outcome": "completed"},
+        build_context,
+    )
+    emits["boundaryBuilt"] = list(built)
+    runner.emit_error({"extensionPath": "/x/ext.mjs", "event": "manual", "error": "reported by hand"})
+    r["emits"] = emits
+    r["errors"] = list(reported)
+
+    live = runner.create_context()
+    signal = live.signal()
+    contexts = {
+        "mode": live.mode(), "hasUI": live.has_ui(), "cwd": live.cwd(), "model": live.model()["id"], "scopedModels": [[e["model"]["id"], e.get("thinkingLevel")] for e in live.scoped_models()],
+        "thinkingLevel": live.thinking_level(), "isIdle": live.is_idle(), "isProjectTrusted": live.is_project_trusted(), "signal": None if signal is None else {"aborted": signal.is_set()},
+        "hasPendingMessages": live.has_pending_messages(), "contextUsage": live.get_context_usage(), "systemPrompt": live.get_system_prompt(),
+    }
+    live.abort()
+    live.shutdown()
+    live.compact({"customInstructions": "short"})
+    runner.shutdown()
+    command = runner.create_command_context()
+    runner.bind_command_context({
+        "wait_for_idle": lambda: record("waitForIdle"),
+        "new_session": lambda options=None: (record("newSession", (options or {}).get("parentSession")), {"cancelled": False})[1],
+        "fork": lambda entry_id, options=None: (record("fork", entry_id, (options or {}).get("position")), {"cancelled": True})[1],
+        "navigate_tree": lambda target, options=None: (record("navigateTree", target, (options or {}).get("label")), {"cancelled": False})[1],
+        "switch_session": lambda path, _options=None: (record("switchSession", path), {"cancelled": False})[1],
+        "reload": lambda: record("reload"),
+    })
+    command_report = {"systemPromptOptions": command.get_system_prompt_options()}
+    command.wait_for_idle()
+    command_report["waitForIdle"] = None
+    command_report["newSession"] = command.new_session({"parentSession": "parent.jsonl"})
+    command_report["fork"] = command.fork("e1", {"position": "at"})
+    command_report["navigateTree"] = command.navigate_tree("e2", {"label": "l"})
+    command_report["switchSession"] = command.switch_session("other.jsonl")
+    command.reload()
+    command_report["reload"] = None
+    contexts["command"] = command_report
+    tool_context = runner.create_tool_context("call-1")
+    contexts["tool"] = {"tools": [tool["name"] for tool in tool_context.tools()], "executeTool": tool_context.execute_tool("alpha", {"text": "x"})}
+    r["contexts"] = contexts
+
+    ui_log = []
+
+    def note(*call):
+        ui_log.append(list(call))
+
+    def select(title, options, _opts=None):
+        note("select", title, options)
+        return options[1] if len(options) > 1 else None
+
+    def confirm(title, message, _opts=None):
+        note("confirm", title, message)
+        return True
+
+    def input_(title, placeholder=None, _opts=None):
+        note("input", title, placeholder)
+        return "typed"
+
+    def editor(title, prefill=None):
+        note("editor", title, prefill)
+        return f"{prefill or ''}!"
+
+    ui = {
+        "select": select, "confirm": confirm, "input": input_, "editor": editor,
+        "notify": lambda message, kind=None: note("notify", message, kind),
+        "set_status": lambda key, text=None: note("setStatus", key, text),
+        "set_working_message": lambda message=None: note("setWorkingMessage", message),
+        "set_working_visible": lambda visible: note("setWorkingVisible", visible),
+        "set_hidden_thinking_label": lambda label=None: note("setHiddenThinkingLabel", label),
+        "set_widget": lambda key, content, options=None: note("setWidget", key, content, (options or {}).get("placement")),
+        "set_title": lambda title: note("setTitle", title),
+        "paste_to_editor": lambda text: note("pasteToEditor", text),
+        "set_editor_text": lambda text: note("setEditorText", text),
+        "get_editor_text": lambda: "editor text",
+        "get_tools_expanded": lambda: True,
+        "set_tools_expanded": lambda expanded: note("setToolsExpanded", expanded),
+    }
+    runner.set_ui_context(ui, "tui")
+    live_ui = runner.get_ui_context()
+    dialogs = {"select": live_ui.select("Pick", ["x", "y"]), "confirm": live_ui.confirm("Sure?", "really"), "input": live_ui.input("Name", "placeholder"), "editor": live_ui.editor("Edit", "pre")}
+    live_ui.notify("hello", "info")
+    live_ui.set_status("k", "v")
+    live_ui.set_working_message("working")
+    live_ui.set_working_visible(False)
+    live_ui.set_hidden_thinking_label("hidden")
+    live_ui.set_widget("w", ["line"], {"placement": "belowEditor"})
+    live_ui.set_title("title")
+    live_ui.paste_to_editor("pasted")
+    live_ui.set_editor_text("set")
+    live_ui.set_tools_expanded(False)
+    reads_ui = {"editorText": live_ui.get_editor_text(), "toolsExpanded": live_ui.get_tools_expanded()}
+    # The prompt events are delivered on a later turn: wait for both of each dialog.
+    for _ in range(100):
+        if sum(1 for entry in log if entry[0] == "appendEntry" and entry[1] == "a_ui") >= 8:
+            break
+        time.sleep(0.05)
+    after = runner.create_context()
+    ui_report = {"mode": after.mode(), "hasUI": runner.has_ui(), "contextHasUI": after.has_ui(), "dialogs": dialogs, "reads": reads_ui, "calls": list(ui_log)}
+    runner.set_ui_context(None, "")
+    cleared = runner.create_context()
+    ui_report["afterClear"] = {"hasUI": runner.has_ui(), "mode": cleared.mode()}
+    r["ui"] = ui_report
+
+    off()
+    runner.emit_error({"extensionPath": "/x/ext.mjs", "event": "after-off", "error": "not delivered"})
+    r["errors"] = list(reported)
+    runner.invalidate("runner is stale")
+    runner.invalidate("a second message is ignored")
+    stale_context = runner.create_context()
+    r["stale"] = {
+        "cwd": error_text(stale_context.cwd), "isIdle": error_text(stale_context.is_idle), "activeTools": error_text(runner.get_active_tools),
+        "commandContext": error_text(runner.create_command_context().wait_for_idle), "toolContext": error_text(lambda: runner.create_tool_context("c").execute_tool("alpha", {})),
+        "ui": error_text(stale_context.ui), "emit": error_text(lambda: runner.emit({"type": "agent_start"})),
+    }
+    r["log"] = list(log)
+    return r
+
+
+def extension_runner_tool(ctx, params):
+    return json.dumps(extension_runner_script(ctx, params))
+
+
 def new_extension():
     ext = pig_sdk.Extension("session-graph")
     ext.register_tool(pig_sdk.ToolDefinition(name="session_manager", label="session_manager", description="Runs the SessionManager script.", parameters={"type": "object"}, execute=session_manager_tool))
@@ -1011,5 +1316,6 @@ def new_extension():
     ext.register_tool(pig_sdk.ToolDefinition(name="child_handles", label="child_handles", description="Runs the createAgentSession handle options script.", parameters={"type": "object"}, execute=child_handles_tool))
     ext.register_tool(pig_sdk.ToolDefinition(name="create_provider", label="create_provider", description="Runs the createProvider script.", parameters={"type": "object"}, execute=create_provider_tool))
     ext.register_tool(pig_sdk.ToolDefinition(name="extension_refs", label="extension_refs", description="Runs the compiled-in extension factories script.", parameters={"type": "object"}, execute=extension_refs_tool))
+    ext.register_tool(pig_sdk.ToolDefinition(name="extension_runner", label="extension_runner", description="Runs the createExtensionRuntime and ExtensionRunner script.", parameters={"type": "object"}, execute=extension_runner_tool))
     ext.register_tool(pig_sdk.ToolDefinition(name="services", label="services", description="Runs the createAgentSessionServices script.", parameters={"type": "object"}, execute=services_tool))
     return ext

@@ -5,8 +5,25 @@ from typing import Any, Callable
 
 from ._graph import _GraphObject, _callback_id
 from .extension_factories import ExtensionFactory
+from .extension_runtime import ExtensionRuntime
 
 _UNSUPPORTED = (("extensions_override", "it returns live extension objects, which live in the host"),)
+
+
+class LoadedExtension(dict):
+    """One extension of a load: its ``path``, ``resolvedPath``, ``sourceInfo`` and ``tools`` as data (the extension object holds functions that live in the host), and the loader it was read from. It reads as that data; ``ExtensionRunner`` takes it."""
+
+    _loader: str = ""
+
+
+class LoadExtensionsResult(dict):
+    """Pi's ``LoadExtensionsResult``: ``{extensions, errors, warnings}`` as data, with the ``runtime`` the extensions share. ``extensions`` holds ``LoadedExtension`` values."""
+
+    runtime: ExtensionRuntime
+
+    @property
+    def extensions(self) -> list[LoadedExtension]:
+        return self["extensions"]
 
 
 class DefaultResourceLoader(_GraphObject):
@@ -17,6 +34,7 @@ class DefaultResourceLoader(_GraphObject):
         cwd: str,
         agent_dir: str,
         settings_manager: Any = None,
+        runtime: ExtensionRuntime | None = None,
         additional_extension_paths: list[str] | None = None,
         additional_skill_paths: list[str] | None = None,
         additional_prompt_template_paths: list[str] | None = None,
@@ -63,11 +81,24 @@ class DefaultResourceLoader(_GraphObject):
             wire["extensionFactories"] = [{"builtin": factory.builtin, "options": factory.options} for factory in extension_factories]
         if settings_manager is not None:
             wire["settingsManager"] = settings_manager.handle
+        if runtime is not None:
+            wire["runtime"] = runtime.handle
         super().__init__(context, "DefaultResourceLoader", "new", wire)
 
-    def get_extensions(self) -> dict[str, Any]:
-        """The extensions of the last ``reload``, as data."""
-        return self._invoke("getExtensions")
+    def _extensions_result(self, data: dict[str, Any]) -> LoadExtensionsResult:
+        result = LoadExtensionsResult(data)
+        extensions = []
+        for extension in data.get("extensions") or []:
+            loaded = LoadedExtension(extension)
+            loaded._loader = self.handle
+            extensions.append(loaded)
+        result["extensions"] = extensions
+        result.runtime = ExtensionRuntime._of_loader(self._context, self.handle)
+        return result
+
+    def get_extensions(self) -> LoadExtensionsResult:
+        """The extensions of the last ``reload``, as data, with the runtime they share (``result.runtime``)."""
+        return self._extensions_result(self._invoke("getExtensions"))
 
     def get_skills(self) -> dict[str, Any]:
         """``{"skills", "diagnostics"}`` of the last ``reload``."""
@@ -102,9 +133,9 @@ class DefaultResourceLoader(_GraphObject):
         """Add the skills, prompt templates and themes extensions contributed: ``{"skillPaths", "promptPaths", "themePaths"}`` lists of ``{"path", "metadata": {"source", "scope", "origin", "baseDir"?}}``."""
         self._invoke("extendResources", paths)
 
-    def load_project_trust_extensions(self) -> dict[str, Any]:
+    def load_project_trust_extensions(self) -> LoadExtensionsResult:
         """The bootstrap extension set, loaded with project settings untrusted, that project trust is decided with."""
-        return self._invoke_async("loadProjectTrustExtensions")
+        return self._extensions_result(self._invoke_async("loadProjectTrustExtensions"))
 
     def reload(self, options: dict[str, Any] | None = None) -> None:
         """Rediscover every resource. ``options["resolveProjectTrust"]`` is a callable taking the bootstrap extension set and returning whether the project is trusted."""

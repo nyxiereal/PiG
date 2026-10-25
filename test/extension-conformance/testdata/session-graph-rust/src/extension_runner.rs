@@ -101,7 +101,7 @@ pub fn extension_runner_script(ctx: &Context, args: &Value) -> io::Result<Value>
     let loaded = loader.get_extensions()?;
     let paths: Vec<Value> = loaded.extensions.iter().map(|ext| ext["path"].clone()).collect();
     let tools: Vec<Value> = loaded.extensions.iter().map(|ext| ext["tools"].clone()).collect();
-    r.insert("loaded".into(), json!({"paths": paths, "tools": tools, "errors": loaded["errors"], "runtime": runtime_view(&loaded.runtime)?}));
+    r.insert("loaded".into(), json!({"paths": paths, "tools": tools, "errors": loaded["errors"], "sources": loaded.extensions.iter().map(|ext| ext["sourceInfo"]["source"].clone()).collect::<Vec<Value>>(), "runtime": runtime_view(&loaded.runtime)?}));
 
     let manager = Arc::new(SessionManager::in_memory(ctx, Some(cwd), None, None)?);
     let runner = ExtensionRunner::new(ctx, &loaded.extensions, Some(&loaded.runtime), cwd, Some(manager.clone()), Some(rt.clone()))?;

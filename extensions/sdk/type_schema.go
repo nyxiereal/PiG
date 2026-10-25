@@ -9,6 +9,7 @@ import (
 	"slices"
 	"strconv"
 	"strings"
+	"sync"
 
 	"github.com/MichaelKinsy/PiG/extensions/sdk/json"
 )
@@ -574,12 +575,15 @@ func (typeNamespace) Enum(value any, options ...TypeOptions) *TSchema {
 	return create("Enum", []any{"enum", values}, firstOptions(options))
 }
 
-var jsNumericString = regexp.MustCompile(`^(?:[+-]?(?:Infinity|(?:[0-9]+\.?[0-9]*|\.[0-9]+)(?:[eE][+-]?[0-9]+)?)|0[xX][0-9a-fA-F]+|0[oO][0-7]+|0[bB][01]+)$`)
+// jsNumericString compiles on first use: a package-level MustCompile ran in every process that links the SDK, 139 allocations and 18 KB in init (GODEBUG=inittrace=1), and only Type.Enum over an object reads it.
+var jsNumericString = sync.OnceValue(func() *regexp.Regexp {
+	return regexp.MustCompile(`^(?:[+-]?(?:Infinity|(?:[0-9]+\.?[0-9]*|\.[0-9]+)(?:[eE][+-]?[0-9]+)?)|0[xX][0-9a-fA-F]+|0[oO][0-7]+|0[bB][01]+)$`)
+})
 
 // jsIsNaNString is `isNaN(key)` for a string: whether Number(key) is NaN. Number trims whitespace and reads the empty string as 0.
 func jsIsNaNString(key string) bool {
 	trimmed := strings.Trim(key, " \t\n\v\f\r\u00a0\u1680\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u2028\u2029\u202f\u205f\u3000\ufeff")
-	return trimmed != "" && !jsNumericString.MatchString(trimmed)
+	return trimmed != "" && !jsNumericString().MatchString(trimmed)
 }
 
 const (

@@ -278,16 +278,30 @@ func runPigPreSessionCommand(args []string) int {
 	return -1
 }
 
-// enforcePigletBinaryScope fails closed when a Piglet Binary is asked to run a
-// different Piglet than the one it was built with. A Piglet Binary is bound to
-// one immutable composition; running another Piglet is out of scope, so it
-// points the user at raw pig.
-func enforcePigletBinaryScope(flags map[string]any) {
-	if !binarypiglet.IsPigletBinary() {
-		return
+// Seams for the Piglet Binary identity, replaced by tests that run the guard in-process; a Binary's values come from what
+// the build embedded.
+var (
+	isPigletBinary    = binarypiglet.IsPigletBinary
+	pigletOverlayBase = binarypiglet.OverlayBase
+	pigletBinaryName  = binarypiglet.Name
+)
+
+// pigletBinaryOverlayRefusal returns the refusal for a Piglet requested from a Piglet Binary that does not accept
+// overlays, or "" when the run may go on. A Piglet Binary is bound to one immutable composition unless its Piglet set
+// build.allowOverlays (D202); otherwise running another Piglet is out of scope, so it names the Binary and points at the
+// setting and at raw pig.
+func pigletBinaryOverlayRefusal(flags map[string]any) string {
+	if !isPigletBinary() || !pigletWasRequested(flags) || pigletOverlayBase() != nil {
+		return ""
 	}
-	if pigletWasRequested(flags) {
-		fmt.Fprintln(os.Stderr, "pig: this Piglet Binary runs its built-in Piglet; run a different Piglet with raw pig (pig --piglet <name|path>)")
+	return fmt.Sprintf("pig: this Piglet Binary (%s) runs only its built-in Piglet and does not accept --piglet overlays (nor PIG_PIGLET_PATH or PIG_PIGLET_NAME); build its Piglet with build.allowOverlays: true to accept them, or run the Piglet with stock pig (pig --piglet <name|path>)", pigletBinaryName())
+}
+
+// enforcePigletBinaryScope fails closed when a Piglet Binary is asked to run a
+// different Piglet than the one it was built with and does not accept overlays.
+func enforcePigletBinaryScope(flags map[string]any) {
+	if message := pigletBinaryOverlayRefusal(flags); message != "" {
+		fmt.Fprintln(os.Stderr, message)
 		exitProcess(1)
 	}
 }
@@ -308,6 +322,12 @@ func requestedPigletName(unknownFlags map[string]any) string {
 }
 
 func resolvePiglet(unknownFlags map[string]any, trustOverride *bool) (*piglet.Piglet, bool) {
+	// pig additive (D202): a Piglet Binary that accepts overlays resolves the selected Piglet on top of its baked one. A run that
+	// selects no Piglet does no overlay work.
+	var base *piglet.OverlayBase
+	if pigletWasRequested(unknownFlags) {
+		base = pigletOverlayBase()
+	}
 	// Find the piglet path from flag or env.
 	var pigletPath string
 	if v, ok := unknownFlags["piglet"]; ok {
@@ -336,8 +356,13 @@ func resolvePiglet(unknownFlags map[string]any, trustOverride *bool) (*piglet.Pi
 		if p := os.Getenv("PIG_PIGLET_PATH"); p != "" {
 			pigletPath = p
 		} else if name := os.Getenv("PIG_PIGLET_NAME"); name != "" {
-			if resolved, err := piglet.ResolveWithTrust(name, trustOverride); err == nil {
+			resolved, err := piglet.ResolveWithTrust(name, trustOverride)
+			if err == nil {
 				pigletPath = resolved
+			} else if base != nil {
+				// An overlay that does not resolve never falls back to the Binary's own Piglet silently.
+				fmt.Fprintf(os.Stderr, "warning: piglet %q: %v\n", name, err)
+				return nil, false
 			}
 		}
 	}
@@ -348,6 +373,8 @@ func resolvePiglet(unknownFlags map[string]any, trustOverride *bool) (*piglet.Pi
 		if p := binarypiglet.Default(); p != nil {
 			return p, true
 		}
+		// The ambient Piglet is no selection: it is never laid over a Binary's Piglet.
+		base = nil
 		if pigletPath = piglet.AmbientPigletPath(); pigletPath == "" {
 			return nil, false
 		}
@@ -362,12 +389,13 @@ func resolvePiglet(unknownFlags map[string]any, trustOverride *bool) (*piglet.Pi
 		}
 		workspace = configured
 	}
-	resolution, err := piglet.ResolveEffectiveWithOptions(pigletPath, piglet.ResolveOptions{Workspace: workspace})
+	resolution, err := piglet.ResolveEffectiveWithOptions(pigletPath, piglet.ResolveOptions{Workspace: workspace, Base: base})
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "warning: piglet %s: %v\n", pigletPath, err)
 		return nil, false
 	}
-	return resolution.Piglet, false
+	// An overlay on a Piglet Binary is still the Binary's Piglet: its closure is verified and its baseline holds.
+	return resolution.Piglet, base != nil
 }
 
 func inlinePigletSystemPrompt(p *piglet.Piglet) {

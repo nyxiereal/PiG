@@ -87761,6 +87761,17 @@
       "shapeHash": "sha256:20394ab6c0c134b86300166cff7ece2adb58372b84c2457148216c559d0af3ef"
     },
     {
+      "id": "go:github.com/MichaelKinsy/PiG/coding/cli#isPigletBinary",
+      "package": "github.com/MichaelKinsy/PiG/coding/cli",
+      "name": "isPigletBinary",
+      "kind": "variable",
+      "exported": false,
+      "shape": {
+        "type": "func() bool"
+      },
+      "shapeHash": "sha256:f632619397f10a7f0e472ad47d2824ec7e080d15ac9eb0994e24800757b3fb96"
+    },
+    {
       "id": "go:github.com/MichaelKinsy/PiG/coding/cli#isPlainRuntimeMetadataCommand",
       "package": "github.com/MichaelKinsy/PiG/coding/cli",
       "name": "isPlainRuntimeMetadataCommand",
@@ -89323,6 +89334,28 @@
       "shapeHash": "sha256:03d38d5beddcbb2535f9dc4f086403d8838371f9391d20bdc824d3a6af8d12d3"
     },
     {
+      "id": "go:github.com/MichaelKinsy/PiG/coding/cli#pigletBinaryName",
+      "package": "github.com/MichaelKinsy/PiG/coding/cli",
+      "name": "pigletBinaryName",
+      "kind": "variable",
+      "exported": false,
+      "shape": {
+        "type": "func() string"
+      },
+      "shapeHash": "sha256:31cac5b359d9888bdbe3fe08c486b2e404a728edce6e0aaaa60e59ceafc92fb5"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/coding/cli#pigletBinaryOverlayRefusal",
+      "package": "github.com/MichaelKinsy/PiG/coding/cli",
+      "name": "pigletBinaryOverlayRefusal",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func(flags map[string]any) string"
+      },
+      "shapeHash": "sha256:d536c34868fd994f7a62e1478a87e7aa9327fd3f11ac46ad9bec18137b5d98bb"
+    },
+    {
       "id": "go:github.com/MichaelKinsy/PiG/coding/cli#pigletExtensionFailurePath",
       "package": "github.com/MichaelKinsy/PiG/coding/cli",
       "name": "pigletExtensionFailurePath",
@@ -89343,6 +89376,17 @@
         "type": "func(p *github.com/MichaelKinsy/PiG/coding/piglet.Piglet) string"
       },
       "shapeHash": "sha256:eacc0493d95f13b7b1f04247b7c8974bf481d36b220160fab277463bdb9f93da"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/coding/cli#pigletOverlayBase",
+      "package": "github.com/MichaelKinsy/PiG/coding/cli",
+      "name": "pigletOverlayBase",
+      "kind": "variable",
+      "exported": false,
+      "shape": {
+        "type": "func() *github.com/MichaelKinsy/PiG/coding/piglet.OverlayBase"
+      },
+      "shapeHash": "sha256:be135690873d2c7cfe6a4ca5485a31cca9da33b6c94a74d2bd1ddae4931e09a4"
     },
     {
       "id": "go:github.com/MichaelKinsy/PiG/coding/cli#pigletToolOwner",
@@ -162429,6 +162473,17 @@
       "shapeHash": "sha256:57afbc3d68079df504146a6c519d1fc9a7066527446a656bb5cb1df2f8bdb610"
     },
     {
+      "id": "go:github.com/MichaelKinsy/PiG/coding/piglet#OverlayBase",
+      "package": "github.com/MichaelKinsy/PiG/coding/piglet",
+      "name": "OverlayBase",
+      "kind": "type",
+      "exported": true,
+      "shape": {
+        "type": "OverlayBase"
+      },
+      "shapeHash": "sha256:4610bfd193a979ad10e3158853ef0bcea882af384f97e009016a65ccffacc917"
+    },
+    {
       "id": "go:github.com/MichaelKinsy/PiG/coding/piglet#Parse",
       "package": "github.com/MichaelKinsy/PiG/coding/piglet",
       "name": "Parse",
@@ -163804,6 +163859,17 @@
       "shapeHash": "sha256:037559b439decd9739aac7fdf9e121053c7591179f007fb2149dab3b6418ca82"
     },
     {
+      "id": "go:github.com/MichaelKinsy/PiG/coding/piglet#checkOverlay",
+      "package": "github.com/MichaelKinsy/PiG/coding/piglet",
+      "name": "checkOverlay",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func(base *Piglet, effective *Piglet) error"
+      },
+      "shapeHash": "sha256:0aa47ab6f8e10d19a7f872de496929b357bac6994a809edc88c286eeaeadc96c"
+    },
+    {
       "id": "go:github.com/MichaelKinsy/PiG/coding/piglet#checkPublishable",
       "package": "github.com/MichaelKinsy/PiG/coding/piglet",
       "name": "checkPublishable",
@@ -164321,6 +164387,17 @@
       "shapeHash": "sha256:864bd81dd802775a1a082d7f99fe261c8f3185dea2a3f45bbeae79e27ef91e07"
     },
     {
+      "id": "go:github.com/MichaelKinsy/PiG/coding/piglet#extensionNames",
+      "package": "github.com/MichaelKinsy/PiG/coding/piglet",
+      "name": "extensionNames",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func(entries []ExtensionEntry) []string"
+      },
+      "shapeHash": "sha256:1a57726eca4d24ac8211c87be122f45e5cf91f26566aba4763028325e74fd5a3"
+    },
+    {
       "id": "go:github.com/MichaelKinsy/PiG/coding/piglet#extensionRealizations",
       "package": "github.com/MichaelKinsy/PiG/coding/piglet",
       "name": "extensionRealizations",
@@ -164363,6 +164440,17 @@
         "type": "func(root string) (string, error)"
       },
       "shapeHash": "sha256:005dc38a2634055b614b96c0cc93327ddaf306ae7e2f97fba61de69403750d9f"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/coding/piglet#findNamed",
+      "package": "github.com/MichaelKinsy/PiG/coding/piglet",
+      "name": "findNamed",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func[T any](items []T, name string, identity func(T) string) T"
+      },
+      "shapeHash": "sha256:fdf12ea683950618fae7b303318f19f55df0ea847d0a612b563ce11c403e78d3"
     },
     {
       "id": "go:github.com/MichaelKinsy/PiG/coding/piglet#findNode",
@@ -164594,6 +164682,17 @@
         "type": "func() ([]managedRecord, []error)"
       },
       "shapeHash": "sha256:b0a4b6245cfc4e2d43f3076faa9dec35dd3dfec2520e9cc2475536bb07f84e1d"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/coding/piglet#listSuffix",
+      "package": "github.com/MichaelKinsy/PiG/coding/piglet",
+      "name": "listSuffix",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func(values *[]string) string"
+      },
+      "shapeHash": "sha256:6d0ed25648275c51fd47efc69166d9806cc95081a700b0918db5f00ff1f43b3b"
     },
     {
       "id": "go:github.com/MichaelKinsy/PiG/coding/piglet#listTrust",
@@ -165828,6 +165927,17 @@
       "shapeHash": "sha256:c05f483ffa265d9d90084e82b02cb0f6e7fbdb5b4606edf9756cdaa9e7865c04"
     },
     {
+      "id": "go:github.com/MichaelKinsy/PiG/coding/piglet#resolveOverlayRoot",
+      "package": "github.com/MichaelKinsy/PiG/coding/piglet",
+      "name": "resolveOverlayRoot",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func(p *Piglet, entry LineageEntry, digest string, base *OverlayBase) (*EffectiveResolution, error)"
+      },
+      "shapeHash": "sha256:7d525fbcb5368116a1151ff1e3c7eab74504bd7b1ceda7186363a0ab10592e92"
+    },
+    {
       "id": "go:github.com/MichaelKinsy/PiG/coding/piglet#resolvePigletAddSource",
       "package": "github.com/MichaelKinsy/PiG/coding/piglet",
       "name": "resolvePigletAddSource",
@@ -166057,6 +166167,17 @@
         "type": "func(record RecordInfo) string"
       },
       "shapeHash": "sha256:f8a4f35f11fe139c74bb6ae8913213332f3617700abd51018fb1b92859b881a7"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/coding/piglet#skillNames",
+      "package": "github.com/MichaelKinsy/PiG/coding/piglet",
+      "name": "skillNames",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func(entries []SkillEntry) []string"
+      },
+      "shapeHash": "sha256:56593f019e6b080c9876bc82afb6133350e78de6dd0c0304e49bec32e473aa03"
     },
     {
       "id": "go:github.com/MichaelKinsy/PiG/coding/piglet#slotIDs",
@@ -172173,6 +172294,28 @@
         "type": "func() bool"
       },
       "shapeHash": "sha256:f632619397f10a7f0e472ad47d2824ec7e080d15ac9eb0994e24800757b3fb96"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/coding/pigletbuild/binarypiglet#Name",
+      "package": "github.com/MichaelKinsy/PiG/coding/pigletbuild/binarypiglet",
+      "name": "Name",
+      "kind": "function",
+      "exported": true,
+      "shape": {
+        "type": "func() string"
+      },
+      "shapeHash": "sha256:31cac5b359d9888bdbe3fe08c486b2e404a728edce6e0aaaa60e59ceafc92fb5"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/coding/pigletbuild/binarypiglet#OverlayBase",
+      "package": "github.com/MichaelKinsy/PiG/coding/pigletbuild/binarypiglet",
+      "name": "OverlayBase",
+      "kind": "function",
+      "exported": true,
+      "shape": {
+        "type": "func() *github.com/MichaelKinsy/PiG/coding/piglet.OverlayBase"
+      },
+      "shapeHash": "sha256:be135690873d2c7cfe6a4ca5485a31cca9da33b6c94a74d2bd1ddae4931e09a4"
     },
     {
       "id": "go:github.com/MichaelKinsy/PiG/coding/pigletbuild/binarypiglet#Verify",

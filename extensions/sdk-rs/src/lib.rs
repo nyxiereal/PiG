@@ -105,7 +105,14 @@ mod extension_factories;
 mod mcp_options;
 pub use mcp_options::{McpAuthProvider, McpFunctionOptions, McpLoadConfig, McpLoadConfigContext, McpOAuthCredentialStore, McpOAuthServerStore, McpOpenUrl, McpSendSignal, McpTransport, McpTransportEvents, McpTransportFactory, McpUpdateConfig};
 pub use extension_factories::{create_codemode_extension, create_mcp_extension, create_tool_search_extension, CodemodeExtensionOptions, McpExtensionOptions};
-pub use resource_loader::{DefaultResourceLoader, DefaultResourceLoaderOptions, ExtensionFactory, InlineExtensionFactory, LoaderOverride};
+pub use resource_loader::{DefaultResourceLoader, DefaultResourceLoaderOptions, ExtensionFactory, InlineExtensionFactory, LoadExtensionsResult, LoadedExtension, LoaderOverride};
+mod extension_runtime;
+pub use extension_runtime::{create_extension_runtime, ExtensionRuntime};
+mod extension_runner;
+pub use extension_runner::{
+    CancelledResult, CommandNewSessionOptions, ExtensionActions, ExtensionCommandContext, ExtensionCommandContextActions, ExtensionContext, ExtensionContextActions, ExtensionRunner, ExtensionToolContext,
+    ExtensionUIContext, ForkOptions, NavigateTreeOptions, ProviderActions, RunnerUIContext, SetupCallback, SwitchSessionOptions, WithSessionCallback,
+};
 mod project_trust;
 pub use project_trust::{has_trust_requiring_project_resources, ProjectTrustStore, ProjectTrustStoreEntry, ProjectTrustUpdate};
 mod host_info;
@@ -203,6 +210,11 @@ mod create_provider;
 pub use create_provider::{create_provider, CreateProviderOptions, FetchModelsFn, ProviderApi, ProviderCancelDeferredFn, ProviderStreams};
 mod agent_session_services;
 pub use agent_session_services::{create_agent_session_from_services, create_agent_session_services, AgentSessionServices, CreateAgentSessionFromServicesOptions, CreateAgentSessionServicesOptions, ResourceLoaderReloadOptions};
+mod agent_session_runtime;
+pub use agent_session_runtime::{
+    create_agent_session_runtime, AgentSessionRuntime, CreateAgentSessionRuntimeFactory, CreateAgentSessionRuntimeFactoryOptions, CreateAgentSessionRuntimeOptions, CreateAgentSessionRuntimeResult, ForkResult,
+    ForkRuntimeOptions, MissingSessionCwdError, NewSessionRuntimeOptions, RuntimeWithSession, SessionImportFileNotFoundError, SwitchSessionRuntimeOptions,
+};
 pub use host_subscriptions::HostSubscription;
 #[doc(hidden)]
 pub use extension::report_load_failure;

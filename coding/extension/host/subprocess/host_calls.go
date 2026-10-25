@@ -47,7 +47,7 @@ func startsAsync(method string) bool {
 	case "ui.select", "ui.confirm", "ui.input", "ui.editor", CallUICustom,
 		"setModel", "registerProvider", "exec", CallLoadingExec, "complete", "modelStream", CallProviderObject, "getModelAuth", "getProviderAuth", "getAvailableOfType", "classify", "generateImages", "refreshModelRegistry", "compact",
 		"waitForIdle", "newSession", "fork", "navigateTree", "switchSession", "reload", CallExecuteTool, CallBuiltinToolExecute, CallBuiltinToolLocalExec, CallSessionGraphAsync,
-		CallChildSessionCreate, CallChildSessionPrompt, CallChildSessionQueue, CallChildSessionAbort, CallChildSessionBindExtensions,
+		CallChildSessionCreate, CallChildSessionPrompt, CallChildSessionQueue, CallChildSessionAbort, CallChildSessionBindExtensions, CallChildSessionEmit,
 		CallOAuthOnPrompt, CallOAuthOnSelect, CallOAuthOnManualCodeInput:
 		return true
 	default:

@@ -17564,6 +17564,26 @@
       ]
     },
     {
+      "id": "BF-8620e9e",
+      "title": "The SDK `DefaultResourceLoader` lists a tool or flag that two extensions register as an error of the…",
+      "symptom": "The SDK `DefaultResourceLoader` lists a tool or flag that two extensions register as an error of the extension load result (`Tool \"x\" conflicts with \u003cpath\u003e`), and an extension it loads from `additionalExtensionPaths` has the source `cli`, as Pi's loader reports them.",
+      "rootCause": "",
+      "rootCauseSource": "",
+      "userImpact": "An operation failed or was rejected",
+      "platform": "All platforms",
+      "class": "own",
+      "fixedIn": "Unreleased",
+      "releaseNote": "The SDK `DefaultResourceLoader` lists a tool or flag that two extensions register as an error of the extension load result (`Tool \"x\" conflicts with \u003cpath\u003e`), and an extension it loads from `additionalExtensionPaths` has the source `cli`, as Pi's loader reports them.",
+      "origin": "release note",
+      "commits": [
+        {
+          "hash": "8620e9eac5",
+          "date": "2026-10-25"
+        }
+      ],
+      "tests": []
+    },
+    {
       "id": "BF-86364b4",
       "title": "fix(minimatch): case-insensitive patterns compare as a JavaScript RegExp does",
       "symptom": "fix(minimatch): case-insensitive patterns compare as a JavaScript RegExp does",

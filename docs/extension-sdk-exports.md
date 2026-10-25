@@ -10,7 +10,7 @@ Use counts (`uses`) are the number of the 255 scanned npm packages that import t
 
 | Module | Rows | type-only (identity by kind) | Node served | Go gaps | Rust gaps | Python gaps |
 |---|---|---|---|---|---|---|
-| `pi-coding-agent` | 920 | 305 | 910 | 382 | 382 | 382 |
+| `pi-coding-agent` | 920 | 305 | 910 | 326 | 326 | 326 |
 | `pi-tui` | 365 | 85 | 364 | 147 | 147 | 147 |
 | `pi-ai` | 97 | 197 | 97 | 66 | 66 | 66 |
 | `pi-ai/compat` | 156 | 204 | 156 | 122 | 122 | 122 |
@@ -20,25 +20,24 @@ Use counts (`uses`) are the number of the 255 scanned npm packages that import t
 
 | Lane | Owner | Opened | Gap cells | Closing row |
 |---|---|---|---|---|
-| C2Sessions | C2Sessions lane (createAgentSession family, E1/E6) | 0.5.2 | 396 | Conformance rows for createAgentSession, createAgentSessionRuntime and the pi-agent-core Agent loop in all four SDKs (branch feat/sdk-child-agent-sessions) |
+| C2Sessions | C2Sessions lane (createAgentSession family, E1/E6) | 0.5.2 | 354 | Conformance rows for createAgentSession, createAgentSessionRuntime and the pi-agent-core Agent loop in all four SDKs (branch feat/sdk-child-agent-sessions) |
 | SdkExportsLedger | SdkExportsLedger lane (Pi application internals no extension scan imports) | 0.5.2 | 1158 | Owner decision per export, listed with usage counts in handoffs/0.5.2/sdk-exports-internals.md: a numbered divergence in docs/parity/DIVERGENCES.md (cells become divergence:D<n>), or a real lane with a port and a conformance row |
 | SdkPiAiHelpers | SdkPiAiHelpers lane (pi-ai pure helpers, StringEnum, host getters, E17-E22) | 0.5.2 | 150 | Pure helpers with vector tests from Pi at the pin; host getters and the pi-ai compat calls with a conformance row per SDK |
-| SdkSessionGraph | SdkSessionGraph lane (SessionManager/SettingsManager/ModelRuntime/resource loader, E2-E5) | 0.5.2 | 333 | Host calls for session open/list/inMemory, scoped settings, standalone model runtime, resource loader and package manager, with a conformance row per SDK |
+| SdkSessionGraph | SdkSessionGraph lane (SessionManager/SettingsManager/ModelRuntime/resource loader, E2-E5) | 0.5.2 | 207 | Host calls for session open/list/inMemory, scoped settings, standalone model runtime, resource loader and package manager, with a conformance row per SDK |
 | SdkTuiHelpers | SdkTuiHelpers lane (pi-tui helpers, keys, keybindings, theme and rendering helpers, E8-E16) | 0.5.2 | 249 | Pure helpers ported per SDK with vector tests from Pi at the pin (test/parity/sdk-vectors), keybinding and theme helpers with a conformance row per SDK |
 
 ## High-use gaps (block the release gate)
 
-7 exports imported by 5 or more scanned packages have a gap.
+6 exports imported by 5 or more scanned packages have a gap.
 
 | Export | uses | Gaps |
 |---|---|---|
 | `pi-coding-agent: buildSessionContext` | 19 | Go SdkSessionGraph; Rust SdkSessionGraph; Python SdkSessionGraph |
 | `pi-ai: Type` | 14 | Go SdkPiAiHelpers; Rust SdkPiAiHelpers; Python SdkPiAiHelpers |
 | `pi-ai/compat: Type` | 14 | Go SdkPiAiHelpers; Rust SdkPiAiHelpers; Python SdkPiAiHelpers |
-| `pi-coding-agent: createAgentSessionRuntime` | 6 | Go SdkSessionGraph; Rust SdkSessionGraph; Python SdkSessionGraph |
-| `pi-coding-agent: createExtensionRuntime` | 6 | Go SdkSessionGraph; Rust SdkSessionGraph; Python SdkSessionGraph |
+| `pi-coding-agent: createMcpExtension` | 6 | Go C2Sessions; Rust C2Sessions; Python C2Sessions |
 | `pi-tui: TuiAltScreen` | 6 | Go SdkTuiHelpers; Rust SdkTuiHelpers; Python SdkTuiHelpers |
-| `pi-coding-agent: ExtensionRunner` | 5 | Go SdkSessionGraph; Rust SdkSessionGraph; Python SdkSessionGraph |
+| `pi-coding-agent: ModelRegistry` | 5 | Go SdkSessionGraph; Rust SdkSessionGraph; Python SdkSessionGraph |
 
 ## Realized cells no fixture reaches
 
@@ -97,7 +96,7 @@ None.
 | `AgentSession.prompt` | 0 | served | native:AgentSession.Prompt | native:AgentSession::prompt | native:AgentSession.prompt |
 | `AgentSession.promptTemplates` | 0 | served | gap:C2Sessions | gap:C2Sessions | gap:C2Sessions |
 | `AgentSession.recordBashResult` | 0 | served | gap:C2Sessions | gap:C2Sessions | gap:C2Sessions |
-| `AgentSession.refreshContext` | 0 | served | gap:C2Sessions | gap:C2Sessions | gap:C2Sessions |
+| `AgentSession.refreshContext` | 0 | served | native:AgentSession.RefreshContext | native:AgentSession::refresh_context | native:AgentSession.refresh_context |
 | `AgentSession.reload` | 0 | served | gap:C2Sessions | gap:C2Sessions | gap:C2Sessions |
 | `AgentSession.resourceLoader` | 0 | served | gap:C2Sessions | gap:C2Sessions | gap:C2Sessions |
 | `AgentSession.retryAttempt` | 0 | served | gap:C2Sessions | gap:C2Sessions | gap:C2Sessions |
@@ -107,7 +106,7 @@ None.
 | `AgentSession.sendUserMessage` | 0 | served | gap:C2Sessions | gap:C2Sessions | gap:C2Sessions |
 | `AgentSession.sessionFile` | 0 | served | gap:C2Sessions | gap:C2Sessions | gap:C2Sessions |
 | `AgentSession.sessionId` | 0 | served | gap:C2Sessions | gap:C2Sessions | gap:C2Sessions |
-| `AgentSession.sessionManager` | 0 | served | gap:C2Sessions | gap:C2Sessions | gap:C2Sessions |
+| `AgentSession.sessionManager` | 0 | served | native:AgentSession.SessionManager | native:AgentSession::session_manager | native:AgentSession.session_manager |
 | `AgentSession.sessionName` | 0 | served | gap:C2Sessions | gap:C2Sessions | gap:C2Sessions |
 | `AgentSession.setActiveToolsByName` | 0 | served | gap:C2Sessions | gap:C2Sessions | gap:C2Sessions |
 | `AgentSession.setAutoCompactionEnabled` | 0 | served | gap:C2Sessions | gap:C2Sessions | gap:C2Sessions |
@@ -129,19 +128,19 @@ None.
 | `AgentSession.systemPrompt` | 0 | served | gap:C2Sessions | gap:C2Sessions | gap:C2Sessions |
 | `AgentSession.thinkingLevel` | 0 | served | gap:C2Sessions | gap:C2Sessions | gap:C2Sessions |
 | `AgentSession.waitForIdle` | 0 | served | gap:C2Sessions | gap:C2Sessions | gap:C2Sessions |
-| `AgentSessionRuntime` | 1 | served | gap:C2Sessions | gap:C2Sessions | gap:C2Sessions |
-| `AgentSessionRuntime.cwd` | 0 | served | gap:C2Sessions | gap:C2Sessions | gap:C2Sessions |
-| `AgentSessionRuntime.diagnostics` | 0 | served | gap:C2Sessions | gap:C2Sessions | gap:C2Sessions |
-| `AgentSessionRuntime.dispose` | 0 | served | gap:C2Sessions | gap:C2Sessions | gap:C2Sessions |
-| `AgentSessionRuntime.fork` | 0 | served | gap:C2Sessions | gap:C2Sessions | gap:C2Sessions |
-| `AgentSessionRuntime.importFromJsonl` | 0 | served | gap:C2Sessions | gap:C2Sessions | gap:C2Sessions |
-| `AgentSessionRuntime.modelFallbackMessage` | 0 | served | gap:C2Sessions | gap:C2Sessions | gap:C2Sessions |
-| `AgentSessionRuntime.newSession` | 0 | served | gap:C2Sessions | gap:C2Sessions | gap:C2Sessions |
-| `AgentSessionRuntime.services` | 0 | served | gap:C2Sessions | gap:C2Sessions | gap:C2Sessions |
-| `AgentSessionRuntime.session` | 0 | served | gap:C2Sessions | gap:C2Sessions | gap:C2Sessions |
-| `AgentSessionRuntime.setBeforeSessionInvalidate` | 0 | served | gap:C2Sessions | gap:C2Sessions | gap:C2Sessions |
-| `AgentSessionRuntime.setRebindSession` | 0 | served | gap:C2Sessions | gap:C2Sessions | gap:C2Sessions |
-| `AgentSessionRuntime.switchSession` | 0 | served | gap:C2Sessions | gap:C2Sessions | gap:C2Sessions |
+| `AgentSessionRuntime` | 1 | served | native:AgentSessionRuntime | native:AgentSessionRuntime | native:AgentSessionRuntime |
+| `AgentSessionRuntime.cwd` | 0 | served | native:AgentSessionRuntime.Cwd | native:AgentSessionRuntime::cwd | native:AgentSessionRuntime.cwd |
+| `AgentSessionRuntime.diagnostics` | 0 | served | native:AgentSessionRuntime.Diagnostics | native:AgentSessionRuntime::diagnostics | native:AgentSessionRuntime.diagnostics |
+| `AgentSessionRuntime.dispose` | 0 | served | native:AgentSessionRuntime.Dispose | native:AgentSessionRuntime::dispose | native:AgentSessionRuntime.dispose |
+| `AgentSessionRuntime.fork` | 0 | served | native:AgentSessionRuntime.Fork | native:AgentSessionRuntime::fork | native:AgentSessionRuntime.fork |
+| `AgentSessionRuntime.importFromJsonl` | 0 | served | native:AgentSessionRuntime.ImportFromJsonl | native:AgentSessionRuntime::import_from_jsonl | native:AgentSessionRuntime.import_from_jsonl |
+| `AgentSessionRuntime.modelFallbackMessage` | 0 | served | native:AgentSessionRuntime.ModelFallbackMessage | native:AgentSessionRuntime::model_fallback_message | native:AgentSessionRuntime.model_fallback_message |
+| `AgentSessionRuntime.newSession` | 0 | served | native:AgentSessionRuntime.NewSession | native:AgentSessionRuntime::new_session | native:AgentSessionRuntime.new_session |
+| `AgentSessionRuntime.services` | 0 | served | native:AgentSessionRuntime.Services | native:AgentSessionRuntime::services | native:AgentSessionRuntime.services |
+| `AgentSessionRuntime.session` | 0 | served | native:AgentSessionRuntime.Session | native:AgentSessionRuntime::session | native:AgentSessionRuntime.session |
+| `AgentSessionRuntime.setBeforeSessionInvalidate` | 0 | served | native:AgentSessionRuntime.SetBeforeSessionInvalidate | native:AgentSessionRuntime::set_before_session_invalidate | native:AgentSessionRuntime.set_before_session_invalidate |
+| `AgentSessionRuntime.setRebindSession` | 0 | served | native:AgentSessionRuntime.SetRebindSession | native:AgentSessionRuntime::set_rebind_session | native:AgentSessionRuntime.set_rebind_session |
+| `AgentSessionRuntime.switchSession` | 0 | served | native:AgentSessionRuntime.SwitchSession | native:AgentSessionRuntime::switch_session | native:AgentSessionRuntime.switch_session |
 | `ArminComponent` | 0 | served | gap:SdkExportsLedger | gap:SdkExportsLedger | gap:SdkExportsLedger |
 | `ArminComponent.dispose` | 0 | served | gap:SdkExportsLedger | gap:SdkExportsLedger | gap:SdkExportsLedger |
 | `ArminComponent.invalidate` | 0 | served | gap:SdkExportsLedger | gap:SdkExportsLedger | gap:SdkExportsLedger |
@@ -313,51 +312,51 @@ None.
 | `ExtensionInputComponent.invalidate` | 0 | served | gap:SdkExportsLedger | gap:SdkExportsLedger | gap:SdkExportsLedger |
 | `ExtensionInputComponent.removeChild` | 0 | served | gap:SdkExportsLedger | gap:SdkExportsLedger | gap:SdkExportsLedger |
 | `ExtensionInputComponent.render` | 0 | served | gap:SdkExportsLedger | gap:SdkExportsLedger | gap:SdkExportsLedger |
-| `ExtensionRunner` | 5 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
-| `ExtensionRunner.bindCommandContext` | 0 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
-| `ExtensionRunner.bindCore` | 0 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
-| `ExtensionRunner.createCommandContext` | 0 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
-| `ExtensionRunner.createContext` | 0 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
-| `ExtensionRunner.createToolContext` | 0 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
-| `ExtensionRunner.emit` | 0 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
-| `ExtensionRunner.emitBeforeAgentStart` | 0 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
-| `ExtensionRunner.emitBeforeProviderHeaders` | 0 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
-| `ExtensionRunner.emitBeforeProviderRequest` | 0 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
-| `ExtensionRunner.emitBoundary` | 0 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
-| `ExtensionRunner.emitCacheWarmingDecision` | 0 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
-| `ExtensionRunner.emitContext` | 0 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
-| `ExtensionRunner.emitError` | 0 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
-| `ExtensionRunner.emitInput` | 0 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
-| `ExtensionRunner.emitMessageEnd` | 0 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
-| `ExtensionRunner.emitResourcesDiscover` | 0 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
-| `ExtensionRunner.emitToolCall` | 0 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
-| `ExtensionRunner.emitToolResult` | 0 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
-| `ExtensionRunner.emitUserBash` | 0 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
-| `ExtensionRunner.getActiveTools` | 0 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
-| `ExtensionRunner.getAllRegisteredTools` | 0 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
-| `ExtensionRunner.getCommand` | 0 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
-| `ExtensionRunner.getCommandDiagnostics` | 0 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
-| `ExtensionRunner.getEntryRenderer` | 0 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
-| `ExtensionRunner.getExtensionPaths` | 0 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
-| `ExtensionRunner.getFlagValues` | 0 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
-| `ExtensionRunner.getFlags` | 0 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
-| `ExtensionRunner.getMarkdownTransformers` | 0 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
-| `ExtensionRunner.getMessageRenderer` | 0 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
-| `ExtensionRunner.getModelRegistry` | 0 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
-| `ExtensionRunner.getRegisteredCommands` | 0 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
-| `ExtensionRunner.getShortcutDiagnostics` | 0 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
-| `ExtensionRunner.getShortcuts` | 0 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
-| `ExtensionRunner.getToolDefinition` | 0 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
-| `ExtensionRunner.getUIContext` | 0 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
-| `ExtensionRunner.hasHandlers` | 0 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
-| `ExtensionRunner.hasUI` | 0 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
-| `ExtensionRunner.invalidate` | 0 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
-| `ExtensionRunner.onError` | 0 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
-| `ExtensionRunner.reportUnhandledMcpServers` | 0 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
-| `ExtensionRunner.resolveToolRenderers` | 0 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
-| `ExtensionRunner.setFlagValue` | 0 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
-| `ExtensionRunner.setUIContext` | 0 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
-| `ExtensionRunner.shutdown` | 0 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
+| `ExtensionRunner` | 5 | served | native:ExtensionRunner | native:ExtensionRunner | native:ExtensionRunner |
+| `ExtensionRunner.bindCommandContext` | 0 | served | native:ExtensionRunner.BindCommandContext | native:ExtensionRunner::bind_command_context | native:ExtensionRunner.bind_command_context |
+| `ExtensionRunner.bindCore` | 0 | served | native:ExtensionRunner.BindCore | native:ExtensionRunner::bind_core | native:ExtensionRunner.bind_core |
+| `ExtensionRunner.createCommandContext` | 0 | served | native:ExtensionRunner.CreateCommandContext | native:ExtensionRunner::create_command_context | native:ExtensionRunner.create_command_context |
+| `ExtensionRunner.createContext` | 0 | served | native:ExtensionRunner.CreateContext | native:ExtensionRunner::create_context | native:ExtensionRunner.create_context |
+| `ExtensionRunner.createToolContext` | 0 | served | native:ExtensionRunner.CreateToolContext | native:ExtensionRunner::create_tool_context | native:ExtensionRunner.create_tool_context |
+| `ExtensionRunner.emit` | 0 | served | native:ExtensionRunner.Emit | native:ExtensionRunner::emit | native:ExtensionRunner.emit |
+| `ExtensionRunner.emitBeforeAgentStart` | 0 | served | native:ExtensionRunner.EmitBeforeAgentStart | native:ExtensionRunner::emit_before_agent_start | native:ExtensionRunner.emit_before_agent_start |
+| `ExtensionRunner.emitBeforeProviderHeaders` | 0 | served | native:ExtensionRunner.EmitBeforeProviderHeaders | native:ExtensionRunner::emit_before_provider_headers | native:ExtensionRunner.emit_before_provider_headers |
+| `ExtensionRunner.emitBeforeProviderRequest` | 0 | served | native:ExtensionRunner.EmitBeforeProviderRequest | native:ExtensionRunner::emit_before_provider_request | native:ExtensionRunner.emit_before_provider_request |
+| `ExtensionRunner.emitBoundary` | 0 | served | native:ExtensionRunner.EmitBoundary | native:ExtensionRunner::emit_boundary | native:ExtensionRunner.emit_boundary |
+| `ExtensionRunner.emitCacheWarmingDecision` | 0 | served | native:ExtensionRunner.EmitCacheWarmingDecision | native:ExtensionRunner::emit_cache_warming_decision | native:ExtensionRunner.emit_cache_warming_decision |
+| `ExtensionRunner.emitContext` | 0 | served | native:ExtensionRunner.EmitContext | native:ExtensionRunner::emit_context | native:ExtensionRunner.emit_context |
+| `ExtensionRunner.emitError` | 0 | served | native:ExtensionRunner.EmitError | native:ExtensionRunner::emit_error | native:ExtensionRunner.emit_error |
+| `ExtensionRunner.emitInput` | 0 | served | native:ExtensionRunner.EmitInput | native:ExtensionRunner::emit_input | native:ExtensionRunner.emit_input |
+| `ExtensionRunner.emitMessageEnd` | 0 | served | native:ExtensionRunner.EmitMessageEnd | native:ExtensionRunner::emit_message_end | native:ExtensionRunner.emit_message_end |
+| `ExtensionRunner.emitResourcesDiscover` | 0 | served | native:ExtensionRunner.EmitResourcesDiscover | native:ExtensionRunner::emit_resources_discover | native:ExtensionRunner.emit_resources_discover |
+| `ExtensionRunner.emitToolCall` | 0 | served | native:ExtensionRunner.EmitToolCall | native:ExtensionRunner::emit_tool_call | native:ExtensionRunner.emit_tool_call |
+| `ExtensionRunner.emitToolResult` | 0 | served | native:ExtensionRunner.EmitToolResult | native:ExtensionRunner::emit_tool_result | native:ExtensionRunner.emit_tool_result |
+| `ExtensionRunner.emitUserBash` | 0 | served | native:ExtensionRunner.EmitUserBash | native:ExtensionRunner::emit_user_bash | native:ExtensionRunner.emit_user_bash |
+| `ExtensionRunner.getActiveTools` | 0 | served | native:ExtensionRunner.GetActiveTools | native:ExtensionRunner::get_active_tools | native:ExtensionRunner.get_active_tools |
+| `ExtensionRunner.getAllRegisteredTools` | 0 | served | native:ExtensionRunner.GetAllRegisteredTools | native:ExtensionRunner::get_all_registered_tools | native:ExtensionRunner.get_all_registered_tools |
+| `ExtensionRunner.getCommand` | 0 | served | native:ExtensionRunner.GetCommand | native:ExtensionRunner::get_command | native:ExtensionRunner.get_command |
+| `ExtensionRunner.getCommandDiagnostics` | 0 | served | native:ExtensionRunner.GetCommandDiagnostics | native:ExtensionRunner::get_command_diagnostics | native:ExtensionRunner.get_command_diagnostics |
+| `ExtensionRunner.getEntryRenderer` | 0 | served | native:ExtensionRunner.GetEntryRenderer | native:ExtensionRunner::get_entry_renderer | native:ExtensionRunner.get_entry_renderer |
+| `ExtensionRunner.getExtensionPaths` | 0 | served | native:ExtensionRunner.GetExtensionPaths | native:ExtensionRunner::get_extension_paths | native:ExtensionRunner.get_extension_paths |
+| `ExtensionRunner.getFlagValues` | 0 | served | native:ExtensionRunner.GetFlagValues | native:ExtensionRunner::get_flag_values | native:ExtensionRunner.get_flag_values |
+| `ExtensionRunner.getFlags` | 0 | served | native:ExtensionRunner.GetFlags | native:ExtensionRunner::get_flags | native:ExtensionRunner.get_flags |
+| `ExtensionRunner.getMarkdownTransformers` | 0 | served | native:ExtensionRunner.GetMarkdownTransformers | native:ExtensionRunner::get_markdown_transformers | native:ExtensionRunner.get_markdown_transformers |
+| `ExtensionRunner.getMessageRenderer` | 0 | served | native:ExtensionRunner.GetMessageRenderer | native:ExtensionRunner::get_message_renderer | native:ExtensionRunner.get_message_renderer |
+| `ExtensionRunner.getModelRegistry` | 0 | served | native:ExtensionRunner.GetModelRegistry | native:ExtensionRunner::get_model_registry | native:ExtensionRunner.get_model_registry |
+| `ExtensionRunner.getRegisteredCommands` | 0 | served | native:ExtensionRunner.GetRegisteredCommands | native:ExtensionRunner::get_registered_commands | native:ExtensionRunner.get_registered_commands |
+| `ExtensionRunner.getShortcutDiagnostics` | 0 | served | native:ExtensionRunner.GetShortcutDiagnostics | native:ExtensionRunner::get_shortcut_diagnostics | native:ExtensionRunner.get_shortcut_diagnostics |
+| `ExtensionRunner.getShortcuts` | 0 | served | native:ExtensionRunner.GetShortcuts | native:ExtensionRunner::get_shortcuts | native:ExtensionRunner.get_shortcuts |
+| `ExtensionRunner.getToolDefinition` | 0 | served | native:ExtensionRunner.GetToolDefinition | native:ExtensionRunner::get_tool_definition | native:ExtensionRunner.get_tool_definition |
+| `ExtensionRunner.getUIContext` | 0 | served | native:ExtensionRunner.GetUIContext | native:ExtensionRunner::get_ui_context | native:ExtensionRunner.get_ui_context |
+| `ExtensionRunner.hasHandlers` | 0 | served | native:ExtensionRunner.HasHandlers | native:ExtensionRunner::has_handlers | native:ExtensionRunner.has_handlers |
+| `ExtensionRunner.hasUI` | 0 | served | native:ExtensionRunner.HasUI | native:ExtensionRunner::has_ui | native:ExtensionRunner.has_ui |
+| `ExtensionRunner.invalidate` | 0 | served | native:ExtensionRunner.Invalidate | native:ExtensionRunner::invalidate | native:ExtensionRunner.invalidate |
+| `ExtensionRunner.onError` | 0 | served | native:ExtensionRunner.OnError | native:ExtensionRunner::on_error | native:ExtensionRunner.on_error |
+| `ExtensionRunner.reportUnhandledMcpServers` | 0 | served | native:ExtensionRunner.ReportUnhandledMcpServers | native:ExtensionRunner::report_unhandled_mcp_servers | native:ExtensionRunner.report_unhandled_mcp_servers |
+| `ExtensionRunner.resolveToolRenderers` | 0 | served | native:ExtensionRunner.ResolveToolRenderers | native:ExtensionRunner::resolve_tool_renderers | native:ExtensionRunner.resolve_tool_renderers |
+| `ExtensionRunner.setFlagValue` | 0 | served | native:ExtensionRunner.SetFlagValue | native:ExtensionRunner::set_flag_value | native:ExtensionRunner.set_flag_value |
+| `ExtensionRunner.setUIContext` | 0 | served | native:ExtensionRunner.SetUIContext | native:ExtensionRunner::set_ui_context | native:ExtensionRunner.set_ui_context |
+| `ExtensionRunner.shutdown` | 0 | served | native:ExtensionRunner.Shutdown | native:ExtensionRunner::shutdown | native:ExtensionRunner.shutdown |
 | `ExtensionSelectorComponent` | 0 | served | gap:SdkExportsLedger | gap:SdkExportsLedger | gap:SdkExportsLedger |
 | `ExtensionSelectorComponent.addChild` | 0 | served | gap:SdkExportsLedger | gap:SdkExportsLedger | gap:SdkExportsLedger |
 | `ExtensionSelectorComponent.children` | 0 | served | gap:SdkExportsLedger | gap:SdkExportsLedger | gap:SdkExportsLedger |
@@ -414,7 +413,7 @@ None.
 | `LoginDialogComponent.showPrompt` | 0 | served | gap:SdkExportsLedger | gap:SdkExportsLedger | gap:SdkExportsLedger |
 | `LoginDialogComponent.showWaiting` | 0 | served | gap:SdkExportsLedger | gap:SdkExportsLedger | gap:SdkExportsLedger |
 | `LoginDialogComponent.signal` | 0 | served | gap:SdkExportsLedger | gap:SdkExportsLedger | gap:SdkExportsLedger |
-| `ModelRegistry` | 5 | served | native:NewModelRegistry | native:ModelRegistry::new | native:ModelRegistry |
+| `ModelRegistry` | 5 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
 | `ModelRegistry.classify` | 0 | served | native:ModelRegistry.Classify | native:ModelRegistry::classify | native:ModelRegistry.classify |
 | `ModelRegistry.complete` | 0 | served | native:ModelRegistry.Complete | native:ModelRegistry::complete | native:ModelRegistry.complete |
 | `ModelRegistry.find` | 0 | served | native:ModelRegistry.Find | native:ModelRegistry::find | native:ModelRegistry.find |
@@ -465,10 +464,10 @@ None.
 | `ModelRuntime.getModels` | 0 | served | native:ModelRuntime.GetModels | native:ModelRuntime::get_models | native:ModelRuntime.get_models |
 | `ModelRuntime.getModelsOfType` | 0 | served | native:ModelRuntime.GetModelsOfType | native:ModelRuntime::get_models_of_type | native:ModelRuntime.get_models_of_type |
 | `ModelRuntime.getPhysicalModel` | 0 | served | native:ModelRuntime.GetPhysicalModel | native:ModelRuntime::get_physical_model | native:ModelRuntime.get_physical_model |
-| `ModelRuntime.getProvider` | 0 | served | native:ModelRuntime.GetProvider | native:ModelRuntime::get_provider | native:ModelRuntime.get_provider |
+| `ModelRuntime.getProvider` | 0 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
 | `ModelRuntime.getProviderAuthStatus` | 0 | served | native:ModelRuntime.GetProviderAuthStatus | native:ModelRuntime::get_provider_auth_status | native:ModelRuntime.get_provider_auth_status |
-| `ModelRuntime.getProviders` | 0 | served | native:ModelRuntime.GetProviders | native:ModelRuntime::get_providers | native:ModelRuntime.get_providers |
-| `ModelRuntime.getRegisteredNativeProvider` | 0 | served | native:ModelRuntime.GetRegisteredNativeProvider | native:ModelRuntime::get_registered_native_provider | native:ModelRuntime.get_registered_native_provider |
+| `ModelRuntime.getProviders` | 0 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
+| `ModelRuntime.getRegisteredNativeProvider` | 0 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
 | `ModelRuntime.getRegisteredProviderConfig` | 0 | served | native:ModelRuntime.GetRegisteredProviderConfig | native:ModelRuntime::get_registered_provider_config | native:ModelRuntime.get_registered_provider_config |
 | `ModelRuntime.getRegisteredProviderIds` | 0 | served | native:ModelRuntime.GetRegisteredProviderIDs | native:ModelRuntime::get_registered_provider_ids | native:ModelRuntime.get_registered_provider_ids |
 | `ModelRuntime.hasConfiguredAuth` | 0 | served | native:ModelRuntime.HasConfiguredAuth | native:ModelRuntime::has_configured_auth | native:ModelRuntime.has_configured_auth |
@@ -478,7 +477,7 @@ None.
 | `ModelRuntime.login` | 0 | served | native:ModelRuntime.Login | native:ModelRuntime::login | native:ModelRuntime.login |
 | `ModelRuntime.logout` | 0 | served | native:ModelRuntime.Logout | native:ModelRuntime::logout | native:ModelRuntime.logout |
 | `ModelRuntime.refresh` | 0 | served | native:ModelRuntime.Refresh | native:ModelRuntime::refresh | native:ModelRuntime.refresh |
-| `ModelRuntime.registerNativeProvider` | 0 | served | native:ModelRuntime.RegisterNativeProvider | native:ModelRuntime::register_native_provider | native:ModelRuntime.register_native_provider |
+| `ModelRuntime.registerNativeProvider` | 0 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
 | `ModelRuntime.registerProvider` | 0 | served | native:ModelRuntime.RegisterProvider | native:ModelRuntime::register_provider | native:ModelRuntime.register_provider |
 | `ModelRuntime.registerVirtualModel` | 0 | served | native:ModelRuntime.RegisterVirtualModel | native:ModelRuntime::register_virtual_model | native:ModelRuntime.register_virtual_model |
 | `ModelRuntime.removeRuntimeApiKey` | 0 | served | native:ModelRuntime.RemoveRuntimeAPIKey | native:ModelRuntime::remove_runtime_api_key | native:ModelRuntime.remove_runtime_api_key |
@@ -869,7 +868,7 @@ None.
 | `copyToClipboard` | 8 | served | native:CopyToClipboard | native:copy_to_clipboard | native:copy_to_clipboard |
 | `createAgentSession` | 20 | served | host:Context.CreateAgentSession | host:Context::create_agent_session | host:Context.create_agent_session |
 | `createAgentSessionFromServices` | 8 | served | native:CreateAgentSessionFromServices | native:create_agent_session_from_services | native:create_agent_session_from_services |
-| `createAgentSessionRuntime` | 6 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
+| `createAgentSessionRuntime` | 6 | served | native:CreateAgentSessionRuntime | native:create_agent_session_runtime | native:create_agent_session_runtime |
 | `createAgentSessionServices` | 9 | served | native:CreateAgentSessionServices | native:create_agent_session_services | native:create_agent_session_services |
 | `createBashTool` | 2 | served | native:CreateBashTool | native:create_bash_tool | native:create_bash_tool |
 | `createBashToolDefinition` | 12 | served | native:CreateBashToolDefinition | native:create_bash_tool_definition | native:create_bash_tool_definition |
@@ -878,7 +877,7 @@ None.
 | `createEditTool` | 3 | served | native:CreateEditTool | native:create_edit_tool | native:create_edit_tool |
 | `createEditToolDefinition` | 12 | served | native:CreateEditToolDefinition | native:create_edit_tool_definition | native:create_edit_tool_definition |
 | `createEventBus` | 4 | served | gap:SdkPiAiHelpers | gap:SdkPiAiHelpers | gap:SdkPiAiHelpers |
-| `createExtensionRuntime` | 6 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
+| `createExtensionRuntime` | 6 | served | native:CreateExtensionRuntime | native:create_extension_runtime | native:create_extension_runtime |
 | `createFindTool` | 4 | served | native:CreateFindTool | native:create_find_tool | native:create_find_tool |
 | `createFindToolDefinition` | 10 | served | native:CreateFindToolDefinition | native:create_find_tool_definition | native:create_find_tool_definition |
 | `createGrepTool` | 3 | served | native:CreateGrepTool | native:create_grep_tool | native:create_grep_tool |
@@ -887,7 +886,7 @@ None.
 | `createLocalPowerShellOperations` | 1 | served | native:CreateLocalPowerShellOperations | native:create_local_powershell_operations | native:create_local_powershell_operations |
 | `createLsTool` | 4 | served | native:CreateLsTool | native:create_ls_tool | native:create_ls_tool |
 | `createLsToolDefinition` | 10 | served | native:CreateLsToolDefinition | native:create_ls_tool_definition | native:create_ls_tool_definition |
-| `createMcpExtension` | 6 | served | native:CreateMcpExtension | native:create_mcp_extension | native:create_mcp_extension |
+| `createMcpExtension` | 6 | served | gap:C2Sessions | gap:C2Sessions | gap:C2Sessions |
 | `createPowerShellTool` | 0 | served | native:CreatePowerShellTool | native:create_powershell_tool | native:create_powershell_tool |
 | `createPowerShellToolDefinition` | 1 | served | native:CreatePowerShellToolDefinition | native:create_powershell_tool_definition | native:create_powershell_tool_definition |
 | `createReadOnlyTools` | 3 | served | native:CreateReadOnlyTools | native:create_read_only_tools | native:create_read_only_tools |

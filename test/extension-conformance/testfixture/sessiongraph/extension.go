@@ -365,5 +365,41 @@ func Extension() *sdk.Extension {
 			return string(encoded), err
 		},
 	})
+	e.RegisterTool(sdk.ToolDefinition{
+		Name: "extension_runner", Label: "extension_runner", Description: "Runs the createExtensionRuntime and ExtensionRunner script.", Parameters: sdk.Schema{"type": "object"},
+		Execute: func(ctx sdk.Context, args map[string]any) (result any, err error) {
+			defer func() {
+				if recovered := recover(); recovered != nil {
+					err = fmt.Errorf("%v", recovered)
+				}
+			}()
+			encoded, err := json.Marshal(extensionRunnerScript(ctx, args))
+			return string(encoded), err
+		},
+	})
+	e.RegisterTool(sdk.ToolDefinition{
+		Name: "extension_runner_bench", Label: "extension_runner_bench", Description: "Times one operation of the extension_runner script.", Parameters: sdk.Schema{"type": "object"},
+		Execute: func(ctx sdk.Context, args map[string]any) (result any, err error) {
+			defer func() {
+				if recovered := recover(); recovered != nil {
+					err = fmt.Errorf("%v", recovered)
+				}
+			}()
+			encoded, err := json.Marshal(extensionRunnerBench(ctx, args))
+			return string(encoded), err
+		},
+	})
+	e.RegisterTool(sdk.ToolDefinition{
+		Name: "agent_session_runtime", Label: "agent_session_runtime", Description: "Runs the createAgentSessionRuntime script.", Parameters: sdk.Schema{"type": "object"},
+		Execute: func(ctx sdk.Context, args map[string]any) (result any, err error) {
+			defer func() {
+				if recovered := recover(); recovered != nil {
+					err = fmt.Errorf("%v", recovered)
+				}
+			}()
+			encoded, err := json.Marshal(agentSessionRuntimeScript(ctx, args))
+			return string(encoded), err
+		},
+	})
 	return e
 }

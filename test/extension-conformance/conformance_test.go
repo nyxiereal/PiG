@@ -3527,7 +3527,7 @@ func testPythonExecutable() string {
 	return toolchain.PythonExecutable(runtime.GOOS, exec.LookPath)
 }
 
-func findModuleRoot(t *testing.T) string {
+func findModuleRoot(t testing.TB) string {
 	t.Helper()
 	dir, err := os.Getwd()
 	if err != nil {

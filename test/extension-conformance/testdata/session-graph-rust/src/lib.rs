@@ -7,6 +7,9 @@ use std::path::Path;
 use std::sync::{Arc, Mutex};
 use std::time::{SystemTime, UNIX_EPOCH};
 
+mod agent_session_runtime;
+mod extension_runner;
+
 fn text(value: &Value) -> &str {
     value.as_str().unwrap_or_default()
 }
@@ -1436,6 +1439,14 @@ pub fn new_extension() -> Extension {
         Err(error) => ToolResult::Error(error.to_string()),
     });
     ext.tool("mcp_options", "Runs the createMcpExtension function options script.", empty_schema(), |ctx, args| match mcp_options_script(ctx, &args) {
+        Ok(report) => ToolResult::text(report.to_string()),
+        Err(error) => ToolResult::Error(error.to_string()),
+    });
+    ext.tool("extension_runner", "Runs the createExtensionRuntime and ExtensionRunner script.", empty_schema(), |ctx, args| match extension_runner::extension_runner_script(ctx, &args) {
+        Ok(report) => ToolResult::text(report.to_string()),
+        Err(error) => ToolResult::Error(error.to_string()),
+    });
+    ext.tool("agent_session_runtime", "Runs the createAgentSessionRuntime script.", empty_schema(), |ctx, args| match agent_session_runtime::agent_session_runtime_script(ctx, &args) {
         Ok(report) => ToolResult::text(report.to_string()),
         Err(error) => ToolResult::Error(error.to_string()),
     });

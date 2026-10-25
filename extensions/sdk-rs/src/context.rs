@@ -2173,7 +2173,7 @@ impl Context {
     ///
     /// The session belongs to this extension's connection and is disposed with it; see the `child_session` module for the async contract.
     pub fn create_agent_session(&self, options: crate::CreateAgentSessionOptions) -> io::Result<crate::AgentSession> {
-        crate::child_session::create(&self.conn, |method, args| self.call_host(method, args), options)
+        crate::child_session::create(self, options)
     }
 
     /// Register a slash command after load, as `pi.registerCommand` does when a handler calls it: it replaces a command with the same name and is visible to the host before this returns.

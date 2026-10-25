@@ -54,6 +54,16 @@ type CreateAgentSessionOptions struct {
 	ModelRuntime    *ModelRuntime
 	// ScopedModels is Pi's `scopedModels`: the models the session cycles through, each a model object with an optional thinking level.
 	ScopedModels []ScopedModel
+	// SessionStartEvent is Pi's `sessionStartEvent`: the session_start event the session's extensions receive when they bind. Nil is Pi's default, reason "startup".
+	SessionStartEvent *SessionStartEvent
+}
+
+// SessionStartEvent is Pi's SessionStartEvent (types.ts) as the `sessionStartEvent` option takes it: why a session starts and, when it replaces another, that session's file. Its `type` is always "session_start".
+type SessionStartEvent struct {
+	// Reason is "startup", "reload", "new", "resume" or "fork".
+	Reason string `json:"reason"`
+	// PreviousSessionFile is the file of the session this one replaces; empty is Pi's undefined.
+	PreviousSessionFile string `json:"previousSessionFile,omitempty"`
 }
 
 // ResourceOptions are the DefaultResourceLoader options of Pi (resource-loader.ts) that select resources.
@@ -146,6 +156,8 @@ type childSessionCreateMsg struct {
 	ResourceLoader  string                 `json:"resourceLoader,omitempty"`
 	ModelRuntime    string                 `json:"modelRuntime,omitempty"`
 	ScopedModels    []ScopedModel          `json:"scopedModels,omitempty"`
+	// SessionStartEvent is the option of that name.
+	SessionStartEvent *SessionStartEvent `json:"sessionStartEvent,omitempty"`
 }
 
 type childSessionResources struct {
@@ -399,6 +411,7 @@ func (c Context) CreateAgentSession(options CreateAgentSessionOptions) (*AgentSe
 		create.ModelRuntime = options.ModelRuntime.Handle()
 	}
 	create.ScopedModels = options.ScopedModels
+	create.SessionStartEvent = options.SessionStartEvent
 	session := &AgentSession{ext: e, conn: conn, id: create.ID, tools: map[string]ToolFunc{}, prepares: map[string]ToolPrepareArgumentsFunc{}}
 	session.cond = sync.NewCond(&session.mu)
 	for _, definition := range options.CustomTools {

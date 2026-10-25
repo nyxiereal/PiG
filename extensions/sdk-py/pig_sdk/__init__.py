@@ -53,7 +53,14 @@ from .branch_summary import (
     collect_entries_for_branch_summary as collect_entries_for_branch_summary,
     prepare_branch_entries as prepare_branch_entries,
 )
-from .child_session import AgentSession as AgentSession, CreateAgentSessionOptions as CreateAgentSessionOptions, ResourceOptions as ResourceOptions, _ChildSessions, create_agent_session as _create_agent_session
+from .child_session import AgentSession as AgentSession, CreateAgentSessionOptions as CreateAgentSessionOptions, ResourceOptions as ResourceOptions, SessionStartEvent as SessionStartEvent, _ChildSessions, create_agent_session as _create_agent_session
+from .agent_session_services import (
+    AgentSessionServices as AgentSessionServices,
+    CreateAgentSessionFromServicesOptions as CreateAgentSessionFromServicesOptions,
+    CreateAgentSessionServicesOptions as CreateAgentSessionServicesOptions,
+    create_agent_session_from_services as create_agent_session_from_services,
+    create_agent_session_services as create_agent_session_services,
+)
 from .image_dimension_note import ResizedImage as ResizedImage, format_dimension_note as format_dimension_note
 from .llm_convert import convert_to_llm as convert_to_llm
 from .serialize_conversation import _ordered_keys, serialize_conversation as serialize_conversation

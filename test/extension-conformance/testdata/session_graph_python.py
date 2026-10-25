@@ -761,6 +761,62 @@ def child_handles_tool(ctx, params):
     return json.dumps(child_handles_script(ctx, params))
 
 
+def services_script(ctx, args):
+    """createAgentSessionServices and createAgentSessionFromServices over the options of testdata/session-graph.mjs servicesScript; the report is Pi's own run's."""
+    r = {}
+    cwd, agent_dir = args["cwd"], args["agentDir"]
+    rt = ModelRuntime.create(ctx, auth_path=args["mrAuth"], models_path=args["mrModels"], models_store_path=args["mrStore"])
+    settings = SettingsManager.in_memory(ctx, {
+        "compaction": {"enabled": False}, "retry": {"enabled": False}, "defaultProvider": "mr-local", "defaultModel": "m1", "defaultThinkingLevel": "high",
+    })
+    quiet = dict(no_extensions=True, no_skills=True, no_prompt_templates=True, no_themes=True, no_context_files=True)
+    services = pig_sdk.create_agent_session_services(ctx, pig_sdk.CreateAgentSessionServicesOptions(
+        cwd=os.path.join(cwd, "sub", ".."), agent_dir=agent_dir, settings_manager=settings, model_runtime=rt,
+        resource_loader_options=dict(quiet, additional_extension_paths=[args["servicesProbe"]], append_system_prompt=["Services appendix"]),
+        extension_flag_values=[("probe-flag", True), ("missing-flag", "x"), ("probe-text", True), ("other", False)],
+    ))
+    loaded = services.resource_loader.get_extensions()
+    r["services"] = {
+        "cwd": services.cwd, "agentDir": services.agent_dir, "sameRuntime": services.model_runtime is rt, "sameSettings": services.settings_manager is settings,
+        "diagnostics": services.diagnostics, "extensions": [extension["path"] for extension in loaded["extensions"]], "extensionErrors": len(loaded["errors"]),
+        "appendix": services.resource_loader.get_append_system_prompt(),
+        "providers": {"ids": sorted(identifier for identifier in rt.get_registered_provider_ids() if identifier.startswith("svc-")), "models": [model["id"] for model in rt.get_models("svc-prov")]},
+    }
+    own = pig_sdk.create_agent_session_services(ctx, pig_sdk.CreateAgentSessionServicesOptions(cwd=cwd, agent_dir=args["servicesAgentDir"], resource_loader_options=quiet))
+    r["own"] = {
+        "cwd": own.cwd, "agentDir": own.agent_dir, "diagnostics": own.diagnostics, "models": [model["id"] for model in own.model_runtime.get_models("svc-local")],
+        "defaultModel": own.settings_manager.get_default_model(), "project": own.settings_manager.get_project_settings(), "appendix": own.resource_loader.get_append_system_prompt(),
+        "registered": own.model_runtime.get_registered_provider_ids(),
+    }
+    defaulted = pig_sdk.create_agent_session_services(ctx, pig_sdk.CreateAgentSessionServicesOptions(cwd=cwd, settings_manager=settings, model_runtime=rt, resource_loader_options=quiet))
+    r["defaulted"] = {"agentDir": defaulted.agent_dir == pig_sdk.get_agent_dir(), "cwd": defaulted.cwd}
+    memory = SessionManager.in_memory(ctx, cwd)
+    session = pig_sdk.create_agent_session_from_services(ctx, pig_sdk.CreateAgentSessionFromServicesOptions(
+        services=services, session_manager=memory, session_start_event=pig_sdk.SessionStartEvent(reason="fork", previous_session_file="/previous.jsonl"),
+        scoped_models=[{"model": rt.get_model("mr-local", "m1"), "thinkingLevel": "off"}],
+    ))
+    events = []
+    session.subscribe(lambda event: events.append(event["type"] + (":" + event["message"]["role"] if event["type"].startswith("message_") else "")))
+    session.bind_extensions()
+    created = {
+        "model": {"provider": session.model["provider"], "id": session.model["id"]}, "thinkingLevel": session.thinking_level, "fallback": session.model_fallback_message,
+        "extensionErrors": len(session.extension_errors), "appendix": "Services appendix" in session.system_prompt, "sessionId": session.session_id == memory.get_session_id(),
+    }
+    session.prompt("hello")
+    messages = session.messages()
+    text = "".join(block.get("text", "") for block in messages[-1]["content"] if block.get("type") == "text")
+    r["session"] = {
+        "created": created, "events": events, "roles": [message["role"] for message in messages], "text": text,
+        "started": [entry["data"] for entry in memory.get_entries() if entry["type"] == "custom" and entry.get("customType") == "probe_start"],
+    }
+    session.dispose()
+    return r
+
+
+def services_tool(ctx, params):
+    return json.dumps(services_script(ctx, params))
+
+
 def new_extension():
     ext = pig_sdk.Extension("session-graph")
     ext.register_tool(pig_sdk.ToolDefinition(name="session_manager", label="session_manager", description="Runs the SessionManager script.", parameters={"type": "object"}, execute=session_manager_tool))
@@ -770,4 +826,5 @@ def new_extension():
     ext.register_tool(pig_sdk.ToolDefinition(name="model_runtime", label="model_runtime", description="Runs the ModelRuntime script.", parameters={"type": "object"}, execute=model_runtime_tool))
     ext.register_tool(pig_sdk.ToolDefinition(name="package_manager", label="package_manager", description="Runs the DefaultPackageManager script.", parameters={"type": "object"}, execute=packages_tool))
     ext.register_tool(pig_sdk.ToolDefinition(name="child_handles", label="child_handles", description="Runs the createAgentSession handle options script.", parameters={"type": "object"}, execute=child_handles_tool))
+    ext.register_tool(pig_sdk.ToolDefinition(name="services", label="services", description="Runs the createAgentSessionServices script.", parameters={"type": "object"}, execute=services_tool))
     return ext

@@ -1,6 +1,6 @@
 //! Fixture for the session graph conformance rows (test/extension-conformance/session_graph_test.go): the script of testfixture/sessiongraph (Go), testdata/session-graph.mjs (Node, Pi's own classes) and testdata/session_graph_python.py.
 
-use pig_sdk::{CreateAgentSessionOptions, ModelRuntime, ModelRuntimeCreateOptions, ModelRoute, VirtualModel, DefaultPackageManager, PackageManagerOptions, DefaultResourceLoader, DefaultResourceLoaderOptions, empty_schema, Context, Extension, NewSessionOptions, SessionInfo, SessionManager, SettingsManager, SettingsManagerCreateOptions, ToolResult, has_trust_requiring_project_resources, ProjectTrustStore, ProjectTrustStoreEntry, ProjectTrustUpdate};
+use pig_sdk::{create_agent_session_from_services, create_agent_session_services, CreateAgentSessionFromServicesOptions, CreateAgentSessionServicesOptions, SessionStartEvent, CreateAgentSessionOptions, ModelRuntime, ModelRuntimeCreateOptions, ModelRoute, VirtualModel, DefaultPackageManager, PackageManagerOptions, DefaultResourceLoader, DefaultResourceLoaderOptions, empty_schema, Context, Extension, NewSessionOptions, SessionInfo, SessionManager, SettingsManager, SettingsManagerCreateOptions, ToolResult, has_trust_requiring_project_resources, ProjectTrustStore, ProjectTrustStoreEntry, ProjectTrustUpdate};
 use serde_json::{json, Value};
 use std::io;
 use std::path::Path;
@@ -732,6 +732,65 @@ fn child_handles_script(ctx: &Context, args: &Value) -> io::Result<Value> {
     Ok(Value::Object(r))
 }
 
+/// createAgentSessionServices and createAgentSessionFromServices over the options of testdata/session-graph.mjs servicesScript; the report is Pi's own run's.
+fn services_script(ctx: &Context, args: &Value) -> io::Result<Value> {
+    let (cwd, agent_dir) = (text(&args["cwd"]), text(&args["agentDir"]));
+    let rt = Arc::new(ModelRuntime::create(ctx, ModelRuntimeCreateOptions { auth_path: Some(text(&args["mrAuth"]).into()), models_path: Some(text(&args["mrModels"]).into()), models_store_path: Some(text(&args["mrStore"]).into()), ..Default::default() })?);
+    let settings = Arc::new(SettingsManager::in_memory(ctx, Some(json!({
+        "compaction": {"enabled": false}, "retry": {"enabled": false}, "defaultProvider": "mr-local", "defaultModel": "m1", "defaultThinkingLevel": "high",
+    })), None)?);
+    let quiet = || DefaultResourceLoaderOptions { no_extensions: true, no_skills: true, no_prompt_templates: true, no_themes: true, no_context_files: true, ..Default::default() };
+    let services = create_agent_session_services(ctx, CreateAgentSessionServicesOptions {
+        cwd: Path::new(cwd).join("sub").join("..").to_string_lossy().into_owned(), agent_dir: Some(agent_dir.into()), settings_manager: Some(settings.clone()), model_runtime: Some(rt.clone()),
+        resource_loader_options: Some(DefaultResourceLoaderOptions { additional_extension_paths: vec![text(&args["servicesProbe"]).into()], append_system_prompt: Some(vec!["Services appendix".into()]), ..quiet() }),
+        extension_flag_values: vec![("probe-flag".into(), json!(true)), ("missing-flag".into(), json!("x")), ("probe-text".into(), json!(true)), ("other".into(), json!(false))],
+        ..Default::default()
+    })?;
+    let loaded = services.resource_loader.get_extensions()?;
+    let mut provider_ids: Vec<Value> = rt.get_registered_provider_ids()?.as_array().cloned().unwrap_or_default().into_iter().filter(|id| text(id).starts_with("svc-")).collect();
+    provider_ids.sort_by(|a, b| text(a).cmp(text(b)));
+    let mut r = serde_json::Map::new();
+    r.insert("services".into(), json!({
+        "cwd": services.cwd, "agentDir": services.agent_dir, "sameRuntime": Arc::ptr_eq(&services.model_runtime, &rt), "sameSettings": Arc::ptr_eq(&services.settings_manager, &settings),
+        "diagnostics": services.diagnostics, "extensions": loaded["extensions"].as_array().map(Vec::as_slice).unwrap_or_default().iter().map(|extension| extension["path"].clone()).collect::<Vec<_>>(),
+        "extensionErrors": loaded["errors"].as_array().map_or(0, Vec::len), "appendix": services.resource_loader.get_append_system_prompt()?,
+        "providers": {"ids": provider_ids, "models": ids(&rt.get_models(Some("svc-prov"))?, None)},
+    }));
+    let own = create_agent_session_services(ctx, CreateAgentSessionServicesOptions { cwd: cwd.into(), agent_dir: Some(text(&args["servicesAgentDir"]).into()), resource_loader_options: Some(quiet()), ..Default::default() })?;
+    r.insert("own".into(), json!({
+        "cwd": own.cwd, "agentDir": own.agent_dir, "diagnostics": own.diagnostics, "models": ids(&own.model_runtime.get_models(Some("svc-local"))?, None),
+        "defaultModel": own.settings_manager.get_default_model()?, "project": own.settings_manager.get_project_settings()?, "appendix": own.resource_loader.get_append_system_prompt()?,
+        "registered": own.model_runtime.get_registered_provider_ids()?,
+    }));
+    let defaulted = create_agent_session_services(ctx, CreateAgentSessionServicesOptions { cwd: cwd.into(), settings_manager: Some(settings.clone()), model_runtime: Some(rt.clone()), resource_loader_options: Some(quiet()), ..Default::default() })?;
+    r.insert("defaulted".into(), json!({"agentDir": defaulted.agent_dir == pig_sdk::get_agent_dir()?, "cwd": defaulted.cwd}));
+    let memory = SessionManager::in_memory(ctx, Some(cwd), None, None)?;
+    let session = create_agent_session_from_services(ctx, CreateAgentSessionFromServicesOptions {
+        services: &services, session_manager: &memory, session_start_event: Some(SessionStartEvent { reason: "fork".into(), previous_session_file: Some("/previous.jsonl".into()) }),
+        model: None, thinking_level: None, scoped_models: Some(json!([{"model": rt.get_model("mr-local", "m1")?, "thinkingLevel": "off"}])), tools: None, exclude_tools: None, no_tools: None, custom_tools: vec![],
+    })?;
+    let events: Arc<Mutex<Vec<String>>> = Arc::new(Mutex::new(Vec::new()));
+    let sink = events.clone();
+    let _subscription = session.subscribe(move |event| {
+        let mut name = event["type"].as_str().unwrap_or("").to_string();
+        if name.starts_with("message_") {
+            name = format!("{}:{}", name, event["message"]["role"].as_str().unwrap_or(""));
+        }
+        sink.lock().unwrap().push(name);
+    });
+    session.bind_extensions()?;
+    let created = json!({
+        "model": {"provider": session.model["provider"], "id": session.model["id"]}, "thinkingLevel": session.thinking_level, "fallback": session.model_fallback_message,
+        "extensionErrors": session.extension_errors.len(), "appendix": session.system_prompt.contains("Services appendix"), "sessionId": json!(session.session_id) == memory.get_session_id()?,
+    });
+    session.prompt("hello")?;
+    let roles: Vec<Value> = session.messages()?.iter().map(|message| message["role"].clone()).collect();
+    let started: Vec<Value> = memory.get_entries()?.as_array().cloned().unwrap_or_default().iter().filter(|entry| entry["type"] == "custom" && entry["customType"] == "probe_start").map(|entry| entry["data"].clone()).collect();
+    r.insert("session".into(), json!({"created": created, "events": *events.lock().unwrap(), "roles": roles, "text": child_last_text(&session)?, "started": started}));
+    session.dispose();
+    Ok(Value::Object(r))
+}
+
 fn model_runtime_script(ctx: &Context, args: &Value) -> io::Result<Value> {
     let (auth, models, store, server) = (text(&args["mrAuth"]), text(&args["mrModels"]), text(&args["mrStore"]), text(&args["mrServer"]));
     let mut r = serde_json::Map::new();
@@ -881,6 +940,10 @@ pub fn new_extension() -> Extension {
         Err(error) => ToolResult::Error(error.to_string()),
     });
     ext.tool("child_handles", "Runs the createAgentSession handle options script.", empty_schema(), |ctx, args| match child_handles_script(ctx, &args) {
+        Ok(report) => ToolResult::text(report.to_string()),
+        Err(error) => ToolResult::Error(error.to_string()),
+    });
+    ext.tool("services", "Runs the createAgentSessionServices script.", empty_schema(), |ctx, args| match services_script(ctx, &args) {
         Ok(report) => ToolResult::text(report.to_string()),
         Err(error) => ToolResult::Error(error.to_string()),
     });

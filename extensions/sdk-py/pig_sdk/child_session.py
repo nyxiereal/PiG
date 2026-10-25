@@ -87,6 +87,18 @@ class CreateAgentSessionOptions:
     model_runtime: Any = None
     #: Pi's ``scopedModels``: a list of ``{"model": <model object>, "thinkingLevel": ...}`` the session cycles through.
     scoped_models: list[dict[str, Any]] | None = None
+    #: Pi's ``sessionStartEvent``: the session_start event the session's extensions receive when they bind. ``None`` is Pi's default, reason ``"startup"``.
+    session_start_event: "SessionStartEvent | None" = None
+
+
+@dataclass(kw_only=True)
+class SessionStartEvent:
+    """Pi's SessionStartEvent (types.ts) as the ``sessionStartEvent`` option takes it: why a session starts and, when it replaces another, that session's file. Its ``type`` is always ``"session_start"``."""
+
+    #: ``"startup"``, ``"reload"``, ``"new"``, ``"resume"`` or ``"fork"``.
+    reason: str
+    #: The file of the session this one replaces; ``None`` is Pi's undefined.
+    previous_session_file: str | None = None
 
 
 def _resources_wire(resources: ResourceOptions | None) -> dict[str, Any] | None:
@@ -337,6 +349,11 @@ def create_agent_session(extension: "Extension", call: Callable[[str, Any], dict
             args[key] = value.handle
     if options.scoped_models is not None:
         args["scopedModels"] = options.scoped_models
+    if options.session_start_event is not None:
+        event: dict[str, Any] = {"reason": options.session_start_event.reason}
+        if options.session_start_event.previous_session_file is not None:
+            event["previousSessionFile"] = options.session_start_event.previous_session_file
+        args["sessionStartEvent"] = event
     resources = _resources_wire(options.resources)
     if resources is not None:
         args["resources"] = resources

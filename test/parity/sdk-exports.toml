@@ -879,9 +879,9 @@ closing = "Pure helpers ported per SDK with vector tests from Pi at the pin (tes
 "pi-coding-agent: convertToPng" = { go = "native:ConvertToPng", rust = "native:convert_to_png", python = "native:convert_to_png" }
 "pi-coding-agent: copyToClipboard" = { go = "native:CopyToClipboard", rust = "native:copy_to_clipboard", python = "native:copy_to_clipboard" }
 "pi-coding-agent: createAgentSession" = { go = "host:Context.CreateAgentSession", rust = "host:Context::create_agent_session", python = "host:Context.create_agent_session" }
-"pi-coding-agent: createAgentSessionFromServices" = { go = "gap:SdkSessionGraph", rust = "gap:SdkSessionGraph", python = "gap:SdkSessionGraph" }
+"pi-coding-agent: createAgentSessionFromServices" = { go = "native:CreateAgentSessionFromServices", rust = "native:create_agent_session_from_services", python = "native:create_agent_session_from_services" }
 "pi-coding-agent: createAgentSessionRuntime" = { go = "gap:SdkSessionGraph", rust = "gap:SdkSessionGraph", python = "gap:SdkSessionGraph" }
-"pi-coding-agent: createAgentSessionServices" = { go = "gap:SdkSessionGraph", rust = "gap:SdkSessionGraph", python = "gap:SdkSessionGraph" }
+"pi-coding-agent: createAgentSessionServices" = { go = "native:CreateAgentSessionServices", rust = "native:create_agent_session_services", python = "native:create_agent_session_services" }
 "pi-coding-agent: createBashTool" = { go = "native:CreateBashTool", rust = "native:create_bash_tool", python = "native:create_bash_tool" }
 "pi-coding-agent: createBashToolDefinition" = { go = "native:CreateBashToolDefinition", rust = "native:create_bash_tool_definition", python = "native:create_bash_tool_definition" }
 "pi-coding-agent: createCodemodeExtension" = { go = "gap:C2Sessions", rust = "gap:C2Sessions", python = "gap:C2Sessions" }

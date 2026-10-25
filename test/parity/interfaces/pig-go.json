@@ -77762,6 +77762,17 @@
       "shapeHash": "sha256:09e49f7a91c43e82c1ad9288360e67a52c5e56c5d1d8e4230a8ad3887ac14ef3"
     },
     {
+      "id": "go:github.com/MichaelKinsy/PiG/coding#graphAgentSessionServicesStatic",
+      "package": "github.com/MichaelKinsy/PiG/coding",
+      "name": "graphAgentSessionServicesStatic",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func(ctx context.Context, scope github.com/MichaelKinsy/PiG/coding/extension/host/subprocess.SessionGraphScope, method string, raw github.com/MichaelKinsy/PiG/extensions/sdk/json.RawMessage) (any, error)"
+      },
+      "shapeHash": "sha256:3822acebcb29d714123cec7d01743a2de572d63ce292b4f39756c965374dfc52"
+    },
+    {
       "id": "go:github.com/MichaelKinsy/PiG/coding#graphAgentsFilesOf",
       "package": "github.com/MichaelKinsy/PiG/coding",
       "name": "graphAgentsFilesOf",
@@ -77947,6 +77958,28 @@
         "type": "graphResourcePath"
       },
       "shapeHash": "sha256:c6ea68e4621a8b6a2c817e396f125f60a7fcce47a84f69c80beeef4109cd8250"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/coding#graphServicesApply",
+      "package": "github.com/MichaelKinsy/PiG/coding",
+      "name": "graphServicesApply",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func(ctx context.Context, scope github.com/MichaelKinsy/PiG/coding/extension/host/subprocess.SessionGraphScope, args github.com/MichaelKinsy/PiG/internal/codingagent.GraphArgs) (any, error)"
+      },
+      "shapeHash": "sha256:f296a0fa60e4f6d70b5aa860dd185452c350285bc65e6ddab286f06fb559d8dd"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/coding#graphServicesResolve",
+      "package": "github.com/MichaelKinsy/PiG/coding",
+      "name": "graphServicesResolve",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func(cwd string, agentDir *string) (any, error)"
+      },
+      "shapeHash": "sha256:55b01e0c824dbe8c9e529d5f164ba30e7814481fdbd7dc434be5c58544874386"
     },
     {
       "id": "go:github.com/MichaelKinsy/PiG/coding#graphSkill",
@@ -119958,6 +119991,17 @@
       "shapeHash": "sha256:0b8c10c5175913a46878abd2b73f30c1abfbd0468932106d5f4619d84f6d6d57"
     },
     {
+      "id": "go:github.com/MichaelKinsy/PiG/coding/extension/host/subprocess#ChildSessionStartEvent",
+      "package": "github.com/MichaelKinsy/PiG/coding/extension/host/subprocess",
+      "name": "ChildSessionStartEvent",
+      "kind": "type",
+      "exported": true,
+      "shape": {
+        "type": "ChildSessionStartEvent"
+      },
+      "shapeHash": "sha256:e1cfb5356565d9407289e802e0da01bd181f1a185f9ad29f6cb3be68742ae957"
+    },
+    {
       "id": "go:github.com/MichaelKinsy/PiG/coding/extension/host/subprocess#ChildSessionState",
       "package": "github.com/MichaelKinsy/PiG/coding/extension/host/subprocess",
       "name": "ChildSessionState",
@@ -127548,6 +127592,17 @@
       "shapeHash": "sha256:1d459289c91efb4c89e31038c9e8420af435393db8f670980e26de2e2f5f91cf"
     },
     {
+      "id": "go:github.com/MichaelKinsy/PiG/coding/extension/host/subprocess#SessionGraphAgentSessionServices",
+      "package": "github.com/MichaelKinsy/PiG/coding/extension/host/subprocess",
+      "name": "SessionGraphAgentSessionServices",
+      "kind": "constant",
+      "exported": true,
+      "shape": {
+        "type": "untyped string"
+      },
+      "shapeHash": "sha256:7eabd192b9f1c379102c8dc793881875f1f949f6b752e15a20b93080cb0b311d"
+    },
+    {
       "id": "go:github.com/MichaelKinsy/PiG/coding/extension/host/subprocess#SessionGraphBackend",
       "package": "github.com/MichaelKinsy/PiG/coding/extension/host/subprocess",
       "name": "SessionGraphBackend",
@@ -127689,6 +127744,28 @@
         "type": "SessionGraphScope"
       },
       "shapeHash": "sha256:bba4f17b4df926c7c899cebb850f7f40ffcd1ef521d59b62bccbf61658eb28be"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/coding/extension/host/subprocess#SessionGraphServicesApply",
+      "package": "github.com/MichaelKinsy/PiG/coding/extension/host/subprocess",
+      "name": "SessionGraphServicesApply",
+      "kind": "constant",
+      "exported": true,
+      "shape": {
+        "type": "untyped string"
+      },
+      "shapeHash": "sha256:7eabd192b9f1c379102c8dc793881875f1f949f6b752e15a20b93080cb0b311d"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/coding/extension/host/subprocess#SessionGraphServicesResolve",
+      "package": "github.com/MichaelKinsy/PiG/coding/extension/host/subprocess",
+      "name": "SessionGraphServicesResolve",
+      "kind": "constant",
+      "exported": true,
+      "shape": {
+        "type": "untyped string"
+      },
+      "shapeHash": "sha256:7eabd192b9f1c379102c8dc793881875f1f949f6b752e15a20b93080cb0b311d"
     },
     {
       "id": "go:github.com/MichaelKinsy/PiG/coding/extension/host/subprocess#SessionGraphSessionManager",
@@ -176575,6 +176652,28 @@
       "shapeHash": "sha256:75aa66ceb27a5257490361ff37d57582eb4069d8967cc0547439696358ed7d00"
     },
     {
+      "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#AgentSessionRuntimeDiagnostic",
+      "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
+      "name": "AgentSessionRuntimeDiagnostic",
+      "kind": "type",
+      "exported": true,
+      "shape": {
+        "type": "AgentSessionRuntimeDiagnostic"
+      },
+      "shapeHash": "sha256:1044772ec37b2a1150fad7ea765ab5459d9696fcbafd4609445a6d7c3cb95637"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#AgentSessionServices",
+      "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
+      "name": "AgentSessionServices",
+      "kind": "type",
+      "exported": true,
+      "shape": {
+        "type": "AgentSessionServices"
+      },
+      "shapeHash": "sha256:a6e741ae30974d4522a19ede15ffcce151fc4098ee01853cfd8f70c37c040f92"
+    },
+    {
       "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#AgentSessionState",
       "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
       "name": "AgentSessionState",
@@ -178995,6 +179094,28 @@
       "shapeHash": "sha256:f648a6d1e1af1a8e16ed656bb9ac13ee30f6bab27b5d311182953c262f51385b"
     },
     {
+      "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#CreateAgentSessionFromServices",
+      "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
+      "name": "CreateAgentSessionFromServices",
+      "kind": "function",
+      "exported": true,
+      "shape": {
+        "type": "func(c Context, options CreateAgentSessionFromServicesOptions) (*AgentSession, error)"
+      },
+      "shapeHash": "sha256:9bfd883143eb12eb415cd1d296a1faf7e4c0f7f69429d0a6edb07021297ca970"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#CreateAgentSessionFromServicesOptions",
+      "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
+      "name": "CreateAgentSessionFromServicesOptions",
+      "kind": "type",
+      "exported": true,
+      "shape": {
+        "type": "CreateAgentSessionFromServicesOptions"
+      },
+      "shapeHash": "sha256:f4370383d5c8fb1e6630be1e86fa05599cc4d402702ced16a24f3a04b1deb049"
+    },
+    {
       "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#CreateAgentSessionOptions",
       "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
       "name": "CreateAgentSessionOptions",
@@ -179004,6 +179125,28 @@
         "type": "CreateAgentSessionOptions"
       },
       "shapeHash": "sha256:47dc996c81c5f34b47359ea24b8bd32cbda96491996511c61ec46a117dc8c83c"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#CreateAgentSessionServices",
+      "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
+      "name": "CreateAgentSessionServices",
+      "kind": "function",
+      "exported": true,
+      "shape": {
+        "type": "func(c Context, options CreateAgentSessionServicesOptions) (*AgentSessionServices, error)"
+      },
+      "shapeHash": "sha256:d8655f16f673e6ac0560fd45ba0c0d9a02a26439d04f286da7d37bbd365372ef"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#CreateAgentSessionServicesOptions",
+      "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
+      "name": "CreateAgentSessionServicesOptions",
+      "kind": "type",
+      "exported": true,
+      "shape": {
+        "type": "CreateAgentSessionServicesOptions"
+      },
+      "shapeHash": "sha256:28c8c645d83302e9c3d1259c30a45a894947457a95f0262ae9798dbfcb140fa3"
     },
     {
       "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#CreateAssistantMessageEventStream",
@@ -182436,6 +182579,17 @@
         "type": "func(target uint64, stop \u003c-chan struct{})"
       },
       "shapeHash": "sha256:e7f2c03174478d1aa4cb57f2cdf82d713068df7f127c6453141f2c750c665901"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#ExtensionFlagValue",
+      "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
+      "name": "ExtensionFlagValue",
+      "kind": "type",
+      "exported": true,
+      "shape": {
+        "type": "ExtensionFlagValue"
+      },
+      "shapeHash": "sha256:0945659b6c618b959959c784cf95e6e1b0807f4e1c4b5a873ec41f81427e3df8"
     },
     {
       "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#ExtensionResourcePath",
@@ -189036,6 +189190,17 @@
         "type": "SessionReader"
       },
       "shapeHash": "sha256:f436b7389f34888babd5a542d183c2cc223b5c61a81f721186b48d9d35ccbe85"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#SessionStartEvent",
+      "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
+      "name": "SessionStartEvent",
+      "kind": "type",
+      "exported": true,
+      "shape": {
+        "type": "SessionStartEvent"
+      },
+      "shapeHash": "sha256:600015db5c8af6ff93d88aa9e3191e1a6d23753df1c6b340880363b4cb740b8a"
     },
     {
       "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#SessionTreeNode",

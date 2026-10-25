@@ -45,6 +45,8 @@ func (*SessionGraph) Static(ctx context.Context, scope subprocess.SessionGraphSc
 		return icodingagent.GraphSessionManagerStatic(ctx, scope, method, args)
 	case subprocess.SessionGraphProjectTrustStore:
 		return icodingagent.GraphProjectTrustStoreStatic(ctx, method, args)
+	case subprocess.SessionGraphAgentSessionServices:
+		return graphAgentSessionServicesStatic(ctx, scope, method, args)
 	}
 	return nil, fmt.Errorf("%s has no static function %s", kind, method)
 }

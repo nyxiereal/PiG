@@ -1,5 +1,5 @@
 // The Node fixture of the session graph conformance rows (session_graph_test.go). It runs the script of testfixture/sessiongraph (Go), testdata/session-graph-rust and the inline Python fixture with Pi's own SessionManager, so the report it makes is Pi's.
-import { DefaultPackageManager, DefaultResourceLoader, ModelRuntime, ProjectTrustStore, SessionManager, SettingsManager, createAgentSession, hasTrustRequiringProjectResources } from "@earendil-works/pi-coding-agent";
+import { DefaultPackageManager, DefaultResourceLoader, ModelRuntime, ProjectTrustStore, SessionManager, SettingsManager, createAgentSession, createAgentSessionFromServices, createAgentSessionServices, getAgentDir, hasTrustRequiringProjectResources } from "@earendil-works/pi-coding-agent";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 
@@ -663,6 +663,54 @@ async function childHandlesScript({ mrAuth, mrModels, mrStore, cwd, dir, agentDi
   return r;
 }
 
+// createAgentSessionServices and createAgentSessionFromServices: Pi's own run is the expectation (services). The Go, Python and Rust scripts call their SDK's functions with the same options and must report the same.
+async function servicesScript({ mrAuth, mrModels, mrStore, cwd, agentDir, servicesAgentDir, servicesProbe }) {
+  const r = {};
+  const rt = await ModelRuntime.create({ authPath: mrAuth, modelsPath: mrModels, modelsStorePath: mrStore });
+  const settings = SettingsManager.inMemory({ compaction: { enabled: false }, retry: { enabled: false }, defaultProvider: "mr-local", defaultModel: "m1", defaultThinkingLevel: "high" });
+  const quiet = { noExtensions: true, noSkills: true, noPromptTemplates: true, noThemes: true, noContextFiles: true };
+  const services = await createAgentSessionServices({
+    cwd: join(cwd, "sub", ".."), agentDir, settingsManager: settings, modelRuntime: rt,
+    resourceLoaderOptions: { ...quiet, additionalExtensionPaths: [servicesProbe], appendSystemPrompt: ["Services appendix"] },
+    extensionFlagValues: new Map([["probe-flag", true], ["missing-flag", "x"], ["probe-text", true], ["other", false]]),
+  });
+  const extensions = services.resourceLoader.getExtensions();
+  r.services = {
+    cwd: services.cwd, agentDir: services.agentDir, sameRuntime: services.modelRuntime === rt, sameSettings: services.settingsManager === settings,
+    diagnostics: services.diagnostics, extensions: extensions.extensions.map((extension) => extension.path), extensionErrors: extensions.errors.length,
+    appendix: services.resourceLoader.getAppendSystemPrompt(),
+    providers: { ids: [...rt.getRegisteredProviderIds()].filter((id) => id.startsWith("svc-")).sort(), models: rt.getModels("svc-prov").map((model) => model.id) },
+  };
+  const own = await createAgentSessionServices({ cwd, agentDir: servicesAgentDir, resourceLoaderOptions: quiet });
+  r.own = {
+    cwd: own.cwd, agentDir: own.agentDir, diagnostics: own.diagnostics, models: own.modelRuntime.getModels("svc-local").map((model) => model.id),
+    defaultModel: orNull(own.settingsManager.getDefaultModel()), project: own.settingsManager.getProjectSettings(), appendix: own.resourceLoader.getAppendSystemPrompt(),
+    registered: [...own.modelRuntime.getRegisteredProviderIds()],
+  };
+  const defaulted = await createAgentSessionServices({ cwd, settingsManager: settings, modelRuntime: rt, resourceLoaderOptions: quiet });
+  r.defaulted = { agentDir: defaulted.agentDir === getAgentDir(), cwd: defaulted.cwd };
+  const memory = SessionManager.inMemory(cwd);
+  const { session, extensionsResult, modelFallbackMessage } = await createAgentSessionFromServices({
+    services, sessionManager: memory, sessionStartEvent: { type: "session_start", reason: "fork", previousSessionFile: "/previous.jsonl" },
+    scopedModels: [{ model: rt.getModel("mr-local", "m1"), thinkingLevel: "off" }],
+  });
+  const events = [];
+  session.subscribe((event) => events.push(event.type + (event.type.startsWith("message_") ? ":" + event.message.role : "")));
+  await session.bindExtensions({});
+  const created = {
+    model: { provider: session.model?.provider, id: session.model?.id }, thinkingLevel: session.thinkingLevel, fallback: orNull(modelFallbackMessage), extensionErrors: extensionsResult.errors.length,
+    appendix: session.systemPrompt.includes("Services appendix"), sessionId: session.sessionId === memory.getSessionId(),
+  };
+  await session.prompt("hello");
+  const textOf = (message) => (typeof message?.content === "string" ? message.content : (message?.content ?? []).filter((block) => block.type === "text").map((block) => block.text).join(""));
+  r.session = {
+    created, events, roles: session.messages.map((message) => message.role), text: textOf(session.messages.at(-1)),
+    started: memory.getEntries().filter((entry) => entry.type === "custom" && entry.customType === "probe_start").map((entry) => entry.data),
+  };
+  session.dispose();
+  return r;
+}
+
 export default function (pi) {
   pi.registerTool({
     name: "session_manager", label: "session_manager", description: "Runs the SessionManager script.", parameters: { type: "object" },
@@ -691,5 +739,9 @@ export default function (pi) {
   pi.registerTool({
     name: "child_handles", label: "child_handles", description: "Runs the createAgentSession handle options script.", parameters: { type: "object" },
     execute: async (_id, params) => ({ content: [{ type: "text", text: JSON.stringify(await childHandlesScript(params)) }] }),
+  });
+  pi.registerTool({
+    name: "services", label: "services", description: "Runs the createAgentSessionServices script.", parameters: { type: "object" },
+    execute: async (_id, params) => ({ content: [{ type: "text", text: JSON.stringify(await servicesScript(params)) }] }),
   });
 }

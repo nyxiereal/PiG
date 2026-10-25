@@ -188,7 +188,9 @@ pub use context::{
 pub use before_agent_start::BeforeAgentStartEvent;
 pub use events::*;
 mod child_session;
-pub use child_session::{AgentSession, CreateAgentSessionOptions, PromptOptions, ResourceOptions, SessionSubscription};
+pub use child_session::{AgentSession, CreateAgentSessionOptions, PromptOptions, ResourceOptions, SessionStartEvent, SessionSubscription};
+mod agent_session_services;
+pub use agent_session_services::{create_agent_session_from_services, create_agent_session_services, AgentSessionServices, CreateAgentSessionFromServicesOptions, CreateAgentSessionServicesOptions, ResourceLoaderReloadOptions};
 pub use host_subscriptions::HostSubscription;
 #[doc(hidden)]
 pub use extension::report_load_failure;

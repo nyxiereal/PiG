@@ -81,6 +81,17 @@ pub struct CreateAgentSessionOptions {
     pub model_runtime: Option<String>,
     /// Pi's `scopedModels`: a JSON list of `{"model": <model object>, "thinkingLevel"?: ...}` the session cycles through.
     pub scoped_models: Option<Value>,
+    /// Pi's `sessionStartEvent`: the session_start event the session's extensions receive when they bind. `None` is Pi's default, reason `"startup"`.
+    pub session_start_event: Option<SessionStartEvent>,
+}
+
+/// Pi's SessionStartEvent (types.ts) as the `sessionStartEvent` option takes it: why a session starts and, when it replaces another, that session's file. Its `type` is always `"session_start"`.
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
+pub struct SessionStartEvent {
+    /// `"startup"`, `"reload"`, `"new"`, `"resume"` or `"fork"`.
+    pub reason: String,
+    /// The file of the session this one replaces; `None` is Pi's undefined.
+    pub previous_session_file: Option<String>,
 }
 
 fn resources_wire(resources: &ResourceOptions) -> Value {
@@ -340,6 +351,14 @@ pub(crate) fn create(conn: &Arc<Connection>, call_host: impl Fn(&str, Option<Val
     }
     if let Some(scoped) = &options.scoped_models {
         args.insert("scopedModels".into(), scoped.clone());
+    }
+    if let Some(event) = &options.session_start_event {
+        let mut wire = serde_json::Map::new();
+        wire.insert("reason".into(), json!(event.reason));
+        if let Some(file) = &event.previous_session_file {
+            wire.insert("previousSessionFile".into(), json!(file));
+        }
+        args.insert("sessionStartEvent".into(), Value::Object(wire));
     }
     if let Some(resources) = &options.resources {
         let wire = resources_wire(resources);

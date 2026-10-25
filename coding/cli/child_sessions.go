@@ -115,6 +115,9 @@ func createChildSession(ctx context.Context, services *coding.AgentSessionServic
 		NoTools:       request.NoTools,
 		CustomTools:   request.ToolDefinitions,
 	}
+	if event := request.SessionStartEvent; event != nil {
+		create.SessionStartEvent = &extension.SessionStartEvent{Type: "session_start", Reason: event.Reason, PreviousSessionFile: event.PreviousSessionFile}
+	}
 	if request.Tools != nil {
 		create.Tools = slices.Clone(*request.Tools)
 		if create.Tools == nil {

@@ -101,7 +101,9 @@ pub use model_runtime::{ModelRuntime, ModelRuntimeCreateOptions};
 mod package_manager;
 pub use package_manager::{DefaultPackageManager, PackageManagerOptions};
 mod resource_loader;
-pub use resource_loader::{DefaultResourceLoader, DefaultResourceLoaderOptions, InlineExtensionFactory, LoaderOverride};
+mod extension_factories;
+pub use extension_factories::{create_codemode_extension, create_mcp_extension, create_tool_search_extension, CodemodeExtensionOptions, McpExtensionOptions};
+pub use resource_loader::{DefaultResourceLoader, DefaultResourceLoaderOptions, ExtensionFactory, InlineExtensionFactory, LoaderOverride};
 mod project_trust;
 pub use project_trust::{has_trust_requiring_project_resources, ProjectTrustStore, ProjectTrustStoreEntry, ProjectTrustUpdate};
 mod host_info;
@@ -194,7 +196,11 @@ pub use context::{
 pub use before_agent_start::BeforeAgentStartEvent;
 pub use events::*;
 mod child_session;
-pub use child_session::{AgentSession, CreateAgentSessionOptions, PromptOptions, ResourceOptions, SessionSubscription};
+pub use child_session::{AgentSession, CreateAgentSessionOptions, PromptOptions, ResourceOptions, SessionStartEvent, SessionSubscription};
+mod create_provider;
+pub use create_provider::{create_provider, CreateProviderOptions, FetchModelsFn, ProviderApi, ProviderCancelDeferredFn, ProviderStreams};
+mod agent_session_services;
+pub use agent_session_services::{create_agent_session_from_services, create_agent_session_services, AgentSessionServices, CreateAgentSessionFromServicesOptions, CreateAgentSessionServicesOptions, ResourceLoaderReloadOptions};
 pub use host_subscriptions::HostSubscription;
 #[doc(hidden)]
 pub use extension::report_load_failure;

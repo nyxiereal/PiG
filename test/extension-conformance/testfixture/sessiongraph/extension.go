@@ -306,5 +306,40 @@ func Extension() *sdk.Extension {
 			return string(encoded), err
 		},
 	})
+	e.RegisterTool(sdk.ToolDefinition{
+		Name: "create_provider", Label: "create_provider", Description: "Runs the createProvider script.", Parameters: sdk.Schema{"type": "object"},
+		Execute: func(ctx sdk.Context, args map[string]any) (result any, err error) {
+			report, err := createProviderScript()
+			if err != nil {
+				return nil, err
+			}
+			encoded, err := json.Marshal(report)
+			return string(encoded), err
+		},
+	})
+	e.RegisterTool(sdk.ToolDefinition{
+		Name: "extension_refs", Label: "extension_refs", Description: "Runs the compiled-in extension factories script.", Parameters: sdk.Schema{"type": "object"},
+		Execute: func(ctx sdk.Context, args map[string]any) (result any, err error) {
+			defer func() {
+				if recovered := recover(); recovered != nil {
+					err = fmt.Errorf("%v", recovered)
+				}
+			}()
+			encoded, err := json.Marshal(extensionRefsScript(ctx, args))
+			return string(encoded), err
+		},
+	})
+	e.RegisterTool(sdk.ToolDefinition{
+		Name: "services", Label: "services", Description: "Runs the createAgentSessionServices script.", Parameters: sdk.Schema{"type": "object"},
+		Execute: func(ctx sdk.Context, args map[string]any) (result any, err error) {
+			defer func() {
+				if recovered := recover(); recovered != nil {
+					err = fmt.Errorf("%v", recovered)
+				}
+			}()
+			encoded, err := json.Marshal(servicesScript(ctx, args))
+			return string(encoded), err
+		},
+	})
 	return e
 }

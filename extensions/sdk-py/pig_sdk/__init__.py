@@ -53,7 +53,14 @@ from .branch_summary import (
     collect_entries_for_branch_summary as collect_entries_for_branch_summary,
     prepare_branch_entries as prepare_branch_entries,
 )
-from .child_session import AgentSession as AgentSession, CreateAgentSessionOptions as CreateAgentSessionOptions, ResourceOptions as ResourceOptions, _ChildSessions, create_agent_session as _create_agent_session
+from .child_session import AgentSession as AgentSession, CreateAgentSessionOptions as CreateAgentSessionOptions, ResourceOptions as ResourceOptions, SessionStartEvent as SessionStartEvent, _ChildSessions, create_agent_session as _create_agent_session
+from .agent_session_services import (
+    AgentSessionServices as AgentSessionServices,
+    CreateAgentSessionFromServicesOptions as CreateAgentSessionFromServicesOptions,
+    CreateAgentSessionServicesOptions as CreateAgentSessionServicesOptions,
+    create_agent_session_from_services as create_agent_session_from_services,
+    create_agent_session_services as create_agent_session_services,
+)
 from .image_dimension_note import ResizedImage as ResizedImage, format_dimension_note as format_dimension_note
 from .llm_convert import convert_to_llm as convert_to_llm
 from .serialize_conversation import _ordered_keys, serialize_conversation as serialize_conversation
@@ -107,6 +114,8 @@ from .kit import ViewComponent as ViewComponent
 from .event_bus import EventBus as EventBus, EventBusHandler as EventBusHandler, _EventBusHub
 from .state_feed import StateFeed
 from .user_bash import BashExecOptions as BashExecOptions, BashOperations as BashOperations, _BashOperationsTable, _data_update, _run_user_bash_exec, _user_bash_operations_reply
+from .extension_factories import ExtensionFactory as ExtensionFactory, create_codemode_extension as create_codemode_extension, create_mcp_extension as create_mcp_extension, create_tool_search_extension as create_tool_search_extension
+from .create_provider import ProviderStreams as ProviderStreams, create_provider as create_provider
 from .provider import (
     Provider, ProviderSignal,
     ProviderAuth as ProviderAuth, APIKeyAuth as APIKeyAuth, OAuthAuth as OAuthAuth,

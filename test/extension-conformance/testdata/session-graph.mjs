@@ -1,5 +1,6 @@
 // The Node fixture of the session graph conformance rows (session_graph_test.go). It runs the script of testfixture/sessiongraph (Go), testdata/session-graph-rust and the inline Python fixture with Pi's own SessionManager, so the report it makes is Pi's.
-import { DefaultPackageManager, DefaultResourceLoader, ModelRuntime, ProjectTrustStore, SessionManager, SettingsManager, createAgentSession, hasTrustRequiringProjectResources } from "@earendil-works/pi-coding-agent";
+import { DefaultPackageManager, DefaultResourceLoader, ModelRuntime, ProjectTrustStore, SessionManager, SettingsManager, createAgentSession, createCodemodeExtension, createMcpExtension, createToolSearchExtension, createAgentSessionFromServices, createAgentSessionServices, getAgentDir, hasTrustRequiringProjectResources } from "@earendil-works/pi-coding-agent";
+import { createAssistantMessageEventStream, createProvider } from "@earendil-works/pi-ai";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 
@@ -663,6 +664,195 @@ async function childHandlesScript({ mrAuth, mrModels, mrStore, cwd, dir, agentDi
   return r;
 }
 
+// createAgentSessionServices and createAgentSessionFromServices: Pi's own run is the expectation (services). The Go, Python and Rust scripts call their SDK's functions with the same options and must report the same.
+async function servicesScript({ mrAuth, mrModels, mrStore, cwd, agentDir, servicesAgentDir, servicesProbe }) {
+  const r = {};
+  const rt = await ModelRuntime.create({ authPath: mrAuth, modelsPath: mrModels, modelsStorePath: mrStore });
+  const settings = SettingsManager.inMemory({ compaction: { enabled: false }, retry: { enabled: false }, defaultProvider: "mr-local", defaultModel: "m1", defaultThinkingLevel: "high" });
+  const quiet = { noExtensions: true, noSkills: true, noPromptTemplates: true, noThemes: true, noContextFiles: true };
+  const services = await createAgentSessionServices({
+    cwd: join(cwd, "sub", ".."), agentDir, settingsManager: settings, modelRuntime: rt,
+    resourceLoaderOptions: { ...quiet, additionalExtensionPaths: [servicesProbe], appendSystemPrompt: ["Services appendix"] },
+    extensionFlagValues: new Map([["probe-flag", true], ["missing-flag", "x"], ["probe-text", true], ["other", false]]),
+  });
+  const extensions = services.resourceLoader.getExtensions();
+  r.services = {
+    cwd: services.cwd, agentDir: services.agentDir, sameRuntime: services.modelRuntime === rt, sameSettings: services.settingsManager === settings,
+    diagnostics: services.diagnostics, extensions: extensions.extensions.map((extension) => extension.path), extensionErrors: extensions.errors.length,
+    appendix: services.resourceLoader.getAppendSystemPrompt(),
+    providers: { ids: [...rt.getRegisteredProviderIds()].filter((id) => id.startsWith("svc-")).sort(), models: rt.getModels("svc-prov").map((model) => model.id) },
+  };
+  const own = await createAgentSessionServices({ cwd, agentDir: servicesAgentDir, resourceLoaderOptions: quiet });
+  r.own = {
+    cwd: own.cwd, agentDir: own.agentDir, diagnostics: own.diagnostics, models: own.modelRuntime.getModels("svc-local").map((model) => model.id),
+    defaultModel: orNull(own.settingsManager.getDefaultModel()), project: own.settingsManager.getProjectSettings(), appendix: own.resourceLoader.getAppendSystemPrompt(),
+    registered: [...own.modelRuntime.getRegisteredProviderIds()],
+  };
+  const defaulted = await createAgentSessionServices({ cwd, settingsManager: settings, modelRuntime: rt, resourceLoaderOptions: quiet });
+  r.defaulted = { agentDir: defaulted.agentDir === getAgentDir(), cwd: defaulted.cwd };
+  const memory = SessionManager.inMemory(cwd);
+  const { session, extensionsResult, modelFallbackMessage } = await createAgentSessionFromServices({
+    services, sessionManager: memory, sessionStartEvent: { type: "session_start", reason: "fork", previousSessionFile: "/previous.jsonl" },
+    scopedModels: [{ model: rt.getModel("mr-local", "m1"), thinkingLevel: "off" }],
+  });
+  const events = [];
+  session.subscribe((event) => events.push(event.type + (event.type.startsWith("message_") ? ":" + event.message.role : "")));
+  await session.bindExtensions({});
+  const created = {
+    model: { provider: session.model?.provider, id: session.model?.id }, thinkingLevel: session.thinkingLevel, fallback: orNull(modelFallbackMessage), extensionErrors: extensionsResult.errors.length,
+    appendix: session.systemPrompt.includes("Services appendix"), sessionId: session.sessionId === memory.getSessionId(),
+  };
+  await session.prompt("hello");
+  const textOf = (message) => (typeof message?.content === "string" ? message.content : (message?.content ?? []).filter((block) => block.type === "text").map((block) => block.text).join(""));
+  r.session = {
+    created, events, roles: session.messages.map((message) => message.role), text: textOf(session.messages.at(-1)),
+    started: memory.getEntries().filter((entry) => entry.type === "custom" && entry.customType === "probe_start").map((entry) => entry.data),
+  };
+  session.dispose();
+  return r;
+}
+
+// createProvider (pi-ai models.ts): Pi's own run is the expectation (create_provider). The Go, Python and Rust scripts call their SDK's CreateProvider with the same parts and must report the same. The provider is built and driven
+// in the extension process, as Pi's is.
+async function createProviderScript() {
+  const r = {};
+  const auth = { apiKey: { name: "Key", resolve: async () => ({ auth: { apiKey: "k" } }) } };
+  const M = (id, api, extra = {}) => ({ id, name: id, api, provider: "cp", ...extra });
+  const message = (model, text) => ({
+    role: "assistant", content: [{ type: "text", text }], api: model.api, provider: model.provider, model: model.id,
+    usage: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0, totalTokens: 0, cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0, total: 0 } }, stopReason: "stop", timestamp: 1,
+  });
+  const scripted = (tag) => (model) => {
+    const stream = createAssistantMessageEventStream();
+    stream.push({ type: "done", reason: "stop", message: message(model, `${tag}:${model.id}`) });
+    return stream;
+  };
+  const impl = (tag, extra = {}) => ({ stream: scripted(`${tag}.stream`), streamSimple: scripted(`${tag}.simple`), ...extra });
+  const drain = async (stream) => {
+    const types = [];
+    for await (const event of stream) types.push(event.type);
+    const result = await stream.result();
+    return {
+      types, text: result.content.map((block) => block.text ?? "").join(""), stopReason: result.stopReason, error: result.errorMessage ?? null, api: result.api ?? null, provider: result.provider, model: result.model,
+      usageZero: result.usage.totalTokens === 0, timestampIsNumber: typeof result.timestamp === "number",
+    };
+  };
+  const thrown = (fn) => {
+    try {
+      fn();
+    } catch (error) {
+      return error.message;
+    }
+    return "no error";
+  };
+  const rejected = async (fn) => {
+    try {
+      await fn();
+    } catch (error) {
+      return error.message;
+    }
+    return "no error";
+  };
+  const base = [M("c1", "api-a"), M("c2", "api-b"), M("i1", "img-a", { type: "image" }), M("k1", "cls-a", { type: "classifier" })];
+  const p = createProvider({ id: "cp", auth, models: base, api: { "api-a": impl("a"), "api-b": impl("b") }, baseUrl: "http://x", headers: { h: "1" } });
+  r.meta = {
+    id: p.id, name: p.name, baseUrl: p.baseUrl ?? null, headers: p.headers ?? null, named: createProvider({ id: "cp2", name: "Named", auth, models: [], api: impl("s") }).name,
+    methods: Object.fromEntries(["fetchDeferred", "cancelDeferred", "generateImages", "classify", "refreshModels", "filterModels", "filterAllModels"].map((name) => [name, typeof p[name]])),
+  };
+  r.models = { chat: p.getModels().map((model) => model.id), all: p.getAllModels().map((model) => model.id) };
+  r.dispatch = {
+    a: await drain(p.stream(base[0], {})), b: await drain(p.streamSimple(base[1], {})), missing: await drain(p.stream(M("c9", "api-z"), {})),
+    noApi: await drain(p.streamSimple({ id: "c8", provider: "cp" }, {})),
+    single: await drain(createProvider({ id: "sp", auth, models: [], api: impl("s") }).stream(M("x", "anything"), {})),
+  };
+  r.invalid = {
+    none: thrown(() => createProvider({ id: "e1", auth, models: [] })),
+    empty: thrown(() => createProvider({ id: "e2", auth, models: [], api: {}, images: {}, classifiers: {} })),
+  };
+  const cancelled = [];
+  const deferredApis = {
+    "api-a": impl("a", { fetchDeferred: (model, handle) => scripted(`a.fetch.${handle.id}`)(model), cancelDeferred: async (_model, handle) => { cancelled.push(handle.id); } }),
+    "api-b": impl("b"),
+  };
+  const d = createProvider({ id: "dp", auth, models: [], api: deferredApis });
+  const broken = createProvider({ id: "bp", auth, models: [], api: { "api-a": impl("a", { fetchDeferred: () => { throw new Error("fetch boom"); } }) } });
+  r.deferred = {
+    fetched: await drain(d.fetchDeferred(M("c1", "api-a"), { id: "h1" })), unsupported: await drain(d.fetchDeferred(M("c2", "api-b"), { id: "h2" })),
+    noApi: await drain(d.fetchDeferred(M("c3", "api-z"), { id: "h3" })), thrown: await drain(broken.fetchDeferred(M("c1", "api-a"), { id: "h4" })),
+    cancelOk: await rejected(() => d.cancelDeferred(M("c1", "api-a"), { id: "h1" })), cancelled,
+    cancelUnsupported: await rejected(() => d.cancelDeferred(M("c2", "api-b"), { id: "h2" })), cancelNoApi: await rejected(() => d.cancelDeferred(M("c3", "api-z"), { id: "h3" })),
+  };
+  const pick = (result) => ({
+    api: result.api ?? null, provider: result.provider, model: result.model, stopReason: result.stopReason, error: result.errorMessage ?? null, output: result.output ?? null, answers: result.answers ?? null,
+    timestampIsNumber: typeof result.timestamp === "number",
+  });
+  const o = createProvider({
+    id: "op", auth, models: [],
+    images: { "img-a": { generateImages: async (model) => ({ api: model.api, provider: model.provider, model: model.id, output: [{ type: "image", data: "x" }], stopReason: "stop", timestamp: 1 }) } },
+    classifiers: { "cls-a": { classify: async (model) => ({ api: model.api, provider: model.provider, model: model.id, answers: { q: "a" }, stopReason: "stop", timestamp: 1 }) } },
+  });
+  r.operations = {
+    methods: { stream: typeof o.stream, generateImages: typeof o.generateImages, classify: typeof o.classify },
+    image: pick(await o.generateImages(M("i1", "img-a", { type: "image" }), {})), imageMissing: pick(await o.generateImages(M("i2", "img-z", { type: "image" }), {})),
+    classify: pick(await o.classify(M("k1", "cls-a", { type: "classifier" }), {})), classifyMissing: pick(await o.classify(M("k2", "cls-z", { type: "classifier" }), {})),
+  };
+  const fetchCalls = [];
+  const publications = [];
+  const f = createProvider({
+    id: "fp", auth, models: [M("c1", "api-a", { name: "Base One" }), M("c2", "api-a")], api: impl("f"),
+    fetchModels: async (context) => {
+      fetchCalls.push(context.allowNetwork);
+      return [M("c1", "api-a", { name: "Fetched One" }), M("c3", "api-a"), M("u1", "api-a", { type: "future" }), M("i1", "img-a", { type: "image" })];
+    },
+  });
+  const catalog = () => f.getAllModels().map((model) => `${model.id}:${model.name}:${model.type ?? "chat"}`);
+  const refreshContext = (extra = {}) => ({
+    allowNetwork: true, signal: new AbortController().signal,
+    publish: async (publication) => {
+      publications.push({ persist: publication.persist === undefined ? "omitted" : { models: publication.persist.models.map((model) => model.id), checkedAt: typeof publication.persist.checkedAt }, update: typeof publication.update });
+      publication.update?.();
+      return true;
+    },
+    ...extra,
+  });
+  const stored = { models: [M("c1", "api-a", { name: "Stored One", provider: "fp" }), M("z9", "api-a", { provider: "other" })] };
+  r.refresh = { present: typeof f.refreshModels, absent: typeof p.refreshModels, initial: catalog() };
+  await f.refreshModels(refreshContext({ stored, allowNetwork: false }));
+  r.refresh.restoredOffline = { catalog: catalog(), fetchCalls: [...fetchCalls], publications: publications.splice(0) };
+  const controller = new AbortController();
+  controller.abort();
+  await f.refreshModels(refreshContext({ stored, signal: controller.signal }));
+  r.refresh.aborted = { fetchCalls: [...fetchCalls], publications: publications.splice(0) };
+  await f.refreshModels(refreshContext({ stored, publish: async () => false }));
+  r.refresh.refused = { catalog: catalog(), fetchCalls: [...fetchCalls] };
+  await f.refreshModels(refreshContext());
+  r.refresh.fetched = { catalog: catalog(), fetchCalls: [...fetchCalls], publications: publications.splice(0), chat: f.getModels().map((model) => model.id) };
+  return r;
+}
+
+// createCodemodeExtension, createToolSearchExtension and createMcpExtension: Pi's own factories are the expectation (extension_refs). The Go, Python and Rust scripts pass their SDK's references to a DefaultResourceLoader and must report the same.
+async function extensionRefsScript({ mrAuth, mrModels, mrStore, cwd, agentDir, refsProbe, dir }) {
+  const r = {};
+  const rt = await ModelRuntime.create({ authPath: mrAuth, modelsPath: mrModels, modelsStorePath: mrStore });
+  const settings = SettingsManager.inMemory({ compaction: { enabled: false }, retry: { enabled: false }, defaultProvider: "mr-local", defaultModel: "m1" });
+  const quiet = { cwd, agentDir, settingsManager: settings, noExtensions: true, noSkills: true, noPromptTemplates: true, noThemes: true, noContextFiles: true, additionalExtensionPaths: [refsProbe] };
+  const observe = async (loader, tools) => {
+    await loader.reload();
+    const manager = SessionManager.inMemory(cwd);
+    const { session } = await createAgentSession({ sessionManager: manager, settingsManager: settings, modelRuntime: rt, resourceLoader: loader, tools });
+    await session.bindExtensions({});
+    const seen = manager.getEntries().filter((entry) => entry.type === "custom" && entry.customType === "refs_seen").map((entry) => entry.data);
+    session.dispose();
+    return seen;
+  };
+  const factories = () => [createCodemodeExtension({ mode: "only", inlineBudget: 123, models: false }), createToolSearchExtension(), createMcpExtension({ logPath: join(dir, "mcp.log"), startupWaitMs: 0 })];
+  r.inactive = await observe(new DefaultResourceLoader({ ...quiet, extensionFactories: factories() }), undefined);
+  r.active = await observe(new DefaultResourceLoader({ ...quiet, extensionFactories: factories() }), ["codemode", "tool_search"]);
+  r.defaults = await observe(new DefaultResourceLoader({ ...quiet, extensionFactories: [createCodemodeExtension(), createToolSearchExtension()] }), ["codemode", "tool_search"]);
+  r.none = await observe(new DefaultResourceLoader(quiet), ["codemode", "tool_search"]);
+  return r;
+}
+
 export default function (pi) {
   pi.registerTool({
     name: "session_manager", label: "session_manager", description: "Runs the SessionManager script.", parameters: { type: "object" },
@@ -691,5 +881,17 @@ export default function (pi) {
   pi.registerTool({
     name: "child_handles", label: "child_handles", description: "Runs the createAgentSession handle options script.", parameters: { type: "object" },
     execute: async (_id, params) => ({ content: [{ type: "text", text: JSON.stringify(await childHandlesScript(params)) }] }),
+  });
+  pi.registerTool({
+    name: "services", label: "services", description: "Runs the createAgentSessionServices script.", parameters: { type: "object" },
+    execute: async (_id, params) => ({ content: [{ type: "text", text: JSON.stringify(await servicesScript(params)) }] }),
+  });
+  pi.registerTool({
+    name: "create_provider", label: "create_provider", description: "Runs the createProvider script.", parameters: { type: "object" },
+    execute: async () => ({ content: [{ type: "text", text: JSON.stringify(await createProviderScript()) }] }),
+  });
+  pi.registerTool({
+    name: "extension_refs", label: "extension_refs", description: "Runs the compiled-in extension factories script.", parameters: { type: "object" },
+    execute: async (_id, params) => ({ content: [{ type: "text", text: JSON.stringify(await extensionRefsScript(params)) }] }),
   });
 }

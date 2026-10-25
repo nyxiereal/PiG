@@ -91,7 +91,7 @@ func (r *sessionGraphRig) script(tool string) (map[string]any, string) {
 	args := map[string]any{
 		"mrAuth": filepath.Join(root, "mr", "auth.json"), "mrModels": filepath.Join(root, "mr", "models.json"), "mrStore": filepath.Join(root, "mr", "models-store.json"), "mrServer": modelServer,
 		"cwd": filepath.Join(root, "project"), "dir": filepath.Join(root, "sessions"), "otherDir": filepath.Join(root, "other"), "junk": filepath.Join(root, "junk.jsonl"),
-		"probeExt": filepath.Join(root, "probe", "probe.mjs"),
+		"probeExt": filepath.Join(root, "probe", "probe.mjs"), "servicesProbe": filepath.Join(root, "probe", "services.mjs"), "refsProbe": filepath.Join(root, "probe", "refs.mjs"), "servicesAgentDir": filepath.Join(root, "agent-services"),
 		"agentDir": filepath.Join(root, "agent"), "configDir": configDir, "root": root, "pmCwd": filepath.Join(root, "pm-project"), "pmAgentDir": filepath.Join(root, "pm-agent"), "loaderAgentDir": filepath.Join(root, "agent-loader"), "brokenCwd": filepath.Join(root, "broken"),
 	}
 	files := map[string]string{
@@ -113,6 +113,11 @@ func (r *sessionGraphRig) script(tool string) (map[string]any, string) {
 		filepath.Join(root, "extra-skills", "beta", "SKILL.md"):                  "---\nname: beta\ndescription: The beta skill\n---\nBeta body\n",
 		filepath.Join(root, "extra-prompts", "bye.md"):                           "---\ndescription: Say bye\n---\nBye $1\n",
 		filepath.Join(root, "probe", "probe.mjs"):                                childHandlesProbe,
+		filepath.Join(root, "probe", "services.mjs"):                             servicesProbe,
+		filepath.Join(root, "probe", "refs.mjs"):                                 extensionRefsProbe,
+		filepath.Join(root, "agent-services", "auth.json"):                       `{"svc-local":{"type":"api_key","key":"svc-key"}}`,
+		filepath.Join(root, "agent-services", "models.json"):                     `{"providers":{"svc-local":{"baseUrl":"` + modelServer + `","api":"openai-completions","apiKey":"svc-key","models":[{"id":"s1","name":"S One","reasoning":false,"input":["text"],"cost":{"input":0,"output":0,"cacheRead":0,"cacheWrite":0},"contextWindow":4000,"maxTokens":500}]}}}`,
+		filepath.Join(root, "agent-services", "settings.json"):                   `{"defaultProvider":"svc-local","defaultModel":"s1"}`,
 		filepath.Join(root, "pm-project", ".keep"):                               "",
 		filepath.Join(root, "pm-agent", ".keep"):                                 "",
 		filepath.Join(root, "pkgs", "localpkg", "package.json"):                  `{"name":"localpkg","version":"1.0.0","pi":{"skills":["./skills"]}}`,
@@ -505,3 +510,98 @@ func TestSessionGraphChildHandlesAcrossSDKs(t *testing.T) {
 //
 //go:embed testdata/session-graph-child-handles.json
 var sessionGraphChildHandlesWant string
+
+// servicesProbe is the extension the services script loads (additionalExtensionPaths of the services' resource loader): it registers two flags and a provider while it loads, which createAgentSessionServices applies to the model runtime, and records in the session log what its session_start event and the flags carried (ctx.sessionManager.appendCustomEntry writes the log and emits no entry_appended event; pi.appendEntry also emits it, which a child session does not forward yet).
+const servicesProbe = `export default function (pi) {
+  pi.registerFlag("probe-flag", { type: "boolean", description: "probe" });
+  pi.registerFlag("probe-text", { type: "string", description: "probe text" });
+  pi.registerProvider("svc-prov", {
+    baseUrl: "http://127.0.0.1:1/v1", apiKey: "k", api: "openai-completions",
+    models: [{ id: "p1", name: "P One", reasoning: false, input: ["text"], cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 }, contextWindow: 4000, maxTokens: 500 }],
+  });
+  pi.on("session_start", async (event, ctx) => {
+    ctx.sessionManager.appendCustomEntry("probe_start", { reason: event.reason, previous: event.previousSessionFile ?? null, flag: pi.getFlag("probe-flag") ?? null, text: pi.getFlag("probe-text") ?? null });
+  });
+}
+`
+
+// createAgentSessionServices and createAgentSessionFromServices (agent-session-services.ts) for every SDK, against the report of Pi's own functions (the Node row): the resolved paths, the registrations and flag values of the extension the services' loader loaded (applied to the model runtime and reported as diagnostics), the services built over the agent directory's own files, and a session whose extensions see the sessionStartEvent.
+func TestSessionGraphAgentSessionServicesAcrossSDKs(t *testing.T) {
+	// Not parallel: the agent directory is the process environment's, which the host resolves a missing agentDir to and every SDK reads back as its host info.
+	agentDir := t.TempDir()
+	t.Setenv("PIG_CODING_AGENT_DIR", agentDir)
+	t.Setenv("PIG_USE_PI_DIRS", "")
+	newRig := func(t *testing.T) *sessionGraphRig {
+		r := newSessionGraphRigWithChildren(t)
+		r.host.SetHostInfo(subprocess.HostInfo{AgentDir: agentDir, ConfigDirName: ".pig", Version: coding.UpstreamPackageVersion})
+		return r
+	}
+	eachSessionGraphSDKWith(t, newRig, func(t *testing.T, r *sessionGraphRig, _ string) {
+		report, root := r.script("services")
+		got := normalizeSessionGraph(t, report, root)
+		if path := os.Getenv("SESSION_GRAPH_PRINT"); path != "" {
+			encoded, _ := json.MarshalIndent(got, "", "\t")
+			_ = os.WriteFile(path, encoded, 0o600)
+		}
+		requireSessionGraphReport(t, got, sessionGraphServicesWant)
+	})
+}
+
+// sessionGraphServicesWant is the report of Pi's own createAgentSessionServices and createAgentSessionFromServices (the Node row).
+//
+//go:embed testdata/session-graph-services.json
+var sessionGraphServicesWant string
+
+// pi-ai's createProvider (models.ts:1077) for every SDK, against the report of Pi's own createProvider run (the Node row): the provider's metadata and model lists, dispatch on model.api (and the stream error of a model whose api has no
+// implementation), the two forms of `api`, the required-implementation error, deferred fetch and cancel, image and classifier operations, and the model refresh (stored restore, offline, aborted, refused and fetched publications).
+func TestSessionGraphCreateProviderAcrossSDKs(t *testing.T) {
+	t.Parallel()
+	eachSessionGraphSDK(t, func(t *testing.T, r *sessionGraphRig, _ string) {
+		report, root := r.script("create_provider")
+		got := normalizeSessionGraph(t, report, root)
+		if path := os.Getenv("SESSION_GRAPH_PRINT"); path != "" {
+			encoded, _ := json.MarshalIndent(got, "", "\t")
+			_ = os.WriteFile(path, encoded, 0o600)
+		}
+		requireSessionGraphReport(t, got, sessionGraphCreateProviderWant)
+	})
+}
+
+// sessionGraphCreateProviderWant is the report of Pi's own createProvider (the Node row).
+//
+//go:embed testdata/session-graph-create-provider.json
+var sessionGraphCreateProviderWant string
+
+// extensionRefsProbe is the extension the extension_refs script loads next to the compiled-in extensions: when a session starts it records, in the session log, which of the codemode, tool_search and MCP tools and commands the session has, whether they are active, whether
+// the codemode description declares the `models` namespace, and the parameter schemas.
+const extensionRefsProbe = `export default function (pi) {
+  pi.on("session_start", async (_event, ctx) => {
+    const active = pi.getActiveTools();
+    const tools = pi.getAllTools().filter((tool) => ["codemode", "tool_search"].includes(tool.name));
+    ctx.sessionManager.appendCustomEntry("refs_seen", {
+      tools: tools.map((tool) => ({ name: tool.name, active: active.includes(tool.name), models: tool.description.includes(String.fromCharCode(96) + "models" + String.fromCharCode(96) + ":"), parameters: tool.parameters, guidelines: tool.promptGuidelines ?? null })),
+      commands: pi.getCommands().map((command) => command.name).filter((name) => name === "mcp"),
+    });
+  });
+}
+`
+
+// createCodemodeExtension, createToolSearchExtension and createMcpExtension (extensions/*/index.ts) for every SDK, against the report of Pi's own factories (the Node row): a loader given the compiled-in extensions through extensionFactories lets a session
+// that allows the tools list them (inactive by default, active when the tools option names them), with the codemode `models` option honored and the `/mcp` command registered, and a loader without them has none.
+func TestSessionGraphExtensionFactoriesAcrossSDKs(t *testing.T) {
+	t.Parallel()
+	eachSessionGraphSDKWith(t, newSessionGraphRigWithChildren, func(t *testing.T, r *sessionGraphRig, _ string) {
+		report, root := r.script("extension_refs")
+		got := normalizeSessionGraph(t, report, root)
+		if path := os.Getenv("SESSION_GRAPH_PRINT"); path != "" {
+			encoded, _ := json.MarshalIndent(got, "", "\t")
+			_ = os.WriteFile(path, encoded, 0o600)
+		}
+		requireSessionGraphReport(t, got, sessionGraphExtensionFactoriesWant)
+	})
+}
+
+// sessionGraphExtensionFactoriesWant is the report of Pi's own extension factories (the Node row).
+//
+//go:embed testdata/session-graph-extension-factories.json
+var sessionGraphExtensionFactoriesWant string

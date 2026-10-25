@@ -10,8 +10,7 @@ use std::sync::Arc;
 /// An override function of the options: it takes Pi's JSON argument and answers Pi's JSON result.
 pub type LoaderOverride = Arc<dyn Fn(Value) -> Value + Send + Sync>;
 
-/// A factory of an inline extension. Not supported yet: see [`DefaultResourceLoaderOptions::extension_factories`].
-pub type InlineExtensionFactory = Box<dyn Fn(&mut crate::Extension) + Send + Sync>;
+pub use crate::extension_factories::{ExtensionFactory, InlineExtensionFactory};
 
 /// Pi's `DefaultResourceLoaderOptions`. `None`, an empty list and `false` are Pi's undefined.
 ///
@@ -25,7 +24,7 @@ pub struct DefaultResourceLoaderOptions<'a> {
     pub additional_skill_paths: Vec<String>,
     pub additional_prompt_template_paths: Vec<String>,
     pub additional_theme_paths: Vec<String>,
-    pub extension_factories: Vec<InlineExtensionFactory>,
+    pub extension_factories: Vec<ExtensionFactory>,
     pub no_extensions: bool,
     pub disabled_builtin_extensions: Vec<String>,
     pub no_skills: bool,
@@ -59,7 +58,7 @@ pub struct DefaultResourceLoader {
 impl DefaultResourceLoader {
     /// `new DefaultResourceLoader(options)`.
     pub fn new(context: &Context, options: DefaultResourceLoaderOptions) -> io::Result<DefaultResourceLoader> {
-        if !options.extension_factories.is_empty() {
+        if options.extension_factories.iter().any(|factory| matches!(factory, ExtensionFactory::Inline(_))) {
             return Err(io::Error::other("DefaultResourceLoader option extensionFactories is not supported by the Rust SDK: an inline factory runs in this process but the child session's extensions load in the host (decision pending, gap SdkSessionGraph); use additional_extension_paths, or create_agent_session custom tools"));
         }
         if options.extensions_override.is_some() {
@@ -77,6 +76,17 @@ impl DefaultResourceLoader {
             "systemPromptOverride": callback(context, &options.system_prompt_override),
             "appendSystemPromptOverride": callback(context, &options.append_system_prompt_override),
         });
+        let references: Vec<Value> = options
+            .extension_factories
+            .iter()
+            .filter_map(|factory| match factory {
+                ExtensionFactory::Builtin { name, options } => Some(json!({"builtin": name, "options": options})),
+                ExtensionFactory::Inline(_) => None,
+            })
+            .collect();
+        if !references.is_empty() {
+            wire["extensionFactories"] = Value::Array(references);
+        }
         if let Some(settings) = options.settings_manager {
             wire["settingsManager"] = json!(settings.handle());
         }

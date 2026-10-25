@@ -879,12 +879,12 @@ closing = "Pure helpers ported per SDK with vector tests from Pi at the pin (tes
 "pi-coding-agent: convertToPng" = { go = "native:ConvertToPng", rust = "native:convert_to_png", python = "native:convert_to_png" }
 "pi-coding-agent: copyToClipboard" = { go = "native:CopyToClipboard", rust = "native:copy_to_clipboard", python = "native:copy_to_clipboard" }
 "pi-coding-agent: createAgentSession" = { go = "host:Context.CreateAgentSession", rust = "host:Context::create_agent_session", python = "host:Context.create_agent_session" }
-"pi-coding-agent: createAgentSessionFromServices" = { go = "gap:SdkSessionGraph", rust = "gap:SdkSessionGraph", python = "gap:SdkSessionGraph" }
+"pi-coding-agent: createAgentSessionFromServices" = { go = "native:CreateAgentSessionFromServices", rust = "native:create_agent_session_from_services", python = "native:create_agent_session_from_services" }
 "pi-coding-agent: createAgentSessionRuntime" = { go = "gap:SdkSessionGraph", rust = "gap:SdkSessionGraph", python = "gap:SdkSessionGraph" }
-"pi-coding-agent: createAgentSessionServices" = { go = "gap:SdkSessionGraph", rust = "gap:SdkSessionGraph", python = "gap:SdkSessionGraph" }
+"pi-coding-agent: createAgentSessionServices" = { go = "native:CreateAgentSessionServices", rust = "native:create_agent_session_services", python = "native:create_agent_session_services" }
 "pi-coding-agent: createBashTool" = { go = "native:CreateBashTool", rust = "native:create_bash_tool", python = "native:create_bash_tool" }
 "pi-coding-agent: createBashToolDefinition" = { go = "native:CreateBashToolDefinition", rust = "native:create_bash_tool_definition", python = "native:create_bash_tool_definition" }
-"pi-coding-agent: createCodemodeExtension" = { go = "gap:C2Sessions", rust = "gap:C2Sessions", python = "gap:C2Sessions" }
+"pi-coding-agent: createCodemodeExtension" = { go = "native:CreateCodemodeExtension", rust = "native:create_codemode_extension", python = "native:create_codemode_extension" }
 "pi-coding-agent: createCodingTools" = { go = "native:CreateCodingTools", rust = "native:create_coding_tools", python = "native:create_coding_tools" }
 "pi-coding-agent: createEditTool" = { go = "native:CreateEditTool", rust = "native:create_edit_tool", python = "native:create_edit_tool" }
 "pi-coding-agent: createEditToolDefinition" = { go = "native:CreateEditToolDefinition", rust = "native:create_edit_tool_definition", python = "native:create_edit_tool_definition" }
@@ -905,7 +905,7 @@ closing = "Pure helpers ported per SDK with vector tests from Pi at the pin (tes
 "pi-coding-agent: createReadTool" = { go = "native:CreateReadTool", rust = "native:create_read_tool", python = "native:create_read_tool" }
 "pi-coding-agent: createReadToolDefinition" = { go = "native:CreateReadToolDefinition", rust = "native:create_read_tool_definition", python = "native:create_read_tool_definition" }
 "pi-coding-agent: createSyntheticSourceInfo" = { go = "gap:SdkSessionGraph", rust = "gap:SdkSessionGraph", python = "gap:SdkSessionGraph" }
-"pi-coding-agent: createToolSearchExtension" = { go = "gap:C2Sessions", rust = "gap:C2Sessions", python = "gap:C2Sessions" }
+"pi-coding-agent: createToolSearchExtension" = { go = "native:CreateToolSearchExtension", rust = "native:create_tool_search_extension", python = "native:create_tool_search_extension" }
 "pi-coding-agent: createWriteTool" = { go = "native:CreateWriteTool", rust = "native:create_write_tool", python = "native:create_write_tool" }
 "pi-coding-agent: createWriteToolDefinition" = { go = "native:CreateWriteToolDefinition", rust = "native:create_write_tool_definition", python = "native:create_write_tool_definition" }
 "pi-coding-agent: defineTool" = { go = "identity", rust = "identity", python = "identity" }
@@ -1386,7 +1386,7 @@ closing = "Pure helpers ported per SDK with vector tests from Pi at the pin (tes
 "pi-ai: createFauxCore" = { go = "gap:SdkExportsLedger", rust = "gap:SdkExportsLedger", python = "gap:SdkExportsLedger" }
 "pi-ai: createInitialSystemMessage" = { go = "native:CreateInitialSystemMessage", rust = "native:create_initial_system_message", python = "native:create_initial_system_message" }
 "pi-ai: createModels" = { go = "gap:SdkSessionGraph", rust = "gap:SdkSessionGraph", python = "gap:SdkSessionGraph" }
-"pi-ai: createProvider" = { go = "gap:SdkSessionGraph", rust = "gap:SdkSessionGraph", python = "gap:SdkSessionGraph" }
+"pi-ai: createProvider" = { go = "native:CreateProvider", rust = "native:create_provider", python = "native:create_provider" }
 "pi-ai: declarationsEqual" = { go = "gap:SdkExportsLedger", rust = "gap:SdkExportsLedger", python = "gap:SdkExportsLedger" }
 "pi-ai: defaultProviderAuthContext" = { go = "gap:SdkSessionGraph", rust = "gap:SdkSessionGraph", python = "gap:SdkSessionGraph" }
 "pi-ai: envApiKeyAuth" = { go = "native:EnvAPIKeyAuth", rust = "native:env_api_key_auth", python = "native:env_api_key_auth" }
@@ -1496,7 +1496,7 @@ closing = "Pure helpers ported per SDK with vector tests from Pi at the pin (tes
 "pi-ai/compat: createFauxCore" = { go = "gap:SdkExportsLedger", rust = "gap:SdkExportsLedger", python = "gap:SdkExportsLedger" }
 "pi-ai/compat: createInitialSystemMessage" = { go = "native:CreateInitialSystemMessage", rust = "native:create_initial_system_message", python = "native:create_initial_system_message" }
 "pi-ai/compat: createModels" = { go = "gap:SdkSessionGraph", rust = "gap:SdkSessionGraph", python = "gap:SdkSessionGraph" }
-"pi-ai/compat: createProvider" = { go = "gap:SdkSessionGraph", rust = "gap:SdkSessionGraph", python = "gap:SdkSessionGraph" }
+"pi-ai/compat: createProvider" = { go = "native:CreateProvider", rust = "native:create_provider", python = "native:create_provider" }
 "pi-ai/compat: declarationsEqual" = { go = "gap:SdkExportsLedger", rust = "gap:SdkExportsLedger", python = "gap:SdkExportsLedger" }
 "pi-ai/compat: defaultProviderAuthContext" = { go = "gap:SdkSessionGraph", rust = "gap:SdkSessionGraph", python = "gap:SdkSessionGraph" }
 "pi-ai/compat: envApiKeyAuth" = { go = "native:EnvAPIKeyAuth", rust = "native:env_api_key_auth", python = "native:env_api_key_auth" }

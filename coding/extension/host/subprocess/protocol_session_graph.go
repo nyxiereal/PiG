@@ -28,6 +28,17 @@ const (
 	SessionGraphResourceLoader    = "DefaultResourceLoader"
 	SessionGraphPackageManager    = "DefaultPackageManager"
 	SessionGraphProjectTrustStore = "ProjectTrustStore"
+	// SessionGraphAgentSessionServices names the two host steps of Pi's createAgentSessionServices (agent-session-services.ts): it builds no object, it only has static functions (SessionGraphServicesResolve, SessionGraphServicesApply).
+	SessionGraphAgentSessionServices = "AgentSessionServices"
+)
+
+// Static functions of SessionGraphAgentSessionServices. The extension builds the services' objects itself, as Pi's function does (ModelRuntime.create, SettingsManager.create, new DefaultResourceLoader, reload), and asks the host for the two steps that need the host's own state.
+const (
+	// SessionGraphServicesResolve answers `resolvePath(options.cwd)` and `options.agentDir ? resolvePath(options.agentDir) : getAgentDir()` (agent-session-services.ts:138-139). Args are [cwd, agentDir|null]; the result is {cwd, agentDir}.
+	SessionGraphServicesResolve = "resolve"
+	// SessionGraphServicesApply is the rest of createAgentSessionServices after resourceLoader.reload (agent-session-services.ts:157-193): the provider, native provider and virtual model registrations the loaded extensions queued apply to the model runtime, a local refresh follows, and the
+	// command-line extension flag values are validated and stored. Args are [modelRuntimeHandle, settingsManagerHandle, resourceLoaderHandle, cwd, agentDir, flagValues] with flagValues a list of [name, true|string] pairs in command-line order; the result is the list of diagnostics ({type, message}).
+	SessionGraphServicesApply = "apply"
 )
 
 // SessionGraphNew is the CallSessionGraphNew argument. Op is the Pi constructor or static factory (`SessionManager.inMemory` is kind "SessionManager", op "inMemory"; a class constructed with `new` is op "new") and Args its positional arguments.

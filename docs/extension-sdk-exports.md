@@ -10,40 +10,35 @@ Use counts (`uses`) are the number of the 255 scanned npm packages that import t
 
 | Module | Rows | type-only (identity by kind) | Node served | Go gaps | Rust gaps | Python gaps |
 |---|---|---|---|---|---|---|
-| `pi-coding-agent` | 920 | 305 | 910 | 391 | 391 | 391 |
+| `pi-coding-agent` | 920 | 305 | 910 | 388 | 388 | 388 |
 | `pi-tui` | 365 | 85 | 364 | 147 | 147 | 147 |
-| `pi-ai` | 97 | 197 | 97 | 67 | 67 | 67 |
-| `pi-ai/compat` | 156 | 204 | 156 | 123 | 123 | 123 |
+| `pi-ai` | 97 | 197 | 97 | 66 | 66 | 66 |
+| `pi-ai/compat` | 156 | 204 | 156 | 122 | 122 | 122 |
 | `pi-agent-core` | 45 | 34 | 45 | 45 | 45 | 45 |
 
 ## Lanes that own gaps
 
 | Lane | Owner | Opened | Gap cells | Closing row |
 |---|---|---|---|---|
-| C2Sessions | C2Sessions lane (createAgentSession family, E1/E6) | 0.5.2 | 405 | Conformance rows for createAgentSession, createAgentSessionRuntime and the pi-agent-core Agent loop in all four SDKs (branch feat/sdk-child-agent-sessions) |
+| C2Sessions | C2Sessions lane (createAgentSession family, E1/E6) | 0.5.2 | 399 | Conformance rows for createAgentSession, createAgentSessionRuntime and the pi-agent-core Agent loop in all four SDKs (branch feat/sdk-child-agent-sessions) |
 | SdkExportsLedger | SdkExportsLedger lane (Pi application internals no extension scan imports) | 0.5.2 | 1158 | Owner decision per export, listed with usage counts in handoffs/0.5.2/sdk-exports-internals.md: a numbered divergence in docs/parity/DIVERGENCES.md (cells become divergence:D<n>), or a real lane with a port and a conformance row |
 | SdkPiAiHelpers | SdkPiAiHelpers lane (pi-ai pure helpers, StringEnum, host getters, E17-E22) | 0.5.2 | 150 | Pure helpers with vector tests from Pi at the pin; host getters and the pi-ai compat calls with a conformance row per SDK |
-| SdkSessionGraph | SdkSessionGraph lane (SessionManager/SettingsManager/ModelRuntime/resource loader, E2-E5) | 0.5.2 | 357 | Host calls for session open/list/inMemory, scoped settings, standalone model runtime, resource loader and package manager, with a conformance row per SDK |
+| SdkSessionGraph | SdkSessionGraph lane (SessionManager/SettingsManager/ModelRuntime/resource loader, E2-E5) | 0.5.2 | 348 | Host calls for session open/list/inMemory, scoped settings, standalone model runtime, resource loader and package manager, with a conformance row per SDK |
 | SdkTuiHelpers | SdkTuiHelpers lane (pi-tui helpers, keys, keybindings, theme and rendering helpers, E8-E16) | 0.5.2 | 249 | Pure helpers ported per SDK with vector tests from Pi at the pin (test/parity/sdk-vectors), keybinding and theme helpers with a conformance row per SDK |
 
 ## High-use gaps (block the release gate)
 
-14 exports imported by 5 or more scanned packages have a gap.
+9 exports imported by 5 or more scanned packages have a gap.
 
 | Export | uses | Gaps |
 |---|---|---|
+| `pi-coding-agent: buildSessionContext` | 19 | Go SdkSessionGraph; Rust SdkSessionGraph; Python SdkSessionGraph |
 | `pi-ai: Type` | 14 | Go SdkPiAiHelpers; Rust SdkPiAiHelpers; Python SdkPiAiHelpers |
 | `pi-ai/compat: Type` | 14 | Go SdkPiAiHelpers; Rust SdkPiAiHelpers; Python SdkPiAiHelpers |
-| `pi-coding-agent: createAgentSessionServices` | 9 | Go SdkSessionGraph; Rust SdkSessionGraph; Python SdkSessionGraph |
-| `pi-coding-agent: createAgentSessionFromServices` | 8 | Go SdkSessionGraph; Rust SdkSessionGraph; Python SdkSessionGraph |
-| `pi-coding-agent: createCodemodeExtension` | 8 | Go C2Sessions; Rust C2Sessions; Python C2Sessions |
-| `pi-coding-agent: createToolSearchExtension` | 7 | Go C2Sessions; Rust C2Sessions; Python C2Sessions |
 | `pi-coding-agent: createAgentSessionRuntime` | 6 | Go SdkSessionGraph; Rust SdkSessionGraph; Python SdkSessionGraph |
 | `pi-coding-agent: createExtensionRuntime` | 6 | Go SdkSessionGraph; Rust SdkSessionGraph; Python SdkSessionGraph |
 | `pi-coding-agent: createMcpExtension` | 6 | Go C2Sessions; Rust C2Sessions; Python C2Sessions |
 | `pi-tui: TuiAltScreen` | 6 | Go SdkTuiHelpers; Rust SdkTuiHelpers; Python SdkTuiHelpers |
-| `pi-ai: createProvider` | 6 | Go SdkSessionGraph; Rust SdkSessionGraph; Python SdkSessionGraph |
-| `pi-ai/compat: createProvider` | 6 | Go SdkSessionGraph; Rust SdkSessionGraph; Python SdkSessionGraph |
 | `pi-coding-agent: ExtensionRunner` | 5 | Go SdkSessionGraph; Rust SdkSessionGraph; Python SdkSessionGraph |
 | `pi-coding-agent: ModelRegistry` | 5 | Go SdkSessionGraph; Rust SdkSessionGraph; Python SdkSessionGraph |
 
@@ -866,7 +861,7 @@ None.
 | `VERSION` | 13 | served | native:Version | native:get_version | native:get_version |
 | `VIRTUAL_MODEL_STATE_ENTRY` | 0 | served | native:VirtualModelStateEntry | native:VIRTUAL_MODEL_STATE_ENTRY | native:VIRTUAL_MODEL_STATE_ENTRY |
 | `buildContextEntries` | 1 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
-| `buildSessionContext` | 19 | served | native:BuildSessionContext | native:build_session_context | native:build_session_context |
+| `buildSessionContext` | 19 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
 | `buildSessionProjection` | 2 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
 | `calculateContextTokens` | 2 | served | native:CalculateContextTokens | native:calculate_context_tokens | native:calculate_context_tokens |
 | `collectEntriesForBranchSummary` | 0 | served | native:CollectEntriesForBranchSummary | native:collect_entries_for_branch_summary | native:collect_entries_for_branch_summary |
@@ -875,12 +870,12 @@ None.
 | `convertToPng` | 2 | served | native:ConvertToPng | native:convert_to_png | native:convert_to_png |
 | `copyToClipboard` | 8 | served | native:CopyToClipboard | native:copy_to_clipboard | native:copy_to_clipboard |
 | `createAgentSession` | 20 | served | host:Context.CreateAgentSession | host:Context::create_agent_session | host:Context.create_agent_session |
-| `createAgentSessionFromServices` | 8 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
+| `createAgentSessionFromServices` | 8 | served | native:CreateAgentSessionFromServices | native:create_agent_session_from_services | native:create_agent_session_from_services |
 | `createAgentSessionRuntime` | 6 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
-| `createAgentSessionServices` | 9 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
+| `createAgentSessionServices` | 9 | served | native:CreateAgentSessionServices | native:create_agent_session_services | native:create_agent_session_services |
 | `createBashTool` | 2 | served | native:CreateBashTool | native:create_bash_tool | native:create_bash_tool |
 | `createBashToolDefinition` | 12 | served | native:CreateBashToolDefinition | native:create_bash_tool_definition | native:create_bash_tool_definition |
-| `createCodemodeExtension` | 8 | served | gap:C2Sessions | gap:C2Sessions | gap:C2Sessions |
+| `createCodemodeExtension` | 8 | served | native:CreateCodemodeExtension | native:create_codemode_extension | native:create_codemode_extension |
 | `createCodingTools` | 3 | served | native:CreateCodingTools | native:create_coding_tools | native:create_coding_tools |
 | `createEditTool` | 3 | served | native:CreateEditTool | native:create_edit_tool | native:create_edit_tool |
 | `createEditToolDefinition` | 12 | served | native:CreateEditToolDefinition | native:create_edit_tool_definition | native:create_edit_tool_definition |
@@ -901,7 +896,7 @@ None.
 | `createReadTool` | 3 | served | native:CreateReadTool | native:create_read_tool | native:create_read_tool |
 | `createReadToolDefinition` | 12 | served | native:CreateReadToolDefinition | native:create_read_tool_definition | native:create_read_tool_definition |
 | `createSyntheticSourceInfo` | 2 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
-| `createToolSearchExtension` | 7 | served | gap:C2Sessions | gap:C2Sessions | gap:C2Sessions |
+| `createToolSearchExtension` | 7 | served | native:CreateToolSearchExtension | native:create_tool_search_extension | native:create_tool_search_extension |
 | `createWriteTool` | 4 | served | native:CreateWriteTool | native:create_write_tool | native:create_write_tool |
 | `createWriteToolDefinition` | 13 | served | native:CreateWriteToolDefinition | native:create_write_tool_definition | native:create_write_tool_definition |
 | `defineTool` | 23 | served | identity | identity | identity |
@@ -1392,7 +1387,7 @@ None.
 | `createFauxCore` | 0 | served | gap:SdkExportsLedger | gap:SdkExportsLedger | gap:SdkExportsLedger |
 | `createInitialSystemMessage` | 0 | served | native:CreateInitialSystemMessage | native:create_initial_system_message | native:create_initial_system_message |
 | `createModels` | 4 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
-| `createProvider` | 6 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
+| `createProvider` | 6 | served | native:CreateProvider | native:create_provider | native:create_provider |
 | `declarationsEqual` | 2 | served | gap:SdkExportsLedger | gap:SdkExportsLedger | gap:SdkExportsLedger |
 | `defaultProviderAuthContext` | 0 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
 | `envApiKeyAuth` | 4 | served | native:EnvAPIKeyAuth | native:env_api_key_auth | native:env_api_key_auth |
@@ -1507,7 +1502,7 @@ None.
 | `createFauxCore` | 0 | served | gap:SdkExportsLedger | gap:SdkExportsLedger | gap:SdkExportsLedger |
 | `createInitialSystemMessage` | 0 | served | native:CreateInitialSystemMessage | native:create_initial_system_message | native:create_initial_system_message |
 | `createModels` | 4 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
-| `createProvider` | 6 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
+| `createProvider` | 6 | served | native:CreateProvider | native:create_provider | native:create_provider |
 | `declarationsEqual` | 2 | served | gap:SdkExportsLedger | gap:SdkExportsLedger | gap:SdkExportsLedger |
 | `defaultProviderAuthContext` | 0 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
 | `envApiKeyAuth` | 4 | served | native:EnvAPIKeyAuth | native:env_api_key_auth | native:env_api_key_auth |

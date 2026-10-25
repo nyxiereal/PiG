@@ -134,7 +134,7 @@ type ResourceLoaderReloadOptions struct {
 
 // DefaultResourceLoaderOptions is Pi's DefaultResourceLoaderOptions. A nil pointer, nil slice or nil function is Pi's undefined.
 //
-// ExtensionFactories and ExtensionsOverride exist so code that sets them fails loudly instead of losing behavior: an inline factory runs in the extension process but the child session's extensions load in the host, and an override returns live extension objects. They are not supported yet (an owner decision is pending, gap "SdkSessionGraph" in test/parity/sdk-exports.toml); NewDefaultResourceLoader returns an error when either is set. AdditionalExtensionPaths loads extension sources, and CreateAgentSession's custom tools serve tools from the parent extension.
+// ExtensionFactories takes the [ExtensionFactory] references [CreateCodemodeExtension], [CreateToolSearchExtension] and [CreateMcpExtension] return; a function of this process is an error, because the child session's extensions load in the host. ExtensionsOverride exists so code that sets them fails loudly instead of losing behavior: an inline factory runs in the extension process but the child session's extensions load in the host, and an override returns live extension objects. They are not supported yet (an owner decision is pending, gap "SdkSessionGraph" in test/parity/sdk-exports.toml); NewDefaultResourceLoader returns an error when either is set. AdditionalExtensionPaths loads extension sources, and CreateAgentSession's custom tools serve tools from the parent extension.
 type DefaultResourceLoaderOptions struct {
 	Cwd                           string
 	AgentDir                      string
@@ -182,8 +182,9 @@ func graphFunc[In, Out any](override func(In) Out) graphCallback {
 
 // NewDefaultResourceLoader is `new DefaultResourceLoader(options)`.
 func NewDefaultResourceLoader(c Context, options DefaultResourceLoaderOptions) (*DefaultResourceLoader, error) {
-	if len(options.ExtensionFactories) > 0 {
-		return nil, errors.New("DefaultResourceLoader option extensionFactories is not supported by the Go SDK: an inline factory runs in this process but the child session's extensions load in the host (decision pending, gap SdkSessionGraph); use AdditionalExtensionPaths, or CreateAgentSession CustomTools")
+	factories, err := extensionFactoriesWire(options.ExtensionFactories)
+	if err != nil {
+		return nil, err
 	}
 	if options.ExtensionsOverride != nil {
 		return nil, errors.New("DefaultResourceLoader option extensionsOverride is not supported by the Go SDK: it returns live extension objects, which live in the host (decision pending, gap SdkSessionGraph)")
@@ -200,6 +201,9 @@ func NewDefaultResourceLoader(c Context, options DefaultResourceLoaderOptions) (
 		"agentsFilesOverride":        c.callbackID(graphFunc(options.AgentsFilesOverride)),
 		"systemPromptOverride":       c.callbackID(graphFunc(options.SystemPromptOverride)),
 		"appendSystemPromptOverride": c.callbackID(graphFunc(options.AppendSystemPromptOverride)),
+	}
+	if len(factories) > 0 {
+		wire["extensionFactories"] = factories
 	}
 	if options.SettingsManager != nil {
 		wire["settingsManager"] = options.SettingsManager.Handle()
@@ -279,3 +283,6 @@ func (l *DefaultResourceLoader) Reload(options *ResourceLoaderReloadOptions) err
 	_, err := graphMethodAsync[graphDone](l.object, "reload", wire)
 	return err
 }
+
+// errExtensionFactoryNotServed is the error of an inline factory: it would run in this process but the child session's extensions load in the host. Use an [ExtensionFactory] reference, AdditionalExtensionPaths, or CreateAgentSession CustomTools.
+var errExtensionFactoryNotServed = errors.New("DefaultResourceLoader option extensionFactories takes only the references CreateCodemodeExtension, CreateToolSearchExtension and CreateMcpExtension return: an inline factory runs in this process but the child session's extensions load in the host (decision pending, gap SdkSessionGraph); use AdditionalExtensionPaths, or CreateAgentSession CustomTools")

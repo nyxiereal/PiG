@@ -4,11 +4,9 @@ from __future__ import annotations
 from typing import Any, Callable
 
 from ._graph import _GraphObject, _callback_id
+from .extension_factories import ExtensionFactory
 
-_UNSUPPORTED = (
-    ("extension_factories", "an inline factory runs in this process but the child session's extensions load in the host"),
-    ("extensions_override", "it returns live extension objects, which live in the host"),
-)
+_UNSUPPORTED = (("extensions_override", "it returns live extension objects, which live in the host"),)
 
 
 class DefaultResourceLoader(_GraphObject):
@@ -41,10 +39,16 @@ class DefaultResourceLoader(_GraphObject):
         append_system_prompt_override: Callable[[list[str]], list[str]] | None = None,
     ) -> None:
         """``new DefaultResourceLoader(options)``; every option is Pi's under its snake_case name and ``None`` is Pi's undefined. ``extension_factories`` and ``extensions_override`` raise: they are not supported yet (an owner decision is pending, gap ``SdkSessionGraph`` in test/parity/sdk-exports.toml); use ``additional_extension_paths``, or ``create_agent_session`` custom tools."""
-        given = {"extension_factories": extension_factories, "extensions_override": extensions_override}
+        given = {"extensions_override": extensions_override}
         for name, why in _UNSUPPORTED:
             if given[name]:
                 raise RuntimeError(f"DefaultResourceLoader option {name} is not supported by the Python SDK: {why} (decision pending, gap SdkSessionGraph)")
+        for factory in extension_factories or []:
+            if not isinstance(factory, ExtensionFactory):
+                raise RuntimeError(
+                    "DefaultResourceLoader option extension_factories takes only the references create_codemode_extension, create_tool_search_extension and create_mcp_extension return: an inline factory runs in this process "
+                    "but the child session's extensions load in the host (decision pending, gap SdkSessionGraph); use additional_extension_paths, or create_agent_session custom tools"
+                )
         wire = {
             "cwd": cwd, "agentDir": agent_dir,
             "additionalExtensionPaths": additional_extension_paths, "additionalSkillPaths": additional_skill_paths,
@@ -55,6 +59,8 @@ class DefaultResourceLoader(_GraphObject):
             "themesOverride": _callback_id(context, themes_override), "agentsFilesOverride": _callback_id(context, agents_files_override),
             "systemPromptOverride": _callback_id(context, system_prompt_override), "appendSystemPromptOverride": _callback_id(context, append_system_prompt_override),
         }
+        if extension_factories:
+            wire["extensionFactories"] = [{"builtin": factory.builtin, "options": factory.options} for factory in extension_factories]
         if settings_manager is not None:
             wire["settingsManager"] = settings_manager.handle
         super().__init__(context, "DefaultResourceLoader", "new", wire)

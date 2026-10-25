@@ -84,6 +84,15 @@ type ChildSessionCreate struct {
 	// ScopedModels is Pi's `scopedModels`: the models the session cycles through.
 	//portlint:allow emptydrop PiG wire field read by the host as a list: an empty list and an absent one mean the same (nothing to exclude or add)
 	ScopedModels []ChildScopedModel `json:"scopedModels,omitempty"`
+	// SessionStartEvent is Pi's `sessionStartEvent` option: the session_start event the session's extensions receive when they bind. Absent is Pi's default, `{type: "session_start", reason: "startup"}`.
+	SessionStartEvent *ChildSessionStartEvent `json:"sessionStartEvent,omitempty"`
+}
+
+// ChildSessionStartEvent is Pi's SessionStartEvent (types.ts), the value of the sessionStartEvent option: the reason a session starts and, when it replaces another, that session's file.
+type ChildSessionStartEvent struct {
+	// Reason is "startup", "reload", "new", "resume" or "fork".
+	Reason              string `json:"reason"`
+	PreviousSessionFile string `json:"previousSessionFile,omitempty"`
 }
 
 // ChildScopedModel is one entry of Pi's scopedModels option: a model object and an optional thinking level.

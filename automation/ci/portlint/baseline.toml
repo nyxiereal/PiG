@@ -5921,8 +5921,8 @@ snippet = "err := withSDKStageLock(context.Background(), configRoot, func() erro
 check = "ctxbackground"
 file = "coding/extension/runtime_state.go"
 func = "ExtensionRuntime.bindNativeProviders"
-snippet = "if err := actions.registerNative(context.Background(), entry.Provider, entry.carrier); err != nil && report != nil {"
 snippet = "err := actions.registerNative(context.Background(), entry.Provider, entry.carrier)"
+
 [[hit]]
 check = "ctxbackground"
 file = "coding/mcpext/extension.go"

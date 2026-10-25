@@ -643,6 +643,7 @@ func (p *FauxProviderHandle) streamWithDeltas(turn *continuationTurn, ctx contex
 				call := builder.partial.Content[state.contentIndex].(ToolCall)
 				arguments, order := state.args.Append(chunk)
 				call.setParsedArguments(arguments, order, nil)
+				builder.noteStreamedArguments(state.contentIndex, state.args, arguments)
 				builder.partial.Content[state.contentIndex] = call
 				builder.push(ToolCallDeltaEvent{ContentIndex: state.contentIndex, Delta: chunk, Partial: builder.partial})
 			}

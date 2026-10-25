@@ -27,6 +27,9 @@ type assistantStreamBuilder struct {
 	activeText     int
 	activeThinking int
 	toolCalls      map[int]*streamToolCall
+	// streamedArguments is, by content index, the immutable snapshot a tool call's ToolCallArgumentsStream last returned when the
+	// stream vouches for it (immutable): publishing keeps that map as the cell's copy instead of copying it.
+	streamedArguments map[int]JsonObject
 	// streamedBlocks appends deltas to open blocks without copying them again.
 	streamedBlocks
 
@@ -318,6 +321,7 @@ func (builder *assistantStreamBuilder) toolCallDelta(delta streamToolCallDelta) 
 	case delta.argumentsDelta != "" || !delta.skipEmpty:
 		arguments, order := state.args.Append(delta.argumentsDelta)
 		block.setParsedArguments(arguments, order, nil)
+		builder.noteStreamedArguments(state.contentIndex, state.args, arguments)
 	}
 	builder.partial.Content[state.contentIndex] = block
 	builder.push(ToolCallDeltaEvent{ContentIndex: state.contentIndex, Delta: delta.argumentsDelta, Partial: builder.partial})
@@ -347,8 +351,22 @@ func (builder *assistantStreamBuilder) replaceToolCallArguments(index int, text 
 	delta, hasDelta, arguments, order := state.args.Replace(text)
 	block := builder.partial.Content[state.contentIndex].(ToolCall)
 	block.setParsedArguments(arguments, order, nil)
+	builder.noteStreamedArguments(state.contentIndex, state.args, arguments)
 	builder.partial.Content[state.contentIndex] = block
 	return delta, hasDelta
+}
+
+// noteStreamedArguments records the partial arguments stream returned for the call at contentIndex, which the call now holds, as the
+// snapshot the cell may keep as it is (streamedArguments) when the stream says it is immutable, and forgets any earlier one otherwise.
+func (builder *assistantStreamBuilder) noteStreamedArguments(contentIndex int, stream *ToolCallArgumentsStream, arguments JsonObject) {
+	if !stream.immutable() {
+		delete(builder.streamedArguments, contentIndex)
+		return
+	}
+	if builder.streamedArguments == nil {
+		builder.streamedArguments = map[int]JsonObject{}
+	}
+	builder.streamedArguments[contentIndex] = arguments
 }
 
 // pushToolCallDelta pushes a toolcall_delta event for the call at index, whose arguments the caller already updated.
@@ -611,7 +629,7 @@ func (builder *assistantStreamBuilder) publish() *AssistantMessage {
 	if builder.cell == nil {
 		builder.cell = newAssistantMessageCell(builder.partial)
 	} else {
-		builder.cell.publish(builder.partial, builder.replacements)
+		builder.cell.publishSharing(builder.partial, builder.replacements, builder.streamedArguments)
 	}
 	builder.replacements = assistantMessageReplacements{}
 	if !builder.publishesViews() {

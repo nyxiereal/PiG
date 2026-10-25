@@ -2,6 +2,7 @@ package ai
 
 import (
 	"maps"
+	"math"
 	"slices"
 	"strconv"
 	"strings"
@@ -122,6 +123,8 @@ type streamingOpenString struct {
 	path    JSONPath
 	hasPath bool
 	change  *streamingOpenChange
+	// validLen is the length of the prefix of text already found valid UTF-8, which ends between two characters.
+	validLen int
 }
 
 // StreamingJSONParser is the incremental, tolerant JSON parser described above.
@@ -142,6 +145,12 @@ type StreamingJSONParser struct {
 	snapshotDefined bool
 	snapshotOrder   schemaObjectOrder
 	snapshotVersion uint64
+	snapshotValid   bool
+	// invalid is set once a finished string or key is not valid UTF-8 (or WTF-8, for a value) or a number is not finite; every
+	// later snapshot is then not Valid.
+	invalid bool
+	// quiet stops the parser from recording the changes Append returns, for a caller that reads only Snapshot.
+	quiet bool
 
 	// order holds the member order of completed containers by path.
 	order   schemaObjectOrder
@@ -155,6 +164,9 @@ type StreamingJSONSnapshot struct {
 	Defined bool
 	// Order is the member order of the objects in Value that are not in sorted order, by path.
 	Order schemaObjectOrder
+	// Valid is true when every string in Value is valid UTF-8 or WTF-8, every key is valid UTF-8 and every number is finite: Value is
+	// then what cloneJSONValue returns for it, so a holder may keep it as the immutable copy of itself.
+	Valid bool
 	// Version changes whenever Snapshot made a fresh copy.
 	Version uint64
 }
@@ -207,10 +219,23 @@ func (p *StreamingJSONParser) Snapshot() StreamingJSONSnapshot {
 			p.credit -= cost
 			p.dirty = false
 			p.snapshotValue, p.snapshotDefined, p.snapshotOrder = p.copyOpenPath(pending)
+			p.snapshotValid = p.valueIsValid(pending)
 			p.snapshotVersion++
 		}
 	}
-	return StreamingJSONSnapshot{Value: p.snapshotValue, Defined: p.snapshotDefined, Order: p.snapshotOrder, Version: p.snapshotVersion}
+	return StreamingJSONSnapshot{Value: p.snapshotValue, Defined: p.snapshotDefined, Order: p.snapshotOrder, Valid: p.snapshotValid, Version: p.snapshotVersion}
+}
+
+// valueIsValid reports whether the snapshot just copied holds only what cloneJSONValue copies as it is: every finished string valid
+// UTF-8 or WTF-8 (invalid is sticky once one is not), the string being read valid so far, and no number that is not finite.
+func (p *StreamingJSONParser) valueIsValid(pending *streamingPending) bool {
+	if p.invalid {
+		return false
+	}
+	if p.str != nil && !p.str.isKey && p.str.slot != nil && !p.str.valid() {
+		return false
+	}
+	return pending == nil || finiteJSONValue(pending.value)
 }
 
 // readString reads string characters from start until the string ends or the text does; it returns the next index.
@@ -343,6 +368,9 @@ func (p *StreamingJSONParser) startString() {
 
 // reportedPath is the path of a value at slot in the innermost open container, when its changes are reported.
 func (p *StreamingJSONParser) reportedPath(slot *streamingSlot) (JSONPath, bool) {
+	if p.quiet {
+		return nil, false
+	}
 	if slot == nil {
 		return nil, false
 	}
@@ -492,9 +520,32 @@ func (p *StreamingJSONParser) endString(open *streamingOpenString) {
 		}
 		frame.key, frame.hasKey = open.text.String(), true
 		frame.phase = phaseColon
+		// A key is checked strictly, as clonePlainObject checks it: a lone surrogate in a key is not valid there.
+		if !utf8.ValidString(frame.key) {
+			p.invalid = true
+		}
 		return
 	}
+	if !open.valid() {
+		p.invalid = true
+	}
 	p.valueEnded(frame)
+}
+
+// valid reports whether the string read so far is valid UTF-8, or WTF-8 (the form a lone UTF-16 surrogate takes), as
+// isWTF8 reports it. It reads only what follows the prefix an earlier call found valid, so checking a growing string at
+// every snapshot costs the new text, not the whole string.
+func (open *streamingOpenString) valid() bool {
+	if open.high != 0 {
+		// A pending high surrogate shows as a lone unit: the text is not strictly valid until its low surrogate arrives.
+		return isWTF8(open.current())
+	}
+	text := open.text.String()
+	if utf8.ValidString(text[open.validLen:]) {
+		open.validLen = len(text)
+		return true
+	}
+	return isWTF8(text)
 }
 
 func (p *StreamingJSONParser) endScalar() {
@@ -502,11 +553,20 @@ func (p *StreamingJSONParser) endScalar() {
 	p.scalar, p.scalarSl = "", nil
 	if value, ok := streamingScalarValue(token); ok {
 		p.place(slot, value)
+		if !finiteJSONValue(value) {
+			p.invalid = true
+		}
 		if path, has := p.reportedPath(slot); has {
 			p.report(&streamingOpenChange{kind: jsonChangeSet, path: path, value: value})
 		}
 	}
 	p.valueEnded(p.top())
+}
+
+// finiteJSONValue is false for the one scalar a snapshot could hold that cloneJSONValue refuses: a number that is not finite.
+func finiteJSONValue(value any) bool {
+	number, isNumber := value.(float64)
+	return !isNumber || !(math.IsNaN(number) || math.IsInf(number, 0))
 }
 
 type streamingPending struct {
@@ -895,11 +955,13 @@ type ToolCallArgumentsStream struct {
 	version   uint64
 	arguments JsonObject
 	order     schemaObjectOrder
+	// valid is whether arguments are immutable (see immutable).
+	valid bool
 }
 
 // NewToolCallArgumentsStream returns an empty stream; its partial arguments are the empty object.
 func NewToolCallArgumentsStream() *ToolCallArgumentsStream {
-	return &ToolCallArgumentsStream{arguments: JsonObject{}}
+	return &ToolCallArgumentsStream{arguments: JsonObject{}, valid: true}
 }
 
 // Text is the raw argument text received so far.
@@ -908,6 +970,8 @@ func (stream *ToolCallArgumentsStream) Text() string { return stream.text.String
 // Append adds a piece of argument text and returns the partial arguments: a new object whenever they changed.
 func (stream *ToolCallArgumentsStream) Append(delta string) (JsonObject, schemaObjectOrder) {
 	stream.text.WriteString(delta)
+	// Only the snapshot is read, so the parser need not record the changes each piece made.
+	stream.parser.quiet = true
 	stream.parser.Append(delta)
 	return stream.partial()
 }
@@ -926,7 +990,7 @@ func (stream *ToolCallArgumentsStream) Replace(text string) (delta string, hasDe
 	}
 	stream.text.Reset()
 	stream.parser = StreamingJSONParser{}
-	stream.version, stream.arguments, stream.order = 0, JsonObject{}, nil
+	stream.version, stream.arguments, stream.order, stream.valid = 0, JsonObject{}, nil, true
 	arguments, order = stream.Append(text)
 	return "", false, arguments, order
 }
@@ -947,9 +1011,14 @@ func (stream *ToolCallArgumentsStream) partial() (JsonObject, schemaObjectOrder)
 	stream.version = snapshot.Version
 	// Tool arguments are an object; any other partial value shows as no arguments yet.
 	if object, ok := snapshot.Value.(map[string]any); ok && snapshot.Defined {
-		stream.arguments, stream.order = JsonObject(object), snapshot.Order
+		stream.arguments, stream.order, stream.valid = JsonObject(object), snapshot.Order, snapshot.Valid
 	} else {
-		stream.arguments, stream.order = JsonObject{}, nil
+		stream.arguments, stream.order, stream.valid = JsonObject{}, nil, true
 	}
 	return stream.arguments, stream.order
 }
+
+// immutable reports whether the arguments the last Append or Replace returned are the parser's own snapshot and already what
+// cloneJSONValue copies them to (valid strings, finite numbers): a holder that never changes them may share them instead of
+// copying them again.
+func (stream *ToolCallArgumentsStream) immutable() bool { return stream.valid }

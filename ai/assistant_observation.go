@@ -45,11 +45,17 @@ func newAssistantMessageCell(message *AssistantMessage) *assistantMessageCell {
 
 // publish runs under producer ownership of message, before the producer suspends. It never changes delivered public fields.
 func (cell *assistantMessageCell) publish(message *AssistantMessage, replacements assistantMessageReplacements) {
+	cell.publishSharing(message, replacements, nil)
+}
+
+// publishSharing is publish for a producer that streams tool-call arguments: streamed holds, by content index, the immutable snapshot
+// of the arguments a call's ToolCallArgumentsStream last returned (see sharesStreamedArguments), which the cell keeps as its copy.
+func (cell *assistantMessageCell) publishSharing(message *AssistantMessage, replacements assistantMessageReplacements, streamed map[int]JsonObject) {
 	// The previous snapshot's content is immutable once published, so the copy below may share what has not changed.
 	cell.mu.RLock()
 	previous := cell.current.Content
 	cell.mu.RUnlock()
-	next := cloneAssistantMessageFrom(*message, previous)
+	next := cloneAssistantMessageSharing(*message, previous, streamed)
 	cell.mu.Lock()
 	defer cell.mu.Unlock()
 	// Absent optional properties are not object references; adding or removing one is an assignment even without an explicit replacement flag.

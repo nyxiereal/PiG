@@ -2415,6 +2415,34 @@
       ]
     },
     {
+      "scenario": "test/parity/scenarios/extensions-runtime/88-startup-provider-registration-failure.toml",
+      "transforms": [
+        {
+          "kind": "output_normalized_equal",
+          "reason": "Declared plain-text/layout surface: A rejected provider registration is the services diagnostic, not a failed extension load",
+          "limitations": "ANSI, CR, trailing spaces and outer blank rows are not equality evidence."
+        }
+      ]
+    },
+    {
+      "scenario": "test/parity/scenarios/extensions-runtime/89-reload-provider-registration-failure.toml",
+      "transforms": [
+        {
+          "kind": "terminal_crop",
+          "configuration": {
+            "capture_start": "Reloaded keybindings",
+            "capture_end": "────────────────────"
+          },
+          "reason": "Owned visible surface: A provider registration rejected on /reload is the extension error and the extension stays loaded",
+          "limitations": "No claim about output outside this crop or transient terminal bytes."
+        },
+        {
+          "kind": "cwd_snapshot_digits",
+          "reason": "D2: per-run cwd digits vary; preserve digit count so path width, truncation and surrounding cells remain compared."
+        }
+      ]
+    },
+    {
       "scenario": "test/parity/scenarios/footer/01-footer-default.toml",
       "transforms": [
         {

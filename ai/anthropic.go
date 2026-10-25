@@ -309,7 +309,7 @@ type anthEventContentBlockStart struct {
 		Text      string         `json:"text,omitempty"`
 		Thinking  string         `json:"thinking,omitempty"`
 		Signature string         `json:"signature,omitempty"`
-		Input     anthStartInput `json:"input,omitempty"`
+		Input     anthStartInput `json:"input"`
 		Data      string         `json:"data,omitempty"` // redacted_thinking
 	} `json:"content_block"`
 }

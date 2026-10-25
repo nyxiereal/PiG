@@ -246,7 +246,7 @@ func (record NestedToolCallRecord) MarshalJSON() ([]byte, error) {
 		}
 		wire.Arguments = arguments
 	}
-	return jsstring.MarshalKeepingSurrogates(wire)
+	return json.Marshal(wire)
 }
 
 // UnmarshalJSON decodes the record and keeps the member order of its arguments.
@@ -256,13 +256,13 @@ func (record *NestedToolCallRecord) UnmarshalJSON(data []byte) error {
 	}
 	type plain NestedToolCallRecord
 	var decoded plain
-	if err := jsstring.UnmarshalKeepingSurrogates(data, &decoded); err != nil {
+	if err := json.Unmarshal(data, &decoded); err != nil {
 		return err
 	}
 	var members struct {
 		Arguments json.RawMessage `json:"arguments"`
 	}
-	if err := jsstring.UnmarshalKeepingSurrogates(data, &members); err != nil {
+	if err := json.Unmarshal(data, &members); err != nil {
 		return err
 	}
 	if len(members.Arguments) > 0 {

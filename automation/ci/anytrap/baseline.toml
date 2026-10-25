@@ -54,13 +54,6 @@ dest = "*T"
 count = 2
 
 [[hit]]
-file = "ai/messages.go"
-func = "ToolResultMessage.UnmarshalJSON"
-call = "json.Unmarshal"
-dest = "*any"
-count = 1
-
-[[hit]]
 file = "ai/oauth_openai_codex.go"
 func = "CodexAccountID"
 call = "json.Unmarshal"
@@ -548,20 +541,6 @@ file = "durable/harness/tool.go"
 func = "prepareArguments"
 call = "json.Unmarshal"
 dest = "*map[string]any"
-count = 1
-
-[[hit]]
-file = "durable/json.go"
-func = "FromJsonValue"
-call = "json.Decode"
-dest = "*T"
-count = 1
-
-[[hit]]
-file = "durable/json.go"
-func = "unmarshalOrdered"
-call = "json.Unmarshal"
-dest = "any"
 count = 1
 
 [[hit]]
@@ -1200,13 +1179,6 @@ dest = "*any"
 count = 1
 
 # once per code-mode call or nested tool result; the value is the tool's arbitrary JSON result
-[[hit]]
-file = "durable/codemode/tool.go"
-func = "storedResult.result"
-call = "json.Unmarshal"
-dest = "*any"
-count = 1
-
 # cold path: once per login, catalog load, command or rare API request
 [[hit]]
 file = "durable/core/driver/session.go"
@@ -1256,13 +1228,6 @@ dest = "*T"
 count = 1
 
 # once per code-mode call or nested tool result; the value is the tool's arbitrary JSON result
-[[hit]]
-file = "durable/nested_result.go"
-func = "decodeJsonValue"
-call = "json.Unmarshal"
-dest = "*any"
-count = 1
-
 # once per code-mode call or nested tool result; the value is the tool's arbitrary JSON result
 [[hit]]
 file = "durable/toolsearch/toolsearch.go"

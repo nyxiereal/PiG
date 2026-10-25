@@ -1,6 +1,7 @@
 package durable
 
 import (
+	"bytes"
 	stdjson "encoding/json"
 	"errors"
 	"fmt"
@@ -10,7 +11,6 @@ import (
 	"github.com/MichaelKinsy/PiG/chord/delta"
 	"github.com/MichaelKinsy/PiG/durable/internal/ordered"
 	sdkjson "github.com/MichaelKinsy/PiG/extensions/sdk/json"
-	"github.com/MichaelKinsy/PiG/internal/chord/chordjson"
 	"github.com/MichaelKinsy/PiG/internal/jsstring"
 )
 
@@ -31,7 +31,7 @@ func ToJsonValue(value any) (JsonValue, error) {
 		return nil, copyErr
 	}
 	// Objects decode in encoding order, so a struct's fields keep their declared order.
-	return decodeJson(encoded)
+	return delta.DecodeJson(encoded)
 }
 
 func isNonFinite(text string) bool {
@@ -80,7 +80,7 @@ func FromJsonValue[T any](value JsonValue) (T, error) {
 		return decoded, err
 	}
 	if holdsDynamicJSON[T]() {
-		dynamic, err := decodeJson(encoded)
+		dynamic, err := delta.DecodeJson(encoded)
 		if err != nil {
 			return decoded, err
 		}
@@ -90,12 +90,13 @@ func FromJsonValue[T any](value JsonValue) (T, error) {
 		}
 		return typed, nil
 	}
-	if err := jsstring.UnmarshalKeepingSurrogates(encoded, &decoded); err != nil {
+	decoder := sdkjson.NewDecoder(bytes.NewReader(encoded))
+	if err := decoder.Decode(&decoded); err != nil {
 		return decoded, err
 	}
 	if ordered.HasDynamic(reflect.TypeFor[T]()) {
 		// A JsonValue member holds the text's objects in order, as JSON.parse gives Pi.
-		tree, err := decodeJson(encoded)
+		tree, err := delta.DecodeJson(encoded)
 		if err != nil {
 			return decoded, err
 		}
@@ -142,31 +143,21 @@ func CopyJson(value JsonValue) (JsonValue, error) {
 // unmarshalOrdered decodes data into target, then gives target's JsonValue members the text's key order, as JSON.parse gives Pi.
 func unmarshalOrdered(data []byte, target any) error {
 	if dynamic, ok := target.(*JsonValue); ok {
-		value, err := decodeJson(data)
+		value, err := delta.DecodeJson(data)
 		if err == nil {
 			*dynamic = value
 		}
 		return err
 	}
-	if err := jsstring.UnmarshalKeepingSurrogates(data, target); err != nil {
+	if err := sdkjson.Unmarshal(data, target); err != nil {
 		return err
 	}
 	if ordered.HasDynamic(reflect.TypeOf(target).Elem()) {
-		tree, err := decodeJson(data)
+		tree, err := delta.DecodeJson(data)
 		if err != nil {
 			return err
 		}
 		ordered.Restore(target, tree)
 	}
 	return nil
-}
-
-// decodeJson is delta.DecodeJson with JavaScript string semantics: a lone surrogate escape (`"\ud83d"`) is kept, as the
-// WTF-8 form of its UTF-16 unit, where encoding/json would replace it with U+FFFD. Pi's strings hold such a unit and
-// JSON.stringify writes it back as the escape, so a value must survive a copy unchanged.
-func decodeJson(data []byte) (any, error) {
-	if !jsstring.HasSurrogateEscape(data) {
-		return delta.DecodeJson(data)
-	}
-	return chordjson.DecodeUnquoting(data, func(raw []byte, text *string) error { return sdkjson.Unmarshal(raw, text) })
 }

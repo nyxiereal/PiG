@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"slices"
 	"strings"
@@ -128,7 +129,14 @@ func TestRunCallsAnMCPToolThroughTheProvider(t *testing.T) {
 		}
 	}
 	t.Chdir(t.TempDir())
-	t.Setenv("PIG_HOME", home)
+	// A lane or the agent-dir guard exports PIG_CODING_AGENT_DIR, which DefaultAgentDir reads before PIG_HOME: every
+	// variable that names the agent directory must point at this test's.
+	for _, name := range []string{"PIG_HOME", "PI_HOME"} {
+		t.Setenv(name, home)
+	}
+	for _, name := range []string{"PIG_CODING_AGENT_DIR", "PI_CODING_AGENT_DIR"} {
+		t.Setenv(name, agentDir)
+	}
 	t.Setenv("ANTHROPIC_API_KEY", "sk-test")
 
 	ctx, cancel := context.WithTimeout(t.Context(), 2*time.Minute)
@@ -148,5 +156,18 @@ func TestRunCallsAnMCPToolThroughTheProvider(t *testing.T) {
 func TestRunRequiresAPrompt(t *testing.T) {
 	if err := run(t.Context(), "", &bytes.Buffer{}); err == nil {
 		t.Fatal("run with no prompt returned nil")
+	}
+}
+
+// A program that embeds the extension host without the upgrade command links neither the SDK upgrade rules nor go/types behind them: classifying a failed extension build as SDK drift is the command's (runtimecell.SetDriftClassifier), and the type checker is 0.3 MB of the program.
+func TestHeadlessEmbedDoesNotLinkTheTypeChecker(t *testing.T) {
+	out, err := exec.CommandContext(t.Context(), "go", "list", "-deps", ".").Output()
+	if err != nil {
+		t.Fatalf("go list -deps: %v", err)
+	}
+	for _, dependency := range strings.Fields(string(out)) {
+		if dependency == "go/types" || strings.HasSuffix(dependency, "/extensions/sdk/upgrade") {
+			t.Errorf("the headless embed depends on %s", dependency)
+		}
 	}
 }

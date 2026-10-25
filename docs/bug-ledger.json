@@ -23779,6 +23779,29 @@
       ]
     },
     {
+      "id": "BF-aec0042",
+      "title": "fix(env): the daemon runs a command whose timeoutMs Node cannot arm, as Pi's daemon does",
+      "symptom": "fix(env): the daemon runs a command whose timeoutMs Node cannot arm, as Pi's daemon does",
+      "rootCause": "Pi refuses a timeout above 2^31-1 ms in the clients (durable env/node.ts and env remote-env.ts, both ported and unchanged); only a raw request reaches the daemon, which Pi runs without a deadline. Regression: the TestDaemonExecMatchesPisDaemon case \"timeout above what Node can arm\" (red before, green after). Also clears the lint findings of the earlier test files.",
+      "rootCauseSource": "commit",
+      "userImpact": "An operation failed or was rejected",
+      "platform": "All platforms",
+      "class": "own",
+      "fixedIn": "Unreleased",
+      "origin": "commit",
+      "commits": [
+        {
+          "hash": "aec0042260",
+          "date": "2026-10-24"
+        }
+      ],
+      "tests": [
+        "durable/env/node/rename_directory_pi_test.go::TestRenameFileReportsTheErrorOfRename2ForADirectoryDestination",
+        "env/daemon_wire_exec_oracle_test.go::TestDaemonExecMatchesPisDaemon",
+        "env/daemon_wire_exec_oracle_test.go::TestDaemonWatchMatchesPisDaemon"
+      ]
+    },
+    {
       "id": "BF-af1fe1a",
       "title": "Cycling models in the interactive UI goes through the Session as in Pi: the new model persists as the…",
       "symptom": "Cycling models in the interactive UI goes through the Session as in Pi: the new model persists as the default, extends a non-empty `enabledModels` scope, keeps scope keys for model IDs that start with their provider, and checks Anthropic subscription auth after the switch.",
@@ -24021,6 +24044,43 @@
       ],
       "tests": [
         "coding/session_compact_extension_test.go::TestCompactForExtensionReturnsUpstreamResultShape"
+      ]
+    },
+    {
+      "id": "BF-b1ff77a",
+      "title": "fix(env): the daemon answers as Pi's daemon does on file, command and error paths",
+      "symptom": "fix(env): the daemon answers as Pi's daemon does on file, command and error paths",
+      "rootCause": "A differential test of the daemon against Pi's own Rust daemon (every file operation, exec, watch, hello, framing) found nine differences: the error JSON omitted an empty path; realpath of a symlink loop was UNKNOWN, not ELOOP; a directory renamed over a non-empty directory was EEXIST, not ENOTEMPTY (Node and the daemon now call rename(2) through nodeerrno.Rename); opendir of an unreadable file was EACCES, not ENOTDIR; errors outside the daemon's table (ENXIO) were named, not UNKNOWN; an empty write to a full device failed; an exec timeout read timeout:\u003cs\u003e and a timeout of 0 was refused; spawn and spill failures did not use the text of Rust's io::Error; and commands were process-group…",
+      "rootCauseSource": "commit",
+      "userImpact": "An operation failed or was rejected",
+      "platform": "All platforms",
+      "class": "own",
+      "fixedIn": "Unreleased",
+      "origin": "commit",
+      "commits": [
+        {
+          "hash": "b1ff77a5e2",
+          "date": "2026-10-24"
+        }
+      ],
+      "tests": [
+        "durable/env/node/exec_session_leader_test.go::TestShellCommandRunsAsTheLeaderOfANewSession",
+        "durable/env/node/rename_directory_pi_test.go::TestRenameFileReportsTheErrorOfRename2ForADirectoryDestination",
+        "env/daemon_wire_exec_oracle_test.go::TestDaemonCancelRightBehindItsRequestMatchesPisDaemon",
+        "env/daemon_wire_exec_oracle_test.go::TestDaemonExecCancelMatchesPisDaemon",
+        "env/daemon_wire_exec_oracle_test.go::TestDaemonExecMatchesPisDaemon",
+        "env/daemon_wire_exec_oracle_test.go::TestDaemonHelloMatchesPisDaemon",
+        "env/daemon_wire_exec_oracle_test.go::TestDaemonRepliesBeforeBulkOutputLikePisDaemon",
+        "env/daemon_wire_exec_oracle_test.go::TestDaemonWatchMatchesPisDaemon",
+        "env/daemon_wire_exec_oracle_test.go::TestDaemonWatchRequestsMatchPisDaemon",
+        "env/daemon_wire_oracle_test.go::TestDaemonAnswersAFrameWhoseJSONDoesNotParseLikePisDaemon",
+        "env/daemon_wire_oracle_test.go::TestDaemonEndsOnAFramingErrorLikePisDaemon",
+        "env/daemon_wire_oracle_test.go::TestDaemonFileOperationsMatchPisDaemon",
+        "env/daemon_wire_oracle_test.go::TestDaemonHandlesAreLimitedLikePisDaemon",
+        "env/daemon_wire_oracle_test.go::TestDaemonNameEncodingsMatchPisDaemon",
+        "env/daemon_wire_oracle_test.go::TestDaemonOpensASocketLikePisDaemon",
+        "env/daemon_wire_oracle_test.go::TestDaemonPoisonsAWriteHandleAfterAFailedChunkLikePisDaemon",
+        "env/daemon_wire_oracle_test.go::TestDaemonStatReportsTheFilesIdentityLikePisDaemon"
       ]
     },
     {

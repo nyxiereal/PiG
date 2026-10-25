@@ -6340,3 +6340,6 @@ class Extension:
                 raise EOFError
             got += count
         return buf
+
+# Loaded with the package: no function imports a submodule from disk after import (tests/test_staged_directory_independence.py).
+from .model_registry_runtime import RuntimeModelRegistry as RuntimeModelRegistry  # noqa: E402,F401

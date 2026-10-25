@@ -2,6 +2,7 @@ package extensionconformance
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"path/filepath"
 	"testing"
@@ -38,7 +39,7 @@ func BenchmarkModelRegistryOverRuntime(b *testing.B) {
 							return &sdk.AuthResult{Auth: map[string]any{"apiKey": "k"}}, nil
 						}}},
 						Models: []map[string]any{{"id": "m", "name": "m", "api": "bench-api", "provider": "bench-prov", "baseUrl": baseURL}},
-						APIs:   map[string]sdk.ProviderStreams{"bench-api": {Stream: func(map[string]any, map[string]any, sdk.ProviderStreamOptions) (*sdk.ModelEventStream, error) { return nil, fmt.Errorf("unused") }}},
+						APIs:   map[string]sdk.ProviderStreams{"bench-api": {Stream: unusedBenchStream}},
 					})
 					if err != nil {
 						return nil, err
@@ -55,10 +56,10 @@ func BenchmarkModelRegistryOverRuntime(b *testing.B) {
 							return nil, err
 						}
 						if found, err := registry.GetRegisteredNativeProvider("bench-prov"); err != nil || found == nil {
-							return nil, fmt.Errorf("registered provider missing: %v", err)
+							return nil, fmt.Errorf("registered provider missing: %w", err)
 						}
 						if found, err := registry.GetProvider("bench-prov"); err != nil || found == nil {
-							return nil, fmt.Errorf("provider missing: %v", err)
+							return nil, fmt.Errorf("provider missing: %w", err)
 						}
 						if err := registry.UnregisterProvider("bench-prov"); err != nil {
 							return nil, err
@@ -86,4 +87,8 @@ func BenchmarkModelRegistryOverRuntime(b *testing.B) {
 			}
 		})
 	}
+}
+
+func unusedBenchStream(map[string]any, map[string]any, sdk.ProviderStreamOptions) (*sdk.ModelEventStream, error) {
+	return nil, errors.New("unused")
 }

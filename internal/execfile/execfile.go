@@ -20,18 +20,62 @@ var chunkSize int64 = 256 << 10
 //
 // The file is closed and opened again between chunks (the later opens seek to the end of the written part), so nothing else may remove or replace name until Write returns, and the file is visible with a partial length meanwhile. Every goroutine that starts a process waits while a chunk is written, so content must be memory or a file. A pipe, a socket, or a reader that waits for a goroutine that starts a process can deadlock.
 func Write(name string, flag int, perm fs.FileMode, content io.Reader) error {
-	var written int64
-	for first := true; ; first = false {
-		n, done, err := writeChunk(name, flag, perm, first, written, content)
-		written += n
-		if err != nil || done {
+	// One limited reader and, for content that is not a file, one buffer serve every chunk.
+	limited := &io.LimitedReader{R: content}
+	remaining := remainingBytes(content)
+	var buffer []byte
+	switch content.(type) {
+	case *os.File, *byteSource:
+	default:
+		buffer = make([]byte, 32<<10)
+		if remaining < 0 || remaining > int64(len(buffer)) {
+			buffer = make([]byte, min(chunkSize, 256<<10))
+		}
+	}
+	for first, offset := true, int64(0); ; first = false {
+		limited.N = chunkSize
+		if remaining >= 0 {
+			limited.N = min(chunkSize, remaining)
+		}
+		want := limited.N
+		if err := writeChunk(name, flag, perm, first, offset, limited, buffer); err != nil {
 			return err
+		}
+		offset += want - limited.N
+		if remaining >= 0 {
+			remaining -= want - limited.N
+		}
+		// Content ended before the chunk filled, or, when its length is known, the last chunk was written. A length that is a multiple of the chunk and not known costs one empty chunk.
+		if limited.N > 0 || remaining == 0 {
+			return nil
 		}
 	}
 }
 
-// writeChunk copies up to chunkSize bytes under the fork lock, starting at offset, and reports how many it wrote and whether content ended. The later chunks are not opened with O_APPEND: the kernel refuses copy_file_range into an append-mode descriptor, and the copy would fall back to a buffer.
-func writeChunk(name string, flag int, perm fs.FileMode, first bool, offset int64, content io.Reader) (n int64, done bool, err error) {
+// remainingBytes is how many bytes content has left when that is known without reading it (a regular file, or a reader with Len), and -1 otherwise. Knowing it lets Write stop at the last chunk instead of opening the file once more to find the end.
+func remainingBytes(content io.Reader) int64 {
+	switch r := content.(type) {
+	case *os.File:
+		info, err := r.Stat()
+		if err != nil || !info.Mode().IsRegular() {
+			return -1
+		}
+		position, err := r.Seek(0, io.SeekCurrent)
+		if err != nil {
+			return -1
+		}
+		return max(info.Size()-position, 0)
+	case interface{ Len() int }:
+		return int64(r.Len())
+	}
+	return -1
+}
+
+// writeOnly hides the ReadFrom of a file, so that a copy through a buffer uses the buffer.
+type writeOnly struct{ io.Writer }
+
+// writeChunk copies limited's next chunk into name under the fork lock, starting at offset. The later chunks are not opened with O_APPEND: the kernel refuses copy_file_range into an append-mode descriptor, and the copy would fall back to a buffer.
+func writeChunk(name string, flag int, perm fs.FileMode, first bool, offset int64, limited *io.LimitedReader, buffer []byte) (err error) {
 	syscall.ForkLock.RLock()
 	defer syscall.ForkLock.RUnlock()
 	if !first {
@@ -39,16 +83,50 @@ func writeChunk(name string, flag int, perm fs.FileMode, first bool, offset int6
 	}
 	file, err := os.OpenFile(name, flag|os.O_WRONLY, perm)
 	if err != nil {
-		return 0, false, err
+		return err
 	}
 	if !first {
 		if _, err := file.Seek(offset, io.SeekStart); err != nil {
-			return 0, false, errors.Join(err, file.Close())
+			return errors.Join(err, file.Close())
 		}
 	}
-	n, err = io.CopyN(file, content, chunkSize)
-	if errors.Is(err, io.EOF) {
-		done, err = true, nil
+	if limited.N > 0 {
+		switch {
+		case buffer != nil:
+			_, err = io.CopyBuffer(writeOnly{file}, limited, buffer)
+		default:
+			if source, ok := limited.R.(*byteSource); ok {
+				err = source.writeChunk(file, limited)
+			} else {
+				_, err = io.Copy(file, limited)
+			}
+		}
 	}
-	return n, done, errors.Join(err, file.Close())
+	return errors.Join(err, file.Close())
+}
+
+// byteSource is the content of a Write that is already in memory. Write writes its chunks from the slice directly, with no buffer and no copy.
+type byteSource struct{ data []byte }
+
+// Bytes returns content for Write that reads data.
+func Bytes(data []byte) io.Reader { return &byteSource{data} }
+
+func (s *byteSource) Len() int { return len(s.data) }
+
+func (s *byteSource) Read(p []byte) (int, error) {
+	if len(s.data) == 0 {
+		return 0, io.EOF
+	}
+	n := copy(p, s.data)
+	s.data = s.data[n:]
+	return n, nil
+}
+
+// writeChunk writes the next limited.N bytes, or what is left, to file and counts them off limited.
+func (s *byteSource) writeChunk(file *os.File, limited *io.LimitedReader) error {
+	n := min(limited.N, int64(len(s.data)))
+	_, err := file.Write(s.data[:n])
+	s.data = s.data[n:]
+	limited.N -= n
+	return err
 }

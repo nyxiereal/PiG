@@ -189,3 +189,19 @@ func TestWriteAcrossChunksKeepsAllContent(t *testing.T) {
 		t.Fatalf("empty content did not create the file: %v", err)
 	}
 }
+
+// Bytes is written from the slice in chunks and ends exactly at its length.
+func TestWriteBytesAcrossChunks(t *testing.T) {
+	defer execfile.SetChunkSize(8)()
+	dir := t.TempDir()
+	for _, length := range []int{0, 1, 7, 8, 9, 16, 41} {
+		want := strings.Repeat("z", length)
+		name := filepath.Join(dir, "f"+strings.Repeat("x", length))
+		if err := execfile.Write(name, os.O_CREATE|os.O_EXCL, 0o755, execfile.Bytes([]byte(want))); err != nil {
+			t.Fatalf("length %d: %v", length, err)
+		}
+		if got, err := os.ReadFile(name); err != nil || string(got) != want {
+			t.Fatalf("length %d: file = %q, %v", length, got, err)
+		}
+	}
+}

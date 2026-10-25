@@ -169,7 +169,7 @@ func writeCellBinary(path string, data []byte, mode os.FileMode) error {
 	if holdsExactly(path, data, mode) {
 		return nil
 	}
-	err := atomicWriteFile(path, bytes.NewReader(data), mode)
+	err := atomicWriteFile(path, execfile.Bytes(data), mode)
 	if err != nil && holdsExactly(path, data, mode) {
 		// A peer published the same bytes while this write was refused.
 		return nil

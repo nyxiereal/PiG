@@ -152,13 +152,11 @@ jobs:
           {
             echo "present=true"
             echo "image-ref=$IMAGE_REF"
-            if [ "$current" = "$PINNED_INPUTS" ]; then
-              echo "stale=false"
-            else
-              echo "stale=true"
-              echo "::notice::The inputs of the $IMAGE image changed since the pinned image was built. The scheduled refresh (or a publish dispatch from main) builds a new one and proposes its pin; until then this check verifies the pinned digest only for its own integrity."
-            fi
+            if [ "$current" = "$PINNED_INPUTS" ]; then echo "stale=false"; else echo "stale=true"; fi
           } >> "$GITHUB_OUTPUT"
+          if [ "$current" != "$PINNED_INPUTS" ]; then
+            echo "::notice::The inputs of the $IMAGE image changed since the pinned image was built. The scheduled refresh (or a publish dispatch from main) builds a new one and proposes its pin; until then this check verifies the pinned digest only for its own integrity."
+          fi
       - name: Pull the published image by digest
         if: steps.published.outputs.present == 'true'
         shell: bash

@@ -98,6 +98,13 @@ func (r *graphCallbackRegistry) add(callback graphCallback) string {
 	return id
 }
 
+// remove forgets a function that will not be called again (the callbacks of a closed transport).
+func (r *graphCallbackRegistry) remove(id string) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	delete(r.callbacks, id)
+}
+
 func (r *graphCallbackRegistry) get(id string) graphCallback {
 	r.mu.Lock()
 	defer r.mu.Unlock()

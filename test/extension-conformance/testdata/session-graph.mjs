@@ -853,6 +853,87 @@ async function extensionRefsScript({ mrAuth, mrModels, mrStore, cwd, agentDir, r
   return r;
 }
 
+// createMcpExtension's function options (loadConfig, createTransport, credentials, authProvider): Pi's own factory is the expectation (mcp_options). The in-process peer answers the MCP handshake, the tool list and a tool call; the report is what each function was asked, in order.
+const mcpPeerReply = (message) => {
+  if (message.id === undefined) return undefined;
+  const reply = (result) => ({ jsonrpc: "2.0", id: message.id, result });
+  switch (message.method) {
+    case "initialize": return reply({ protocolVersion: message.params.protocolVersion, capabilities: { tools: {} }, serverInfo: { name: "fake", version: "1" } });
+    case "tools/list": return reply({ tools: [{ name: "echo", description: "Echo text", inputSchema: { type: "object", properties: { text: { type: "string" } }, required: ["text"] } }] });
+    case "tools/call": return reply({ content: [{ type: "text", text: `echo:${message.params.arguments.text}` }] });
+    case "ping": return reply({});
+    default: return { jsonrpc: "2.0", id: message.id, error: { code: -32601, message: "method not found" } };
+  }
+};
+
+async function mcpOptionsScript({ mrAuth, mrToolModels, mrStore, cwd, agentDir, mcpProbe }) {
+  const r = {};
+  const log = { demo: [], remote: [], credentials: [], loadConfig: [] };
+  const rt = await ModelRuntime.create({ authPath: mrAuth, modelsPath: mrToolModels, modelsStorePath: mrStore });
+  const settings = SettingsManager.inMemory({ compaction: { enabled: false }, retry: { enabled: false }, defaultProvider: "mr-tool", defaultModel: "m1" });
+  const state = { serverUrl: "http://127.0.0.1:9/mcp", tokens: { access_token: "tok-1", token_type: "Bearer" } };
+  const credentials = {
+    forServer: (name, url) => {
+      log.credentials.push(`forServer ${name} ${url}`);
+      return { load: () => (log.credentials.push(`load ${name}`), state), save: () => { log.credentials.push(`save ${name}`); }, withRefreshLock: async (fn) => (log.credentials.push(`lock ${name}`), fn()) };
+    },
+    tokens: (name, url) => (log.credentials.push(`tokens ${name} ${url}`), state.tokens),
+    remove: (name, url) => (log.credentials.push(`remove ${name} ${url}`), true),
+  };
+  const createTransport = (entry, transportCwd, authProvider) => {
+    const events = log[entry.name];
+    events.push(`create ${entry.name} cwd=${transportCwd} auth=${authProvider !== undefined}`);
+    const listeners = { message: new Set(), error: new Set(), close: new Set() };
+    let closeEmitted = false;
+    const transport = {
+      onMessage: (listener) => (listeners.message.add(listener), () => listeners.message.delete(listener)),
+      onError: (listener) => (listeners.error.add(listener), () => listeners.error.delete(listener)),
+      onClose: (listener) => (listeners.close.add(listener), () => listeners.close.delete(listener)),
+      start: async () => {
+        events.push("start");
+        if (authProvider) events.push(`token ${await authProvider.token()}`);
+      },
+      send: async (message) => {
+        events.push(`send ${message.method ?? "response"}`);
+        const reply = mcpPeerReply(message);
+        if (reply) for (const listener of listeners.message) listener(reply);
+      },
+      close: async () => {
+        events.push("close");
+        if (closeEmitted) return;
+        closeEmitted = true;
+        for (const listener of listeners.close) listener();
+      },
+    };
+    return transport;
+  };
+  const loader = new DefaultResourceLoader({
+    cwd, agentDir, settingsManager: settings, noExtensions: true, noSkills: true, noPromptTemplates: true, noThemes: true, noContextFiles: true, additionalExtensionPaths: [mcpProbe],
+    extensionFactories: [createMcpExtension({
+      loadConfig: (ctx) => {
+        log.loadConfig.push({ cwd: ctx.cwd, isProjectTrusted: ctx.isProjectTrusted() });
+        return { servers: [
+          { name: "demo", config: { command: "unused", exposure: "direct" }, source: "<config>", scope: "global" },
+          { name: "remote", config: { url: "http://127.0.0.1:9/mcp", exposure: "direct" }, source: "<config>", scope: "global" },
+        ], errors: [] };
+      },
+      createTransport, credentials, openUrl: () => {}, updateConfig: () => {}, logPath: join(agentDir, "mcp.log"),
+    })],
+  });
+  await loader.reload();
+  const manager = SessionManager.inMemory(cwd);
+  const { session } = await createAgentSession({ sessionManager: manager, settingsManager: settings, modelRuntime: rt, resourceLoader: loader });
+  await session.bindExtensions({});
+  await session.prompt("call the tool");
+  await session.prompt("/mcp reconnect demo");
+  await session.prompt("/mcp logout remote");
+  r.messages = session.messages.filter((message) => message.role === "toolResult").map((message) => message.content.map((part) => part.text).join(""));
+  r.seen = manager.getEntries().filter((entry) => entry.type === "custom" && entry.customType === "mcp_seen").map((entry) => entry.data);
+  r.log = log;
+  session.dispose();
+  return r;
+}
+
 export default function (pi) {
   pi.registerTool({
     name: "session_manager", label: "session_manager", description: "Runs the SessionManager script.", parameters: { type: "object" },
@@ -889,6 +970,10 @@ export default function (pi) {
   pi.registerTool({
     name: "create_provider", label: "create_provider", description: "Runs the createProvider script.", parameters: { type: "object" },
     execute: async () => ({ content: [{ type: "text", text: JSON.stringify(await createProviderScript()) }] }),
+  });
+  pi.registerTool({
+    name: "mcp_options", label: "mcp_options", description: "Runs the createMcpExtension function options script.", parameters: { type: "object" },
+    execute: async (_id, params) => ({ content: [{ type: "text", text: JSON.stringify(await mcpOptionsScript(params)) }] }),
   });
   pi.registerTool({
     name: "extension_refs", label: "extension_refs", description: "Runs the compiled-in extension factories script.", parameters: { type: "object" },

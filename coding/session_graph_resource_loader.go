@@ -154,7 +154,7 @@ func newGraphResourceLoader(scope subprocess.SessionGraphScope, op string, raw j
 		}
 	}
 	for _, entry := range options.ExtensionFactories {
-		factory, err := entry.factory(loaderOptions.AgentDir)
+		factory, err := entry.factory(scope, loaderOptions.AgentDir)
 		if err != nil {
 			return nil, err
 		}

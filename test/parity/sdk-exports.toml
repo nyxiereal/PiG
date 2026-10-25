@@ -898,7 +898,7 @@ closing = "Pure helpers ported per SDK with vector tests from Pi at the pin (tes
 "pi-coding-agent: createLocalPowerShellOperations" = { go = "native:CreateLocalPowerShellOperations", rust = "native:create_local_powershell_operations", python = "native:create_local_powershell_operations" }
 "pi-coding-agent: createLsTool" = { go = "native:CreateLsTool", rust = "native:create_ls_tool", python = "native:create_ls_tool" }
 "pi-coding-agent: createLsToolDefinition" = { go = "native:CreateLsToolDefinition", rust = "native:create_ls_tool_definition", python = "native:create_ls_tool_definition" }
-"pi-coding-agent: createMcpExtension" = { go = "gap:C2Sessions", rust = "gap:C2Sessions", python = "gap:C2Sessions" }
+"pi-coding-agent: createMcpExtension" = { go = "native:CreateMcpExtension", rust = "native:create_mcp_extension", python = "native:create_mcp_extension" }
 "pi-coding-agent: createPowerShellTool" = { go = "native:CreatePowerShellTool", rust = "native:create_powershell_tool", python = "native:create_powershell_tool" }
 "pi-coding-agent: createPowerShellToolDefinition" = { go = "native:CreatePowerShellToolDefinition", rust = "native:create_powershell_tool_definition", python = "native:create_powershell_tool_definition" }
 "pi-coding-agent: createReadOnlyTools" = { go = "native:CreateReadOnlyTools", rust = "native:create_read_only_tools", python = "native:create_read_only_tools" }

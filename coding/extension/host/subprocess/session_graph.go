@@ -32,6 +32,10 @@ type SessionGraphScope interface {
 	Object(handle string) (SessionGraphObject, bool)
 	// Callback runs the function the extension named id (RequestSessionGraphCallback) and answers its result. A closed connection fails it.
 	Callback(ctx context.Context, id string, args json.RawMessage) (json.RawMessage, error)
+	// Add makes an object the host built (not one the extension constructed with CallSessionGraphNew) live for the connection and names it, so the extension can call its methods with CallSessionGraphCall. The extension's release call and the end of the connection drop it like any object; Remove drops it earlier.
+	Add(object SessionGraphObject) (handle string, err error)
+	// Remove drops the object Add named. A handle the extension already released is ignored.
+	Remove(handle string)
 }
 
 // SessionGraphStreamer is an object that serves a model stream (ModelRuntime.stream and streamSimple). A modelStream call that names the object's handle in its runtime field runs on it, and the call delivers the events as it does for the Session's runtime.
@@ -124,6 +128,12 @@ func (s graphScope) Callback(ctx context.Context, id string, args json.RawMessag
 	}
 	return response.Response.Result, nil
 }
+
+func (s graphScope) Add(object SessionGraphObject) (string, error) {
+	return s.host.sessionGraphObjects.add(s.conn, object)
+}
+
+func (s graphScope) Remove(handle string) { s.host.sessionGraphObjects.remove(s.conn, handle) }
 
 // SetSessionGraph binds the backend that serves the session graph. Without one the calls fail with SessionGraphUnavailableMessage.
 func (h *Host) SetSessionGraph(backend SessionGraphBackend) {

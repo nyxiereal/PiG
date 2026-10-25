@@ -102,6 +102,8 @@ mod package_manager;
 pub use package_manager::{DefaultPackageManager, PackageManagerOptions};
 mod resource_loader;
 mod extension_factories;
+mod mcp_options;
+pub use mcp_options::{McpAuthProvider, McpFunctionOptions, McpLoadConfig, McpLoadConfigContext, McpOAuthCredentialStore, McpOAuthServerStore, McpOpenUrl, McpSendSignal, McpTransport, McpTransportEvents, McpTransportFactory, McpUpdateConfig};
 pub use extension_factories::{create_codemode_extension, create_mcp_extension, create_tool_search_extension, CodemodeExtensionOptions, McpExtensionOptions};
 pub use resource_loader::{DefaultResourceLoader, DefaultResourceLoaderOptions, ExtensionFactory, InlineExtensionFactory, LoaderOverride};
 mod project_trust;

@@ -77834,9 +77834,9 @@
       "kind": "function",
       "exported": false,
       "shape": {
-        "type": "func(agentDir string) (github.com/MichaelKinsy/PiG/coding/extension.InlineExtension, error)"
+        "type": "func(scope github.com/MichaelKinsy/PiG/coding/extension/host/subprocess.SessionGraphScope, agentDir string) (github.com/MichaelKinsy/PiG/coding/extension.InlineExtension, error)"
       },
-      "shapeHash": "sha256:e1bd9148089649228e60824318afc37c3d34a1da71cb047c85a3faf04b062740"
+      "shapeHash": "sha256:87dc1e03abfe8ffb8c3de85072b88f97219e2398de82d5400eb73b5b3b61539c"
     },
     {
       "id": "go:github.com/MichaelKinsy/PiG/coding#graphExtensionFactory.hasOptions",
@@ -77881,6 +77881,567 @@
         "type": "graphLoaderOptions"
       },
       "shapeHash": "sha256:2f6c189608e7de51ddbc49b9827d10aea16990b764714219f52f8acfa86a4e4c"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/coding#graphMcpAuthProvider",
+      "package": "github.com/MichaelKinsy/PiG/coding",
+      "name": "graphMcpAuthProvider",
+      "kind": "type",
+      "exported": false,
+      "shape": {
+        "type": "graphMcpAuthProvider"
+      },
+      "shapeHash": "sha256:0bd28ffc0880e857865d1e569c1404e772138947c79e1803c97ec0b6f3e29fd6"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/coding#graphMcpAuthProvider.Call",
+      "package": "github.com/MichaelKinsy/PiG/coding",
+      "name": "graphMcpAuthProvider.Call",
+      "kind": "function",
+      "exported": true,
+      "shape": {
+        "type": "func(ctx context.Context, method string, raw github.com/MichaelKinsy/PiG/extensions/sdk/json.RawMessage) (any, error)"
+      },
+      "shapeHash": "sha256:29dfade4e7a7b49f0681b4f42b388aab5b3cba903cf98ffab730840f36972c4e"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/coding#graphMcpCredentials",
+      "package": "github.com/MichaelKinsy/PiG/coding",
+      "name": "graphMcpCredentials",
+      "kind": "type",
+      "exported": false,
+      "shape": {
+        "type": "graphMcpCredentials"
+      },
+      "shapeHash": "sha256:4a4c5bfde4f40d8d010a2fe73acdc6a863e64060fc4c5e74852424a32b59e0cb"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/coding#graphMcpCredentials.ForServer",
+      "package": "github.com/MichaelKinsy/PiG/coding",
+      "name": "graphMcpCredentials.ForServer",
+      "kind": "function",
+      "exported": true,
+      "shape": {
+        "type": "func(name string, serverURL string) (github.com/MichaelKinsy/PiG/coding/mcpext.McpOAuthServerStore, error)"
+      },
+      "shapeHash": "sha256:c9486c52ea4bc71c6f073752a1b1ec757162c9fcace52b2d436de03fd18c731d"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/coding#graphMcpCredentials.Remove",
+      "package": "github.com/MichaelKinsy/PiG/coding",
+      "name": "graphMcpCredentials.Remove",
+      "kind": "function",
+      "exported": true,
+      "shape": {
+        "type": "func(name string, serverURL string) (bool, error)"
+      },
+      "shapeHash": "sha256:04309941491c729258880be8fec522b120cf22861d33809c117e3c4f727d5399"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/coding#graphMcpCredentials.Tokens",
+      "package": "github.com/MichaelKinsy/PiG/coding",
+      "name": "graphMcpCredentials.Tokens",
+      "kind": "function",
+      "exported": true,
+      "shape": {
+        "type": "func(name string, serverURL string) *github.com/MichaelKinsy/PiG/mcp/oauth.OAuthTokens"
+      },
+      "shapeHash": "sha256:4d621d2d9ed4674b00e68cb7271f1ef7f476a5711ce39b36675810a2ef66d142"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/coding#graphMcpCredentials.call",
+      "package": "github.com/MichaelKinsy/PiG/coding",
+      "name": "graphMcpCredentials.call",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func(ctx context.Context, args ...any) (github.com/MichaelKinsy/PiG/extensions/sdk/json.RawMessage, error)"
+      },
+      "shapeHash": "sha256:d0335b9ec886087831254b6f03c12fa1a259df0d27952d9b18b99115be444b9e"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/coding#graphMcpEntry",
+      "package": "github.com/MichaelKinsy/PiG/coding",
+      "name": "graphMcpEntry",
+      "kind": "type",
+      "exported": false,
+      "shape": {
+        "type": "graphMcpEntry"
+      },
+      "shapeHash": "sha256:f9226772fb97ae35c296d514921c061f85e0eaae044800b632d6ebb8f7667763"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/coding#graphMcpEntryOf",
+      "package": "github.com/MichaelKinsy/PiG/coding",
+      "name": "graphMcpEntryOf",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func(entry github.com/MichaelKinsy/PiG/coding/mcpext.McpServerEntry) graphMcpEntry"
+      },
+      "shapeHash": "sha256:cccce0444700f08b715c848015952deb8a8d739843f21dca40ea6214757f4c7d"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/coding#graphMcpEvent",
+      "package": "github.com/MichaelKinsy/PiG/coding",
+      "name": "graphMcpEvent",
+      "kind": "type",
+      "exported": false,
+      "shape": {
+        "type": "graphMcpEvent"
+      },
+      "shapeHash": "sha256:9ea37dd90bdf0a43287fa16ab346e31b346b5b6993b8248d6cb82f4291074d03"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/coding#graphMcpFunctions",
+      "package": "github.com/MichaelKinsy/PiG/coding",
+      "name": "graphMcpFunctions",
+      "kind": "type",
+      "exported": false,
+      "shape": {
+        "type": "graphMcpFunctions"
+      },
+      "shapeHash": "sha256:a8849e3ba6aa49005cf521c1ecfe49b9b6f62df1301500a0d2cf417eea7b541b"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/coding#graphMcpFunctions.apply",
+      "package": "github.com/MichaelKinsy/PiG/coding",
+      "name": "graphMcpFunctions.apply",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func(scope github.com/MichaelKinsy/PiG/coding/extension/host/subprocess.SessionGraphScope, options *github.com/MichaelKinsy/PiG/coding/mcpext.Options)"
+      },
+      "shapeHash": "sha256:285469822af72b86c46a4410744ad59ff8d57574832300731f1184f85a72f6e8"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/coding#graphMcpLoadConfig",
+      "package": "github.com/MichaelKinsy/PiG/coding",
+      "name": "graphMcpLoadConfig",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func(scope github.com/MichaelKinsy/PiG/coding/extension/host/subprocess.SessionGraphScope, id string) func(context.Context) github.com/MichaelKinsy/PiG/coding/mcpext.LoadedMcpConfig"
+      },
+      "shapeHash": "sha256:0e3d5795f0c433b3330c76201508fb76b6b5ea61889f17966215cd05525adc41"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/coding#graphMcpLoadContext",
+      "package": "github.com/MichaelKinsy/PiG/coding",
+      "name": "graphMcpLoadContext",
+      "kind": "type",
+      "exported": false,
+      "shape": {
+        "type": "graphMcpLoadContext"
+      },
+      "shapeHash": "sha256:98dcf5bb0bf805a95db4dd9aaf52e4b33955bca18e1a9ed7a9a4e189d7cecf1f"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/coding#graphMcpLoadedConfig",
+      "package": "github.com/MichaelKinsy/PiG/coding",
+      "name": "graphMcpLoadedConfig",
+      "kind": "type",
+      "exported": false,
+      "shape": {
+        "type": "graphMcpLoadedConfig"
+      },
+      "shapeHash": "sha256:0c87df4a293b4a81ec99d6725af2d88856b2e988bb5c5f69eff16827406d8449"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/coding#graphMcpPatch",
+      "package": "github.com/MichaelKinsy/PiG/coding",
+      "name": "graphMcpPatch",
+      "kind": "type",
+      "exported": false,
+      "shape": {
+        "type": "graphMcpPatch"
+      },
+      "shapeHash": "sha256:53000b566234699bb8a560d33e99f09038abce3b86994a295389d1222c709432"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/coding#graphMcpServerStore",
+      "package": "github.com/MichaelKinsy/PiG/coding",
+      "name": "graphMcpServerStore",
+      "kind": "type",
+      "exported": false,
+      "shape": {
+        "type": "graphMcpServerStore"
+      },
+      "shapeHash": "sha256:c99528af89cc405439a77dd04399525cdc4a6d50fd379385a7dbe0d3209936bd"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/coding#graphMcpServerStore.Load",
+      "package": "github.com/MichaelKinsy/PiG/coding",
+      "name": "graphMcpServerStore.Load",
+      "kind": "function",
+      "exported": true,
+      "shape": {
+        "type": "func(ctx context.Context) (*github.com/MichaelKinsy/PiG/mcp/oauth.McpOAuthState, error)"
+      },
+      "shapeHash": "sha256:8c9c776bfd0d8b2b7cf9dd4372b5c28ccd53ae128830065f9db8472834e88de2"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/coding#graphMcpServerStore.Save",
+      "package": "github.com/MichaelKinsy/PiG/coding",
+      "name": "graphMcpServerStore.Save",
+      "kind": "function",
+      "exported": true,
+      "shape": {
+        "type": "func(ctx context.Context, state github.com/MichaelKinsy/PiG/mcp/oauth.McpOAuthState) error"
+      },
+      "shapeHash": "sha256:f8a7f1e81ce01cd4786779dc8f60cfd320f9d248ba79530f9ed9e289789b3aca"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/coding#graphMcpServerStore.WithRefreshLock",
+      "package": "github.com/MichaelKinsy/PiG/coding",
+      "name": "graphMcpServerStore.WithRefreshLock",
+      "kind": "function",
+      "exported": true,
+      "shape": {
+        "type": "func(ctx context.Context, fn func(ctx context.Context) error) error"
+      },
+      "shapeHash": "sha256:3062ee9e243d7b065598850f925d452b94af5ac8441a7135894bdc33f17acf37"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/coding#graphMcpStoreRelease",
+      "package": "github.com/MichaelKinsy/PiG/coding",
+      "name": "graphMcpStoreRelease",
+      "kind": "type",
+      "exported": false,
+      "shape": {
+        "type": "graphMcpStoreRelease"
+      },
+      "shapeHash": "sha256:96c974210922ce0a93c6c4413dfb701eea0794ebeb327ffc27f70193a96cfa3d"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/coding#graphMcpTransport",
+      "package": "github.com/MichaelKinsy/PiG/coding",
+      "name": "graphMcpTransport",
+      "kind": "type",
+      "exported": false,
+      "shape": {
+        "type": "graphMcpTransport"
+      },
+      "shapeHash": "sha256:786e5339bf032cedb0edca710a740c56da84da4fb8c6dcca0fac586b7400faf6"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/coding#graphMcpTransport.Close",
+      "package": "github.com/MichaelKinsy/PiG/coding",
+      "name": "graphMcpTransport.Close",
+      "kind": "function",
+      "exported": true,
+      "shape": {
+        "type": "func() error"
+      },
+      "shapeHash": "sha256:6af1cd6889de8772da28bb1f2998d0262659331d5ba93f6bf1933b49a3efd5e9"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/coding#graphMcpTransport.EmitClose",
+      "package": "github.com/MichaelKinsy/PiG/coding",
+      "name": "graphMcpTransport.EmitClose",
+      "kind": "function",
+      "exported": true,
+      "shape": {
+        "type": "func()"
+      },
+      "shapeHash": "sha256:032e891204f123caf14d3d421fa9728efc3f31299c17e98859c219dccddd74fb"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/coding#graphMcpTransport.EmitError",
+      "package": "github.com/MichaelKinsy/PiG/coding",
+      "name": "graphMcpTransport.EmitError",
+      "kind": "function",
+      "exported": true,
+      "shape": {
+        "type": "func(err error)"
+      },
+      "shapeHash": "sha256:93a6c6c514b3d04f95e2b5274d3e899928348deef941bd76a022f9ea0f5ed2eb"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/coding#graphMcpTransport.EmitMessage",
+      "package": "github.com/MichaelKinsy/PiG/coding",
+      "name": "graphMcpTransport.EmitMessage",
+      "kind": "function",
+      "exported": true,
+      "shape": {
+        "type": "func(message github.com/MichaelKinsy/PiG/mcp.JSONRPCMessage)"
+      },
+      "shapeHash": "sha256:13f4e81a153603c4d49535b224b2855c071b1b5b84842e354528e44f047d62f6"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/coding#graphMcpTransport.OnClose",
+      "package": "github.com/MichaelKinsy/PiG/coding",
+      "name": "graphMcpTransport.OnClose",
+      "kind": "function",
+      "exported": true,
+      "shape": {
+        "type": "func(listener github.com/MichaelKinsy/PiG/mcp.CloseListener) func()"
+      },
+      "shapeHash": "sha256:34b4c2837f44afa672cedf88061e080ea9af54893d770e04c3ce53bf5aca41a2"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/coding#graphMcpTransport.OnError",
+      "package": "github.com/MichaelKinsy/PiG/coding",
+      "name": "graphMcpTransport.OnError",
+      "kind": "function",
+      "exported": true,
+      "shape": {
+        "type": "func(listener github.com/MichaelKinsy/PiG/mcp.ErrorListener) func()"
+      },
+      "shapeHash": "sha256:81f30c3950d7a28e4b669af6b7a95aacfcc73ebba69ab335cf34bdbebc35172f"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/coding#graphMcpTransport.OnMessage",
+      "package": "github.com/MichaelKinsy/PiG/coding",
+      "name": "graphMcpTransport.OnMessage",
+      "kind": "function",
+      "exported": true,
+      "shape": {
+        "type": "func(listener github.com/MichaelKinsy/PiG/mcp.MessageListener) func()"
+      },
+      "shapeHash": "sha256:f1ca975fb83d9e34d7fe6b25f490d5e924ddf02067f4df3b75d2eba5b2e19af1"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/coding#graphMcpTransport.Send",
+      "package": "github.com/MichaelKinsy/PiG/coding",
+      "name": "graphMcpTransport.Send",
+      "kind": "function",
+      "exported": true,
+      "shape": {
+        "type": "func(ctx context.Context, message github.com/MichaelKinsy/PiG/mcp.JSONRPCMessage) error"
+      },
+      "shapeHash": "sha256:566e59111f46a7c2bdcf673264b62d417b31b19d139913e107dbbf5c138cf235"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/coding#graphMcpTransport.SendOrdered",
+      "package": "github.com/MichaelKinsy/PiG/coding",
+      "name": "graphMcpTransport.SendOrdered",
+      "kind": "function",
+      "exported": true,
+      "shape": {
+        "type": "func(ctx context.Context, message github.com/MichaelKinsy/PiG/mcp.JSONRPCMessage, placed func()) error"
+      },
+      "shapeHash": "sha256:cd85e794388de3dd632be027ba9ea0847f95ae2294bd09a6cc0b48f80270d9e6"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/coding#graphMcpTransport.Start",
+      "package": "github.com/MichaelKinsy/PiG/coding",
+      "name": "graphMcpTransport.Start",
+      "kind": "function",
+      "exported": true,
+      "shape": {
+        "type": "func() error"
+      },
+      "shapeHash": "sha256:6af1cd6889de8772da28bb1f2998d0262659331d5ba93f6bf1933b49a3efd5e9"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/coding#graphMcpTransport.call",
+      "package": "github.com/MichaelKinsy/PiG/coding",
+      "name": "graphMcpTransport.call",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func(ctx context.Context, args ...any) (github.com/MichaelKinsy/PiG/extensions/sdk/json.RawMessage, error)"
+      },
+      "shapeHash": "sha256:d0335b9ec886087831254b6f03c12fa1a259df0d27952d9b18b99115be444b9e"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/coding#graphMcpTransport.poll",
+      "package": "github.com/MichaelKinsy/PiG/coding",
+      "name": "graphMcpTransport.poll",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func(ctx context.Context, done chan struct{})"
+      },
+      "shapeHash": "sha256:33b13a327ce30a233372e851a79bd2671ba0a5e146b1f833286af89d3315757a"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/coding#graphMcpTransport.send",
+      "package": "github.com/MichaelKinsy/PiG/coding",
+      "name": "graphMcpTransport.send",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func(ctx context.Context, message github.com/MichaelKinsy/PiG/mcp.JSONRPCMessage, placed func()) error"
+      },
+      "shapeHash": "sha256:cd85e794388de3dd632be027ba9ea0847f95ae2294bd09a6cc0b48f80270d9e6"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/coding#graphMcpTransportFactory",
+      "package": "github.com/MichaelKinsy/PiG/coding",
+      "name": "graphMcpTransportFactory",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func(scope github.com/MichaelKinsy/PiG/coding/extension/host/subprocess.SessionGraphScope, id string) github.com/MichaelKinsy/PiG/coding/mcpext.TransportFactory"
+      },
+      "shapeHash": "sha256:d4a6576b720cb7b27c41742c96579ee0e8b32ebd97be0cae9acc2f91733959ef"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/coding#graphMcpVersionedTransport",
+      "package": "github.com/MichaelKinsy/PiG/coding",
+      "name": "graphMcpVersionedTransport",
+      "kind": "type",
+      "exported": false,
+      "shape": {
+        "type": "graphMcpVersionedTransport"
+      },
+      "shapeHash": "sha256:9efaa6719714fcc7974a1461b610b6b55332b0628188a1facb7f46607b647307"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/coding#graphMcpVersionedTransport.Close",
+      "package": "github.com/MichaelKinsy/PiG/coding",
+      "name": "graphMcpVersionedTransport.Close",
+      "kind": "function",
+      "exported": true,
+      "shape": {
+        "type": "func() error"
+      },
+      "shapeHash": "sha256:6af1cd6889de8772da28bb1f2998d0262659331d5ba93f6bf1933b49a3efd5e9"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/coding#graphMcpVersionedTransport.EmitClose",
+      "package": "github.com/MichaelKinsy/PiG/coding",
+      "name": "graphMcpVersionedTransport.EmitClose",
+      "kind": "function",
+      "exported": true,
+      "shape": {
+        "type": "func()"
+      },
+      "shapeHash": "sha256:032e891204f123caf14d3d421fa9728efc3f31299c17e98859c219dccddd74fb"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/coding#graphMcpVersionedTransport.EmitError",
+      "package": "github.com/MichaelKinsy/PiG/coding",
+      "name": "graphMcpVersionedTransport.EmitError",
+      "kind": "function",
+      "exported": true,
+      "shape": {
+        "type": "func(err error)"
+      },
+      "shapeHash": "sha256:93a6c6c514b3d04f95e2b5274d3e899928348deef941bd76a022f9ea0f5ed2eb"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/coding#graphMcpVersionedTransport.EmitMessage",
+      "package": "github.com/MichaelKinsy/PiG/coding",
+      "name": "graphMcpVersionedTransport.EmitMessage",
+      "kind": "function",
+      "exported": true,
+      "shape": {
+        "type": "func(message github.com/MichaelKinsy/PiG/mcp.JSONRPCMessage)"
+      },
+      "shapeHash": "sha256:13f4e81a153603c4d49535b224b2855c071b1b5b84842e354528e44f047d62f6"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/coding#graphMcpVersionedTransport.OnClose",
+      "package": "github.com/MichaelKinsy/PiG/coding",
+      "name": "graphMcpVersionedTransport.OnClose",
+      "kind": "function",
+      "exported": true,
+      "shape": {
+        "type": "func(listener github.com/MichaelKinsy/PiG/mcp.CloseListener) func()"
+      },
+      "shapeHash": "sha256:34b4c2837f44afa672cedf88061e080ea9af54893d770e04c3ce53bf5aca41a2"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/coding#graphMcpVersionedTransport.OnError",
+      "package": "github.com/MichaelKinsy/PiG/coding",
+      "name": "graphMcpVersionedTransport.OnError",
+      "kind": "function",
+      "exported": true,
+      "shape": {
+        "type": "func(listener github.com/MichaelKinsy/PiG/mcp.ErrorListener) func()"
+      },
+      "shapeHash": "sha256:81f30c3950d7a28e4b669af6b7a95aacfcc73ebba69ab335cf34bdbebc35172f"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/coding#graphMcpVersionedTransport.OnMessage",
+      "package": "github.com/MichaelKinsy/PiG/coding",
+      "name": "graphMcpVersionedTransport.OnMessage",
+      "kind": "function",
+      "exported": true,
+      "shape": {
+        "type": "func(listener github.com/MichaelKinsy/PiG/mcp.MessageListener) func()"
+      },
+      "shapeHash": "sha256:f1ca975fb83d9e34d7fe6b25f490d5e924ddf02067f4df3b75d2eba5b2e19af1"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/coding#graphMcpVersionedTransport.Send",
+      "package": "github.com/MichaelKinsy/PiG/coding",
+      "name": "graphMcpVersionedTransport.Send",
+      "kind": "function",
+      "exported": true,
+      "shape": {
+        "type": "func(ctx context.Context, message github.com/MichaelKinsy/PiG/mcp.JSONRPCMessage) error"
+      },
+      "shapeHash": "sha256:566e59111f46a7c2bdcf673264b62d417b31b19d139913e107dbbf5c138cf235"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/coding#graphMcpVersionedTransport.SendOrdered",
+      "package": "github.com/MichaelKinsy/PiG/coding",
+      "name": "graphMcpVersionedTransport.SendOrdered",
+      "kind": "function",
+      "exported": true,
+      "shape": {
+        "type": "func(ctx context.Context, message github.com/MichaelKinsy/PiG/mcp.JSONRPCMessage, placed func()) error"
+      },
+      "shapeHash": "sha256:cd85e794388de3dd632be027ba9ea0847f95ae2294bd09a6cc0b48f80270d9e6"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/coding#graphMcpVersionedTransport.SetProtocolVersion",
+      "package": "github.com/MichaelKinsy/PiG/coding",
+      "name": "graphMcpVersionedTransport.SetProtocolVersion",
+      "kind": "function",
+      "exported": true,
+      "shape": {
+        "type": "func(version string)"
+      },
+      "shapeHash": "sha256:3b369d885c3af5158e26120b1a23b7ff46b7fc695c4a8d9c5f096858e3054570"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/coding#graphMcpVersionedTransport.Start",
+      "package": "github.com/MichaelKinsy/PiG/coding",
+      "name": "graphMcpVersionedTransport.Start",
+      "kind": "function",
+      "exported": true,
+      "shape": {
+        "type": "func() error"
+      },
+      "shapeHash": "sha256:6af1cd6889de8772da28bb1f2998d0262659331d5ba93f6bf1933b49a3efd5e9"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/coding#graphMcpVersionedTransport.call",
+      "package": "github.com/MichaelKinsy/PiG/coding",
+      "name": "graphMcpVersionedTransport.call",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func(ctx context.Context, args ...any) (github.com/MichaelKinsy/PiG/extensions/sdk/json.RawMessage, error)"
+      },
+      "shapeHash": "sha256:d0335b9ec886087831254b6f03c12fa1a259df0d27952d9b18b99115be444b9e"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/coding#graphMcpVersionedTransport.poll",
+      "package": "github.com/MichaelKinsy/PiG/coding",
+      "name": "graphMcpVersionedTransport.poll",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func(ctx context.Context, done chan struct{})"
+      },
+      "shapeHash": "sha256:33b13a327ce30a233372e851a79bd2671ba0a5e146b1f833286af89d3315757a"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/coding#graphMcpVersionedTransport.send",
+      "package": "github.com/MichaelKinsy/PiG/coding",
+      "name": "graphMcpVersionedTransport.send",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func(ctx context.Context, message github.com/MichaelKinsy/PiG/mcp.JSONRPCMessage, placed func()) error"
+      },
+      "shapeHash": "sha256:cd85e794388de3dd632be027ba9ea0847f95ae2294bd09a6cc0b48f80270d9e6"
     },
     {
       "id": "go:github.com/MichaelKinsy/PiG/coding#graphModelList",
@@ -78422,6 +78983,17 @@
       "shapeHash": "sha256:91250ce24cf0484ecf74d228c3811bb642e8ed11adab23be7caae3ec619c5d28"
     },
     {
+      "id": "go:github.com/MichaelKinsy/PiG/coding#mustMarshalArgs",
+      "package": "github.com/MichaelKinsy/PiG/coding",
+      "name": "mustMarshalArgs",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func(args ...any) github.com/MichaelKinsy/PiG/extensions/sdk/json.RawMessage"
+      },
+      "shapeHash": "sha256:28893973f52b564d3a3d7054dac3e3da5dcd4a5e165dc6d1b1ceb8aa7f593e2c"
+    },
+    {
       "id": "go:github.com/MichaelKinsy/PiG/coding#nativeModelBackend",
       "package": "github.com/MichaelKinsy/PiG/coding",
       "name": "nativeModelBackend",
@@ -78541,6 +79113,17 @@
         "type": "func(cwd string, agentDir string, auth *github.com/MichaelKinsy/PiG/ai.AuthStorage, credentials github.com/MichaelKinsy/PiG/ai.CredentialStore, sm *github.com/MichaelKinsy/PiG/internal/codingagent.SettingsManager, reg *github.com/MichaelKinsy/PiG/internal/codingagent.ModelRegistry) (*AgentSessionServices, error)"
       },
       "shapeHash": "sha256:1146020e9c7056b945887a7f54cf68723fdcbc877e90622a3cedd9c463a19f9c"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/coding#newGraphMcpTransport",
+      "package": "github.com/MichaelKinsy/PiG/coding",
+      "name": "newGraphMcpTransport",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func(scope github.com/MichaelKinsy/PiG/coding/extension/host/subprocess.SessionGraphScope, id string, auth string) *graphMcpTransport"
+      },
+      "shapeHash": "sha256:777cb99499ef8279c4f0d01c83e287f45a8729425c72468dd5bef5dca0ad7f31"
     },
     {
       "id": "go:github.com/MichaelKinsy/PiG/coding#newGraphModelRuntime",
@@ -136513,6 +137096,17 @@
       "shapeHash": "sha256:292c0230f2430bddae4504b8269e142133463925717f8ed0faa46f4f1b6def62"
     },
     {
+      "id": "go:github.com/MichaelKinsy/PiG/coding/extension/host/subprocess#graphScope.Add",
+      "package": "github.com/MichaelKinsy/PiG/coding/extension/host/subprocess",
+      "name": "graphScope.Add",
+      "kind": "function",
+      "exported": true,
+      "shape": {
+        "type": "func(object SessionGraphObject) (string, error)"
+      },
+      "shapeHash": "sha256:87df0319355eb79bbed8209835398352ff4ba0e19c0a43d6ef87b81027dac1ae"
+    },
+    {
       "id": "go:github.com/MichaelKinsy/PiG/coding/extension/host/subprocess#graphScope.Callback",
       "package": "github.com/MichaelKinsy/PiG/coding/extension/host/subprocess",
       "name": "graphScope.Callback",
@@ -136533,6 +137127,17 @@
         "type": "func(handle string) (SessionGraphObject, bool)"
       },
       "shapeHash": "sha256:c5e6a9202b516f4088ce3b48343c5ab00291c7b1d0514992f68fe98d926f1319"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/coding/extension/host/subprocess#graphScope.Remove",
+      "package": "github.com/MichaelKinsy/PiG/coding/extension/host/subprocess",
+      "name": "graphScope.Remove",
+      "kind": "function",
+      "exported": true,
+      "shape": {
+        "type": "func(handle string)"
+      },
+      "shapeHash": "sha256:93ec0a95ca38427ca481caa7775ceb85ed2aac731ddef871d1a0e660bf4227ef"
     },
     {
       "id": "go:github.com/MichaelKinsy/PiG/coding/extension/host/subprocess#graphStreamerOf",
@@ -153937,6 +154542,17 @@
       "shapeHash": "sha256:fd239d1e00912e94932100baf52028825032c85b6cd20f49e4a7091a65acdb6f"
     },
     {
+      "id": "go:github.com/MichaelKinsy/PiG/coding/mcpext#McpOAuthCredentials",
+      "package": "github.com/MichaelKinsy/PiG/coding/mcpext",
+      "name": "McpOAuthCredentials",
+      "kind": "type",
+      "exported": true,
+      "shape": {
+        "type": "McpOAuthCredentials"
+      },
+      "shapeHash": "sha256:1b5254ac4614136d4153dc6e1ec5a8f2c09bca8563f76af484e40dd49c90ad02"
+    },
+    {
       "id": "go:github.com/MichaelKinsy/PiG/coding/mcpext#McpOAuthServerStore",
       "package": "github.com/MichaelKinsy/PiG/coding/mcpext",
       "name": "McpOAuthServerStore",
@@ -154210,6 +154826,17 @@
         "type": "func(agentDir string) *McpOAuthCredentialStore"
       },
       "shapeHash": "sha256:98ceb0c070a248d90df331302547c93b20629a96e76615b5ad47b8a40d3a3f96"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/coding/mcpext#NewMcpOAuthCredentialStoreOver",
+      "package": "github.com/MichaelKinsy/PiG/coding/mcpext",
+      "name": "NewMcpOAuthCredentialStoreOver",
+      "kind": "function",
+      "exported": true,
+      "shape": {
+        "type": "func(custom McpOAuthCredentials) *McpOAuthCredentialStore"
+      },
+      "shapeHash": "sha256:13edb143de094c8df175267e827ceaa5bcb76c255edb176afd34bc2fe14622ab"
     },
     {
       "id": "go:github.com/MichaelKinsy/PiG/coding/mcpext#NewMcpOAuthCredentialStoreWithBackend",
@@ -183516,6 +184143,17 @@
       "shapeHash": "sha256:e17d7fbf803c6cb47486c70343d7705a0ef3caff284ae286a75828cc584ca775"
     },
     {
+      "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#LoadedMcpConfig",
+      "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
+      "name": "LoadedMcpConfig",
+      "kind": "type",
+      "exported": true,
+      "shape": {
+        "type": "LoadedMcpConfig"
+      },
+      "shapeHash": "sha256:fd44cfdea317dfeac4ace1a775cd4b14fbac9cf8f1753a7ea5bf4ea32fb28322"
+    },
+    {
       "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#LocalBashOperationsOptions",
       "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
       "name": "LocalBashOperationsOptions",
@@ -183637,6 +184275,39 @@
       "shapeHash": "sha256:f3b83b11e0f1aa09602b83990b3142a1c38d6a83c0caf4608aa67b0b1191e1d1"
     },
     {
+      "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#McpAuthProvider",
+      "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
+      "name": "McpAuthProvider",
+      "kind": "type",
+      "exported": true,
+      "shape": {
+        "type": "McpAuthProvider"
+      },
+      "shapeHash": "sha256:e37df1f6011616e69d8e5542fafe46a17f49c744daf4ca1ff6f24fdacf87ba02"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#McpAuthProvider.OnUnauthorized",
+      "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
+      "name": "McpAuthProvider.OnUnauthorized",
+      "kind": "function",
+      "exported": true,
+      "shape": {
+        "type": "func(unauthorized McpUnauthorizedContext) error"
+      },
+      "shapeHash": "sha256:4eae1f713cf67af69b3ffab07700e82c728eaa844ec5bcb58512282ef51ae18f"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#McpAuthProvider.Token",
+      "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
+      "name": "McpAuthProvider.Token",
+      "kind": "function",
+      "exported": true,
+      "shape": {
+        "type": "func() (*string, error)"
+      },
+      "shapeHash": "sha256:42a0c2a8210f1cecaa117211796afeb7fd773c5acc999c850896428dfe67db43"
+    },
+    {
       "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#McpExposure",
       "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
       "name": "McpExposure",
@@ -183703,6 +184374,17 @@
       "shapeHash": "sha256:bb9d40a78746b83acf20300896dae7646582a4fae5a087a1dbfbc124c0d79ec4"
     },
     {
+      "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#McpLoadConfigContext",
+      "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
+      "name": "McpLoadConfigContext",
+      "kind": "type",
+      "exported": true,
+      "shape": {
+        "type": "McpLoadConfigContext"
+      },
+      "shapeHash": "sha256:63e1e3d6acfee169ac4629dad95d5d4b45373a30b9f298e0da4a3838cc47f7f4"
+    },
+    {
       "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#McpOAuthConfig",
       "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
       "name": "McpOAuthConfig",
@@ -183714,6 +184396,72 @@
       "shapeHash": "sha256:509a1a9a8121ea72d0dc6bf3c866401aa899336ada579c559b4ed0cb63b8e514"
     },
     {
+      "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#McpOAuthCredentialStore",
+      "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
+      "name": "McpOAuthCredentialStore",
+      "kind": "type",
+      "exported": true,
+      "shape": {
+        "type": "McpOAuthCredentialStore"
+      },
+      "shapeHash": "sha256:f99d4f0120d6efc1addcb3d4bc7d14bdb7b9586a0def12d1d53d23cc62436a18"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#McpOAuthServerStore",
+      "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
+      "name": "McpOAuthServerStore",
+      "kind": "type",
+      "exported": true,
+      "shape": {
+        "type": "McpOAuthServerStore"
+      },
+      "shapeHash": "sha256:f351618635e901c6c8b069400ab70128e0f06895079892fb513ecf4b0ae5f514"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#McpOAuthState",
+      "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
+      "name": "McpOAuthState",
+      "kind": "type",
+      "exported": true,
+      "shape": {
+        "type": "McpOAuthState"
+      },
+      "shapeHash": "sha256:9b63a136583632d5aa5d3b278af8990373f348ec55295b3800fa2406bf921af0"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#McpOAuthTokens",
+      "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
+      "name": "McpOAuthTokens",
+      "kind": "type",
+      "exported": true,
+      "shape": {
+        "type": "McpOAuthTokens"
+      },
+      "shapeHash": "sha256:1a06503daebfc0fd0a5415c6898fbdb203c84f85d5dbc316a9a70b6e0b8e02e5"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#McpOrderedSender",
+      "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
+      "name": "McpOrderedSender",
+      "kind": "type",
+      "exported": true,
+      "shape": {
+        "type": "McpOrderedSender"
+      },
+      "shapeHash": "sha256:94b544c0edd684f146ae2b58126fa991e3364620ee476f73eec1ce99e3aef8c6"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#McpRejectedResponse",
+      "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
+      "name": "McpRejectedResponse",
+      "kind": "type",
+      "exported": true,
+      "shape": {
+        "type": "McpRejectedResponse"
+      },
+      "shapeHash": "sha256:fa6aa4eff7631f7d0a2bb77b4154466b9fbdbda883aa44851beb73115125099a"
+    },
+    {
       "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#McpServerConfig",
       "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
       "name": "McpServerConfig",
@@ -183723,6 +184471,138 @@
         "type": "McpServerConfig"
       },
       "shapeHash": "sha256:a47fdd915d54a350576c33076ffd87a9d7b9106db05ca0a4eaee58da6109dd01"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#McpServerConfigPatch",
+      "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
+      "name": "McpServerConfigPatch",
+      "kind": "type",
+      "exported": true,
+      "shape": {
+        "type": "McpServerConfigPatch"
+      },
+      "shapeHash": "sha256:4b3a0b9983867d915b9c5c182b76e44367c3ae5339485ed4656d2e0c1e22eb70"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#McpServerEntry",
+      "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
+      "name": "McpServerEntry",
+      "kind": "type",
+      "exported": true,
+      "shape": {
+        "type": "McpServerEntry"
+      },
+      "shapeHash": "sha256:57cb025a1b5fe6649b0b0447dee405ceae2350452909272ce9e2284e2723bdc5"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#McpTransport",
+      "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
+      "name": "McpTransport",
+      "kind": "type",
+      "exported": true,
+      "shape": {
+        "type": "McpTransport"
+      },
+      "shapeHash": "sha256:c9cb8c12499149fe5fdcd71dfd68d138b324775660fd156f2fac996b61c545a8"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#McpTransportEvents",
+      "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
+      "name": "McpTransportEvents",
+      "kind": "type",
+      "exported": true,
+      "shape": {
+        "type": "McpTransportEvents"
+      },
+      "shapeHash": "sha256:cbc11a88c2548696c366f85997a68a11a1947fdcd6558825dc28c000419fbcf4"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#McpTransportEvents.EmitClose",
+      "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
+      "name": "McpTransportEvents.EmitClose",
+      "kind": "function",
+      "exported": true,
+      "shape": {
+        "type": "func()"
+      },
+      "shapeHash": "sha256:032e891204f123caf14d3d421fa9728efc3f31299c17e98859c219dccddd74fb"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#McpTransportEvents.EmitError",
+      "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
+      "name": "McpTransportEvents.EmitError",
+      "kind": "function",
+      "exported": true,
+      "shape": {
+        "type": "func(err error)"
+      },
+      "shapeHash": "sha256:93a6c6c514b3d04f95e2b5274d3e899928348deef941bd76a022f9ea0f5ed2eb"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#McpTransportEvents.EmitMessage",
+      "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
+      "name": "McpTransportEvents.EmitMessage",
+      "kind": "function",
+      "exported": true,
+      "shape": {
+        "type": "func(message github.com/MichaelKinsy/PiG/extensions/sdk/json.RawMessage)"
+      },
+      "shapeHash": "sha256:47201c6f43a7e6ae1149d690c7b95cbf2daf80773e64bd3a5e3005ba996bf9e3"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#McpTransportEvents.OnClose",
+      "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
+      "name": "McpTransportEvents.OnClose",
+      "kind": "function",
+      "exported": true,
+      "shape": {
+        "type": "func(listener func()) func()"
+      },
+      "shapeHash": "sha256:32ae25d528c45332203b6bf7035b990a5f12336bc1b26ec5a27ef4300bbeefb0"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#McpTransportEvents.OnError",
+      "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
+      "name": "McpTransportEvents.OnError",
+      "kind": "function",
+      "exported": true,
+      "shape": {
+        "type": "func(listener func(error)) func()"
+      },
+      "shapeHash": "sha256:760ad8a9e54af081ccb74cd70e7e3424dbd379a14494c0fa2da1d12c5322dc5a"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#McpTransportEvents.OnMessage",
+      "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
+      "name": "McpTransportEvents.OnMessage",
+      "kind": "function",
+      "exported": true,
+      "shape": {
+        "type": "func(listener func(github.com/MichaelKinsy/PiG/extensions/sdk/json.RawMessage)) func()"
+      },
+      "shapeHash": "sha256:4e2001f179ba1d9cb1b6227775e1624c6751f82df25bbc345fed1da9e18d3b5e"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#McpTransportFactory",
+      "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
+      "name": "McpTransportFactory",
+      "kind": "type",
+      "exported": true,
+      "shape": {
+        "type": "McpTransportFactory"
+      },
+      "shapeHash": "sha256:7991f2bec73515d24eb2386d32dbd80e2b477b8b254b2bce87e01f14ce473972"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#McpUnauthorizedContext",
+      "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
+      "name": "McpUnauthorizedContext",
+      "kind": "type",
+      "exported": true,
+      "shape": {
+        "type": "McpUnauthorizedContext"
+      },
+      "shapeHash": "sha256:43e373966030b062ca934b16331a0b180caa460e478dd5e3e57a600aa5a30a4d"
     },
     {
       "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#MessageRenderOptions",
@@ -192756,6 +193636,17 @@
       "shapeHash": "sha256:35abc8e102bcad9bb17084f005014fe6009ff4afdb8851a0e99167023148427d"
     },
     {
+      "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#addListener",
+      "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
+      "name": "addListener",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func[F any](mu *sync.Mutex, next *int, listeners *map[int]F, listener F) func()"
+      },
+      "shapeHash": "sha256:7972f51315558e7a418cbf47f391c87bf49acc2e171e484ddf3f690fcab993db"
+    },
+    {
       "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#addToSet",
       "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
       "name": "addToSet",
@@ -194373,6 +195264,17 @@
       "shapeHash": "sha256:36e6666fbf9ebff0c443572ce6e0d324cdac80c51208d6da97738cf21c40a9b9"
     },
     {
+      "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#decodeGraphArg",
+      "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
+      "name": "decodeGraphArg",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func(args []github.com/MichaelKinsy/PiG/extensions/sdk/json.RawMessage, i int, into any) error"
+      },
+      "shapeHash": "sha256:5333f14f78171337b7756bd54dcc620abb0f39a7c9771d1309005bac29c4ae1d"
+    },
+    {
       "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#decodeModelProvider",
       "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
       "name": "decodeModelProvider",
@@ -195050,9 +195952,9 @@
       "kind": "function",
       "exported": false,
       "shape": {
-        "type": "func(factories []any) ([]map[string]any, error)"
+        "type": "func(c Context, factories []any) ([]map[string]any, error)"
       },
-      "shapeHash": "sha256:87dd5b609fb1510c449e2ecfeb3760252a03895f602b1d4bf3cd6651d39886c2"
+      "shapeHash": "sha256:1e3d37b101d5d63ff62da8db5659f02c0e97c03d7f49312e5ed6f831fee00dad"
     },
     {
       "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#extensionHandlerStopTimeout",
@@ -195614,6 +196516,17 @@
         "type": "func(id string) graphCallback"
       },
       "shapeHash": "sha256:e127659241cc5d3b2a39f47f354584182b56fe83a21b4f36109c231d1c397b25"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#graphCallbackRegistry.remove",
+      "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
+      "name": "graphCallbackRegistry.remove",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func(id string)"
+      },
+      "shapeHash": "sha256:cfecdc755116fa71eb3b2bdd3bd35e8bff60ec89238fe389c46963b6e90a69dd"
     },
     {
       "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#graphDone",
@@ -196639,6 +197552,17 @@
       "shapeHash": "sha256:ff8d6594a4ae0e29b85e006f49cd4739342bef92a67af6c3186887eac2e3ea4e"
     },
     {
+      "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#listenersOf",
+      "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
+      "name": "listenersOf",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func[F any](mu *sync.Mutex, listeners map[int]F) []F"
+      },
+      "shapeHash": "sha256:034af5d48eb2964cc75c80c48114894e0a2efac0461176bd1d69fadc44c3a493"
+    },
+    {
       "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#loadTheme",
       "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
       "name": "loadTheme",
@@ -196738,6 +197662,83 @@
       "shapeHash": "sha256:f7e050c9f851ab1a8dfee7bf684f02408092eb4d5e76ae1b7603bc8bfc027212"
     },
     {
+      "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#mcpCredentialsShim",
+      "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
+      "name": "mcpCredentialsShim",
+      "kind": "type",
+      "exported": false,
+      "shape": {
+        "type": "mcpCredentialsShim"
+      },
+      "shapeHash": "sha256:b7d0ce3004c62756d604df86fe78f4350e48c7ae679d1fbd1a59c731dfef07fa"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#mcpCredentialsShim.lock",
+      "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
+      "name": "mcpCredentialsShim.lock",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func(storeID string, store McpOAuthServerStore) (any, error)"
+      },
+      "shapeHash": "sha256:adc884157a5219da66ca999321751c8a5635b5f2f440f7b4298acf442d5af92e"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#mcpCredentialsShim.serve",
+      "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
+      "name": "mcpCredentialsShim.serve",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func(args []github.com/MichaelKinsy/PiG/extensions/sdk/json.RawMessage) (any, error)"
+      },
+      "shapeHash": "sha256:df24e47c899b292c27c5fcbd3b099acb84f6b82d81d87c153cf8a8d61e9ec200"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#mcpEvent",
+      "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
+      "name": "mcpEvent",
+      "kind": "type",
+      "exported": false,
+      "shape": {
+        "type": "mcpEvent"
+      },
+      "shapeHash": "sha256:22d37be3c054b328c932058c2a47289f584679be45d5d989fea95be8f9bce9fb"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#mcpFunctionOptions",
+      "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
+      "name": "mcpFunctionOptions",
+      "kind": "type",
+      "exported": false,
+      "shape": {
+        "type": "mcpFunctionOptions"
+      },
+      "shapeHash": "sha256:45a07b1ab0f2540699268935305a833d70e5123e0cf5f47e0837708ef13949a0"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#mcpFunctionOptions.register",
+      "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
+      "name": "mcpFunctionOptions.register",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func(c Context, wire map[string]any)"
+      },
+      "shapeHash": "sha256:4626244f8cdf306fd7d6d22d1ef55742531951ac2c20b600e600f681345f5c4e"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#mcpRefreshLock",
+      "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
+      "name": "mcpRefreshLock",
+      "kind": "type",
+      "exported": false,
+      "shape": {
+        "type": "mcpRefreshLock"
+      },
+      "shapeHash": "sha256:89df2c9e1da3ae00aff9db29a829bf586f5b4245024b432fd8afaf94ee96a4d9"
+    },
+    {
       "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#mcpServerDecl",
       "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
       "name": "mcpServerDecl",
@@ -196747,6 +197748,83 @@
         "type": "mcpServerDecl"
       },
       "shapeHash": "sha256:845fdee76326903cdaaa9112dbd3393bed016be44f8271c9e657817e0a022604"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#mcpTransportShim",
+      "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
+      "name": "mcpTransportShim",
+      "kind": "type",
+      "exported": false,
+      "shape": {
+        "type": "mcpTransportShim"
+      },
+      "shapeHash": "sha256:ab99f5934851435f14bdfb9df25f3c62b4ff4846dce03adb06d50e83e841f838"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#mcpTransportShim.push",
+      "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
+      "name": "mcpTransportShim.push",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func(event mcpEvent)"
+      },
+      "shapeHash": "sha256:970d170bf15d10f5f9c5fd69b46febf800abeec56bdb50250880b6e43d32a52c"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#mcpTransportShim.pushClose",
+      "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
+      "name": "mcpTransportShim.pushClose",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func()"
+      },
+      "shapeHash": "sha256:032e891204f123caf14d3d421fa9728efc3f31299c17e98859c219dccddd74fb"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#mcpTransportShim.receive",
+      "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
+      "name": "mcpTransportShim.receive",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func() map[string]any"
+      },
+      "shapeHash": "sha256:8fd6b172652468ab086fb7eaa418a41ccd86c4de48801816cacc27cd53cbf80c"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#mcpTransportShim.send",
+      "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
+      "name": "mcpTransportShim.send",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func(args []github.com/MichaelKinsy/PiG/extensions/sdk/json.RawMessage) error"
+      },
+      "shapeHash": "sha256:39a3eed78f73fbae31a4b5a4ba18f76491a78d553f3b9d5ee1b3dc4a90960d6b"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#mcpTransportShim.serve",
+      "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
+      "name": "mcpTransportShim.serve",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func(args []github.com/MichaelKinsy/PiG/extensions/sdk/json.RawMessage) (any, error)"
+      },
+      "shapeHash": "sha256:df24e47c899b292c27c5fcbd3b099acb84f6b82d81d87c153cf8a8d61e9ec200"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#mcpTransportShim.signal",
+      "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
+      "name": "mcpTransportShim.signal",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func()"
+      },
+      "shapeHash": "sha256:032e891204f123caf14d3d421fa9728efc3f31299c17e98859c219dccddd74fb"
     },
     {
       "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#messageFromEntry",
@@ -197132,6 +198210,17 @@
         "type": "func(pairs ...any) *jsObject"
       },
       "shapeHash": "sha256:188abc14f9b691f65d1688632c355dfc79e6ab718d3a3efb9959b0dc2e758161"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#newMcpTransportShim",
+      "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
+      "name": "newMcpTransportShim",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func(c Context, transport McpTransport) *mcpTransportShim"
+      },
+      "shapeHash": "sha256:a0816e23dd932de92468f8a5f18629fd50a8201902d67fc5dfc3da04e3226b47"
     },
     {
       "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#newModelEventStream",

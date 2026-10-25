@@ -1,6 +1,6 @@
 //! Fixture for the session graph conformance rows (test/extension-conformance/session_graph_test.go): the script of testfixture/sessiongraph (Go), testdata/session-graph.mjs (Node, Pi's own classes) and testdata/session_graph_python.py.
 
-use pig_sdk::{create_codemode_extension, create_tool_search_extension, create_mcp_extension, CodemodeExtensionOptions, McpExtensionOptions, ExtensionFactory, create_provider, CreateProviderOptions, ProviderApi, ProviderStreams, ProviderAuth, APIKeyAuth, AuthResult, ProviderStreamFn, ProviderOperationFn, ProviderOperationOptions, ProviderStreamOptions, RefreshModelsContext, ModelsPublication, create_assistant_message_event_stream, ProviderSignal, create_agent_session_from_services, create_agent_session_services, CreateAgentSessionFromServicesOptions, CreateAgentSessionServicesOptions, SessionStartEvent, CreateAgentSessionOptions, ModelRuntime, ModelRuntimeCreateOptions, ModelRoute, VirtualModel, DefaultPackageManager, PackageManagerOptions, DefaultResourceLoader, DefaultResourceLoaderOptions, empty_schema, Context, Extension, NewSessionOptions, SessionInfo, SessionManager, SettingsManager, SettingsManagerCreateOptions, ToolResult, has_trust_requiring_project_resources, ProjectTrustStore, ProjectTrustStoreEntry, ProjectTrustUpdate};
+use pig_sdk::{McpAuthProvider, McpLoadConfigContext, McpOAuthCredentialStore, McpOAuthServerStore, McpSendSignal, McpTransport, McpTransportEvents, create_codemode_extension, create_tool_search_extension, create_mcp_extension, CodemodeExtensionOptions, McpExtensionOptions, ExtensionFactory, create_provider, CreateProviderOptions, ProviderApi, ProviderStreams, ProviderAuth, APIKeyAuth, AuthResult, ProviderStreamFn, ProviderOperationFn, ProviderOperationOptions, ProviderStreamOptions, RefreshModelsContext, ModelsPublication, create_assistant_message_event_stream, ProviderSignal, create_agent_session_from_services, create_agent_session_services, CreateAgentSessionFromServicesOptions, CreateAgentSessionServicesOptions, SessionStartEvent, CreateAgentSessionOptions, ModelRuntime, ModelRuntimeCreateOptions, ModelRoute, VirtualModel, DefaultPackageManager, PackageManagerOptions, DefaultResourceLoader, DefaultResourceLoaderOptions, empty_schema, Context, Extension, NewSessionOptions, SessionInfo, SessionManager, SettingsManager, SettingsManagerCreateOptions, ToolResult, has_trust_requiring_project_resources, ProjectTrustStore, ProjectTrustStoreEntry, ProjectTrustUpdate};
 use serde_json::{json, Value};
 use std::io;
 use std::path::Path;
@@ -975,13 +975,179 @@ fn extension_refs_script(ctx: &Context, args: &Value) -> io::Result<Value> {
     let factories = || vec![
         create_codemode_extension(CodemodeExtensionOptions { mode: Some("only".into()), inline_budget: Some(123.0), models: Some(false) }),
         create_tool_search_extension(),
-        create_mcp_extension(McpExtensionOptions { log_path: Some(Path::new(text(&args["dir"])).join("mcp.log").to_string_lossy().into_owned()), startup_wait_ms: Some(0.0) }),
+        create_mcp_extension(McpExtensionOptions { log_path: Some(Path::new(text(&args["dir"])).join("mcp.log").to_string_lossy().into_owned()), startup_wait_ms: Some(0.0), ..Default::default() }),
     ];
     let both = || Some(vec!["codemode".to_string(), "tool_search".to_string()]);
     Ok(json!({
         "inactive": observe(factories(), None)?, "active": observe(factories(), both())?,
         "defaults": observe(vec![create_codemode_extension(CodemodeExtensionOptions::default()), create_tool_search_extension()], both())?, "none": observe(vec![], both())?,
     }))
+}
+
+/// Answers one message of the MCP handshake, the tool list and a tool call, as testdata/session-graph.mjs mcpPeerReply does.
+fn mcp_peer_reply(message: &Value) -> Option<Value> {
+    let id = message.get("id")?.clone();
+    let reply = |result: Value| json!({"jsonrpc": "2.0", "id": id, "result": result});
+    Some(match message["method"].as_str().unwrap_or_default() {
+        "initialize" => reply(json!({"protocolVersion": message["params"]["protocolVersion"], "capabilities": {"tools": {}}, "serverInfo": {"name": "fake", "version": "1"}})),
+        "tools/list" => reply(json!({"tools": [{"name": "echo", "description": "Echo text", "inputSchema": {"type": "object", "properties": {"text": {"type": "string"}}, "required": ["text"]}}]})),
+        "tools/call" => reply(json!({"content": [{"type": "text", "text": format!("echo:{}", text(&message["params"]["arguments"]["text"]))}]})),
+        "ping" => reply(json!({})),
+        _ => json!({"jsonrpc": "2.0", "id": id, "error": {"code": -32601, "message": "method not found"}}),
+    })
+}
+
+#[derive(Default)]
+struct McpLog {
+    demo: Mutex<Vec<String>>,
+    remote: Mutex<Vec<String>>,
+    credentials: Mutex<Vec<String>>,
+    load_config: Mutex<Vec<Value>>,
+}
+
+impl McpLog {
+    fn server(&self, name: &str) -> &Mutex<Vec<String>> {
+        if name == "remote" { &self.remote } else { &self.demo }
+    }
+}
+
+/// The in-process peer behind create_transport.
+struct McpScriptTransport {
+    events: McpTransportEvents,
+    log: Arc<McpLog>,
+    server: String,
+    auth: Option<McpAuthProvider>,
+}
+
+impl McpScriptTransport {
+    fn note(&self, entry: String) {
+        self.log.server(&self.server).lock().unwrap().push(entry);
+    }
+}
+
+impl McpTransport for McpScriptTransport {
+    fn start(&self) -> Result<(), String> {
+        self.note("start".into());
+        if let Some(auth) = &self.auth {
+            match auth.token().map_err(|error| error.to_string())? {
+                Some(token) => self.note(format!("token {token}")),
+                None => self.note("token undefined".into()),
+            }
+        }
+        Ok(())
+    }
+    fn send(&self, message: Value, _signal: &McpSendSignal) -> Result<(), String> {
+        self.note(format!("send {}", message["method"].as_str().unwrap_or("response")));
+        if let Some(reply) = mcp_peer_reply(&message) {
+            self.events.emit_message(reply);
+        }
+        Ok(())
+    }
+    fn close(&self) -> Result<(), String> {
+        self.note("close".into());
+        self.events.emit_close();
+        Ok(())
+    }
+    fn on_message(&self, listener: Box<dyn Fn(Value) + Send + Sync>) -> Box<dyn FnOnce() + Send> {
+        self.events.on_message(listener)
+    }
+    fn on_error(&self, listener: Box<dyn Fn(String) + Send + Sync>) -> Box<dyn FnOnce() + Send> {
+        self.events.on_error(listener)
+    }
+    fn on_close(&self, listener: Box<dyn Fn() + Send + Sync>) -> Box<dyn FnOnce() + Send> {
+        self.events.on_close(listener)
+    }
+}
+
+struct McpScriptServerStore {
+    log: Arc<McpLog>,
+    name: String,
+    state: Value,
+}
+
+impl McpOAuthServerStore for McpScriptServerStore {
+    fn load(&self) -> Result<Option<Value>, String> {
+        self.log.credentials.lock().unwrap().push(format!("load {}", self.name));
+        Ok(Some(self.state.clone()))
+    }
+    fn save(&self, _state: Value) -> Result<(), String> {
+        self.log.credentials.lock().unwrap().push(format!("save {}", self.name));
+        Ok(())
+    }
+    fn with_refresh_lock(&self, f: &mut dyn FnMut() -> Result<(), String>) -> Result<(), String> {
+        self.log.credentials.lock().unwrap().push(format!("lock {}", self.name));
+        f()
+    }
+}
+
+struct McpScriptCredentials {
+    log: Arc<McpLog>,
+    state: Value,
+}
+
+impl McpOAuthCredentialStore for McpScriptCredentials {
+    fn for_server(&self, name: &str, server_url: &str) -> Result<Arc<dyn McpOAuthServerStore>, String> {
+        self.log.credentials.lock().unwrap().push(format!("forServer {name} {server_url}"));
+        Ok(Arc::new(McpScriptServerStore { log: self.log.clone(), name: name.into(), state: self.state.clone() }))
+    }
+    fn tokens(&self, name: &str, server_url: &str) -> Result<Option<Value>, String> {
+        self.log.credentials.lock().unwrap().push(format!("tokens {name} {server_url}"));
+        Ok(Some(json!({"access_token": "tok-1", "token_type": "Bearer"})))
+    }
+    fn remove(&self, name: &str, server_url: &str) -> Result<bool, String> {
+        self.log.credentials.lock().unwrap().push(format!("remove {name} {server_url}"));
+        Ok(true)
+    }
+}
+
+/// Passes load_config, create_transport and credentials to create_mcp_extension, as testdata/session-graph.mjs mcpOptionsScript does with Pi's factory; the report is Pi's own run's.
+fn mcp_options_script(ctx: &Context, args: &Value) -> io::Result<Value> {
+    let (cwd, agent_dir) = (text(&args["cwd"]), text(&args["agentDir"]));
+    let log = Arc::new(McpLog::default());
+    let rt = ModelRuntime::create(ctx, ModelRuntimeCreateOptions { auth_path: Some(text(&args["mrAuth"]).into()), models_path: Some(text(&args["mrToolModels"]).into()), models_store_path: Some(text(&args["mrStore"]).into()), ..Default::default() })?;
+    let settings = SettingsManager::in_memory(ctx, Some(json!({"compaction": {"enabled": false}, "retry": {"enabled": false}, "defaultProvider": "mr-tool", "defaultModel": "m1"})), None)?;
+    let state = json!({"serverUrl": "http://127.0.0.1:9/mcp", "tokens": {"access_token": "tok-1", "token_type": "Bearer"}});
+    let (load_log, transport_log) = (log.clone(), log.clone());
+    let factory = create_mcp_extension(McpExtensionOptions {
+        load_config: Some(Arc::new(move |c: McpLoadConfigContext| {
+            load_log.load_config.lock().unwrap().push(json!({"cwd": c.cwd, "isProjectTrusted": c.is_project_trusted}));
+            Ok(json!({"servers": [
+                {"name": "demo", "config": {"command": "unused", "exposure": "direct"}, "source": "<config>", "scope": "global"},
+                {"name": "remote", "config": {"url": "http://127.0.0.1:9/mcp", "exposure": "direct"}, "source": "<config>", "scope": "global"},
+            ], "errors": []}))
+        })),
+        create_transport: Some(Arc::new(move |entry: Value, transport_cwd: &str, auth: Option<McpAuthProvider>| {
+            let name = text(&entry["name"]).to_string();
+            transport_log.server(&name).lock().unwrap().push(format!("create {name} cwd={transport_cwd} auth={}", auth.is_some()));
+            Ok(Arc::new(McpScriptTransport { events: McpTransportEvents::default(), log: transport_log.clone(), server: name, auth }) as Arc<dyn McpTransport>)
+        })),
+        credentials: Some(Arc::new(McpScriptCredentials { log: log.clone(), state })),
+        open_url: Some(Arc::new(|_url: &str| {})),
+        update_config: Some(Arc::new(|_entry: Value, _patch: Value| Ok(()))),
+        log_path: Some(Path::new(agent_dir).join("mcp.log").to_string_lossy().into_owned()),
+        ..Default::default()
+    });
+    let loader = DefaultResourceLoader::new(ctx, DefaultResourceLoaderOptions {
+        cwd: cwd.into(), agent_dir: agent_dir.into(), settings_manager: Some(&settings), no_extensions: true, no_skills: true, no_prompt_templates: true, no_themes: true, no_context_files: true,
+        additional_extension_paths: vec![text(&args["mcpProbe"]).into()], extension_factories: vec![factory], ..Default::default()
+    })?;
+    loader.reload(None)?;
+    let manager = SessionManager::in_memory(ctx, Some(cwd), None, None)?;
+    let session = ctx.create_agent_session(CreateAgentSessionOptions {
+        session_manager: Some(manager.handle().to_string()), settings_manager: Some(settings.handle().to_string()), model_runtime: Some(rt.handle().to_string()),
+        resource_loader: Some(loader.handle().to_string()), ..Default::default()
+    })?;
+    session.bind_extensions()?;
+    for prompt in ["call the tool", "/mcp reconnect demo", "/mcp logout remote"] {
+        session.prompt(prompt)?;
+    }
+    let messages: Vec<Value> = session.messages()?.iter().filter(|message| message["role"] == "toolResult").map(|message| json!(message["content"].as_array().map(|parts| parts.iter().map(|part| text(&part["text"])).collect::<String>()).unwrap_or_default())).collect();
+    let seen: Vec<Value> = manager.get_entries()?.as_array().cloned().unwrap_or_default().iter().filter(|entry| entry["type"] == "custom" && entry["customType"] == "mcp_seen").map(|entry| entry["data"].clone()).collect();
+    let report = json!({"messages": messages, "seen": seen, "log": {
+        "demo": *log.demo.lock().unwrap(), "remote": *log.remote.lock().unwrap(), "credentials": *log.credentials.lock().unwrap(), "loadConfig": *log.load_config.lock().unwrap(),
+    }});
+    session.dispose();
+    Ok(report)
 }
 
 fn model_runtime_script(ctx: &Context, args: &Value) -> io::Result<Value> {
@@ -1141,6 +1307,10 @@ pub fn new_extension() -> Extension {
         Err(error) => ToolResult::Error(error),
     });
     ext.tool("extension_refs", "Runs the compiled-in extension factories script.", empty_schema(), |ctx, args| match extension_refs_script(ctx, &args) {
+        Ok(report) => ToolResult::text(report.to_string()),
+        Err(error) => ToolResult::Error(error.to_string()),
+    });
+    ext.tool("mcp_options", "Runs the createMcpExtension function options script.", empty_schema(), |ctx, args| match mcp_options_script(ctx, &args) {
         Ok(report) => ToolResult::text(report.to_string()),
         Err(error) => ToolResult::Error(error.to_string()),
     });

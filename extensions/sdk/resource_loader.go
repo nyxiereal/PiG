@@ -182,7 +182,7 @@ func graphFunc[In, Out any](override func(In) Out) graphCallback {
 
 // NewDefaultResourceLoader is `new DefaultResourceLoader(options)`.
 func NewDefaultResourceLoader(c Context, options DefaultResourceLoaderOptions) (*DefaultResourceLoader, error) {
-	factories, err := extensionFactoriesWire(options.ExtensionFactories)
+	factories, err := extensionFactoriesWire(c, options.ExtensionFactories)
 	if err != nil {
 		return nil, err
 	}

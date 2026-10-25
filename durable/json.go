@@ -10,6 +10,7 @@ import (
 	"github.com/MichaelKinsy/PiG/chord/delta"
 	"github.com/MichaelKinsy/PiG/durable/internal/ordered"
 	sdkjson "github.com/MichaelKinsy/PiG/extensions/sdk/json"
+	"github.com/MichaelKinsy/PiG/internal/chord/chordjson"
 	"github.com/MichaelKinsy/PiG/internal/jsstring"
 )
 
@@ -30,7 +31,7 @@ func ToJsonValue(value any) (JsonValue, error) {
 		return nil, copyErr
 	}
 	// Objects decode in encoding order, so a struct's fields keep their declared order.
-	return delta.DecodeJson(encoded)
+	return decodeJsonText(encoded)
 }
 
 func isNonFinite(text string) bool {
@@ -79,7 +80,7 @@ func FromJsonValue[T any](value JsonValue) (T, error) {
 		return decoded, err
 	}
 	if holdsDynamicJSON[T]() {
-		dynamic, err := delta.DecodeJson(encoded)
+		dynamic, err := decodeJsonText(encoded)
 		if err != nil {
 			return decoded, err
 		}
@@ -94,7 +95,7 @@ func FromJsonValue[T any](value JsonValue) (T, error) {
 	}
 	if ordered.HasDynamic(reflect.TypeFor[T]()) {
 		// A JsonValue member holds the text's objects in order, as JSON.parse gives Pi.
-		tree, err := delta.DecodeJson(encoded)
+		tree, err := decodeJsonText(encoded)
 		if err != nil {
 			return decoded, err
 		}
@@ -141,7 +142,7 @@ func CopyJson(value JsonValue) (JsonValue, error) {
 // unmarshalOrdered decodes data into target, then gives target's JsonValue members the text's key order, as JSON.parse gives Pi.
 func unmarshalOrdered[T any](data []byte, target *T) error {
 	if dynamic, ok := any(target).(*JsonValue); ok {
-		value, err := delta.DecodeJson(data)
+		value, err := decodeJsonText(data)
 		if err == nil {
 			*dynamic = value
 		}
@@ -151,7 +152,7 @@ func unmarshalOrdered[T any](data []byte, target *T) error {
 		return err
 	}
 	if ordered.HasDynamic(reflect.TypeFor[T]()) {
-		tree, err := delta.DecodeJson(data)
+		tree, err := decodeJsonText(data)
 		if err != nil {
 			return err
 		}
@@ -159,3 +160,12 @@ func unmarshalOrdered[T any](data []byte, target *T) error {
 	}
 	return nil
 }
+
+// decodeJsonText parses JSON text into a strict JSON value whose objects keep the text's key order, as JSON.parse gives Pi,
+// and whose strings keep the unit of a lone surrogate escape (`\ud83d`), which a Go string holds as WTF-8. Chord's own
+// decoder reads that escape as U+FFFD, as every other Chord caller expects.
+func decodeJsonText(data []byte) (JsonValue, error) {
+	return chordjson.DecodeUnquoting(data, unquoteJS)
+}
+
+func unquoteJS(raw []byte, text *string) error { return jsstring.UnmarshalKeepingSurrogates(raw, text) }

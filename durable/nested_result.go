@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 
 	"github.com/MichaelKinsy/PiG/ai"
-	"github.com/MichaelKinsy/PiG/chord/delta"
 	"github.com/MichaelKinsy/PiG/internal/jsstring"
 )
 
@@ -68,5 +67,5 @@ func (result *NestedToolExecutionResult) UnmarshalJSON(data []byte) error {
 }
 
 func decodeJsonValue(raw json.RawMessage) (JsonValue, error) {
-	return delta.DecodeJson(raw)
+	return decodeJsonText(raw)
 }

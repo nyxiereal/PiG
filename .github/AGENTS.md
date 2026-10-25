@@ -34,6 +34,8 @@ Build from `git archive HEAD` in an empty workspace. Test each composition and t
 
 `automation/ci/ci-tiers.txt` assigns every CI job to a tier and `automation/ci/ci-plan.sh` turns it into the job matrices of `ci.yml`. The full run is every row; the light run is the `pr` rows. A check keeps its name in both runs. A docs-only change skips the product jobs in both, classified on the pull request's diff and on the queue entry's diff. The full run runs on `merge_group`, on the weekly schedule, on `workflow_dispatch`, and on a pull request unless the repository variable `PIG_PR_CI_LIGHT` selects a light mode. Pushes to `main` do not run `ci.yml`: a change lands on the tree that was tested, and the weekly run keeps `main`'s health current.
 
+`Bookkeeping` is the first job of every run (`make ci-bookkeeping`, about three minutes on a warm cache) and every job that spends real minutes waits for it: the Linux preflight and shards, Node extensions, the Durable Cloudflare host and Android (Windows, macOS and the Node loader wait through preflight). It runs the commit sign-off and test-expectation checks of a pull request and the gates that need only Go, Python and Pi's source mirror: the drift of every committed file that `make generate` rewrites without an oracle build (divergences, Piglet strip IDs, known gaps, the custom-factory ledger, coverage, the bug ledger, the performance scoreboard, the knowledge graph), PORT_MAP completeness, scenario lint, divergence consistency, quality and guard, public and source hygiene, test provenance and race coverage. A red bookkeeping job stops the run before the 30-minute shards start, and `CI result` says so instead of listing every skipped job. A gate that needs the npm toolchain, the oracle's node modules or compiled test binaries stays in its shard. `make changelog-check` stays a release-candidate gate (`docs/project/RELEASING.md`): its fragment names refer to commits a squash merge replaces.
+
 `PIG_PR_CI_LIGHT` is the switch, and no value lets a change land on a light run alone:
 
 | `PIG_PR_CI_LIGHT` | A pull request push runs | `CI result` on that run | Where the full run happens |
@@ -46,7 +48,7 @@ The flow in `label` mode: push; the light run reports `CI result` red with the m
 
 | Check | Tier | Min | What stays out of the light run |
 |---|---|---|---|
-| Changed paths, Project documents, DCO, CI result, Linux verification, Prune superseded caches | always | 5 | |
+| Changed paths, Bookkeeping, Project documents, CI result, Linux verification, Prune superseded caches | always | 5 | |
 | Linux / preflight | always | 20 | Build, and vet natively, for both Windows architectures and for Android, and `go fix` |
 | Linux / test-fast-sharded | pr | 31 | |
 | Linux / test-fast | pr | 26 | |

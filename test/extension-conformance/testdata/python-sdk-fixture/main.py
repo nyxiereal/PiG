@@ -522,6 +522,14 @@ def new_extension() -> pig_sdk.Extension:
         ext.tool("schema-invalid", "Must not register", None, lambda ctx, args: {"content": "bad"})
     except ValueError as error:
         schema_rejected = str(error) == 'Tool "schema-invalid" registered by extension "python-sdk-fixture" must define an object parameter schema.'
+    Type = pig_sdk.Type
+    ext.tool("type-schema-tool", "Parameters built with Type", Type.object({
+        "query": Type.string({"description": "What to look up"}),
+        "limit": Type.optional(Type.integer({"minimum": 1, "maximum": 50})),
+        "mode": Type.union([Type.literal("fast"), Type.literal("deep")]),
+        "tags": Type.optional(Type.array(Type.string())),
+        "filter": Type.optional(Type.record(Type.string(), Type.number())),
+    }, {"additionalProperties": False}), lambda ctx, args: "ok")
     class ConformanceEditor(pig_sdk.EditorComponent):
         """Swallows "q", rewrites "a" to "A", upper-cases the host's setText, and frames super.render."""
 

@@ -633,6 +633,20 @@ fn main() {
     let schema_rejected = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
         ext.tool("schema-invalid", "Must not register", Value::Null, |_, _| ToolResult::text("bad"));
     })).is_err();
+    {
+        use pig_sdk::Type;
+        let parameters = Type::object(
+            [
+                ("query", Type::string(json!({"description": "What to look up"}).as_object())),
+                ("limit", Type::optional(Type::integer(json!({"minimum": 1, "maximum": 50}).as_object()))),
+                ("mode", Type::union([Type::literal("fast", None).unwrap(), Type::literal("deep", None).unwrap()], None)),
+                ("tags", Type::optional(Type::array(Type::string(None), None))),
+                ("filter", Type::optional(Type::record(Type::string(None), Type::number(None), None).unwrap())),
+            ],
+            json!({"additionalProperties": false}).as_object(),
+        );
+        ext.tool("type-schema-tool", "Parameters built with Type", parameters.to_value(), |_, _| ToolResult::text("ok"));
+    }
     ext.command("language_probe", "Report the highlight language of a path", |ctx, args| {
         let case: serde_json::Value = match serde_json::from_str(args) { Ok(case) => case, Err(err) => return CommandResult::Error(err.to_string()) };
         let language = pig_sdk::get_language_from_path(case["path"].as_str().unwrap_or(""));

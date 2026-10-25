@@ -66,7 +66,7 @@ func piVectorsFile(t *testing.T) string {
 
 	var cases []map[string]any
 	for _, export := range exports {
-		if export == "envApiKeyAuth" || export == "createAssistantMessageEventStream" {
+		if export == "envApiKeyAuth" || export == "createAssistantMessageEventStream" || export == "Type" { // Type has its own vectors and rows (type_schema_registration_test.go)
 			continue
 		}
 		for _, c := range piVectorCases(t, "pi-ai", export) {

@@ -21944,6 +21944,30 @@
       ]
     },
     {
+      "id": "BF-D198",
+      "title": "The Go, Rust and Python `Type` has no Codec family (`Codec`, `Decode`, `Encode`, `DecodeBuilder`…",
+      "symptom": "none.",
+      "rootCause": "a Codec's callbacks have no consumer outside `Value.Decode` and `Value.Encode` (`typebox/build/value/codec/callback.mjs`, the only reader of `~codec`), which pi-ai does not export (`ai/src/index.ts` exports `Static`, `TSchema` and `Type` from typebox) and no SDK serves. Pi's own tool-argument validation does not call them (`ai/src/utils/validation.ts` uses `Value.Convert` and `Compile(schema).Check`). A port could store the callbacks, but nothing in any SDK or in the host could ever call them, which is an inert member that accepts the call and does nothing.",
+      "rootCauseSource": "divergence record",
+      "userImpact": "Behavior differed from Pi",
+      "platform": "All platforms",
+      "class": "ahead-of-pi",
+      "divergence": "D198",
+      "removeWhen": "an SDK serves `Value.Decode`/`Value.Encode` (or a host call runs a codec) so a stored callback pair has a consumer.",
+      "fixedIn": "Unreleased",
+      "origin": "divergence",
+      "commits": [
+        {
+          "hash": "a8c3cdfb85",
+          "date": "2026-10-24"
+        }
+      ],
+      "tests": [
+        "extensions/sdk/type_vectors_test.go::TestTypeOmitsTheCodecFamily",
+        "test/extension-conformance/type_schema_registration_test.go::TestConformance_TypeSchemaToolParametersAgreeAcrossSDKs"
+      ]
+    },
+    {
       "id": "BF-a076a50",
       "title": "A model request on a reused connection gets the full HTTP idle timeout to receive its first response bytes…",
       "symptom": "The time the connection had spent idle in the pool was deducted from the next request's timeout.",
@@ -36006,8 +36030,9 @@
       "entry": "BF-648ff3e-13"
     },
     {
-      "id": "D199",
-      "title": "PiG lists OpenRouter's :nitro and :floor routing variants beside every OpenRouter model, where Pi lists only…"
+      "id": "D198",
+      "title": "The Go, Rust and Python `Type` has no Codec family (`Codec`, `Decode`, `Encode`, `DecodeBuilder`…",
+      "entry": "BF-D198"
     }
   ],
   "exemptCommits": {

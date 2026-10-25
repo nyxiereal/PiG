@@ -664,7 +664,7 @@ async function modelRegistryScript({ mrAuth, mrModels, mrStore, mrServer }) {
   registry.unregisterProvider("reg-prov");
   r.registered.after = { ids: [...registry.getRegisteredProviderIds()], models: registry.getAll().filter((model) => model.provider === "reg-prov").length, config: registry.getRegisteredProviderConfig("reg-prov") === undefined };
 
-  const nativeModel = { id: "n1", name: "N One", api: "nat-api", provider: "nreg", baseUrl: "https://ext.invalid", reasoning: false, input: ["text"], cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 }, contextWindow: 4000, maxTokens: 500 };
+  const nativeModel = { id: "n1", name: "N One", api: "nat-api", provider: "nreg", reasoning: false, input: ["text"], cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 }, contextWindow: 4000, maxTokens: 500 };
   const message = (model, text) => ({
     role: "assistant", content: [{ type: "text", text }], api: model.api, provider: model.provider, model: model.id,
     usage: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0, totalTokens: 0, cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0, total: 0 } }, stopReason: "stop", timestamp: 1,
@@ -681,15 +681,25 @@ async function modelRegistryScript({ mrAuth, mrModels, mrStore, mrServer }) {
   const nativeEvents = [];
   for await (const event of nativeStream) nativeEvents.push(event.type);
   const nativeMessage = await nativeStream.result();
+  await registry.refresh({ allowNetwork: false });
   r.native = {
     registered: registry.getRegisteredNativeProvider("nreg")?.id ?? null, same: registry.getRegisteredNativeProvider("nreg") === provider, viaGetProvider: registry.getProvider("nreg")?.id ?? null, viaRuntime: rt.getProvider("nreg")?.id ?? null,
     viaRuntimeRegistered: rt.getRegisteredNativeProvider("nreg")?.id ?? null, none: registry.getRegisteredNativeProvider("nope-prov") === undefined, noneProvider: registry.getProvider("nope-prov") === undefined,
     ids: [...registry.getRegisteredProviderIds()], displayName: registry.getProviderDisplayName("nreg"), models: registry.getAll().filter((model) => model.provider === "nreg").map((model) => model.id),
     auth: plain(await registry.getProviderAuth("nreg")), request: plain(await registry.getApiKeyAndHeaders(nativeModel)),
     events: nativeEvents, text: nativeMessage.content.map((block) => block.text ?? "").join(""), stopReason: nativeMessage.stopReason, completed: (await registry.complete(nativeModel, conversation, {})).stopReason,
+    configured: registry.hasConfiguredAuth(nativeModel),
   };
   registry.unregisterProvider("nreg");
   r.native.after = { registered: registry.getRegisteredNativeProvider("nreg") === undefined, provider: registry.getProvider("nreg") === undefined, models: registry.getAll().filter((model) => model.provider === "nreg").length };
+  // A stored credential makes registration mark the provider configured at once (model-runtime.ts markProvisionallyConfigured); its auth check finds no key, so the availability refresh the registration launched replaces the mark and the settled state is unconfigured.
+  const storedModel = { ...nativeModel, provider: "stored-prov" };
+  const storedProvider = createProvider({ id: "stored-prov", name: "Stored Native", auth: { apiKey: { name: "Key", check: async () => undefined, resolve: async () => undefined } }, models: [storedModel], api: { "nat-api": { stream: scripted("s.stream"), streamSimple: scripted("s.simple") } } });
+  registry.registerProvider(storedProvider);
+  await registry.refresh({ allowNetwork: false });
+  r.native.storedSettled = { configured: registry.hasConfiguredAuth(storedModel), status: registry.getProviderAuthStatus("stored-prov"), available: registry.getAvailable().some((model) => model.provider === "stored-prov") };
+  registry.unregisterProvider("stored-prov");
+  await registry.refresh({ allowNetwork: false });
   r.builtin = { provider: registry.getProvider("anthropic").id, providers: rt.getProviders().some((candidate) => candidate.id === "anthropic") ? "anthropic" : "absent" };
 
   registry.registerVirtualModel({

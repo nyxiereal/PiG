@@ -69,7 +69,7 @@ func modelRegistryScript(ctx sdk.Context, args map[string]any) map[string]any {
 	check(registry.UnregisterProvider("reg-prov"))
 	r["registered"].(map[string]any)["after"] = map[string]any{"ids": ok(registry.GetRegisteredProviderIDs()), "models": len(of(ok(registry.GetAll()), "reg-prov")), "config": ok(registry.GetRegisteredProviderConfig("reg-prov")) == nil}
 
-	nativeModel := map[string]any{"id": "n1", "name": "N One", "api": "nat-api", "provider": "nreg", "baseUrl": "https://ext.invalid", "reasoning": false, "input": []any{"text"}, "cost": map[string]any{"input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0}, "contextWindow": 4000, "maxTokens": 500}
+	nativeModel := map[string]any{"id": "n1", "name": "N One", "api": "nat-api", "provider": "nreg", "reasoning": false, "input": []any{"text"}, "cost": map[string]any{"input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0}, "contextWindow": 4000, "maxTokens": 500}
 	message := func(model map[string]any, text string) map[string]any {
 		return map[string]any{
 			"role": "assistant", "content": []any{map[string]any{"type": "text", "text": text}}, "api": model["api"], "provider": model["provider"], "model": model["id"],
@@ -101,6 +101,8 @@ func modelRegistryScript(ctx sdk.Context, args map[string]any) map[string]any {
 		nativeEvents = append(nativeEvents, fmt.Sprint(event["type"]))
 	}
 	nativeMessage := nativeStream.Result()
+	offline := false
+	ok(registry.Refresh(sdk.ModelsRefreshOptions{AllowNetwork: &offline}))
 	idOf := func(p *sdk.Provider, err error) any {
 		if p == nil {
 			check(err)
@@ -115,11 +117,31 @@ func modelRegistryScript(ctx sdk.Context, args map[string]any) map[string]any {
 		"ids": ok(registry.GetRegisteredProviderIDs()), "displayName": ok(registry.GetProviderDisplayName("nreg")), "models": modelIDs(of(ok(registry.GetAll()), "nreg"), ""),
 		"auth": plain(ok(registry.GetProviderAuth("nreg"))), "request": plain(ok(registry.GetApiKeyAndHeaders(nativeModel))),
 		"events": nativeEvents, "text": messageText(nativeMessage), "stopReason": nativeMessage["stopReason"], "completed": registry.Complete(nativeModel, conversation, map[string]any{})["stopReason"],
+		"configured": ok(registry.HasConfiguredAuth(nativeModel)),
 	}
 	check(registry.UnregisterProvider("nreg"))
 	r["native"].(map[string]any)["after"] = map[string]any{
 		"registered": ok(registry.GetRegisteredNativeProvider("nreg")) == nil, "provider": ok(registry.GetProvider("nreg")) == nil, "models": len(of(ok(registry.GetAll()), "nreg")),
 	}
+	// A stored credential makes registration mark the provider configured at once (model-runtime.ts markProvisionallyConfigured); its auth check finds no key, so the availability refresh the registration launched replaces the mark and the settled state is unconfigured.
+	storedModel := map[string]any{}
+	for key, value := range nativeModel {
+		storedModel[key] = value
+	}
+	storedModel["provider"] = "stored-prov"
+	storedProvider := ok(sdk.CreateProvider(sdk.CreateProviderOptions{
+		ID: "stored-prov", Name: "Stored Native",
+		Auth: sdk.ProviderAuth{APIKey: &sdk.APIKeyAuth{Name: "Key", Check: func(sdk.APIKeyAuthInput) (*sdk.AuthCheck, error) { return nil, nil }, Resolve: func(sdk.APIKeyAuthInput) (*sdk.AuthResult, error) { return nil, nil }}},
+		Models: []map[string]any{storedModel}, APIs: map[string]sdk.ProviderStreams{"nat-api": {Stream: scripted("s.stream"), StreamSimple: scripted("s.simple")}},
+	}))
+	check(registry.RegisterNativeProvider(storedProvider))
+	ok(registry.Refresh(sdk.ModelsRefreshOptions{AllowNetwork: &offline}))
+	r["native"].(map[string]any)["storedSettled"] = map[string]any{
+		"configured": ok(registry.HasConfiguredAuth(storedModel)), "status": plain(ok(registry.GetProviderAuthStatus("stored-prov"))),
+		"available": slices.ContainsFunc(ok(registry.GetAvailable()), func(model map[string]any) bool { return model["provider"] == "stored-prov" }),
+	}
+	check(registry.UnregisterProvider("stored-prov"))
+	ok(registry.Refresh(sdk.ModelsRefreshOptions{AllowNetwork: &offline}))
 	builtin := map[string]any{}
 	if found, err := registry.GetProvider("anthropic"); err != nil {
 		builtin["provider"] = "error: " + err.Error()

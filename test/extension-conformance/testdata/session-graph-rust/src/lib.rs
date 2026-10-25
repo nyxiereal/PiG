@@ -1314,7 +1314,7 @@ fn model_registry_script(ctx: &Context, args: &Value) -> io::Result<Value> {
     registered["after"] = json!({"ids": registry.get_registered_provider_ids()?, "models": of(&registry.get_all()?, "reg-prov").len(), "config": registry.get_registered_provider_config("reg-prov")?.is_null()});
     r.insert("registered".into(), registered);
 
-    let native_model = json!({"id": "n1", "name": "N One", "api": "nat-api", "provider": "nreg", "baseUrl": "https://ext.invalid", "reasoning": false, "input": ["text"], "cost": {"input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0}, "contextWindow": 4000, "maxTokens": 500});
+    let native_model = json!({"id": "n1", "name": "N One", "api": "nat-api", "provider": "nreg", "reasoning": false, "input": ["text"], "cost": {"input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0}, "contextWindow": 4000, "maxTokens": 500});
     let scripted = move |tag: String| -> ProviderStreamFn {
         Arc::new(move |model, _context, _options| {
             let stream = create_assistant_message_event_stream();
@@ -1342,6 +1342,7 @@ fn model_registry_script(ctx: &Context, args: &Value) -> io::Result<Value> {
         (events, stream.result().unwrap_or(Value::Null))
     };
     let (native_events, native_message) = drain(registry.stream_simple(native_model.clone(), conversation.clone(), json!({})));
+    registry.refresh(json!({"allowNetwork": false}))?;
     let provider_id = |found: Option<Arc<pig_sdk::Provider>>| found.map_or(Value::Null, |found| json!(found.id));
     let registered_native = registry.get_registered_native_provider("nreg")?;
     r.insert("native".into(), json!({
@@ -1350,9 +1351,25 @@ fn model_registry_script(ctx: &Context, args: &Value) -> io::Result<Value> {
         "ids": registry.get_registered_provider_ids()?, "displayName": registry.get_provider_display_name("nreg")?, "models": ids(&json!(of(&registry.get_all()?, "nreg")), None),
         "auth": registry.get_provider_auth("nreg")?, "request": registry.get_api_key_and_headers(&native_model)?,
         "events": native_events, "text": message_text(&native_message), "stopReason": native_message["stopReason"], "completed": registry.complete(native_model.clone(), conversation.clone(), json!({})).unwrap_or(Value::Null)["stopReason"],
+        "configured": registry.has_configured_auth(&native_model)?,
     }));
     registry.unregister_provider("nreg")?;
     r.get_mut("native").unwrap()["after"] = json!({"registered": registry.get_registered_native_provider("nreg")?.is_none(), "provider": registry.get_provider("nreg")?.is_none(), "models": of(&registry.get_all()?, "nreg").len()});
+    // A stored credential makes registration mark the provider configured at once (model-runtime.ts markProvisionallyConfigured); its auth check finds no key, so the availability refresh the registration launched replaces the mark and the settled state is unconfigured.
+    let mut stored_model = native_model.clone();
+    stored_model["provider"] = json!("stored-prov");
+    let stored_provider = Arc::new(create_provider(CreateProviderOptions {
+        id: "stored-prov".into(), name: Some("Stored Native".into()), base_url: None, headers: None,
+        auth: ProviderAuth { api_key: Some(APIKeyAuth { name: "Key".into(), check: Some(Arc::new(|_| Ok(None))), resolve: Arc::new(|_| Ok(None)), login: None }), oauth: None },
+        models: vec![stored_model.clone()], fetch_models: None, filter_models: None, filter_all_models: None,
+        api: Some(ProviderApi::ByApi(vec![("nat-api".into(), ProviderStreams { stream: scripted("s.stream".into()), stream_simple: scripted("s.simple".into()), fetch_deferred: None, cancel_deferred: None })])), images: vec![], classifiers: vec![],
+    }).map_err(io::Error::other)?);
+    registry.register_native_provider(stored_provider)?;
+    registry.refresh(json!({"allowNetwork": false}))?;
+    let stored_available = registry.get_available()?.as_array().is_some_and(|models| models.iter().any(|model| model["provider"] == "stored-prov"));
+    r.get_mut("native").unwrap()["storedSettled"] = json!({"configured": registry.has_configured_auth(&stored_model)?, "status": registry.get_provider_auth_status("stored-prov")?, "available": stored_available});
+    registry.unregister_provider("stored-prov")?;
+    registry.refresh(json!({"allowNetwork": false}))?;
     let builtin_provider = match registry.get_provider("anthropic") {
         Ok(Some(found)) => found.id.clone(),
         Ok(None) => "missing".into(),

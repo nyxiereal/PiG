@@ -300,72 +300,72 @@ class RunnerUIContext:
     def __init__(self, runner: ExtensionRunner) -> None:
         self._runner = runner
 
-    def _call(self, member: str, *args: Any) -> Any:
+    def _member(self, member: str, *args: Any) -> Any:
         return self._runner._invoke_async("ui", member, *args)
 
     def select(self, title: str, options: list[str], opts: dict[str, Any] | None = None) -> str | None:
         """``ui.select(title, options, opts?)``; ``None`` is the dialog's undefined (cancelled)."""
-        return self._call("select", title, options, opts)
+        return self._member("select", title, options, opts)
 
     def confirm(self, title: str, message: str, opts: dict[str, Any] | None = None) -> bool:
         """``ui.confirm(title, message, opts?)``."""
-        return bool(self._call("confirm", title, message, opts))
+        return bool(self._member("confirm", title, message, opts))
 
     def input(self, title: str, placeholder: str | None = None, opts: dict[str, Any] | None = None) -> str | None:
         """``ui.input(title, placeholder?, opts?)``; ``None`` is the dialog's undefined."""
-        return self._call("input", title, placeholder, opts)
+        return self._member("input", title, placeholder, opts)
 
     def editor(self, title: str, prefill: str | None = None) -> str | None:
         """``ui.editor(title, prefill?)``; ``None`` is the dialog's undefined."""
-        return self._call("editor", title, prefill)
+        return self._member("editor", title, prefill)
 
     def notify(self, message: str, kind: str | None = None) -> None:
         """``ui.notify(message, type?)``."""
-        self._call("notify", message, kind)
+        self._member("notify", message, kind)
 
     def set_status(self, key: str, text: str | None) -> None:
         """``ui.setStatus(key, text)``."""
-        self._call("setStatus", key, text)
+        self._member("setStatus", key, text)
 
     def set_working_message(self, message: str | None = None) -> None:
         """``ui.setWorkingMessage(message?)``."""
-        self._call("setWorkingMessage", message)
+        self._member("setWorkingMessage", message)
 
     def set_working_visible(self, visible: bool) -> None:
         """``ui.setWorkingVisible(visible)``."""
-        self._call("setWorkingVisible", visible)
+        self._member("setWorkingVisible", visible)
 
     def set_hidden_thinking_label(self, label: str | None = None) -> None:
         """``ui.setHiddenThinkingLabel(label?)``."""
-        self._call("setHiddenThinkingLabel", label)
+        self._member("setHiddenThinkingLabel", label)
 
     def set_widget(self, key: str, content: list[str] | None, options: dict[str, Any] | None = None) -> None:
         """``ui.setWidget(key, content, options?)`` for lines of text."""
-        self._call("setWidget", key, content, options)
+        self._member("setWidget", key, content, options)
 
     def set_title(self, title: str) -> None:
         """``ui.setTitle(title)``."""
-        self._call("setTitle", title)
+        self._member("setTitle", title)
 
     def paste_to_editor(self, text: str) -> None:
         """``ui.pasteToEditor(text)``."""
-        self._call("pasteToEditor", text)
+        self._member("pasteToEditor", text)
 
     def set_editor_text(self, text: str) -> None:
         """``ui.setEditorText(text)``."""
-        self._call("setEditorText", text)
+        self._member("setEditorText", text)
 
     def get_editor_text(self) -> str:
         """``ui.getEditorText()``."""
-        return self._call("getEditorText") or ""
+        return self._member("getEditorText") or ""
 
     def get_tools_expanded(self) -> bool:
         """``ui.getToolsExpanded()``."""
-        return bool(self._call("getToolsExpanded"))
+        return bool(self._member("getToolsExpanded"))
 
     def set_tools_expanded(self, expanded: bool) -> None:
         """``ui.setToolsExpanded(expanded)``."""
-        self._call("setToolsExpanded", expanded)
+        self._member("setToolsExpanded", expanded)
 
 
 class ExtensionContext:

@@ -77,8 +77,8 @@ func (g *GraphExtensionRuntime) Call(_ context.Context, method string, raw json.
 		if err != nil {
 			return nil, err
 		}
-		var value any
-		if err := args.Unmarshal(1, func(raw json.RawMessage) error { return json.Unmarshal(raw, &value) }); err != nil {
+		value, err := graphFlagValueArg(args, 1)
+		if err != nil {
 			return nil, err
 		}
 		runtime.SetFlagValue(name, value)
@@ -122,4 +122,24 @@ func (g *GraphExtensionRuntime) Call(_ context.Context, method string, raw json.
 		return nil, nil
 	}
 	return nil, errors.New("ExtensionRuntime has no method " + method)
+}
+
+// graphFlagValueArg is argument i as a flag value: a boolean or a string (a JavaScript Map<string, boolean | string>).
+func graphFlagValueArg(args icodingagent.GraphArgs, i int) (any, error) {
+	var text string
+	var flag bool
+	var decoded any
+	err := args.Unmarshal(i, func(raw json.RawMessage) error {
+		switch {
+		case string(raw) == "null":
+		case json.Unmarshal(raw, &text) == nil:
+			decoded = text
+		case json.Unmarshal(raw, &flag) == nil:
+			decoded = flag
+		default:
+			return errors.New("a flag value is a boolean or a string")
+		}
+		return nil
+	})
+	return decoded, err
 }

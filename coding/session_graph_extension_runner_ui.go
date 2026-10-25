@@ -18,7 +18,8 @@ type graphContextSpec struct {
 
 // callContext is `context(spec, member, ...args)`.
 func (g *GraphExtensionRunner) callContext(ctx context.Context, args icodingagent.GraphArgs) (any, error) {
-	spec, err := argAs[graphContextSpec](args, 0)
+	var spec graphContextSpec
+	err := args.Unmarshal(0, func(raw json.RawMessage) error { return json.Unmarshal(raw, &spec) })
 	if err != nil {
 		return nil, err
 	}
@@ -307,7 +308,8 @@ func (u *graphUIContext) SetToolsExpanded(expanded bool) {
 
 // setUIContext is `setUIContext(uiContext?, mode = "print")`.
 func (g *GraphExtensionRunner) setUIContext(args icodingagent.GraphArgs) error {
-	ids, err := argAs[callbackIDs](args, 0)
+	var ids callbackIDs
+	err := args.Unmarshal(0, func(raw json.RawMessage) error { return json.Unmarshal(raw, &ids) })
 	if err != nil {
 		return err
 	}
@@ -363,11 +365,13 @@ func (g *GraphExtensionRunner) callUI(ctx context.Context, args icodingagent.Gra
 	switch member {
 	case "select":
 		title, _ := args.String(1)
-		options, err := argAs[[]string](args, 2)
+		var options []string
+		err := args.Unmarshal(2, func(raw json.RawMessage) error { return json.Unmarshal(raw, &options) })
 		if err != nil {
 			return nil, err
 		}
-		opts, err := argAs[extension.ExtensionUIDialogOptions](args, 3)
+		var opts extension.ExtensionUIDialogOptions
+		err = args.Unmarshal(3, func(raw json.RawMessage) error { return json.Unmarshal(raw, &opts) })
 		if err != nil {
 			return nil, err
 		}
@@ -375,7 +379,8 @@ func (g *GraphExtensionRunner) callUI(ctx context.Context, args icodingagent.Gra
 	case "confirm":
 		title, _ := args.String(1)
 		message, _ := args.String(2)
-		opts, err := argAs[extension.ExtensionUIDialogOptions](args, 3)
+		var opts extension.ExtensionUIDialogOptions
+		err := args.Unmarshal(3, func(raw json.RawMessage) error { return json.Unmarshal(raw, &opts) })
 		if err != nil {
 			return nil, err
 		}
@@ -383,7 +388,8 @@ func (g *GraphExtensionRunner) callUI(ctx context.Context, args icodingagent.Gra
 	case "input":
 		title, _ := args.String(1)
 		placeholder, _ := args.String(2)
-		opts, err := argAs[extension.ExtensionUIDialogOptions](args, 3)
+		var opts extension.ExtensionUIDialogOptions
+		err := args.Unmarshal(3, func(raw json.RawMessage) error { return json.Unmarshal(raw, &opts) })
 		if err != nil {
 			return nil, err
 		}
@@ -411,11 +417,13 @@ func (g *GraphExtensionRunner) callUI(ctx context.Context, args icodingagent.Gra
 		ui.SetHiddenThinkingLabel(label)
 	case "setWidget":
 		key, _ := args.String(1)
-		content, err := argAs[[]string](args, 2)
+		var content []string
+		err := args.Unmarshal(2, func(raw json.RawMessage) error { return json.Unmarshal(raw, &content) })
 		if err != nil {
 			return nil, err
 		}
-		opts, err := argAs[*extension.ExtensionWidgetOptions](args, 3)
+		var opts *extension.ExtensionWidgetOptions
+		err = args.Unmarshal(3, func(raw json.RawMessage) error { return json.Unmarshal(raw, &opts) })
 		if err != nil {
 			return nil, err
 		}

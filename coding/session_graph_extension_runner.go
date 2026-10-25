@@ -197,7 +197,31 @@ func callbackBackground() context.Context {
 	return context.Background()
 }
 
-func decodeJSON[T any](raw json.RawMessage) (T, error) {
+// graphScopedModel is one entry of getScopedModels: a model object and its thinking level.
+type graphScopedModel struct {
+	Model         json.RawMessage `json:"model"`
+	ThinkingLevel string          `json:"thinkingLevel"`
+}
+
+// graphSignalState is the answer of getSignal: whether the signal has aborted.
+type graphSignalState struct {
+	Aborted bool `json:"aborted"`
+}
+
+// graphRendererFlags tells which render functions a tool renderer registered.
+type graphRendererFlags struct {
+	RenderCall   bool `json:"renderCall"`
+	RenderResult bool `json:"renderResult"`
+}
+
+// graphDecoded is every type an extension's answer to a runner callback decodes into. The set is closed so that no answer is decoded into an interface value.
+type graphDecoded interface {
+	string | bool | []string | extension.ThinkingLevel | extension.Settings | extension.AgentToolCallOutcome | extension.CancelledResult | extension.BoundaryContextPreview |
+		[]extension.ToolInfo | []extension.SlashCommandInfo | []extension.AgentTool | []graphScopedModel |
+		*extension.ContextUsage | *extension.BuildSystemPromptOptions | *graphSignalState | *graphRendererFlags
+}
+
+func decodeJSON[T graphDecoded](raw json.RawMessage) (T, error) {
 	var value T
 	if len(raw) == 0 {
 		return value, nil
@@ -250,8 +274,8 @@ func (g *GraphExtensionRunner) Call(ctx context.Context, method string, raw json
 		if err != nil {
 			return nil, err
 		}
-		var value any
-		if err := args.Unmarshal(1, func(raw json.RawMessage) error { return json.Unmarshal(raw, &value) }); err != nil {
+		value, err := graphFlagValueArg(args, 1)
+		if err != nil {
 			return nil, err
 		}
 		runner.SetFlagValue(name, value)
@@ -447,10 +471,7 @@ func (g *GraphExtensionRunner) resolveToolRenderers(ctx context.Context, args ic
 			baseErr = err
 			return nil
 		}
-		flags, err := decodeJSON[*struct {
-			RenderCall   bool `json:"renderCall"`
-			RenderResult bool `json:"renderResult"`
-		}](raw)
+		flags, err := decodeJSON[*graphRendererFlags](raw)
 		if err != nil {
 			baseErr = err
 			return nil

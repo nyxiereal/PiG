@@ -581,7 +581,7 @@ pub struct RunnerUIContext {
 }
 
 impl RunnerUIContext {
-    fn call(&self, member: &str, mut args: Vec<Value>) -> io::Result<Value> {
+    fn member_call(&self, member: &str, mut args: Vec<Value>) -> io::Result<Value> {
         args.insert(0, json!(member));
         self.inner.object.call_async("ui", args)
     }
@@ -592,67 +592,67 @@ impl RunnerUIContext {
 
     /// `ui.select(title, options, opts?)`; `None` is the dialog's undefined (cancelled).
     pub fn select(&self, title: &str, options: &[String], opts: Option<Value>) -> io::Result<Option<String>> {
-        self.call("select", vec![json!(title), json!(options), opts.unwrap_or(Value::Null)]).map(Self::text)
+        self.member_call("select", vec![json!(title), json!(options), opts.unwrap_or(Value::Null)]).map(Self::text)
     }
     /// `ui.confirm(title, message, opts?)`.
     pub fn confirm(&self, title: &str, message: &str, opts: Option<Value>) -> io::Result<bool> {
-        Ok(self.call("confirm", vec![json!(title), json!(message), opts.unwrap_or(Value::Null)])?.as_bool().unwrap_or(false))
+        Ok(self.member_call("confirm", vec![json!(title), json!(message), opts.unwrap_or(Value::Null)])?.as_bool().unwrap_or(false))
     }
     /// `ui.input(title, placeholder?, opts?)`; `None` is the dialog's undefined.
     pub fn input(&self, title: &str, placeholder: Option<&str>, opts: Option<Value>) -> io::Result<Option<String>> {
-        self.call("input", vec![json!(title), json!(placeholder), opts.unwrap_or(Value::Null)]).map(Self::text)
+        self.member_call("input", vec![json!(title), json!(placeholder), opts.unwrap_or(Value::Null)]).map(Self::text)
     }
     /// `ui.editor(title, prefill?)`; `None` is the dialog's undefined.
     pub fn editor(&self, title: &str, prefill: Option<&str>) -> io::Result<Option<String>> {
-        self.call("editor", vec![json!(title), json!(prefill)]).map(Self::text)
+        self.member_call("editor", vec![json!(title), json!(prefill)]).map(Self::text)
     }
     /// `ui.notify(message, type?)`.
     pub fn notify(&self, message: &str, kind: Option<&str>) -> io::Result<()> {
-        self.call("notify", vec![json!(message), json!(kind)]).map(|_| ())
+        self.member_call("notify", vec![json!(message), json!(kind)]).map(|_| ())
     }
     /// `ui.setStatus(key, text)`.
     pub fn set_status(&self, key: &str, text: Option<&str>) -> io::Result<()> {
-        self.call("setStatus", vec![json!(key), json!(text)]).map(|_| ())
+        self.member_call("setStatus", vec![json!(key), json!(text)]).map(|_| ())
     }
     /// `ui.setWorkingMessage(message?)`.
     pub fn set_working_message(&self, message: Option<&str>) -> io::Result<()> {
-        self.call("setWorkingMessage", vec![json!(message)]).map(|_| ())
+        self.member_call("setWorkingMessage", vec![json!(message)]).map(|_| ())
     }
     /// `ui.setWorkingVisible(visible)`.
     pub fn set_working_visible(&self, visible: bool) -> io::Result<()> {
-        self.call("setWorkingVisible", vec![json!(visible)]).map(|_| ())
+        self.member_call("setWorkingVisible", vec![json!(visible)]).map(|_| ())
     }
     /// `ui.setHiddenThinkingLabel(label?)`.
     pub fn set_hidden_thinking_label(&self, label: Option<&str>) -> io::Result<()> {
-        self.call("setHiddenThinkingLabel", vec![json!(label)]).map(|_| ())
+        self.member_call("setHiddenThinkingLabel", vec![json!(label)]).map(|_| ())
     }
     /// `ui.setWidget(key, content, options?)` for lines of text.
     pub fn set_widget(&self, key: &str, content: &[String], options: Option<Value>) -> io::Result<()> {
-        self.call("setWidget", vec![json!(key), json!(content), options.unwrap_or(Value::Null)]).map(|_| ())
+        self.member_call("setWidget", vec![json!(key), json!(content), options.unwrap_or(Value::Null)]).map(|_| ())
     }
     /// `ui.setTitle(title)`.
     pub fn set_title(&self, title: &str) -> io::Result<()> {
-        self.call("setTitle", vec![json!(title)]).map(|_| ())
+        self.member_call("setTitle", vec![json!(title)]).map(|_| ())
     }
     /// `ui.pasteToEditor(text)`.
     pub fn paste_to_editor(&self, text: &str) -> io::Result<()> {
-        self.call("pasteToEditor", vec![json!(text)]).map(|_| ())
+        self.member_call("pasteToEditor", vec![json!(text)]).map(|_| ())
     }
     /// `ui.setEditorText(text)`.
     pub fn set_editor_text(&self, text: &str) -> io::Result<()> {
-        self.call("setEditorText", vec![json!(text)]).map(|_| ())
+        self.member_call("setEditorText", vec![json!(text)]).map(|_| ())
     }
     /// `ui.getEditorText()`.
     pub fn get_editor_text(&self) -> io::Result<String> {
-        Ok(self.call("getEditorText", vec![])?.as_str().unwrap_or_default().to_string())
+        Ok(self.member_call("getEditorText", vec![])?.as_str().unwrap_or_default().to_string())
     }
     /// `ui.getToolsExpanded()`.
     pub fn get_tools_expanded(&self) -> io::Result<bool> {
-        Ok(self.call("getToolsExpanded", vec![])?.as_bool().unwrap_or(false))
+        Ok(self.member_call("getToolsExpanded", vec![])?.as_bool().unwrap_or(false))
     }
     /// `ui.setToolsExpanded(expanded)`.
     pub fn set_tools_expanded(&self, expanded: bool) -> io::Result<()> {
-        self.call("setToolsExpanded", vec![json!(expanded)]).map(|_| ())
+        self.member_call("setToolsExpanded", vec![json!(expanded)]).map(|_| ())
     }
 }
 

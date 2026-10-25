@@ -84,13 +84,6 @@ func decodeEvent[T extension.ExtensionEvent](raw json.RawMessage) (extension.Ext
 	return event, nil
 }
 
-// argAs decodes argument i into a T; an undefined or null argument is T's zero value.
-func argAs[T any](args icodingagent.GraphArgs, i int) (T, error) {
-	var value T
-	err := args.Unmarshal(i, func(raw json.RawMessage) error { return json.Unmarshal(raw, &value) })
-	return value, err
-}
-
 // callEmit runs the emit method named by method, and reports an unknown method as such.
 func (g *GraphExtensionRunner) callEmit(ctx context.Context, method string, args icodingagent.GraphArgs) (any, error) {
 	runner := g.runner
@@ -106,7 +99,8 @@ func (g *GraphExtensionRunner) callEmit(ctx context.Context, method string, args
 		}
 		return runner.Emit(ctx, event)
 	case "emitToolCall":
-		event, err := argAs[extension.CustomToolCallEvent](args, 0)
+		var event extension.CustomToolCallEvent
+		err := args.Unmarshal(0, func(raw json.RawMessage) error { return json.Unmarshal(raw, &event) })
 		if err != nil {
 			return nil, err
 		}
@@ -134,7 +128,8 @@ func (g *GraphExtensionRunner) callEmit(ctx context.Context, method string, args
 		if err != nil {
 			return nil, err
 		}
-		images, err := argAs[[]extension.ImageContent](args, 1)
+		var images []extension.ImageContent
+		err = args.Unmarshal(1, func(raw json.RawMessage) error { return json.Unmarshal(raw, &images) })
 		if err != nil {
 			return nil, err
 		}
@@ -153,7 +148,8 @@ func (g *GraphExtensionRunner) callEmit(ctx context.Context, method string, args
 		encoded, err := extension.MarshalInputEventResult(result)
 		return json.RawMessage(encoded), err
 	case "emitContext":
-		messages, err := argAs[[]extension.AgentMessage](args, 0)
+		var messages []extension.AgentMessage
+		err := args.Unmarshal(0, func(raw json.RawMessage) error { return json.Unmarshal(raw, &messages) })
 		if err != nil {
 			return nil, err
 		}
@@ -161,19 +157,22 @@ func (g *GraphExtensionRunner) callEmit(ctx context.Context, method string, args
 	case "emitBeforeAgentStart":
 		return g.emitBeforeAgentStart(ctx, args)
 	case "emitBeforeProviderRequest":
+		// The payload is the provider's request, opaque JSON the handlers read and replace: it is handed on as the bytes received.
 		var payload any
-		if err := args.Unmarshal(0, func(raw json.RawMessage) error { return json.Unmarshal(raw, &payload) }); err != nil {
-			return nil, err
+		if raw := args.Raw(0); raw != nil && string(raw) != "null" {
+			payload = json.RawMessage(raw)
 		}
 		return runner.EmitBeforeProviderRequest(ctx, payload)
 	case "emitBeforeProviderHeaders":
-		headers, err := argAs[extension.ProviderHeaders](args, 0)
+		var headers extension.ProviderHeaders
+		err := args.Unmarshal(0, func(raw json.RawMessage) error { return json.Unmarshal(raw, &headers) })
 		if err != nil {
 			return nil, err
 		}
 		return runner.EmitBeforeProviderHeaders(ctx, headers)
 	case "emitUserBash":
-		event, err := argAs[extension.UserBashEvent](args, 0)
+		var event extension.UserBashEvent
+		err := args.Unmarshal(0, func(raw json.RawMessage) error { return json.Unmarshal(raw, &event) })
 		if err != nil {
 			return nil, err
 		}
@@ -183,7 +182,8 @@ func (g *GraphExtensionRunner) callEmit(ctx context.Context, method string, args
 		}
 		return result, nil
 	case "emitMessageEnd":
-		event, err := argAs[extension.MessageEndEvent](args, 0)
+		var event extension.MessageEndEvent
+		err := args.Unmarshal(0, func(raw json.RawMessage) error { return json.Unmarshal(raw, &event) })
 		if err != nil {
 			return nil, err
 		}
@@ -203,7 +203,8 @@ func (g *GraphExtensionRunner) callEmit(ctx context.Context, method string, args
 		}
 		return runner.EmitResourcesDiscover(ctx, cwd, reason)
 	case "emitCacheWarmingDecision":
-		event, err := argAs[extension.CacheWarmingDecisionEvent](args, 0)
+		var event extension.CacheWarmingDecisionEvent
+		err := args.Unmarshal(0, func(raw json.RawMessage) error { return json.Unmarshal(raw, &event) })
 		if err != nil {
 			return nil, err
 		}
@@ -276,7 +277,7 @@ func (g *GraphExtensionRunner) emitBoundary(ctx context.Context, args icodingage
 
 // emitBeforeAgentStart is `emitBeforeAgentStart(trigger, systemPromptOptions)`: trigger is `{messageType: "user", prompt, images?}` or `{messageType: "custom", message}`. The result is `{messages, systemPromptOptions}`, the options the handlers' edits left, with the prompt a handler set as forceSystemPrompt.
 func (g *GraphExtensionRunner) emitBeforeAgentStart(ctx context.Context, args icodingagent.GraphArgs) (any, error) {
-	wire, err := argAs[struct {
+	var wire struct {
 		MessageType string                   `json:"messageType"`
 		Prompt      string                   `json:"prompt"`
 		Images      []extension.ImageContent `json:"images"`
@@ -287,11 +288,13 @@ func (g *GraphExtensionRunner) emitBeforeAgentStart(ctx context.Context, args ic
 			Details    any    `json:"details"`
 			Timestamp  int64  `json:"timestamp"`
 		} `json:"message"`
-	}](args, 0)
+	}
+	err := args.Unmarshal(0, func(raw json.RawMessage) error { return json.Unmarshal(raw, &wire) })
 	if err != nil {
 		return nil, err
 	}
-	options, err := argAs[extension.BuildSystemPromptOptions](args, 1)
+	var options extension.BuildSystemPromptOptions
+	err = args.Unmarshal(1, func(raw json.RawMessage) error { return json.Unmarshal(raw, &options) })
 	if err != nil {
 		return nil, err
 	}

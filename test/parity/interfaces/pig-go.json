@@ -77003,17 +77003,6 @@
       "shapeHash": "sha256:f304f2050a5132e98d512acdf2967a168db001c0588fa382abff82bc16689402"
     },
     {
-      "id": "go:github.com/MichaelKinsy/PiG/coding#argAs",
-      "package": "github.com/MichaelKinsy/PiG/coding",
-      "name": "argAs",
-      "kind": "function",
-      "exported": false,
-      "shape": {
-        "type": "func[T any](args github.com/MichaelKinsy/PiG/internal/codingagent.GraphArgs, i int) (T, error)"
-      },
-      "shapeHash": "sha256:4b267d0a444310257b882c0535a7169c42b8cf2a67921027646fca278bd7d882"
-    },
-    {
       "id": "go:github.com/MichaelKinsy/PiG/coding#assertChat",
       "package": "github.com/MichaelKinsy/PiG/coding",
       "name": "assertChat",
@@ -77724,9 +77713,9 @@
       "kind": "function",
       "exported": false,
       "shape": {
-        "type": "func[T any](raw github.com/MichaelKinsy/PiG/extensions/sdk/json.RawMessage) (T, error)"
+        "type": "func[T graphDecoded](raw github.com/MichaelKinsy/PiG/extensions/sdk/json.RawMessage) (T, error)"
       },
-      "shapeHash": "sha256:9774131845933aec373cccf6401bb0e0f3a912915edd290f05d4574b589a5e8a"
+      "shapeHash": "sha256:9fe2f2cc39a7a1cee6ca5d5c62c2840499344650614e88d1a57b84d4b2a30ca7"
     },
     {
       "id": "go:github.com/MichaelKinsy/PiG/coding#decodeKeybindings",
@@ -78235,6 +78224,17 @@
       "shapeHash": "sha256:50154ffa25e4c89af93e6ebb8adbece691b687dea0e818b63146965a58818099"
     },
     {
+      "id": "go:github.com/MichaelKinsy/PiG/coding#graphDecoded",
+      "package": "github.com/MichaelKinsy/PiG/coding",
+      "name": "graphDecoded",
+      "kind": "type",
+      "exported": false,
+      "shape": {
+        "type": "graphDecoded"
+      },
+      "shapeHash": "sha256:fab2c0f630efe8e91cd65b34e68f0974fe1744964d8b3e3a83f5ced51dd0a426"
+    },
+    {
       "id": "go:github.com/MichaelKinsy/PiG/coding#graphExtensionFactory",
       "package": "github.com/MichaelKinsy/PiG/coding",
       "name": "graphExtensionFactory",
@@ -78299,6 +78299,17 @@
         "type": "func(result LoadExtensionsResult) map[string]any"
       },
       "shapeHash": "sha256:c40bfc1502ecfd4c3b79e3f620af87fb0aa76da287d741745b05d164fd3674bc"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/coding#graphFlagValueArg",
+      "package": "github.com/MichaelKinsy/PiG/coding",
+      "name": "graphFlagValueArg",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func(args github.com/MichaelKinsy/PiG/internal/codingagent.GraphArgs, i int) (any, error)"
+      },
+      "shapeHash": "sha256:7ee95e5b55bcb65d702e4557ef3de857147388dd3a7163e9ea2057cc145d1152"
     },
     {
       "id": "go:github.com/MichaelKinsy/PiG/coding#graphFlagValues",
@@ -78422,6 +78433,17 @@
       "shapeHash": "sha256:853b1608c75f4696fe72dbe63661132e5178754b2b71e682d0579779282153c7"
     },
     {
+      "id": "go:github.com/MichaelKinsy/PiG/coding#graphRendererFlags",
+      "package": "github.com/MichaelKinsy/PiG/coding",
+      "name": "graphRendererFlags",
+      "kind": "type",
+      "exported": false,
+      "shape": {
+        "type": "graphRendererFlags"
+      },
+      "shapeHash": "sha256:c1a54f3c60e1a315fbf4a845f096db82a69cde301f7ebeb0888ea08c6714ddb9"
+    },
+    {
       "id": "go:github.com/MichaelKinsy/PiG/coding#graphResolved",
       "package": "github.com/MichaelKinsy/PiG/coding",
       "name": "graphResolved",
@@ -78455,6 +78477,17 @@
       "shapeHash": "sha256:c6ea68e4621a8b6a2c817e396f125f60a7fcce47a84f69c80beeef4109cd8250"
     },
     {
+      "id": "go:github.com/MichaelKinsy/PiG/coding#graphScopedModel",
+      "package": "github.com/MichaelKinsy/PiG/coding",
+      "name": "graphScopedModel",
+      "kind": "type",
+      "exported": false,
+      "shape": {
+        "type": "graphScopedModel"
+      },
+      "shapeHash": "sha256:5940d65ff0d5ac30d196da2887ed4887f6c1c35393b365618a896ed79578632a"
+    },
+    {
       "id": "go:github.com/MichaelKinsy/PiG/coding#graphServicesApply",
       "package": "github.com/MichaelKinsy/PiG/coding",
       "name": "graphServicesApply",
@@ -78475,6 +78508,17 @@
         "type": "func(cwd string, agentDir *string) (any, error)"
       },
       "shapeHash": "sha256:55b01e0c824dbe8c9e529d5f164ba30e7814481fdbd7dc434be5c58544874386"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/coding#graphSignalState",
+      "package": "github.com/MichaelKinsy/PiG/coding",
+      "name": "graphSignalState",
+      "kind": "type",
+      "exported": false,
+      "shape": {
+        "type": "graphSignalState"
+      },
+      "shapeHash": "sha256:e0c197002b779098463e7ec29f77d11a020785397d816e4c83dc10739c58f2cf"
     },
     {
       "id": "go:github.com/MichaelKinsy/PiG/coding#graphSkill",
@@ -80188,9 +80232,9 @@
       "kind": "function",
       "exported": false,
       "shape": {
-        "type": "func[T any](g *GraphExtensionRunner, ctx context.Context, ids callbackIDs, name string, args ...any) (T, error)"
+        "type": "func[T graphDecoded](g *GraphExtensionRunner, ctx context.Context, ids callbackIDs, name string, args ...any) (T, error)"
       },
-      "shapeHash": "sha256:21526a5c618a15d97f2075e6cc1ef725dea1b172b2b03f51403d285fe054b501"
+      "shapeHash": "sha256:bee85d02cfd43d5e29f5d5c25b0b47970bb473865b73b1efadd165964f43d693"
     },
     {
       "id": "go:github.com/MichaelKinsy/PiG/coding#runPrepareLoadout",

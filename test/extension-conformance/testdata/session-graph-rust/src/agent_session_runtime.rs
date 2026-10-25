@@ -264,6 +264,8 @@ pub fn agent_session_runtime_script(ctx: &Context, args: &Value) -> io::Result<V
         }),
     );
 
+    // A direct refresh of the live session (the runtime's own after a setup is the one the report shows); Pi's run reads nothing from it, so it adds nothing to the report.
+    runtime.session().refresh_context()?;
     runtime.dispose()?;
     let reasons: Vec<String> = calls.lock().unwrap().iter().map(|call| format!("{}{}", if call["reason"].is_null() { "null".to_string() } else { text(&call["reason"]).to_string() }, if call["previous"] == true { "+previous" } else { "" })).collect();
     r.insert(

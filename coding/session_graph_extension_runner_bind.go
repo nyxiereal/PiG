@@ -28,7 +28,7 @@ func (g *GraphExtensionRunner) run(ctx context.Context, ids callbackIDs, name st
 }
 
 // runDecoded is run with the result decoded as a T; a function that returned nothing is T's zero value.
-func runDecoded[T any](g *GraphExtensionRunner, ctx context.Context, ids callbackIDs, name string, args ...any) (T, error) {
+func runDecoded[T graphDecoded](g *GraphExtensionRunner, ctx context.Context, ids callbackIDs, name string, args ...any) (T, error) {
 	raw, _, err := g.run(ctx, ids, name, args...)
 	if err != nil {
 		var zero T
@@ -159,10 +159,7 @@ func (g *GraphExtensionRunner) contextActions(ids callbackIDs) extension.Context
 	}
 	if has("getScopedModels") {
 		actions.GetScopedModels = func() []extension.ScopedModel {
-			entries, err := runDecoded[[]struct {
-				Model         json.RawMessage `json:"model"`
-				ThinkingLevel string          `json:"thinkingLevel"`
-			}](g, bg(), ids, "getScopedModels")
+			entries, err := runDecoded[[]graphScopedModel](g, bg(), ids, "getScopedModels")
 			if err != nil {
 				return []extension.ScopedModel{}
 			}
@@ -191,9 +188,7 @@ func (g *GraphExtensionRunner) contextActions(ids callbackIDs) extension.Context
 	}
 	if has("getSignal") {
 		actions.GetSignal = func() context.Context {
-			signal, err := runDecoded[*struct {
-				Aborted bool `json:"aborted"`
-			}](g, bg(), ids, "getSignal")
+			signal, err := runDecoded[*graphSignalState](g, bg(), ids, "getSignal")
 			if err != nil || signal == nil {
 				return nil
 			}
@@ -325,15 +320,18 @@ func (g *GraphExtensionRunner) commandActions(ids callbackIDs) extension.Command
 
 // bindCore is `bindCore(actions, contextActions, providerActions?)`.
 func (g *GraphExtensionRunner) bindCore(args icodingagent.GraphArgs) error {
-	actionIDs, err := argAs[callbackIDs](args, 0)
+	var actionIDs callbackIDs
+	err := args.Unmarshal(0, func(raw json.RawMessage) error { return json.Unmarshal(raw, &actionIDs) })
 	if err != nil {
 		return err
 	}
-	contextIDs, err := argAs[callbackIDs](args, 1)
+	var contextIDs callbackIDs
+	err = args.Unmarshal(1, func(raw json.RawMessage) error { return json.Unmarshal(raw, &contextIDs) })
 	if err != nil {
 		return err
 	}
-	providerIDs, err := argAs[callbackIDs](args, 2)
+	var providerIDs callbackIDs
+	err = args.Unmarshal(2, func(raw json.RawMessage) error { return json.Unmarshal(raw, &providerIDs) })
 	if err != nil {
 		return err
 	}
@@ -361,7 +359,8 @@ func (g *GraphExtensionRunner) bindCore(args icodingagent.GraphArgs) error {
 
 // bindCommandContext is `bindCommandContext(actions?)`: an omitted object restores Pi's defaults.
 func (g *GraphExtensionRunner) bindCommandContext(args icodingagent.GraphArgs) error {
-	ids, err := argAs[callbackIDs](args, 0)
+	var ids callbackIDs
+	err := args.Unmarshal(0, func(raw json.RawMessage) error { return json.Unmarshal(raw, &ids) })
 	if err != nil {
 		return err
 	}

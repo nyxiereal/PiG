@@ -1590,7 +1590,7 @@ SCRUTINIZED:approved
 
 ## D201 The SDK resource loader takes the runtime its extensions register against
 
-Stock disposition: always on; it is an optional argument of the SDK loaders.
+Stock disposition: required substrate. It is an optional argument of the SDK loaders that a program building an ExtensionRunner needs, and a load without it behaves as Pi's does.
 
 What: The `DefaultResourceLoader` of the Go, Rust and Python SDKs takes an optional `runtime` (Go `Runtime`, Rust `runtime`, Python `runtime`), a value `createExtensionRuntime()` returned. The extensions the loader loads register against that runtime, so an `ExtensionRunner` built over them with the same runtime sees their flags, provider registrations and MCP servers. Without it each reload makes its own runtime, as Pi's does, and `getExtensions().runtime` returns the runtime of the load.
 

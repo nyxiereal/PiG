@@ -18,7 +18,7 @@ func entryMessageText(message map[string]any) string {
 	blocks, _ := message["content"].([]any)
 	for _, block := range blocks {
 		if entry, isMap := block.(map[string]any); isMap && entry["type"] == "text" {
-			out.WriteString(fmt.Sprint(entry["text"]))
+			fmt.Fprint(&out, entry["text"])
 		}
 	}
 	return out.String()
@@ -207,6 +207,10 @@ func agentSessionRuntimeScript(ctx sdk.Context, args map[string]any) map[string]
 		}()),
 	}
 
+	// A direct refresh of the live session (the runtime's own after a setup is the one the report shows); Pi's run reads nothing from it, so it adds nothing to the report.
+	if err := runtime.Session().RefreshContext(); err != nil {
+		panic(err)
+	}
 	if err := runtime.Dispose(); err != nil {
 		panic(err)
 	}

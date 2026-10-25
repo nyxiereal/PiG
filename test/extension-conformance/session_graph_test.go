@@ -242,20 +242,19 @@ func eachSessionGraphSDK(t *testing.T, body func(t *testing.T, r *sessionGraphRi
 // eachSessionGraphSDKWith runs body for every SDK on the rig newRig builds.
 func eachSessionGraphSDKWith(t *testing.T, newRig func(testing.TB) *sessionGraphRig, body func(t *testing.T, r *sessionGraphRig, sdkName string)) {
 	t.Helper()
-	eachSessionGraphCellWith(t, newRig, false, body)
+	eachSessionGraphCellWith(t, newRig, sessionGraphSDKs(), body)
 }
 
-// eachSessionGraphCellWith is eachSessionGraphSDKWith that also runs the packed cells (a shared cell holding a second extension of the SDK's language) when packed is set: a packed cell must report what the isolated cell of the same SDK reports.
-func eachSessionGraphCellWith(t *testing.T, newRig func(testing.TB) *sessionGraphRig, packed bool, body func(t *testing.T, r *sessionGraphRig, sdkName string)) {
+// eachSessionGraphPackedWith runs body for every packed cell (a shared cell holding a second extension of the SDK's language) on the rig newRig builds: a packed cell must report what the isolated cell of the same SDK reports. A row's packed cells are a test of their own so that the isolated row's shard is not made longer by them.
+func eachSessionGraphPackedWith(t *testing.T, newRig func(testing.TB) *sessionGraphRig, body func(t *testing.T, r *sessionGraphRig, sdkName string)) {
+	t.Helper()
+	eachSessionGraphCellWith(t, newRig, sessionGraphPackedSDKs(), body)
+}
+
+func eachSessionGraphCellWith(t *testing.T, newRig func(testing.TB) *sessionGraphRig, loaders map[string]sessionGraphLoader, body func(t *testing.T, r *sessionGraphRig, sdkName string)) {
 	t.Helper()
 	if testing.Short() {
 		t.Skip("skipping conformance suite in short mode (starts SDK subprocesses)")
-	}
-	loaders := sessionGraphSDKs()
-	if packed {
-		for name, load := range sessionGraphPackedSDKs() {
-			loaders[name] = load
-		}
 	}
 	names := make([]string, 0, len(loaders))
 	for name := range loaders {

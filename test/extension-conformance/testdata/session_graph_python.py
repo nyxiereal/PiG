@@ -1374,7 +1374,7 @@ def agent_session_runtime_script(ctx, args):
         return next(entry["id"] for entry in current().get_entries() if entry["type"] == "message" and entry["message"]["role"] == "assistant")
 
     def cancelling(run):
-        with open(cancel_file, "w"):
+        with open(cancel_file, "w", newline=""):
             pass
         try:
             return run()

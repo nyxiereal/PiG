@@ -398,16 +398,24 @@ func (u *RunnerUIContext) Editor(title string, prefill *string) (*string, error)
 }
 
 // Notify is `ui.notify(message, type?)`.
-func (u *RunnerUIContext) Notify(message string, kind *string) error { return u.call("notify", message, kind) }
+func (u *RunnerUIContext) Notify(message string, kind *string) error {
+	return u.call("notify", message, kind)
+}
 
 // SetStatus is `ui.setStatus(key, text)`.
-func (u *RunnerUIContext) SetStatus(key string, text *string) error { return u.call("setStatus", key, text) }
+func (u *RunnerUIContext) SetStatus(key string, text *string) error {
+	return u.call("setStatus", key, text)
+}
 
 // SetWorkingMessage is `ui.setWorkingMessage(message?)`.
-func (u *RunnerUIContext) SetWorkingMessage(message *string) error { return u.call("setWorkingMessage", message) }
+func (u *RunnerUIContext) SetWorkingMessage(message *string) error {
+	return u.call("setWorkingMessage", message)
+}
 
 // SetWorkingVisible is `ui.setWorkingVisible(visible)`.
-func (u *RunnerUIContext) SetWorkingVisible(visible bool) error { return u.call("setWorkingVisible", visible) }
+func (u *RunnerUIContext) SetWorkingVisible(visible bool) error {
+	return u.call("setWorkingVisible", visible)
+}
 
 // SetHiddenThinkingLabel is `ui.setHiddenThinkingLabel(label?)`.
 func (u *RunnerUIContext) SetHiddenThinkingLabel(label *string) error {
@@ -491,7 +499,9 @@ func (c *ExtensionContext) ModelRegistry() (*ModelRuntime, error) {
 }
 
 // Model is `ctx.model`: the model object the bound getModel answers; nil is Pi's undefined.
-func (c *ExtensionContext) Model() (map[string]any, error) { return contextGet[map[string]any](c, "model") }
+func (c *ExtensionContext) Model() (map[string]any, error) {
+	return contextGet[map[string]any](c, "model")
+}
 
 // ScopedModels is `ctx.scopedModels`.
 func (c *ExtensionContext) ScopedModels() ([]ScopedModel, error) {
@@ -499,13 +509,17 @@ func (c *ExtensionContext) ScopedModels() ([]ScopedModel, error) {
 }
 
 // ThinkingLevel is `ctx.thinkingLevel`: what the bound getThinkingLevel answers.
-func (c *ExtensionContext) ThinkingLevel() (string, error) { return contextGet[string](c, "thinkingLevel") }
+func (c *ExtensionContext) ThinkingLevel() (string, error) {
+	return contextGet[string](c, "thinkingLevel")
+}
 
 // IsIdle is `ctx.isIdle()`.
 func (c *ExtensionContext) IsIdle() (bool, error) { return contextGet[bool](c, "isIdle") }
 
 // IsProjectTrusted is `ctx.isProjectTrusted()`.
-func (c *ExtensionContext) IsProjectTrusted() (bool, error) { return contextGet[bool](c, "isProjectTrusted") }
+func (c *ExtensionContext) IsProjectTrusted() (bool, error) {
+	return contextGet[bool](c, "isProjectTrusted")
+}
 
 // Signal is `ctx.signal`: nil is Pi's undefined (no run); otherwise a context that is done when the signal is aborted.
 func (c *ExtensionContext) Signal() (context.Context, error) {
@@ -530,7 +544,9 @@ func (c *ExtensionContext) Abort() error {
 }
 
 // HasPendingMessages is `ctx.hasPendingMessages()`.
-func (c *ExtensionContext) HasPendingMessages() (bool, error) { return contextGet[bool](c, "hasPendingMessages") }
+func (c *ExtensionContext) HasPendingMessages() (bool, error) {
+	return contextGet[bool](c, "hasPendingMessages")
+}
 
 // Shutdown is `ctx.shutdown()`.
 func (c *ExtensionContext) Shutdown() error {
@@ -558,7 +574,9 @@ func (c *ExtensionContext) Compact(options *CompactOptions) error {
 }
 
 // GetSystemPrompt is `ctx.getSystemPrompt()`.
-func (c *ExtensionContext) GetSystemPrompt() (string, error) { return contextGet[string](c, "getSystemPrompt") }
+func (c *ExtensionContext) GetSystemPrompt() (string, error) {
+	return contextGet[string](c, "getSystemPrompt")
+}
 
 // ExtensionToolContext is Pi's ExtensionToolContext: the context of one tool call, with the callable tools and nested execution.
 type ExtensionToolContext struct {
@@ -573,7 +591,9 @@ func (r *ExtensionRunner) CreateToolContext(toolCallID string, signal context.Co
 }
 
 // Tools is `ctx.tools`: the tools a nested call can run.
-func (c *ExtensionToolContext) Tools() ([]AgentTool, error) { return contextGet[[]AgentTool](&c.ExtensionContext, "tools") }
+func (c *ExtensionToolContext) Tools() ([]AgentTool, error) {
+	return contextGet[[]AgentTool](&c.ExtensionContext, "tools")
+}
 
 // ExecuteTool is `ctx.executeTool(name, args, options?)`: it calls the bound executeTool function, here, with options whose Signal defaults to the one the context was created with. Without a bound function the outcome is Pi's error outcome ("Nested tool calls are not available in this context").
 func (c *ExtensionToolContext) ExecuteTool(name string, args any, options ExecuteToolOptions) (AgentToolCallOutcome, error) {

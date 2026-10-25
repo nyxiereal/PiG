@@ -140,9 +140,9 @@ type ResourceLoaderReloadOptions struct {
 //
 // ExtensionFactories takes the [ExtensionFactory] references [CreateCodemodeExtension], [CreateToolSearchExtension] and [CreateMcpExtension] return; a function of this process is an error, because the child session's extensions load in the host. ExtensionsOverride exists so code that sets them fails loudly instead of losing behavior: an inline factory runs in the extension process but the child session's extensions load in the host, and an override returns live extension objects. They are not supported yet (an owner decision is pending, gap "SdkSessionGraph" in test/parity/sdk-exports.toml); NewDefaultResourceLoader returns an error when either is set. AdditionalExtensionPaths loads extension sources, and CreateAgentSession's custom tools serve tools from the parent extension.
 type DefaultResourceLoaderOptions struct {
-	Cwd                           string
-	AgentDir                      string
-	SettingsManager               *SettingsManager
+	Cwd             string
+	AgentDir        string
+	SettingsManager *SettingsManager
 	// Runtime is the runtime the loader loads its extensions against, which [CreateExtensionRuntime] made. pig additive (D201): Pi's loader takes none (its loadExtensions does); this is how a runtime made first reaches the extensions. Nil: each reload makes its own, as Pi's does.
 	Runtime                       *ExtensionRuntime
 	AdditionalExtensionPaths      []string

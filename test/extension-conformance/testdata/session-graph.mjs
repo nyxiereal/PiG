@@ -2,6 +2,7 @@
 import { DefaultPackageManager, DefaultResourceLoader, ModelRuntime, ProjectTrustStore, SessionManager, SettingsManager, createAgentSession, createCodemodeExtension, createMcpExtension, createToolSearchExtension, createAgentSessionFromServices, createAgentSessionServices, getAgentDir, hasTrustRequiringProjectResources } from "@earendil-works/pi-coding-agent";
 import { createAssistantMessageEventStream, createProvider } from "@earendil-works/pi-ai";
 import { extensionRunnerScript } from "./extension-runner.mjs";
+import { agentSessionRuntimeScript } from "./agent-session-runtime.mjs";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 
@@ -894,6 +895,10 @@ export default function (pi) {
   pi.registerTool({
     name: "extension_refs", label: "extension_refs", description: "Runs the compiled-in extension factories script.", parameters: { type: "object" },
     execute: async (_id, params) => ({ content: [{ type: "text", text: JSON.stringify(await extensionRefsScript(params)) }] }),
+  });
+  pi.registerTool({
+    name: "agent_session_runtime", label: "agent_session_runtime", description: "Runs the createAgentSessionRuntime script.", parameters: { type: "object" },
+    execute: async (_id, params) => ({ content: [{ type: "text", text: JSON.stringify(await agentSessionRuntimeScript(params).catch((e) => { throw new Error(String(e.stack)); })) }] }),
   });
   pi.registerTool({
     name: "extension_runner", label: "extension_runner", description: "Runs the createExtensionRuntime and ExtensionRunner script.", parameters: { type: "object" },

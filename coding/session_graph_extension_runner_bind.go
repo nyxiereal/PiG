@@ -370,8 +370,12 @@ func (g *GraphExtensionRunner) bindCommandContext(args icodingagent.GraphArgs) e
 		// Pi's defaults: waitForIdle and reload resolve, and a session replacement is not cancelled.
 		actions = extension.CommandActions{
 			WaitForIdle: func() error { return nil },
-			NewSession:  func(*extension.NewSessionOptions) (extension.CancelledResult, error) { return extension.CancelledResult{}, nil },
-			Fork:        func(string, *extension.ForkOptions) (extension.CancelledResult, error) { return extension.CancelledResult{}, nil },
+			NewSession: func(*extension.NewSessionOptions) (extension.CancelledResult, error) {
+				return extension.CancelledResult{}, nil
+			},
+			Fork: func(string, *extension.ForkOptions) (extension.CancelledResult, error) {
+				return extension.CancelledResult{}, nil
+			},
 			NavigateTree: func(string, *extension.NavigateTreeOptions) (extension.CancelledResult, error) {
 				return extension.CancelledResult{}, nil
 			},

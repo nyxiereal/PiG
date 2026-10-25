@@ -31,6 +31,11 @@ impl GraphObject {
         Ok(GraphObject { context: context.clone(), handle })
     }
 
+    /// The extension's reference to the host object `handle` names, which the host made without a `sessionGraph.new` call (the log of a child session).
+    pub(crate) fn adopt(context: &Context, handle: String) -> GraphObject {
+        GraphObject { context: context.clone(), handle }
+    }
+
     /// The connection the object was made on, which names the functions of its later calls.
     pub(crate) fn context(&self) -> &Context {
         &self.context

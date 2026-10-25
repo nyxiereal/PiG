@@ -34,11 +34,11 @@ type GraphExtensionRunner struct {
 	// holds end the runner's hold of the objects it uses: the loaders whose extensions it dispatches to, which stop when their last holder lets go, and the log and registry its contexts read.
 	holds []func()
 
-	mu        sync.Mutex
+	mu sync.Mutex
 	// boundContext is the context functions bindCore received, by name.
 	boundContext callbackIDs
-	nextError uint64
-	errorOffs map[string]func()
+	nextError    uint64
+	errorOffs    map[string]func()
 }
 
 var _ subprocess.SessionGraphObject = (*GraphExtensionRunner)(nil)
@@ -49,10 +49,10 @@ type graphExtensionRunnerOptions struct {
 		Loader       string `json:"loader"`
 		ResolvedPath string `json:"resolvedPath"`
 	} `json:"extensions"`
-	Runtime         string `json:"runtime"`
-	Cwd             string `json:"cwd"`
-	SessionManager  string `json:"sessionManager"`
-	ModelRegistry   string `json:"modelRegistry"`
+	Runtime        string `json:"runtime"`
+	Cwd            string `json:"cwd"`
+	SessionManager string `json:"sessionManager"`
+	ModelRegistry  string `json:"modelRegistry"`
 }
 
 func newGraphExtensionRunner(scope subprocess.SessionGraphScope, op string, raw json.RawMessage) (*GraphExtensionRunner, error) {
@@ -463,7 +463,9 @@ func (g *GraphExtensionRunner) resolveToolRenderers(ctx context.Context, args ic
 			out.RenderCall = func(json.RawMessage, extension.Theme, extension.ToolRenderContext) extension.Component { return nil }
 		}
 		if flags.RenderResult {
-			out.RenderResult = func(extension.AgentToolResult, extension.ToolRenderResultOptions, extension.Theme, extension.ToolRenderContext) extension.Component { return nil }
+			out.RenderResult = func(extension.AgentToolResult, extension.ToolRenderResultOptions, extension.Theme, extension.ToolRenderContext) extension.Component {
+				return nil
+			}
 		}
 		return out
 	})

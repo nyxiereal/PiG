@@ -277,8 +277,8 @@ func (g *GraphExtensionRunner) emitBoundary(ctx context.Context, args icodingage
 // emitBeforeAgentStart is `emitBeforeAgentStart(trigger, systemPromptOptions)`: trigger is `{messageType: "user", prompt, images?}` or `{messageType: "custom", message}`. The result is `{messages, systemPromptOptions}`, the options the handlers' edits left, with the prompt a handler set as forceSystemPrompt.
 func (g *GraphExtensionRunner) emitBeforeAgentStart(ctx context.Context, args icodingagent.GraphArgs) (any, error) {
 	wire, err := argAs[struct {
-		MessageType string                  `json:"messageType"`
-		Prompt      string                  `json:"prompt"`
+		MessageType string                   `json:"messageType"`
+		Prompt      string                   `json:"prompt"`
 		Images      []extension.ImageContent `json:"images"`
 		Message     *struct {
 			CustomType string `json:"customType"`

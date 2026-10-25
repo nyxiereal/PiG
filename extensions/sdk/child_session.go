@@ -135,6 +135,9 @@ const (
 	callChildSessionBindExtensions = "childSession.bindExtensions"
 	callChildSessionState          = "childSession.state"
 	callChildSessionMessages       = "childSession.messages"
+	callChildSessionEmit           = "childSession.emit"
+	callChildSessionRefreshContext = "childSession.refreshContext"
+	callChildSessionSessionManager = "childSession.sessionManager"
 	notifyChildSessionEvent        = "childSession.event"
 )
 
@@ -670,4 +673,48 @@ func (s *AgentSession) waitDelivered(seq uint64) {
 		s.cond.Wait()
 	}
 	s.mu.Unlock()
+}
+
+// RefreshContext is AgentSession.refreshContext: the session's finalized transcript is read again from its log, after the caller appended entries to the log [AgentSession.SessionManager] returns.
+func (s *AgentSession) RefreshContext() error {
+	_, err := s.call(callChildSessionRefreshContext, sessionRef{s.id})
+	return err
+}
+
+// SessionManager is `session.sessionManager`: the log the session appends to, the very one a [SessionManager] passed in CreateAgentSessionOptions names.
+func (s *AgentSession) SessionManager() (SessionManager, error) {
+	reply, err := s.call(callChildSessionSessionManager, sessionRef{s.id})
+	if err != nil {
+		return SessionManager{}, err
+	}
+	var handle struct {
+		Handle string `json:"handle"`
+	}
+	if err := json.Unmarshal(reply, &handle); err != nil {
+		return SessionManager{}, err
+	}
+	return SessionManager{object: adoptGraphObject(Context{ext: s.ext}, handle.Handle)}, nil
+}
+
+// emitExtensionEvent is `session.extensionRunner.hasHandlers(event.type)` and then `session.extensionRunner.emit(event)`; emitted is false when no extension has a handler for the type. It serves AgentSessionRuntime, which Pi gives these two calls on the runner of the session it replaces.
+func (s *AgentSession) emitExtensionEvent(event map[string]any) (result json.RawMessage, emitted bool, err error) {
+	wire, err := json.Marshal(event)
+	if err != nil {
+		return nil, false, err
+	}
+	reply, err := s.call(callChildSessionEmit, struct {
+		ID    string          `json:"id"`
+		Event json.RawMessage `json:"event"`
+	}{s.id, wire})
+	if err != nil {
+		return nil, false, err
+	}
+	var answer struct {
+		Emitted bool            `json:"emitted"`
+		Result  json.RawMessage `json:"result"`
+	}
+	if err := json.Unmarshal(reply, &answer); err != nil {
+		return nil, false, err
+	}
+	return answer.Result, answer.Emitted, nil
 }

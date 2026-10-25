@@ -40,6 +40,15 @@ from .settings_manager import SettingsManager as SettingsManager
 from .resource_loader import DefaultResourceLoader as DefaultResourceLoader, LoadedExtension as LoadedExtension, LoadExtensionsResult as LoadExtensionsResult
 from .extension_runtime import ExtensionRuntime as ExtensionRuntime, create_extension_runtime as create_extension_runtime
 from .extension_runner import ExtensionCommandContext as ExtensionCommandContext, ExtensionContext as ExtensionContext, ExtensionRunner as ExtensionRunner, ExtensionToolContext as ExtensionToolContext, RunnerUIContext as RunnerUIContext
+from .agent_session_runtime import (
+    AgentSessionRuntime as AgentSessionRuntime,
+    CreateAgentSessionRuntimeFactoryOptions as CreateAgentSessionRuntimeFactoryOptions,
+    CreateAgentSessionRuntimeOptions as CreateAgentSessionRuntimeOptions,
+    CreateAgentSessionRuntimeResult as CreateAgentSessionRuntimeResult,
+    MissingSessionCwdError as MissingSessionCwdError,
+    SessionImportFileNotFoundError as SessionImportFileNotFoundError,
+    create_agent_session_runtime as create_agent_session_runtime,
+)
 from .model_runtime import ModelRuntime as ModelRuntime
 from .package_manager import DefaultPackageManager as DefaultPackageManager
 from .project_trust import ProjectTrustStore as ProjectTrustStore, has_trust_requiring_project_resources as has_trust_requiring_project_resources

@@ -1306,6 +1306,140 @@ def extension_runner_tool(ctx, params):
     return json.dumps(extension_runner_script(ctx, params))
 
 
+def _entry_text(message):
+    content = message.get("content")
+    if isinstance(content, str):
+        return content
+    return "".join(block.get("text", "") for block in content or [] if block.get("type") == "text")
+
+
+def agent_session_runtime_script(ctx, args):
+    """createAgentSessionRuntime and AgentSessionRuntime through every replacement method, as testdata/agent-session-runtime.mjs does with Pi's own classes; the report is Pi's own run's."""
+    cwd, agent_dir, root = args["cwd"], args["agentDir"], args["root"]
+    r = {}
+    rt = ModelRuntime.create(ctx, auth_path=args["mrAuth"], models_path=args["mrModels"], models_store_path=args["mrStore"])
+    settings = SettingsManager.in_memory(ctx, {"compaction": {"enabled": False}, "retry": {"enabled": False}, "defaultProvider": "mr-local", "defaultModel": "m1"})
+    quiet = dict(no_extensions=True, no_skills=True, no_prompt_templates=True, no_themes=True, no_context_files=True)
+    session_dir = os.path.join(root, "runtime-sessions")
+    log_file, cancel_file = os.path.join(cwd, "runtime-events.log"), os.path.join(cwd, "cancel-next")
+    os.makedirs(cwd, exist_ok=True)
+    calls = []
+
+    def factory(options):
+        start = options.session_start_event
+        calls.append({"cwd": options.cwd, "reason": None if start is None else start.reason, "previous": bool(start and start.previous_session_file), "persisted": options.session_manager.is_persisted()})
+        services = pig_sdk.create_agent_session_services(ctx, pig_sdk.CreateAgentSessionServicesOptions(
+            cwd=options.cwd, agent_dir=options.agent_dir, settings_manager=settings, model_runtime=rt,
+            resource_loader_options=dict(quiet, additional_extension_paths=[args["runtimeProbe"]]),
+        ))
+        session = pig_sdk.create_agent_session_from_services(ctx, pig_sdk.CreateAgentSessionFromServicesOptions(services=services, session_manager=options.session_manager, session_start_event=start))
+        return pig_sdk.CreateAgentSessionRuntimeResult(session=session, services=services, diagnostics=services.diagnostics, model_fallback_message=session.model_fallback_message)
+
+    manager = SessionManager.create(ctx, cwd, session_dir)
+    run_file = manager.get_session_file()
+    runtime = pig_sdk.create_agent_session_runtime(ctx, factory, pig_sdk.CreateAgentSessionRuntimeOptions(cwd=cwd, agent_dir=agent_dir, session_manager=manager))
+    counts = {"rebinds": 0, "invalidations": 0}
+
+    def rebind(session):
+        counts["rebinds"] += 1
+        session.bind_extensions()
+
+    def invalidated():
+        counts["invalidations"] += 1
+
+    runtime.set_rebind_session(rebind)
+    runtime.set_before_session_invalidate(invalidated)
+    runtime.session.bind_extensions()
+    seen = {manager.get_session_id()}
+
+    def current():
+        return runtime.session.session_manager()
+
+    def is_new():
+        identifier = current().get_session_id()
+        fresh = identifier not in seen
+        seen.add(identifier)
+        return fresh
+
+    def kinds():
+        return [entry["type"] for entry in current().get_entries()]
+
+    def roles():
+        return [message["role"] for message in runtime.session.messages()]
+
+    def user_entry(wanted):
+        return next(entry for entry in current().get_entries() if entry["type"] == "message" and entry["message"]["role"] == "user" and _entry_text(entry["message"]) == wanted)
+
+    def assistant_id():
+        return next(entry["id"] for entry in current().get_entries() if entry["type"] == "message" and entry["message"]["role"] == "assistant")
+
+    def cancelling(run):
+        with open(cancel_file, "w"):
+            pass
+        try:
+            return run()
+        finally:
+            os.remove(cancel_file)
+
+    def parent_is(file):
+        return (current().get_header() or {}).get("parentSession") == file
+
+    r["initial"] = {
+        "cwd": runtime.cwd, "diagnostics": runtime.diagnostics, "fallback": runtime.model_fallback_message, "sameLog": current().get_session_id() == manager.get_session_id(),
+        "servicesCwd": runtime.services.cwd, "servicesAgentDir": runtime.services.agent_dir == agent_dir, "calls": len(calls),
+    }
+    runtime.session.prompt("one")
+    r["prompted"] = {"kinds": kinds(), "persisted": os.path.exists(run_file)}
+
+    cancelled_new = cancelling(lambda: runtime.new_session())
+    r["newCancelled"] = {"result": cancelled_new, "sameSession": not is_new(), "calls": len(calls), "rebinds": counts["rebinds"], "invalidations": counts["invalidations"]}
+    created = runtime.new_session({"parentSession": run_file, "setup": lambda sm: sm.append_custom_message_entry("setup-note", "from setup", True)})
+    r["newSession"] = {
+        "result": created, "fresh": is_new(), "parentIsFirst": parent_is(run_file), "kinds": kinds(), "roles": roles(), "calls": list(calls[1:]),
+        "rebinds": counts["rebinds"], "invalidations": counts["invalidations"],
+    }
+    runtime.session.prompt("two")
+
+    second_file = current().get_session_file()
+    two_id = user_entry("two")["id"]
+    r["forkCancelled"] = {"result": cancelling(lambda: runtime.fork(two_id)), "sameSession": not is_new()}
+    forked = runtime.fork(two_id)
+    r["fork"] = {"result": forked, "fresh": is_new(), "parentIsNotSecond": current().get_session_file() != second_file, "roles": roles(), "kinds": kinds(), "calls": len(calls) - 2}
+    runtime.session.prompt("three")
+    forked_at = runtime.fork(assistant_id(), {"position": "at"})
+    r["forkAt"] = {"result": forked_at, "fresh": is_new(), "roles": roles()}
+    r["forkErrors"] = {"missing": error_text(lambda: runtime.fork("no-such-entry")), "notUser": error_text(lambda: runtime.fork(assistant_id()))}
+
+    r["switchCancelled"] = {"result": cancelling(lambda: runtime.switch_session(run_file)), "sameSession": not is_new()}
+    switched = runtime.switch_session(run_file)
+    r["switch"] = {"result": switched, "backOnFirst": current().get_session_id() == manager.get_session_id(), "file": os.path.basename(current().get_session_file()) == os.path.basename(run_file), "roles": roles()}
+
+    emptied = runtime.fork(user_entry("one")["id"])
+    r["forkRoot"] = {"result": emptied, "fresh": is_new(), "parentIsFirst": parent_is(run_file), "kinds": kinds()}
+
+    import_dir = os.path.join(root, "import")
+    os.makedirs(import_dir, exist_ok=True)
+    import_path = os.path.join(import_dir, "imported.jsonl")
+    with open(run_file, "rb") as source, open(import_path, "wb") as target:
+        target.write(source.read())
+    imported = runtime.import_from_jsonl(import_path)
+    imported_file = current().get_session_file()
+    r["import"] = {
+        "result": imported, "fresh": is_new(), "inSessionDir": imported_file.startswith(session_dir), "name": os.path.basename(imported_file), "roles": roles(), "sourceKept": os.path.exists(import_path),
+        "missing": error_text(lambda: runtime.import_from_jsonl(os.path.join(import_dir, "missing.jsonl"))),
+    }
+
+    runtime.dispose()
+    r["counts"] = {"rebinds": counts["rebinds"], "invalidations": counts["invalidations"], "factoryCalls": len(calls), "reasons": [("null" if call["reason"] is None else call["reason"]) + ("+previous" if call["previous"] else "") for call in calls]}
+    with open(log_file) as handle:
+        r["events"] = handle.read().rstrip("\n").split("\n")
+    return r
+
+
+def agent_session_runtime_tool(ctx, params):
+    return json.dumps(agent_session_runtime_script(ctx, params))
+
+
 def new_extension():
     ext = pig_sdk.Extension("session-graph")
     ext.register_tool(pig_sdk.ToolDefinition(name="session_manager", label="session_manager", description="Runs the SessionManager script.", parameters={"type": "object"}, execute=session_manager_tool))
@@ -1318,5 +1452,6 @@ def new_extension():
     ext.register_tool(pig_sdk.ToolDefinition(name="create_provider", label="create_provider", description="Runs the createProvider script.", parameters={"type": "object"}, execute=create_provider_tool))
     ext.register_tool(pig_sdk.ToolDefinition(name="extension_refs", label="extension_refs", description="Runs the compiled-in extension factories script.", parameters={"type": "object"}, execute=extension_refs_tool))
     ext.register_tool(pig_sdk.ToolDefinition(name="extension_runner", label="extension_runner", description="Runs the createExtensionRuntime and ExtensionRunner script.", parameters={"type": "object"}, execute=extension_runner_tool))
+    ext.register_tool(pig_sdk.ToolDefinition(name="agent_session_runtime", label="agent_session_runtime", description="Runs the createAgentSessionRuntime script.", parameters={"type": "object"}, execute=agent_session_runtime_tool))
     ext.register_tool(pig_sdk.ToolDefinition(name="services", label="services", description="Runs the createAgentSessionServices script.", parameters={"type": "object"}, execute=services_tool))
     return ext

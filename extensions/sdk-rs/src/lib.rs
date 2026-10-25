@@ -202,6 +202,11 @@ mod create_provider;
 pub use create_provider::{create_provider, CreateProviderOptions, FetchModelsFn, ProviderApi, ProviderCancelDeferredFn, ProviderStreams};
 mod agent_session_services;
 pub use agent_session_services::{create_agent_session_from_services, create_agent_session_services, AgentSessionServices, CreateAgentSessionFromServicesOptions, CreateAgentSessionServicesOptions, ResourceLoaderReloadOptions};
+mod agent_session_runtime;
+pub use agent_session_runtime::{
+    create_agent_session_runtime, AgentSessionRuntime, CreateAgentSessionRuntimeFactory, CreateAgentSessionRuntimeFactoryOptions, CreateAgentSessionRuntimeOptions, CreateAgentSessionRuntimeResult, ForkResult,
+    ForkRuntimeOptions, MissingSessionCwdError, NewSessionRuntimeOptions, RuntimeWithSession, SessionImportFileNotFoundError, SwitchSessionRuntimeOptions,
+};
 pub use host_subscriptions::HostSubscription;
 #[doc(hidden)]
 pub use extension::report_load_failure;

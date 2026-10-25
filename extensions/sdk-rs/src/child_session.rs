@@ -283,6 +283,7 @@ impl SessionShared {
 /// A child agent session: Pi's `AgentSession` as an extension holds it. Create it with
 /// [`Context::create_agent_session`](crate::Context::create_agent_session).
 pub struct AgentSession {
+    context: crate::context::Context,
     conn: Arc<Connection>,
     shared: Arc<SessionShared>,
     /// `session.sessionId`.
@@ -321,7 +322,9 @@ fn call(conn: &Connection, method: &str, args: Value) -> io::Result<Option<Value
     Ok(result.result)
 }
 
-pub(crate) fn create(conn: &Arc<Connection>, call_host: impl Fn(&str, Option<Value>) -> io::Result<Option<Value>>, options: CreateAgentSessionOptions) -> io::Result<AgentSession> {
+pub(crate) fn create(context: &crate::context::Context, options: CreateAgentSessionOptions) -> io::Result<AgentSession> {
+    let conn = &context.conn;
+    let call_host = |method: &str, args: Option<Value>| context.call_host(method, args);
     let id = format!("c{}", conn.children.next.fetch_add(1, Ordering::SeqCst) + 1);
     let mut args = serde_json::Map::new();
     args.insert("id".into(), json!(id));
@@ -389,6 +392,7 @@ pub(crate) fn create(conn: &Arc<Connection>, call_host: impl Fn(&str, Option<Val
     };
     let text = |key: &str| info[key].as_str().unwrap_or("").to_string();
     Ok(AgentSession {
+        context: context.clone(),
         conn: conn.clone(),
         shared,
         session_id: text("sessionId"),
@@ -452,6 +456,24 @@ impl AgentSession {
     /// `AgentSession.bindExtensions({})`: the extensions the session's resources loaded start, headless, and receive `session_start`.
     pub fn bind_extensions(&self) -> io::Result<()> {
         self.call("childSession.bindExtensions", json!({})).map(|_| ())
+    }
+
+    /// `session.refreshContext()`: the session's finalized transcript is read again from its log, after the caller appended entries to the log [`AgentSession::session_manager`] returns.
+    pub fn refresh_context(&self) -> io::Result<()> {
+        self.call("childSession.refreshContext", json!({})).map(|_| ())
+    }
+
+    /// `session.sessionManager`: the log the session appends to, the very one a `SessionManager` passed in `CreateAgentSessionOptions` names.
+    pub fn session_manager(&self) -> io::Result<crate::SessionManager> {
+        let reply = self.call("childSession.sessionManager", json!({}))?.unwrap_or(Value::Null);
+        let handle = reply["handle"].as_str().filter(|handle| !handle.is_empty()).ok_or_else(|| io::Error::new(io::ErrorKind::Other, "host returned no session graph handle"))?;
+        Ok(crate::SessionManager::adopt(&self.context, handle.to_string()))
+    }
+
+    /// `session.extensionRunner.hasHandlers(event.type)` and then `emit(event)`: the result (`Null` for nothing) and whether an extension had a handler for the type. It serves `AgentSessionRuntime`, which Pi gives these two calls on the runner of the session it replaces.
+    pub(crate) fn emit_extension_event(&self, event: Value) -> io::Result<(Value, bool)> {
+        let reply = self.call("childSession.emit", json!({"event": event}))?.unwrap_or(Value::Null);
+        Ok((reply["result"].clone(), reply["emitted"].as_bool().unwrap_or(false)))
     }
 
     /// The session's current state: `sessionId`, `sessionFile`, `model`, `isStreaming`, `isIdle`, `thinkingLevel`, `activeTools`, `systemPrompt`,

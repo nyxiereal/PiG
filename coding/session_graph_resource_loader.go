@@ -33,9 +33,9 @@ func (g *GraphResourceLoader) Release() { g.loader.Close() }
 
 // graphLoaderOptions is Pi's DefaultResourceLoaderOptions as it crosses the wire: an object option is the handle of the object, a function option is the name of the function the extension holds.
 type graphLoaderOptions struct {
-	Cwd                           string    `json:"cwd"`
-	AgentDir                      string    `json:"agentDir"`
-	SettingsManager               string    `json:"settingsManager"`
+	Cwd             string `json:"cwd"`
+	AgentDir        string `json:"agentDir"`
+	SettingsManager string `json:"settingsManager"`
 	// Runtime is the handle of an ExtensionRuntime (createExtensionRuntime) the loader loads its extensions against.
 	Runtime                       string    `json:"runtime"`
 	AdditionalExtensionPaths      []string  `json:"additionalExtensionPaths"`

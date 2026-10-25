@@ -44,6 +44,7 @@ func rustIOError(err error) (string, bool) {
 	}
 	text := errno.Error()
 	first, size := utf8.DecodeRuneInString(text)
+	//portlint:allow utf16units Rust io::Error text, not a JS string: size is the UTF-8 byte length DecodeRuneInString returned for the first rune
 	return fmt.Sprintf("%c%s (os error %d)", unicode.ToUpper(first), text[size:], int(errno)), true
 }
 

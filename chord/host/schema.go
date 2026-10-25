@@ -3,6 +3,7 @@ package host
 // Ports packages/chord/src/schema.ts.
 
 import (
+	"maps"
 	"math"
 	"reflect"
 	"slices"
@@ -30,10 +31,7 @@ func asSchema(schema any) Schema {
 	case *chordjson.Object:
 		// An ordered schema written with chordjson: the members are copied to a map, the nested nodes stay as they are.
 		if typed != nil {
-			out := make(Schema, typed.Len())
-			for key, item := range typed.All() {
-				out[key] = item
-			}
+			out := maps.Collect(typed.All())
 			return out
 		}
 	case bool:

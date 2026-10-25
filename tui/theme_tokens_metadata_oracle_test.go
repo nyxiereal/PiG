@@ -4,6 +4,7 @@ package tui
 
 import (
 	"encoding/json"
+	"maps"
 	"os"
 	"path/filepath"
 	"slices"
@@ -119,9 +120,7 @@ func TestOmittedOptionalThemeTokensFallBackAsInPi(t *testing.T) {
 	var files []string
 	for i, omit := range variants {
 		doc := map[string]any{}
-		for k, v := range base {
-			doc[k] = v
-		}
+		maps.Copy(doc, base)
 		colors := map[string]any{}
 		for k, v := range baseColors {
 			if !slices.Contains(omit, k) {

@@ -282,10 +282,7 @@ func objectMap(value any) (map[string]any, bool) {
 		if typed == nil {
 			return nil, false
 		}
-		out := make(map[string]any, typed.Len())
-		for key, item := range typed.All() {
-			out[key] = item
-		}
+		out := maps.Collect(typed.All())
 		return out, true
 	}
 	return nil, false

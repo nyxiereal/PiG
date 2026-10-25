@@ -115,7 +115,7 @@ func (g *GraphModelRuntime) nativeProvider(id string) json.RawMessage {
 	g.nativesMu.Lock()
 	native, ok := g.natives[id]
 	g.nativesMu.Unlock()
-	if !ok || g.runtime.GetRegisteredNativeProvider(id) == nil {
+	if !ok || g.runtime.services.Registry().NativeProvider(id) == nil {
 		return nil
 	}
 	return native.declared
@@ -146,6 +146,8 @@ func (g *GraphModelRuntime) registerNativeProvider(ctx context.Context, args ico
 	if previous.release != nil {
 		previous.release()
 	}
+	// Pi's registerNativeProvider composes the provider into the runtime's snapshot before it returns; the port runs that composition in the queued registration refresh, which the call waits for so the extension's next read sees the provider (D84).
+	g.runtime.services.Registry().YieldToRegistrationRefresh(ctx)
 	return nil, nil
 }
 
@@ -473,6 +475,16 @@ func (g *GraphModelRuntime) Call(ctx context.Context, method string, raw json.Ra
 			return runtime.IsUsingSubscription(provider), nil
 		}
 		return runtime.HasConfiguredAuth(provider), nil
+	case "providerName":
+		// The name of the provider's object, for ModelRegistry.getProviderDisplayName (model-registry.ts: `getProvider(provider)?.name ?? provider`), which does not need the object a builtin provider has no carrier for.
+		provider, err := args.String(0)
+		if err != nil {
+			return nil, err
+		}
+		if found := runtime.GetProvider(provider); found != nil {
+			return found.Name, nil
+		}
+		return nil, nil
 	case "getProviderAuthStatus":
 		provider, err := args.String(0)
 		if err != nil {

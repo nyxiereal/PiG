@@ -1551,8 +1551,29 @@ def _model_stream_error_event(error: Exception, model: dict[str, Any]) -> dict[s
     }
 
 
+def _provider_from_declaration(context: "Context", declaration: dict[str, Any]) -> Provider:
+    """The Provider object a declaration of the host names: the extension's own object when it registered it, else a proxy that calls the extension that did, cached by the host's handle."""
+    extension = context.extension
+    with extension._provider_lock:
+        local = extension._native_providers.get(declaration["key"])
+        if local is not None:
+            return local
+        key = declaration["id"]
+        cached = extension._remote_providers.get(key)
+        if cached is None or cached._provider_handle != declaration["handle"]:
+            extension._remote_providers[key] = _remote_provider(context, declaration)
+        return extension._remote_providers[key]
+
+
 class ModelRegistry:
-    """Session model discovery, request authentication, and model operations."""
+    """Session model discovery, request authentication, and model operations. ``ModelRegistry(runtime)`` is Pi's ``new ModelRegistry(runtime)`` (model-registry.ts:48-52): the facade over a :class:`ModelRuntime` the extension built, every member forwarding to that runtime (see model_registry_runtime.py)."""
+    def __new__(cls, source: Any) -> "ModelRegistry":
+        if cls is ModelRegistry and isinstance(source, ModelRuntime):
+            from .model_registry_runtime import RuntimeModelRegistry
+
+            return object.__new__(RuntimeModelRegistry)
+        return object.__new__(cls)
+
     def __init__(self, context: "Context") -> None:
         self._context = context
 
@@ -1676,17 +1697,7 @@ class ModelRegistry:
         for entry in self._state()["registered"]:
             if entry["name"] != provider or not entry.get("native"):
                 continue
-            declaration = entry["native"]
-            extension = self._context.extension
-            with extension._provider_lock:
-                local = extension._native_providers.get(declaration["key"])
-                if local is not None:
-                    return local
-                key = declaration["id"]
-                cached = extension._remote_providers.get(key)
-                if cached is None or cached._provider_handle != declaration["handle"]:
-                    extension._remote_providers[key] = _remote_provider(self._context, declaration)
-                return extension._remote_providers[key]
+            return _provider_from_declaration(self._context, entry["native"])
         return None
 
     # pig divergence (D78): builtin/composed Provider methods still need a native SDK carrier.

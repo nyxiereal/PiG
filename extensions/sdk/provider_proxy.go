@@ -16,6 +16,9 @@ type providerCallbacks map[string]func(json.RawMessage) (any, error)
 var providerStreamCallbackNames = []string{"onPayload", "onResponse", "onProviderStreamEvent"}
 
 func (r ModelRegistry) GetRegisteredNativeProvider(id string) (*Provider, error) {
+	if r.runtime != nil {
+		return r.runtime.GetRegisteredNativeProvider(id)
+	}
 	state, err := r.state()
 	if err != nil {
 		return nil, err
@@ -53,6 +56,9 @@ func providerFromDeclaration(c Context, decl providerObjectDeclaration) (*Provid
 
 // pig divergence (D78): builtin/composed Provider object methods still need a native SDK carrier.
 func (r ModelRegistry) GetProvider(id string) (*Provider, error) {
+	if r.runtime != nil {
+		return r.runtime.GetProvider(id)
+	}
 	provider, err := r.GetRegisteredNativeProvider(id)
 	if provider != nil || err != nil {
 		return provider, err
@@ -69,6 +75,9 @@ func (r ModelRegistry) GetProvider(id string) (*Provider, error) {
 
 // RegisterNativeProvider applies the native overload to the live registry and waits for publication.
 func (r ModelRegistry) RegisterNativeProvider(provider *Provider) error {
+	if r.runtime != nil {
+		return r.runtime.RegisterNativeProvider(provider)
+	}
 	decl, err := providerDeclaration(provider, rand.Text())
 	if err != nil {
 		return err

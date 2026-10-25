@@ -1,6 +1,6 @@
 //! Fixture for the session graph conformance rows (test/extension-conformance/session_graph_test.go): the script of testfixture/sessiongraph (Go), testdata/session-graph.mjs (Node, Pi's own classes) and testdata/session_graph_python.py.
 
-use pig_sdk::{McpAuthProvider, McpLoadConfigContext, McpOAuthCredentialStore, McpOAuthServerStore, McpSendSignal, McpTransport, McpTransportEvents, create_codemode_extension, create_tool_search_extension, create_mcp_extension, CodemodeExtensionOptions, McpExtensionOptions, ExtensionFactory, create_provider, CreateProviderOptions, ProviderApi, ProviderStreams, ProviderAuth, APIKeyAuth, AuthResult, ProviderStreamFn, ProviderOperationFn, ProviderOperationOptions, ProviderStreamOptions, RefreshModelsContext, ModelsPublication, create_assistant_message_event_stream, ProviderSignal, create_agent_session_from_services, create_agent_session_services, CreateAgentSessionFromServicesOptions, CreateAgentSessionServicesOptions, SessionStartEvent, CreateAgentSessionOptions, ModelRuntime, ModelRuntimeCreateOptions, ModelRoute, VirtualModel, DefaultPackageManager, PackageManagerOptions, DefaultResourceLoader, DefaultResourceLoaderOptions, empty_schema, Context, Extension, NewSessionOptions, SessionInfo, SessionManager, SettingsManager, SettingsManagerCreateOptions, ToolResult, has_trust_requiring_project_resources, ProjectTrustStore, ProjectTrustStoreEntry, ProjectTrustUpdate};
+use pig_sdk::{AuthCheck, ModelRegistry, McpAuthProvider, McpLoadConfigContext, McpOAuthCredentialStore, McpOAuthServerStore, McpSendSignal, McpTransport, McpTransportEvents, create_codemode_extension, create_tool_search_extension, create_mcp_extension, CodemodeExtensionOptions, McpExtensionOptions, ExtensionFactory, create_provider, CreateProviderOptions, ProviderApi, ProviderStreams, ProviderAuth, APIKeyAuth, AuthResult, ProviderStreamFn, ProviderOperationFn, ProviderOperationOptions, ProviderStreamOptions, RefreshModelsContext, ModelsPublication, create_assistant_message_event_stream, ProviderSignal, create_agent_session_from_services, create_agent_session_services, CreateAgentSessionFromServicesOptions, CreateAgentSessionServicesOptions, SessionStartEvent, CreateAgentSessionOptions, ModelRuntime, ModelRuntimeCreateOptions, ModelRoute, VirtualModel, DefaultPackageManager, PackageManagerOptions, DefaultResourceLoader, DefaultResourceLoaderOptions, empty_schema, Context, Extension, NewSessionOptions, SessionInfo, SessionManager, SettingsManager, SettingsManagerCreateOptions, ToolResult, has_trust_requiring_project_resources, ProjectTrustStore, ProjectTrustStoreEntry, ProjectTrustUpdate};
 use serde_json::{json, Value};
 use std::io;
 use std::path::Path;
@@ -1272,6 +1272,127 @@ fn model_runtime_script(ctx: &Context, args: &Value) -> io::Result<Value> {
     Ok(Value::Object(r))
 }
 
+/// `ModelRegistry::new(runtime)` over the parts of testdata/session-graph.mjs modelRegistryScript; the report is Pi's own run's except `builtin` (D78: Pi answers a builtin provider's Provider object, this SDK fails with the D78 error and the test expects that).
+fn model_registry_script(ctx: &Context, args: &Value) -> io::Result<Value> {
+    let (auth, models, store, server) = (text(&args["mrAuth"]), text(&args["mrModels"]), text(&args["mrStore"]), text(&args["mrServer"]));
+    let mut r = serde_json::Map::new();
+    let rt = Arc::new(ModelRuntime::create(ctx, ModelRuntimeCreateOptions { auth_path: Some(auth.into()), models_path: Some(models.into()), models_store_path: Some(store.into()), ..Default::default() })?);
+    let registry = ModelRegistry::new(rt.clone());
+    let of = |list: &Value, provider: &str| -> Vec<Value> { list.as_array().cloned().unwrap_or_default().into_iter().filter(|model| model["provider"] == provider).collect() };
+    let local = registry.find("mr-local", "m1")?.unwrap_or(Value::Null);
+    let available_of_type = ids(&registry.get_available_of_type("chat", Some("mr-local"))?, None);
+    r.insert("catalog".into(), json!({
+        "error": registry.get_error()?, "all": pick_models(&json!(of(&registry.get_all()?, "mr-local"))), "builtinListed": !of(&registry.get_all()?, "anthropic").is_empty(),
+        "available": ids(&json!(of(&registry.get_available()?, "mr-local")), None), "one": pick_model(&local), "missing": registry.find("mr-local", "nope")?.is_none(),
+        "findOfType": pick_model(&registry.find_of_type("chat", "mr-local", "m1")?.unwrap_or(Value::Null)), "ofType": ids(&registry.get_models_of_type("chat", Some("mr-local"))?, None),
+        "oneOfType": pick_model(&registry.get_model_of_type("chat", "mr-local", "m1")?.unwrap_or(Value::Null)),
+        "oneOfTypeMissing": registry.get_model_of_type("image", "mr-local", "m1")?.is_none(), "imagesOfType": registry.get_models_of_type("image", Some("mr-local"))?.as_array().map_or(0, Vec::len), "availableOfType": available_of_type,
+    }));
+    let mut unknown = local.clone();
+    unknown["provider"] = json!("nope-prov");
+    r.insert("auth".into(), json!({
+        "configured": registry.has_configured_auth(&local)?, "unconfigured": registry.has_configured_auth(&unknown)?, "oauth": registry.is_using_oauth(&local)?,
+        "status": registry.get_provider_auth_status("mr-local")?, "storedStatus": registry.get_provider_auth_status("stored-prov")?, "unknownStatus": registry.get_provider_auth_status("nope-prov")?,
+        "displayLocal": registry.get_provider_display_name("mr-local")?, "displayBuiltin": registry.get_provider_display_name("anthropic")?, "displayUnknown": registry.get_provider_display_name("nope-prov")?,
+        "providerAuth": registry.get_provider_auth("mr-local")?, "providerAuthNone": registry.get_provider_auth("nope-prov")?,
+        "apiKey": registry.get_api_key_for_provider("mr-local"), "apiKeyNone": registry.get_api_key_for_provider("nope-prov"),
+        "request": registry.get_api_key_and_headers(&local)?, "requestUnconfigured": registry.get_api_key_and_headers(&unknown)?,
+    }));
+
+    let before = registry.get_registered_provider_ids()?;
+    registry.register_provider("reg-prov", json!({
+        "baseUrl": server, "apiKey": "regkey", "api": "openai-completions", "headers": {"x-reg": "1"},
+        "models": [{"id": "r1", "name": "Reg One", "reasoning": false, "input": ["text"], "cost": {"input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0}, "contextWindow": 4000, "maxTokens": 500}],
+    }))?;
+    let config = registry.get_registered_provider_config("reg-prov")?;
+    let rejected = error_text(registry.register_provider("bad-prov", json!({"models": [{"id": "x"}]})));
+    let mut registered = json!({
+        "before": before, "ids": registry.get_registered_provider_ids()?, "models": pick_models(&json!(of(&registry.get_all()?, "reg-prov"))), "baseUrl": config["baseUrl"], "apiKey": config["apiKey"], "api": config["api"], "headers": config["headers"], "modelIds": ids(&config["models"], None),
+        "unregisteredConfig": registry.get_registered_provider_config("nope-prov")?.is_null(), "rejected": rejected,
+    });
+    registry.unregister_provider("reg-prov")?;
+    registered["after"] = json!({"ids": registry.get_registered_provider_ids()?, "models": of(&registry.get_all()?, "reg-prov").len(), "config": registry.get_registered_provider_config("reg-prov")?.is_null()});
+    r.insert("registered".into(), registered);
+
+    let native_model = json!({"id": "n1", "name": "N One", "api": "nat-api", "provider": "nreg", "baseUrl": "https://ext.invalid", "reasoning": false, "input": ["text"], "cost": {"input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0}, "contextWindow": 4000, "maxTokens": 500});
+    let scripted = move |tag: String| -> ProviderStreamFn {
+        Arc::new(move |model, _context, _options| {
+            let stream = create_assistant_message_event_stream();
+            stream.push(json!({"type": "done", "reason": "stop", "message": json!({
+                "role": "assistant", "content": [{"type": "text", "text": format!("{}:{}", tag, text(&model["id"]))}], "api": model["api"], "provider": model["provider"], "model": model["id"],
+                "usage": {"input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0, "totalTokens": 0, "cost": {"input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0, "total": 0}},
+                "stopReason": "stop", "timestamp": 1,
+            })}));
+            Ok(stream)
+        })
+    };
+    let provider = Arc::new(create_provider(CreateProviderOptions {
+        id: "nreg".into(), name: Some("Native Reg".into()), base_url: None, headers: None,
+        auth: ProviderAuth { api_key: Some(APIKeyAuth { name: "Key".into(), check: Some(Arc::new(|_| Ok(Some(AuthCheck { kind: "api_key".into(), source: Some("ext check".into()) })))), resolve: Arc::new(|_| Ok(Some(AuthResult { auth: json!({"apiKey": "nk"}), env: None, source: None }))), login: None }), oauth: None },
+        models: vec![native_model.clone()], fetch_models: None, filter_models: None, filter_all_models: None,
+        api: Some(ProviderApi::ByApi(vec![("nat-api".into(), ProviderStreams { stream: scripted("n.stream".into()), stream_simple: scripted("n.simple".into()), fetch_deferred: None, cancel_deferred: None })])), images: vec![], classifiers: vec![],
+    }).map_err(io::Error::other)?);
+    registry.register_native_provider(provider.clone())?;
+    let conversation = json!({"systemPrompt": "Be brief.", "messages": [{"role": "user", "content": "say hello", "timestamp": 1}]});
+    let drain = |stream: Arc<pig_sdk::ModelEventStream>| -> (Vec<Value>, Value) {
+        let mut events = Vec::new();
+        while let Some(event) = stream.next() {
+            events.push(event["type"].clone());
+        }
+        (events, stream.result().unwrap_or(Value::Null))
+    };
+    let (native_events, native_message) = drain(registry.stream_simple(native_model.clone(), conversation.clone(), json!({})));
+    let provider_id = |found: Option<Arc<pig_sdk::Provider>>| found.map_or(Value::Null, |found| json!(found.id));
+    let registered_native = registry.get_registered_native_provider("nreg")?;
+    r.insert("native".into(), json!({
+        "registered": provider_id(registered_native.clone()), "same": registered_native.as_ref().is_some_and(|found| Arc::ptr_eq(found, &provider)), "viaGetProvider": provider_id(registry.get_provider("nreg")?), "viaRuntime": provider_id(rt.get_provider("nreg")?),
+        "viaRuntimeRegistered": provider_id(rt.get_registered_native_provider("nreg")?), "none": registry.get_registered_native_provider("nope-prov")?.is_none(), "noneProvider": registry.get_provider("nope-prov")?.is_none(),
+        "ids": registry.get_registered_provider_ids()?, "displayName": registry.get_provider_display_name("nreg")?, "models": ids(&json!(of(&registry.get_all()?, "nreg")), None),
+        "auth": registry.get_provider_auth("nreg")?, "request": registry.get_api_key_and_headers(&native_model)?,
+        "events": native_events, "text": message_text(&native_message), "stopReason": native_message["stopReason"], "completed": registry.complete(native_model.clone(), conversation.clone(), json!({})).unwrap_or(Value::Null)["stopReason"],
+    }));
+    registry.unregister_provider("nreg")?;
+    r.get_mut("native").unwrap()["after"] = json!({"registered": registry.get_registered_native_provider("nreg")?.is_none(), "provider": registry.get_provider("nreg")?.is_none(), "models": of(&registry.get_all()?, "nreg").len()});
+    let builtin_provider = match registry.get_provider("anthropic") {
+        Ok(Some(found)) => found.id.clone(),
+        Ok(None) => "missing".into(),
+        Err(error) => format!("error: {error}"),
+    };
+    let builtin_providers = match rt.get_providers() {
+        Ok(all) => if all.iter().any(|candidate| candidate.id == "anthropic") { "anthropic".to_string() } else { "absent".to_string() },
+        Err(error) => format!("error: {error}"),
+    };
+    r.insert("builtin".into(), json!({"provider": builtin_provider, "providers": builtin_providers}));
+
+    let route_rt = rt.clone();
+    let mut virtual_model = VirtualModel::new("mr-virtual", "v1", "Virtual One", move |_ctx, _request| {
+        let model = route_rt.get_physical_model("mr-local", "m1").map_err(|error| error.to_string())?;
+        Ok(ModelRoute { model, thinking_level: "off".into(), state: None })
+    });
+    virtual_model.thinking_levels = Some(vec!["off".into(), "high".into()]);
+    virtual_model.context_window = Some(1000);
+    virtual_model.max_tokens = Some(100);
+    virtual_model.input = Some(vec!["text".into()]);
+    registry.register_virtual_model(virtual_model)?;
+    let virtual_object = registry.find("mr-virtual", "v1")?.unwrap_or(Value::Null);
+    r.insert("virtual".into(), json!({"model": pick_model(&virtual_object), "thinkingLevels": virtual_object["thinkingLevels"]}));
+    registry.unregister_virtual_model("mr-virtual", "v1")?;
+    r.get_mut("virtual").unwrap()["after"] = json!(registry.find("mr-virtual", "v1")?.is_none());
+
+    let refreshed = registry.refresh(json!({"allowNetwork": false}))?;
+    r.insert("refresh".into(), json!({"aborted": refreshed["aborted"], "errors": refreshed["errors"]}));
+    let options = json!({"maxTokens": 50});
+    let (events, message) = drain(registry.stream_simple(local.clone(), conversation.clone(), options.clone()));
+    let full = registry.complete(local.clone(), conversation, options).unwrap_or(Value::Null);
+    let classified = registry.classify(&local, json!({"state": {}, "questions": {}}), None);
+    let imaged = registry.generate_images(&local, json!({"input": [{"type": "text", "text": "a cat"}]}), None);
+    r.insert("stream".into(), json!({
+        "events": events, "stopReason": message["stopReason"], "text": message_text(&message), "provider": message["provider"], "model": message["model"], "api": message["api"], "full": full["stopReason"],
+        "classifyStop": classified["stopReason"], "classifyError": classified["errorMessage"], "imagesStop": imaged["stopReason"], "imagesError": imaged["errorMessage"],
+    }));
+    Ok(Value::Object(r))
+}
+
 pub fn new_extension() -> Extension {
     let mut ext = Extension::new("session-graph");
     ext.tool("session_manager", "Runs the SessionManager script.", empty_schema(), |ctx, args| match script(ctx, &args) {
@@ -1291,6 +1412,10 @@ pub fn new_extension() -> Extension {
         Err(error) => ToolResult::Error(error.to_string()),
     });
     ext.tool("model_runtime", "Runs the ModelRuntime script.", empty_schema(), |ctx, args| match model_runtime_script(ctx, &args) {
+        Ok(report) => ToolResult::text(report.to_string()),
+        Err(error) => ToolResult::Error(error.to_string()),
+    });
+    ext.tool("model_registry", "Runs the ModelRegistry over a ModelRuntime script.", empty_schema(), |ctx, args| match model_registry_script(ctx, &args) {
         Ok(report) => ToolResult::text(report.to_string()),
         Err(error) => ToolResult::Error(error.to_string()),
     });

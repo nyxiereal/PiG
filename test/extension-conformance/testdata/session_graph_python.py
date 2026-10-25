@@ -693,6 +693,126 @@ def model_runtime_tool(ctx, params):
     return json.dumps(model_runtime_script(ctx, params))
 
 
+def model_registry_script(ctx, args):
+    """``ModelRegistry(runtime)`` over the parts of testdata/session-graph.mjs modelRegistryScript; the report is Pi's own run's except ``builtin`` (D78: Pi answers a builtin provider's Provider object, this SDK fails with the D78 error and the test expects that)."""
+    r = {}
+    auth, models, store, server = args["mrAuth"], args["mrModels"], args["mrStore"], args["mrServer"]
+    rt = ModelRuntime.create(ctx, auth_path=auth, models_path=models, models_store_path=store)
+    registry = pig_sdk.ModelRegistry(rt)
+
+    def of(models_list, provider):
+        return [m for m in models_list if m["provider"] == provider]
+
+    local = registry.find("mr-local", "m1")
+    available_of_type = [m["id"] for m in registry.get_available_of_type("chat", "mr-local")]
+    r["catalog"] = {
+        "error": registry.get_error(), "all": [pick_model(m) for m in of(registry.get_all(), "mr-local")], "builtinListed": len(of(registry.get_all(), "anthropic")) > 0,
+        "available": [m["id"] for m in of(registry.get_available(), "mr-local")], "one": pick_model(local), "missing": registry.find("mr-local", "nope") is None,
+        "findOfType": pick_model(registry.find_of_type("chat", "mr-local", "m1")), "ofType": [m["id"] for m in registry.get_models_of_type("chat", "mr-local")], "oneOfType": pick_model(registry.get_model_of_type("chat", "mr-local", "m1")),
+        "oneOfTypeMissing": registry.get_model_of_type("image", "mr-local", "m1") is None, "imagesOfType": len(registry.get_models_of_type("image", "mr-local")), "availableOfType": available_of_type,
+    }
+    unknown = {**local, "provider": "nope-prov"}
+    r["auth"] = {
+        "configured": registry.has_configured_auth(local), "unconfigured": registry.has_configured_auth(unknown), "oauth": registry.is_using_oauth(local),
+        "status": registry.get_provider_auth_status("mr-local"), "storedStatus": registry.get_provider_auth_status("stored-prov"), "unknownStatus": registry.get_provider_auth_status("nope-prov"),
+        "displayLocal": registry.get_provider_display_name("mr-local"), "displayBuiltin": registry.get_provider_display_name("anthropic"), "displayUnknown": registry.get_provider_display_name("nope-prov"),
+        "providerAuth": registry.get_provider_auth("mr-local"), "providerAuthNone": registry.get_provider_auth("nope-prov"),
+        "apiKey": registry.get_api_key_for_provider("mr-local"), "apiKeyNone": registry.get_api_key_for_provider("nope-prov"),
+        "request": registry.get_api_key_and_headers(local), "requestUnconfigured": registry.get_api_key_and_headers(unknown),
+    }
+
+    before = registry.get_registered_provider_ids()
+    registry.register_provider("reg-prov", {
+        "baseUrl": server, "apiKey": "regkey", "api": "openai-completions", "headers": {"x-reg": "1"},
+        "models": [{"id": "r1", "name": "Reg One", "reasoning": False, "input": ["text"], "cost": {"input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0}, "contextWindow": 4000, "maxTokens": 500}],
+    })
+    config = registry.get_registered_provider_config("reg-prov")
+    r["registered"] = {
+        "before": before, "ids": registry.get_registered_provider_ids(), "models": [pick_model(m) for m in of(registry.get_all(), "reg-prov")], "baseUrl": config["baseUrl"], "apiKey": config["apiKey"], "api": config["api"], "headers": config["headers"], "modelIds": [m["id"] for m in config["models"]],
+        "unregisteredConfig": registry.get_registered_provider_config("nope-prov") is None, "rejected": error_text(lambda: registry.register_provider("bad-prov", {"models": [{"id": "x"}]})),
+    }
+    registry.unregister_provider("reg-prov")
+    r["registered"]["after"] = {"ids": registry.get_registered_provider_ids(), "models": len(of(registry.get_all(), "reg-prov")), "config": registry.get_registered_provider_config("reg-prov") is None}
+
+    native_model = {"id": "n1", "name": "N One", "api": "nat-api", "provider": "nreg", "baseUrl": "https://ext.invalid", "reasoning": False, "input": ["text"], "cost": {"input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0}, "contextWindow": 4000, "maxTokens": 500}
+
+    def message(model, text):
+        return {
+            "role": "assistant", "content": [{"type": "text", "text": text}], "api": model.get("api"), "provider": model.get("provider"), "model": model.get("id"),
+            "usage": {"input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0, "totalTokens": 0, "cost": {"input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0, "total": 0}},
+            "stopReason": "stop", "timestamp": 1,
+        }
+
+    def scripted(tag):
+        def run(model, _context, _options):
+            stream = pig_sdk.create_assistant_message_event_stream()
+            stream.push({"type": "done", "reason": "stop", "message": message(model, tag + ":" + model["id"])})
+            return stream
+        return run
+
+    provider = pig_sdk.create_provider(
+        id="nreg", name="Native Reg", auth=pig_sdk.ProviderAuth(api_key=pig_sdk.APIKeyAuth(name="Key", check=lambda _input: pig_sdk.AuthCheck(type="api_key", source="ext check"), resolve=lambda _input: pig_sdk.AuthResult(auth={"apiKey": "nk"}))),
+        models=[native_model], api={"nat-api": pig_sdk.ProviderStreams(stream=scripted("n.stream"), stream_simple=scripted("n.simple"))},
+    )
+    registry.register_provider(provider)
+    conversation = {"systemPrompt": "Be brief.", "messages": [{"role": "user", "content": "say hello", "timestamp": 1}]}
+    native_stream = registry.stream_simple(native_model, conversation, {})
+    native_events = [event["type"] for event in native_stream.events()]
+    native_message = native_stream.result()
+
+    def provider_id(found):
+        return None if found is None else found.id
+
+    registered = registry.get_registered_native_provider("nreg")
+    r["native"] = {
+        "registered": provider_id(registered), "same": registered is provider, "viaGetProvider": provider_id(registry.get_provider("nreg")), "viaRuntime": provider_id(rt.get_provider("nreg")),
+        "viaRuntimeRegistered": provider_id(rt.get_registered_native_provider("nreg")), "none": registry.get_registered_native_provider("nope-prov") is None, "noneProvider": registry.get_provider("nope-prov") is None,
+        "ids": registry.get_registered_provider_ids(), "displayName": registry.get_provider_display_name("nreg"), "models": [m["id"] for m in of(registry.get_all(), "nreg")],
+        "auth": registry.get_provider_auth("nreg"), "request": registry.get_api_key_and_headers(native_model),
+        "events": native_events, "text": message_text(native_message), "stopReason": native_message["stopReason"], "completed": registry.complete(native_model, conversation, {})["stopReason"],
+    }
+    registry.unregister_provider("nreg")
+    r["native"]["after"] = {"registered": registry.get_registered_native_provider("nreg") is None, "provider": registry.get_provider("nreg") is None, "models": len(of(registry.get_all(), "nreg"))}
+    builtin = {}
+    try:
+        builtin["provider"] = registry.get_provider("anthropic").id
+    except Exception as error:  # noqa: BLE001
+        builtin["provider"] = "error: " + str(error)
+    try:
+        builtin["providers"] = "anthropic" if any(candidate.id == "anthropic" for candidate in rt.get_providers()) else "absent"
+    except Exception as error:  # noqa: BLE001
+        builtin["providers"] = "error: " + str(error)
+    r["builtin"] = builtin
+
+    registry.register_virtual_model(pig_sdk.VirtualModel(
+        provider="mr-virtual", id="v1", name="Virtual One", thinking_levels=["off", "high"], context_window=1000, max_tokens=100, input=["text"],
+        route=lambda _ctx, _request: {"model": rt.get_physical_model("mr-local", "m1"), "thinkingLevel": "off"},
+    ))
+    virtual = registry.find("mr-virtual", "v1")
+    r["virtual"] = {"model": pick_model(virtual), "thinkingLevels": virtual.get("thinkingLevels")}
+    registry.unregister_virtual_model("mr-virtual", "v1")
+    r["virtual"]["after"] = registry.find("mr-virtual", "v1") is None
+
+    refreshed = registry.refresh({"allowNetwork": False})
+    r["refresh"] = {"aborted": refreshed["aborted"], "errors": refreshed["errors"]}
+    options = {"maxTokens": 50}
+    stream = registry.stream_simple(local, conversation, options)
+    events = [event["type"] for event in stream.events()]
+    result = stream.result()
+    full = registry.complete(local, conversation, options)
+    classified = registry.classify(local, {"state": {}, "questions": {}})
+    imaged = registry.generate_images(local, {"input": [{"type": "text", "text": "a cat"}]})
+    r["stream"] = {
+        "events": events, "stopReason": result["stopReason"], "text": message_text(result), "provider": result["provider"], "model": result["model"], "api": result["api"], "full": full["stopReason"],
+        "classifyStop": classified["stopReason"], "classifyError": classified.get("errorMessage"), "imagesStop": imaged["stopReason"], "imagesError": imaged.get("errorMessage"),
+    }
+    return r
+
+
+def model_registry_tool(ctx, params):
+    return json.dumps(model_registry_script(ctx, params))
+
+
 def child_handles_script(ctx, args):
     """createAgentSession over the objects the extension built; the report is Pi's own run's (testdata/session-graph.mjs childHandlesScript)."""
     import gc
@@ -1145,6 +1265,7 @@ def new_extension():
     ext.register_tool(pig_sdk.ToolDefinition(name="project_trust_store", label="project_trust_store", description="Runs the ProjectTrustStore script.", parameters={"type": "object"}, execute=trust_tool))
     ext.register_tool(pig_sdk.ToolDefinition(name="resource_loader", label="resource_loader", description="Runs the DefaultResourceLoader script.", parameters={"type": "object"}, execute=loader_tool))
     ext.register_tool(pig_sdk.ToolDefinition(name="model_runtime", label="model_runtime", description="Runs the ModelRuntime script.", parameters={"type": "object"}, execute=model_runtime_tool))
+    ext.register_tool(pig_sdk.ToolDefinition(name="model_registry", label="model_registry", description="Runs the ModelRegistry over a ModelRuntime script.", parameters={"type": "object"}, execute=model_registry_tool))
     ext.register_tool(pig_sdk.ToolDefinition(name="package_manager", label="package_manager", description="Runs the DefaultPackageManager script.", parameters={"type": "object"}, execute=packages_tool))
     ext.register_tool(pig_sdk.ToolDefinition(name="child_handles", label="child_handles", description="Runs the createAgentSession handle options script.", parameters={"type": "object"}, execute=child_handles_tool))
     ext.register_tool(pig_sdk.ToolDefinition(name="create_provider", label="create_provider", description="Runs the createProvider script.", parameters={"type": "object"}, execute=create_provider_tool))

@@ -271,6 +271,18 @@ func Extension() *sdk.Extension {
 		},
 	})
 	e.RegisterTool(sdk.ToolDefinition{
+		Name: "model_registry", Label: "model_registry", Description: "Runs the ModelRegistry over a ModelRuntime script.", Parameters: sdk.Schema{"type": "object"},
+		Execute: func(ctx sdk.Context, args map[string]any) (result any, err error) {
+			defer func() {
+				if recovered := recover(); recovered != nil {
+					err = fmt.Errorf("%v", recovered)
+				}
+			}()
+			encoded, err := json.Marshal(modelRegistryScript(ctx, args))
+			return string(encoded), err
+		},
+	})
+	e.RegisterTool(sdk.ToolDefinition{
 		Name: "model_runtime", Label: "model_runtime", Description: "Runs the ModelRuntime script.", Parameters: sdk.Schema{"type": "object"},
 		Execute: func(ctx sdk.Context, args map[string]any) (result any, err error) {
 			defer func() {

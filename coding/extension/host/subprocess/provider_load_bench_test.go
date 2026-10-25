@@ -2,6 +2,7 @@ package subprocess
 
 import (
 	"fmt"
+	"net"
 	"testing"
 
 	"github.com/MichaelKinsy/PiG/coding/extension"
@@ -22,7 +23,13 @@ func BenchmarkLoadInProcessProviders(b *testing.B) {
 				registered := 0
 				host.SetProviderCallbacks(func(string, extension.ProviderConfig) error { registered++; return nil }, func(string) {})
 				host.SetUIBridge(NewUIBridge(func() {}))
-				if _, err := host.LoadInProcess(b.Context(), ExtConfig{Name: "provider-load-bench", Enabled: true}, ext.RunWithConn); err != nil {
+				// One Extension serves one connection at a time: the next iteration serves it again only after this serve returned.
+				served := make(chan struct{})
+				serve := func(conn net.Conn) error {
+					defer close(served)
+					return ext.RunWithConn(conn)
+				}
+				if _, err := host.LoadInProcess(b.Context(), ExtConfig{Name: "provider-load-bench", Enabled: true}, serve); err != nil {
 					b.Fatal(err)
 				}
 				runtime := host.Runtime()
@@ -31,6 +38,7 @@ func BenchmarkLoadInProcessProviders(b *testing.B) {
 					b.Fatalf("registry received %d registrations, want %d", registered, providers)
 				}
 				host.Shutdown("benchmark iteration")
+				<-served
 			}
 		})
 	}

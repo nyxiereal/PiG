@@ -1103,9 +1103,14 @@ func (e *Extension) runWithConn(nc net.Conn, started *conn, sockPath string) err
 	defer func() { _ = nc.Close() }()
 
 	e.stopFactoryPump()
+	e.eventMu.Lock()
+	// One Extension serves one connection at a time: its connection, run context, tool lock and event bus are the running serve's, so a second serve would corrupt the first and hang its host's load.
+	if e.running {
+		e.eventMu.Unlock()
+		return errExtensionAlreadyServing
+	}
 	e.runCtx, e.runCancel = context.WithCancel(context.Background())
 	defer e.runCancel()
-	e.eventMu.Lock()
 	if started != nil {
 		e.conn = started
 	} else {

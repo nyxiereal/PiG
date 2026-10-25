@@ -177389,6 +177389,50 @@
       "shapeHash": "sha256:50d6823b862c5ee0c85acd8cc8589ffffd0863c3d1d6f2a86d3d787069a34349"
     },
     {
+      "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#BigInt",
+      "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
+      "name": "BigInt",
+      "kind": "type",
+      "exported": true,
+      "shape": {
+        "type": "BigInt"
+      },
+      "shapeHash": "sha256:23d3d1ef2e5989480be3dec9424a4bfc1b9541fdfd4015969f7b995ddeb62e0b"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#BigInt.Int",
+      "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
+      "name": "BigInt.Int",
+      "kind": "function",
+      "exported": true,
+      "shape": {
+        "type": "func() *math/big.Int"
+      },
+      "shapeHash": "sha256:4e8fa975c3363aefe57d8037f60970dc25a4e0f799535862231b8200bc169d6f"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#BigInt.MarshalJSON",
+      "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
+      "name": "BigInt.MarshalJSON",
+      "kind": "function",
+      "exported": true,
+      "shape": {
+        "type": "func() ([]byte, error)"
+      },
+      "shapeHash": "sha256:57179946cef7df4d918e29b424f6d9096a9653a12925304bcb5da9ee7ff359ee"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#BigInt.String",
+      "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
+      "name": "BigInt.String",
+      "kind": "function",
+      "exported": true,
+      "shape": {
+        "type": "func() string"
+      },
+      "shapeHash": "sha256:31cac5b359d9888bdbe3fe08c486b2e404a728edce6e0aaaa60e59ceafc92fb5"
+    },
+    {
       "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#Bool",
       "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
       "name": "Bool",
@@ -185494,6 +185538,17 @@
         "type": "func(name string) *Extension"
       },
       "shapeHash": "sha256:a863ac56b6b29eb769d5e411c9749086f624089c2a802d425777206d5aed458c"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#NewBigInt",
+      "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
+      "name": "NewBigInt",
+      "kind": "function",
+      "exported": true,
+      "shape": {
+        "type": "func(value *math/big.Int) BigInt"
+      },
+      "shapeHash": "sha256:c75cd2f56416dd5fec8d86ba75f6dcb6fa223569a55f6b8bddfd0d0796bac954"
     },
     {
       "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#NewCredential",
@@ -194811,6 +194866,17 @@
         "type": "func(cwd string, options *BashToolOptions) (builtinSpec, error)"
       },
       "shapeHash": "sha256:00be5fa5a180b0bad097c3711d8304c43b235e845fbadb0b3ee99f0557f50dcf"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#bigIntStringifyError",
+      "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
+      "name": "bigIntStringifyError",
+      "kind": "constant",
+      "exported": false,
+      "shape": {
+        "type": "untyped string"
+      },
+      "shapeHash": "sha256:7eabd192b9f1c379102c8dc793881875f1f949f6b752e15a20b93080cb0b311d"
     },
     {
       "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#branchSummaryPrefix",

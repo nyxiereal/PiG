@@ -101,7 +101,7 @@ func serveTypeEngineSocket(t testing.TB) string {
 				return
 			}
 			go func() {
-				defer conn.Close()
+				defer func() { _ = conn.Close() }()
 				for {
 					var header [4]byte
 					if _, err := io.ReadFull(conn, header[:]); err != nil {

@@ -317,15 +317,16 @@ func TestTypeMatchesPi(t *testing.T) {
 				continue
 			}
 			text, err := schema.MarshalJSON()
-			if want.StringifyThrows != nil {
+			switch {
+			case want.StringifyThrows != nil:
 				// The value holds a bigint, which only writing it as JSON refuses, with Pi's message.
 				if err == nil || !strings.Contains(err.Error(), *want.StringifyThrows) {
 					t.Errorf("%s: MarshalJSON gave %q, %v; Pi's JSON.stringify throws %q", c.Name, text, err, *want.StringifyThrows)
 				}
-			} else if err != nil {
+			case err != nil:
 				t.Errorf("%s: %v", c.Name, err)
 				continue
-			} else if string(text) != *want.JSON {
+			case string(text) != *want.JSON:
 				t.Errorf("%s:\n got  %s\n Pi   %s", c.Name, text, *want.JSON)
 			}
 			have := maps.Clone(schema.hidden)

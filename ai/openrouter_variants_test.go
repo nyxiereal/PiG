@@ -179,8 +179,8 @@ func TestDerivedOpenRouterVariantsAreBuiltOnce(t *testing.T) {
 	if second := count(); second != first {
 		t.Errorf("a second list holds %d derived variants, the first held %d", second, first)
 	}
-	// One slice, no derivation: the list itself, the id set the check for a listed variant would build is skipped.
-	if allocs > 50 {
+	// Copying held entries costs a few hundred allocations (the cache keys), not the 2,661 deriving every variant took.
+	if allocs > 1000 {
 		t.Errorf("a list allocates %v times; it should copy held entries, not derive them", allocs)
 	}
 	spec := "openrouter/" + bases[0].ID + ":nitro"

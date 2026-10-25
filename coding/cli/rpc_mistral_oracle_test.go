@@ -192,7 +192,7 @@ func serveMistral(t *testing.T, body, reply, delivery string, gap time.Duration,
 				read++
 			}
 			if k := read - 1; first && piece != "" && k < len(targets) {
-				waitCtx, cancel := context.WithTimeout(r.Context(), 30*time.Second)
+				waitCtx, cancel := context.WithTimeout(r.Context(), testbudget.Wait(t))
 				err := pace.wait(waitCtx, targets[k])
 				cancel()
 				if err != nil && r.Context().Err() == nil {

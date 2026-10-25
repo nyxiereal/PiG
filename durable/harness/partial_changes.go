@@ -19,12 +19,21 @@ type toolCallChanges struct {
 	snapshot durable.JsonValue
 }
 
-// PartialCommit is what one partial commit writes besides the partial message itself; from PartialChanges.Take.
+// PartialCommit is what one partial commit writes besides the partial message itself; from PartialChanges.Bind.
 type PartialCommit struct {
 	// plan is the plan AssignJson writes the message with: text appends, and the arguments it leaves to the changes.
 	plan *AssignPlan
 	// toolCalls is each tracked tool call by content index.
 	toolCalls map[int]toolCallChanges
+}
+
+// PartialCut is what the events observed up to one moment changed since the last cut, before it is bound to the partial message of that
+// moment; from PartialChanges.Cut.
+type PartialCut struct {
+	// text is the text and thinking appended to each tracked block, by content index.
+	text map[int]*trackedText
+	// toolCalls is the argument changes of each tracked tool call, by content index.
+	toolCalls map[int][]ai.JSONChange
 }
 
 type trackedText struct {
@@ -50,7 +59,9 @@ type trackedToolCall struct {
 //     so the committed arguments are exactly the parsed text so far. toolcall_end ends the tracking; the call's last commit assigns its final
 //     arguments.
 //
-// The event consumer and the commit run on different goroutines, so the state is under a mutex.
+// The event consumer and the commit run on different goroutines, so the state is under a mutex. The changes describe the partial message of
+// the last event observed, and a commit writes the partial it is given, so the caller keeps the two paired: it observes an event and
+// records that event's partial in one step, and cuts the changes and takes the recorded partial in one step (Cut, Bind).
 type PartialChanges struct {
 	mu        sync.Mutex
 	text      map[int]*trackedText
@@ -105,33 +116,64 @@ func (changes *PartialChanges) appendText(index int, field, delta string) {
 	changes.text[index] = &trackedText{field: field, text: []byte(delta)}
 }
 
-// Take takes what changed since the last call, for a commit of message, a copy of the partial. It clears the arguments of tracked tool
-// calls in message: the commit writes them from the changes. Call Restore if the commit fails.
-func (changes *PartialChanges) Take(message durable.JsonObject) *PartialCommit {
+// Cut takes what the events observed so far changed since the last cut. It describes the partial message of the last event observed, not
+// of any later one: bind it to a copy of exactly that partial with Bind. A cut is only as good as that pairing, since a string that grew by
+// as much as the changes did is appended their characters, not its own, so a partial one event behind or ahead of the changes would commit
+// text no stream produced.
+func (changes *PartialChanges) Cut() *PartialCut {
 	changes.mu.Lock()
 	defer changes.mu.Unlock()
+	cut := &PartialCut{text: changes.text, toolCalls: make(map[int][]ai.JSONChange, len(changes.toolCalls))}
+	changes.text = map[int]*trackedText{}
+	for index, call := range changes.toolCalls {
+		cut.toolCalls[index] = call.changes
+		call.changes = nil
+	}
+	return cut
+}
+
+// Bind binds cut to message, a copy of the partial the cut describes, for a commit. It clears the arguments of tracked tool calls in
+// message: the commit writes them from the changes. Call Restore if the commit fails.
+func (changes *PartialChanges) Bind(cut *PartialCut, message durable.JsonObject) *PartialCommit {
 	blocks := map[any]*AssignPlan{}
-	for index, pending := range changes.text {
+	for index, pending := range cut.text {
 		blocks[index] = &AssignPlan{Kind: planFields, Fields: map[any]*AssignPlan{pending.field: {Kind: planAppend, Text: string(pending.text)}}}
 	}
-	changes.text = map[int]*trackedText{}
 	taken := &PartialCommit{toolCalls: map[int]toolCallChanges{}}
 	content, _ := message.Value("content").([]any)
-	for index, call := range changes.toolCalls {
-		if index < 0 || index >= len(content) {
+	for index, pieces := range cut.toolCalls {
+		var block *delta.JsonObject
+		if index >= 0 && index < len(content) {
+			block, _ = content[index].(*delta.JsonObject)
+		}
+		if block == nil {
+			// The partial has no such block: the changes wait for a later one.
+			changes.restoreCall(index, pieces)
 			continue
 		}
-		block, ok := content[index].(*delta.JsonObject)
-		if !ok {
-			continue
-		}
-		taken.toolCalls[index] = toolCallChanges{changes: call.changes, snapshot: block.Value("arguments")}
+		taken.toolCalls[index] = toolCallChanges{changes: pieces, snapshot: block.Value("arguments")}
 		block.Set("arguments", delta.JsonObjectOf())
 		blocks[index] = &AssignPlan{Kind: planFields, Fields: map[any]*AssignPlan{"arguments": {Kind: planKeep}}}
-		call.changes = nil
 	}
 	taken.plan = &AssignPlan{Kind: planFields, Fields: map[any]*AssignPlan{"content": {Kind: planFields, Fields: blocks}}}
 	return taken
+}
+
+// Uncut puts back what cut took, when no commit is made of it: the argument changes wait for the next cut, and the appended text is
+// dropped, so the next commit of that text compares it.
+func (changes *PartialChanges) Uncut(cut *PartialCut) {
+	for index, pieces := range cut.toolCalls {
+		changes.restoreCall(index, pieces)
+	}
+}
+
+// restoreCall puts the argument changes of a tracked call that no commit applied ahead of those observed since.
+func (changes *PartialChanges) restoreCall(index int, pieces []ai.JSONChange) {
+	changes.mu.Lock()
+	defer changes.mu.Unlock()
+	if call := changes.toolCalls[index]; call != nil {
+		call.changes = append(append([]ai.JSONChange(nil), pieces...), call.changes...)
+	}
 }
 
 // Commit writes message with what taken took into generation.message: the message leaf by leaf with the plan, then the argument changes. A
@@ -183,12 +225,8 @@ func (changes *PartialChanges) Commit(generation *delta.Object, message durable.
 
 // Restore puts back what a failed commit took, so the next commit applies it first.
 func (changes *PartialChanges) Restore(taken *PartialCommit) {
-	changes.mu.Lock()
-	defer changes.mu.Unlock()
 	for index, entry := range taken.toolCalls {
-		if call := changes.toolCalls[index]; call != nil {
-			call.changes = append(append([]ai.JSONChange(nil), entry.changes...), call.changes...)
-		}
+		changes.restoreCall(index, entry.changes)
 	}
 }
 

@@ -63,11 +63,17 @@ func (stream *partialStream) endBlocks() {
 // commit is one partial commit, as the generation's throttle makes it; fail aborts it like a rejected commit.
 func (stream *partialStream) commit(fail bool) {
 	stream.t.Helper()
-	message, err := durable.ToJsonObject(stream.partial)
+	stream.commitCut(stream.changes.Cut(), stream.partial, fail)
+}
+
+// commitCut is a partial commit of partial with what cut took.
+func (stream *partialStream) commitCut(cut *PartialCut, partial *ai.AssistantMessage, fail bool) {
+	stream.t.Helper()
+	message, err := durable.ToJsonObject(partial)
 	if err != nil {
 		stream.t.Fatal(err)
 	}
-	taken := stream.changes.Take(message)
+	taken := stream.changes.Bind(cut, message)
 	change := stream.tracker.BeginChange()
 	if err := stream.changes.Commit(change.State().Object("generation"), message, taken); err != nil {
 		stream.t.Fatal(err)

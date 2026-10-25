@@ -677,8 +677,7 @@ func streamResponse(ctx context.Context, runtime generationRuntime, model *ai.Mo
 		if partial == nil || len(partial.Content) == 0 {
 			continue
 		}
-		throttle.changes.Observe(event)
-		throttle.offer(partial)
+		throttle.observe(event, partial)
 	}
 	result, err := stream.ResultContext(signal)
 	if err != nil {
@@ -723,32 +722,57 @@ type partialThrottle struct {
 	attempt  int
 	interval float64
 	// changes is what the response's events changed in the partial since the last commit.
-	changes  *PartialChanges
-	mu       sync.Mutex
-	pending  *ai.AssistantMessage
+	changes *PartialChanges
+	mu      sync.Mutex
+	// partial is the newest partial as it was when its event was observed, and pending whether it is yet to be committed.
+	partial  ai.ShallowCapture
+	pending  bool
 	disarm   func()
 	inFlight chan struct{}
 	stopped  bool
 }
 
-// offer records the newest partial. Holding it until the flush is race-free: a partial from a producer outside the
-// executor is an immutable emission-time snapshot, and a live view encodes the stream's current publication under
-// its cell lock, as generation.ts:378 copies the provider's mutable partial at flush time. The flush copies it once.
-func (throttle *partialThrottle) offer(partial *ai.AssistantMessage) {
+// observe records event and its partial as the newest, in one step under the lock flush takes the pair under. generation.ts:378 copies
+// the provider's partial at flush time and takes the changes in the same tick, when no event is between the partial and the changes. Here an
+// event can be observed between any two steps of a flush, and a live view encodes the stream's current publication, which may be newer than
+// the event: a commit of a partial that is not the one the changes are the difference to appends their characters to its text, which
+// have its length and not its content. The capture pins the publication the event was observed at (a partial from a producer outside the
+// executor is an immutable emission-time snapshot already) and costs no copy of the message; the flush copies it once.
+func (throttle *partialThrottle) observe(event ai.AssistantMessageEvent, partial *ai.AssistantMessage) {
 	throttle.mu.Lock()
 	defer throttle.mu.Unlock()
-	throttle.pending = partial
+	throttle.changes.Observe(event)
+	throttle.partial.Capture(partial)
+	throttle.pending = true
 	if throttle.disarm == nil && throttle.inFlight == nil && !throttle.stopped {
 		throttle.disarm = throttle.runtime.SetTimer(throttle.flush, throttle.interval)
 	}
 }
 
+// pinned is the partial a capture holds, as an owned message that no publication of its stream changes.
+func pinned(capture *ai.ShallowCapture) *ai.AssistantMessage {
+	if cell, _ := capture.Publication(); cell != 0 {
+		return capture.Observe()
+	}
+	return capture.ShallowCopy()
+}
+
+// takeLocked takes the newest partial with the changes of every event observed, which are the changes of the events up to that partial; the
+// commit of the pair writes the one and applies the other. ok is false when there is nothing to commit. The caller holds throttle.mu.
+func (throttle *partialThrottle) takeLocked() (partial ai.ShallowCapture, cut *PartialCut, ok bool) {
+	if !throttle.pending || throttle.stopped {
+		return partial, nil, false
+	}
+	partial, cut = throttle.partial, throttle.changes.Cut()
+	throttle.partial, throttle.pending = ai.ShallowCapture{}, false
+	return partial, cut, true
+}
+
 func (throttle *partialThrottle) flush() {
 	throttle.mu.Lock()
 	throttle.disarm = nil
-	partial := throttle.pending
-	throttle.pending = nil
-	if partial == nil || throttle.stopped {
+	partial, cut, ok := throttle.takeLocked()
+	if !ok {
 		throttle.mu.Unlock()
 		return
 	}
@@ -758,11 +782,11 @@ func (throttle *partialThrottle) flush() {
 	go func() {
 		defer close(done)
 		runtime := throttle.runtime
-		message, err := durable.ToJsonObject(partial)
-		var taken *PartialCommit
-		if err == nil {
-			// The changes since the last commit belong to this one.
-			taken = throttle.changes.Take(message)
+		message, err := durable.ToJsonObject(pinned(&partial))
+		if err != nil {
+			throttle.changes.Uncut(cut)
+		} else {
+			taken := throttle.changes.Bind(cut, message)
 			err = runtime.Commit(throttle.ctx, func(tx durable.Tx, _ durable.RunningTask[GenerationInput, GenerationCheckpoint, GenerationResult]) (*generationNext, error) {
 				live, err := docDraft(tx, LiveDoc, runtime.ConversationId())
 				if err != nil {
@@ -787,7 +811,7 @@ func (throttle *partialThrottle) flush() {
 		}
 		throttle.mu.Lock()
 		throttle.inFlight = nil
-		if throttle.pending != nil && !throttle.stopped {
+		if throttle.pending && !throttle.stopped {
 			throttle.disarm = throttle.runtime.SetTimer(throttle.flush, throttle.interval)
 		}
 		throttle.mu.Unlock()

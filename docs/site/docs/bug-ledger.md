@@ -188,6 +188,7 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 | [BF-3651a90](#bf-3651a90) | A provider stream that keeps sending keepalive comments or pings but no event now ends with an error after… | A Pi defect that PiG fixed first | All platforms | 0.5.0 |
 | [BF-369b1e1](#bf-369b1e1) | `grep` with `context` no longer loads each matched file into memory | PiG's own defect | All platforms | 0.5.0 |
 | [BF-36e192b](#bf-36e192b) | fix(lint): port Kitty chunking in UTF-16 units; clear the codemode, terminal image and exit-restore lint hits | PiG's own defect | All platforms | Unreleased |
+| [BF-36e82ad](#bf-36e82ad) | fix(durable): a non-finite number is a strict JSON error whichever JSON package a value's own encoder used | PiG's own defect | All platforms | Unreleased |
 | [BF-37c6048](#bf-37c6048) | fix(tui): a streamed Markdown never resumes past a paragraph clipped before a LaTeX start | PiG's own defect | All platforms | Unreleased |
 | [BF-37d2daa](#bf-37d2daa) | An extension's `ctx.model` and model lists keep a model's `cost.tiers` when the model's record has it as an… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-3804a5a](#bf-3804a5a) | The pi-messages and classifier (System One, decisions) requests are sent to the URL as written and a URL with… | PiG's own defect | All platforms | 0.5.0 |
@@ -221,6 +222,7 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 | [BF-4259631](#bf-4259631) | An extension's direct call into a pi-ai API module (`openAICompletionsApi()` and the other bridged APIs)… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-42c059a](#bf-42c059a) | fix(tui): bash block strips ANSI with Pi's utils/ansi.ts rule | PiG's own defect | All platforms | Unreleased |
 | [BF-42e3d0e](#bf-42e3d0e) | fix(hljs): a class that negates only \r still reaches across lines; gate the streamed code block Linear | PiG's own defect | All platforms | Unreleased |
+| [BF-4312595](#bf-4312595) | fix(ai,durable): keep a value that is not JSON an error when a message or a nested result is encoded | PiG's own defect | All platforms | Unreleased |
 | [BF-432ab7f](#bf-432ab7f) | An agent assistant message that holds an empty `diagnostics` array writes it as `[]`, as Pi does, instead of… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-433d232](#bf-433d232) | A request sent after `/tree` navigation to a point between parallel tool calls and their results no longer… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-433d232-2](#bf-433d232-2) | An extension custom message whose content is a block array (text or images), or an empty string, now reaches… | PiG's own defect | All platforms | 0.5.0 |
@@ -996,6 +998,7 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 | [BF-dde6aa6-8](#bf-dde6aa6-8) | A setext underline on a lazy line after another lazy line in a blockquote now renders as Pi does, joined to… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-dde6aa6-9](#bf-dde6aa6-9) | A line of only spaces and tabs that starts with a tab or four spaces, alone or after a blank line or in a… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-de0aaa7](#bf-de0aaa7) | RPC mode now writes the `PIG_PROFILE` files when it exits; it ended the process before they were written | PiG's own defect | All platforms | 0.5.0 |
+| [BF-de38ce2](#bf-de38ce2) | fix(ai,durable): a lone UTF-16 surrogate survives the JSON of a tool result, a nested call result and a… | PiG's own defect | All platforms | Unreleased |
 | [BF-de85b0e](#bf-de85b0e) | An HTTP MCP client opens its server-to-client stream before it sends the next request after… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-de91c76](#bf-de91c76) | When an MCP server drops tools or is disabled, its tools are hidden in the order the server listed them | PiG's own defect | All platforms | 0.5.0 |
 | [BF-de91c76-2](#bf-de91c76-2) | The error of an MCP stdio server that fails to start ends with the last 2000 UTF-16 code units of its… | PiG's own defect | All platforms | 0.5.0 |
@@ -3502,6 +3505,19 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 - **Fix commits:** `36e192bef8` (2026-10-21)
 - **Tests:** `tui/terminal_image_iterm2_options_test.go::TestEncodeKittyChunksByUTF16Units`
 
+### BF-36e82ad
+
+**fix(durable): a non-finite number is a strict JSON error whichever JSON package a value's own encoder used**
+
+- **Source:** PiG's own defect
+- **Symptom:** fix(durable): a non-finite number is a strict JSON error whichever JSON package a value's own encoder used
+- **Root cause:** Fix-Commit:
+- **User impact:** An operation failed or was rejected
+- **Platform:** All platforms
+- **Fixed in:** Unreleased
+- **Fix commits:** `36e82ade57` (2026-10-24)
+- **Tests:** None recorded.
+
 ### BF-37c6048
 
 **fix(tui): a streamed Markdown never resumes past a paragraph clipped before a LaTeX start**
@@ -3954,6 +3970,19 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 - **Fixed in:** Unreleased
 - **Fix commits:** `42e3d0eb5b` (2026-10-10)
 - **Tests:** `tui/highlight_resume_scaling_norace_test.go::TestScalingStreamedCodeBlockHighlight`, `tui/internal/hljs/resume_test.go::TestPatternReach`
+
+### BF-4312595
+
+**fix(ai,durable): keep a value that is not JSON an error when a message or a nested result is encoded**
+
+- **Source:** PiG's own defect
+- **Symptom:** fix(ai,durable): keep a value that is not JSON an error when a message or a nested result is encoded
+- **Root cause:** Fix-Commit:
+- **User impact:** An operation failed or was rejected
+- **Platform:** All platforms
+- **Fixed in:** Unreleased
+- **Fix commits:** `43125951f9` (2026-10-24)
+- **Tests:** None recorded.
 
 ### BF-432ab7f
 
@@ -14735,6 +14764,19 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 - **Fix commits:** `de0aaa7dec` (2026-10-09)
 - **Tests:** `ai/perf_gate_norace_test.go::TestProviderStreamPerFrameAllocationGate`, `ai/perf_gate_norace_test.go::TestStreamBuilderPerDeltaAllocationGate`, `automation/perf/test_scoreboard.py`, `coding/extension/host/subprocess/perf_gate_norace_test.go::TestExtensionEventRoundTripAllocationGate`, `internal/codingagent/compaction/perf_gate_norace_test.go::TestCompactionPreparePerEntryAllocationGate`, `internal/codingagent/perf_gate_norace_test.go::TestSessionLoadPerLineAllocationGate`, `internal/codingagent/perf_gate_norace_test.go::TestSessionTurnAllocationGate`, `internal/perfgate/perfgate_test.go::TestFormat` and 18 more in docs/bug-ledger.json
 - **Release note:** RPC mode now writes the `PIG_PROFILE` files when it exits; it ended the process before they were written.
+
+### BF-de38ce2
+
+**fix(ai,durable): a lone UTF-16 surrogate survives the JSON of a tool result, a nested call result and a…**
+
+- **Source:** PiG's own defect
+- **Symptom:** fix(ai,durable): a lone UTF-16 surrogate survives the JSON of a tool result, a nested call result and a stored value, as in Pi
+- **Root cause:** Fix-Commit:
+- **User impact:** Behavior differed from Pi
+- **Platform:** All platforms
+- **Fixed in:** Unreleased
+- **Fix commits:** `de38ce2324` (2026-10-24)
+- **Tests:** `ai/lone_surrogate_json_pi_oracle_test.go::TestMessagesKeepALoneSurrogateAsPiDoes`, `coding/cli/lone_surrogate_json_lines_pi_oracle_test.go::TestJSONLinesOfAMessageWithALoneSurrogateAreWhatPisJSONStringifyWrites`, `durable/codemode/lone_surrogate_preview_test.go::TestAPreviewCutInsideASurrogatePairKeepsItsEscapeLikePi`, `durable/codemode/lone_surrogate_tool_result_test.go::TestAToolResultWithALoneSurrogateKeepsItThroughTheHarnessAndTheEntry`, `durable/json_lone_surrogate_test.go::TestToJsonValueAndFromJsonValueKeepALoneSurrogate`, `internal/codingagent/lone_surrogate_session_pi_oracle_test.go::TestSessionLinesWithALoneSurrogateAreWhatPisJSONStringifyWrites`
 
 ### BF-de85b0e
 

@@ -20,7 +20,7 @@ func TestMarshalKeepingSurrogatesIsEncodingJSONExceptForALoneSurrogate(t *testin
 			t.Fatal(err)
 		}
 		got, err := MarshalKeepingSurrogates(value)
-		if err != nil || string(got) != string(want) {
+		if err != nil || !bytes.Equal(got, want) {
 			t.Errorf("Marshal(%v) = %s, %v; encoding/json %s", value, got, err, want)
 		}
 	}

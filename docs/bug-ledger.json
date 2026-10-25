@@ -17459,7 +17459,6 @@
       "tests": [
         "ai/streamed_arguments_shared_test.go::TestMutatingWhatASubscriberReceivedChangesNoSnapshotOfAStreamedCall",
         "ai/streamed_arguments_shared_test.go::TestPublishedStreamedArgumentsShareTheSnapshotOnlyWhenValidAndEqualACloneAlways",
-        "ai/streamed_arguments_shared_test.go::TestStreamingSnapshotValidImpliesCloneJSONValueEqualsIt",
         "ai/streamed_arguments_shared_test.go::TestStreamingSnapshotValidityRules",
         "ai/streamed_arguments_shared_test.go::TestSubscribersMutatingConcurrentlyDoNotRaceWithAStreamingProducer"
       ]

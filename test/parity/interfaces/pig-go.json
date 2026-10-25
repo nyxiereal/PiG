@@ -23175,9 +23175,9 @@
       "kind": "function",
       "exported": false,
       "shape": {
-        "type": "func(pending *streamingPending) bool"
+        "type": "func() bool"
       },
-      "shapeHash": "sha256:3fbf309ddc9d63d21a8bb2d873c0a2aa2e7162aae18684d4664d2958a19164b6"
+      "shapeHash": "sha256:f632619397f10a7f0e472ad47d2824ec7e080d15ac9eb0994e24800757b3fb96"
     },
     {
       "id": "go:github.com/MichaelKinsy/PiG/ai#StreamingJSONParser.valueSlot",
@@ -30429,17 +30429,6 @@
       "shapeHash": "sha256:567c24df22ba8a6f38438b0039e4ac3aa2e9b8346330a5dd8e8d7a5c88b66f88"
     },
     {
-      "id": "go:github.com/MichaelKinsy/PiG/ai#assistantStreamBuilder.noteStreamedArguments",
-      "package": "github.com/MichaelKinsy/PiG/ai",
-      "name": "assistantStreamBuilder.noteStreamedArguments",
-      "kind": "function",
-      "exported": false,
-      "shape": {
-        "type": "func(contentIndex int, stream *ToolCallArgumentsStream, arguments JsonObject)"
-      },
-      "shapeHash": "sha256:f3ef4e6d5de0263ee4d19808367d413bd4837eb9cf46e1af0344da6692aed49a"
-    },
-    {
       "id": "go:github.com/MichaelKinsy/PiG/ai#assistantStreamBuilder.observeCodexFrame",
       "package": "github.com/MichaelKinsy/PiG/ai",
       "name": "assistantStreamBuilder.observeCodexFrame",
@@ -30680,6 +30669,17 @@
         "type": "func()"
       },
       "shapeHash": "sha256:032e891204f123caf14d3d421fa9728efc3f31299c17e98859c219dccddd74fb"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/ai#assistantStreamBuilder.showStreamedArguments",
+      "package": "github.com/MichaelKinsy/PiG/ai",
+      "name": "assistantStreamBuilder.showStreamedArguments",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func(contentIndex int, call *ToolCall, stream *ToolCallArgumentsStream, arguments JsonObject, order schemaObjectOrder)"
+      },
+      "shapeHash": "sha256:3d475eaa4a49e7bd50a09560cdfb78a99b1260a190c48d728fad56313626b66b"
     },
     {
       "id": "go:github.com/MichaelKinsy/PiG/ai#assistantStreamBuilder.start",
@@ -41603,17 +41603,6 @@
         "type": "func(model ImageModel, options ProviderImagesOptions, resp *net/http.Response, data []byte, out AssistantImages) AssistantImages"
       },
       "shapeHash": "sha256:2e791656bd92d9d3b66b518b3e5d76ae9247b887770507a1c6517ac0e895711d"
-    },
-    {
-      "id": "go:github.com/MichaelKinsy/PiG/ai#finiteJSONValue",
-      "package": "github.com/MichaelKinsy/PiG/ai",
-      "name": "finiteJSONValue",
-      "kind": "function",
-      "exported": false,
-      "shape": {
-        "type": "func(value any) bool"
-      },
-      "shapeHash": "sha256:e97bf7bf1ecfdfceef9dc48e038cbf324758ba5a8557005c28b1eea4898962d3"
     },
     {
       "id": "go:github.com/MichaelKinsy/PiG/ai#finiteNumberOf",

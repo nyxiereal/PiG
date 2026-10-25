@@ -260,6 +260,8 @@
     "vercel-ai-gateway/moonshotai/kimi-k2.7-code-highspeed",
     "vercel-ai-gateway/moonshotai/kimi-k3",
     "vercel-ai-gateway/moonshotai/kimi-k3-fast",
+    "vercel-ai-gateway/moonshotai/kimi-k3.1-pro",
+    "vercel-ai-gateway/moonshotai/kimi-k3.1-pro-highspeed",
     "vercel-ai-gateway/nvidia/nemotron-3-nano-30b-a3b",
     "vercel-ai-gateway/nvidia/nemotron-3-super-120b-a12b",
     "vercel-ai-gateway/nvidia/nemotron-3-ultra-550b-a55b",

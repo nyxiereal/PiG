@@ -9068,6 +9068,25 @@
       "tests": []
     },
     {
+      "id": "BF-579b4d2",
+      "title": "fix(durable): a non-finite number is a strict JSON error whichever JSON package a value's own encoder used",
+      "symptom": "fix(durable): a non-finite number is a strict JSON error whichever JSON package a value's own encoder used",
+      "rootCause": "",
+      "rootCauseSource": "",
+      "userImpact": "An operation failed or was rejected",
+      "platform": "All platforms",
+      "class": "own",
+      "fixedIn": "Unreleased",
+      "origin": "commit",
+      "commits": [
+        {
+          "hash": "579b4d240a",
+          "date": "2026-10-24"
+        }
+      ],
+      "tests": []
+    },
+    {
       "id": "BF-57a1687",
       "title": "fix(ai,agent): return a projection's blocks apart from its scalars so the caller's buffer stays on its stack",
       "symptom": "fix(ai,agent): return a projection's blocks apart from its scalars so the caller's buffer stays on its stack",
@@ -28628,6 +28647,33 @@
       ]
     },
     {
+      "id": "BF-db1ee65",
+      "title": "A lone UTF-16 surrogate in a tool result's details, in a nested tool call's result, or in a code mode call's…",
+      "symptom": "It became three U+FFFD characters (`encoding/json` has no lone-surrogate string), so the preview bytes in a stored result differed from Pi's.",
+      "rootCause": "",
+      "rootCauseSource": "",
+      "userImpact": "An operation failed or was rejected",
+      "platform": "All platforms",
+      "class": "own",
+      "fixedIn": "Unreleased",
+      "releaseNote": "A lone UTF-16 surrogate in a tool result's details, in a nested tool call's result, or in a code mode call's argument or error preview now stays a lone surrogate through the Durable entry and its stored values, written as the `\\ud83d` escape that Pi's `JSON.stringify` writes, with `\u003c`, `\u003e` and `\u0026` left as they are. Before, it became three U+FFFD characters (`encoding/json` has no lone-surrogate string), so the preview bytes in a stored result differed from Pi's. The session file, JSON mode and RPC mode already wrote the escape and are unchanged.",
+      "origin": "release note",
+      "commits": [
+        {
+          "hash": "db1ee65be2",
+          "date": "2026-10-24"
+        }
+      ],
+      "tests": [
+        "ai/lone_surrogate_json_pi_oracle_test.go::TestMessagesKeepALoneSurrogateAsPiDoes",
+        "coding/cli/lone_surrogate_json_lines_pi_oracle_test.go::TestJSONLinesOfAMessageWithALoneSurrogateAreWhatPisJSONStringifyWrites",
+        "durable/codemode/lone_surrogate_preview_test.go::TestAPreviewCutInsideASurrogatePairKeepsItsEscapeLikePi",
+        "durable/codemode/lone_surrogate_tool_result_test.go::TestAToolResultWithALoneSurrogateKeepsItThroughTheHarnessAndTheEntry",
+        "durable/json_lone_surrogate_test.go::TestToJsonValueAndFromJsonValueKeepALoneSurrogate",
+        "internal/codingagent/lone_surrogate_session_pi_oracle_test.go::TestSessionLinesWithALoneSurrogateAreWhatPisJSONStringifyWrites"
+      ]
+    },
+    {
       "id": "BF-db7007d",
       "title": "A Radius gateway model's `samplingParamsByThinkingLevel` now reaches the `pi-messages` model and the composed…",
       "symptom": "A Radius gateway model's `samplingParamsByThinkingLevel` now reaches the `pi-messages` model and the composed catalog entry (Pi's `getRadiusModelsFromConfig` spreads each gateway model); it was dropped before.",
@@ -34121,6 +34167,25 @@
         "internal/codingagent/compaction/context_edit_retry_anchor_test.go::TestEstimateKeepsUsageAnchorWhenARetryOmissionEditsOnlyTheTrailingSuffix",
         "internal/codingagent/compaction/context_edit_retry_anchor_test.go::TestEstimateKeepsUsageAnchorWhenTrailingInputIsReplaced"
       ]
+    },
+    {
+      "id": "BF-f992050",
+      "title": "fix(ai,durable): keep a value that is not JSON an error when a message or a nested result is encoded",
+      "symptom": "fix(ai,durable): keep a value that is not JSON an error when a message or a nested result is encoded",
+      "rootCause": "",
+      "rootCauseSource": "",
+      "userImpact": "An operation failed or was rejected",
+      "platform": "All platforms",
+      "class": "own",
+      "fixedIn": "Unreleased",
+      "origin": "commit",
+      "commits": [
+        {
+          "hash": "f992050b6d",
+          "date": "2026-10-24"
+        }
+      ],
+      "tests": []
     },
     {
       "id": "BF-fa3da97",

@@ -297,6 +297,7 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 | [BF-5732479](#bf-5732479) | `auth.json` keeps each credential's properties in the order they were read or returned by an extension's… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-5774749](#bf-5774749) | A Piglet found by name in `<project>/.pig/piglets` now follows project trust: it is used only when the… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-578c1a3](#bf-578c1a3) | The "Applied use cases" page in the manual that ships inside PiG now links the Security page on the website | PiG's own defect | All platforms | 0.5.0 |
+| [BF-579b4d2](#bf-579b4d2) | fix(durable): a non-finite number is a strict JSON error whichever JSON package a value's own encoder used | PiG's own defect | All platforms | Unreleased |
 | [BF-57a1687](#bf-57a1687) | fix(ai,agent): return a projection's blocks apart from its scalars so the caller's buffer stays on its stack | PiG's own defect | All platforms | Unreleased |
 | [BF-57ee33b](#bf-57ee33b) | A model an extension registers with `registerProvider` reaches `ctx.modelRegistry`, `ctx.model` and RPC as… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-59456ae](#bf-59456ae) | Pressing a key in a subprocess extension's overlay no longer freezes interactive mode when the key reaches… | PiG's own defect | All platforms | 0.5.0 |
@@ -949,6 +950,7 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 | [BF-dac3cd5](#bf-dac3cd5) | A session keeps reading its history as it loaded it when another program rewrites, truncates, replaces or… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-dae37be](#bf-dae37be) | fix: the input loop never waits for the Session lock; the abort-fix leak and two stale tests | PiG's own defect | All platforms | Unreleased |
 | [BF-db12780](#bf-db12780) | fix(agent): end the tool flow at custom user messages and hold system messages mid-flow | PiG's own defect | All platforms | Unreleased |
+| [BF-db1ee65](#bf-db1ee65) | A lone UTF-16 surrogate in a tool result's details, in a nested tool call's result, or in a code mode call's… | PiG's own defect | All platforms | Unreleased |
 | [BF-db7007d](#bf-db7007d) | A Radius gateway model's `samplingParamsByThinkingLevel` now reaches the `pi-messages` model and the composed… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-db9a315](#bf-db9a315) | Codemode peak memory is now measured and guarded through the normal tool path in a fresh process with 40… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-dbe1ad3](#bf-dbe1ad3) | `pig setup` now flags a go on PATH older than Go 1.26, the extension SDK minimum, naming the version found… | PiG's own defect | All platforms | 0.5.0 |
@@ -1092,6 +1094,7 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 | [BF-f98d129](#bf-f98d129) | Clearing the queued messages (RPC `clear_queue`, the SDK, the interactive restore-to-editor key) no longer… | A Pi defect that PiG fixed first | All platforms | 0.5.0 |
 | [BF-f98d129-2](#bf-f98d129-2) | Omitting a failed retry attempt no longer makes the context usage jump to an estimate of the whole history | A Pi defect that PiG fixed first | All platforms | 0.5.0 |
 | [BF-f98d129-3](#bf-f98d129-3) | A request carries at most the model's `inputLimits.images.maxPerRequest` images | A Pi defect that PiG fixed first | All platforms | 0.5.0 |
+| [BF-f992050](#bf-f992050) | fix(ai,durable): keep a value that is not JSON an error when a message or a nested result is encoded | PiG's own defect | All platforms | Unreleased |
 | [BF-fa3da97](#bf-fa3da97) | A wake the scheduler took at a change is still delivered to `OnWake` when the Session fails and seals before… | PiG's own defect | All platforms | 0.5.2 |
 | [BF-fa3da97-10](#bf-fa3da97-10) | A model reply with many tool calls no longer slows down as calls finish: finished calls are not parsed again… | PiG's own defect | All platforms | 0.5.2 |
 | [BF-fa3da97-11](#bf-fa3da97-11) | Durable task-graph and view watches no longer send or rebuild the whole graph or view on each commit: a… | PiG's own defect | All platforms | 0.5.2 |
@@ -4998,6 +5001,19 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 - **Commit that wrote the release note (the fix commit is not identified):** `578c1a3b47` (2026-10-11)
 - **Tests:** None recorded.
 - **Release note:** The "Applied use cases" page in the manual that ships inside PiG now links the Security page on the website. Before, it named a `security.md` page that the shipped manual does not have.
+
+### BF-579b4d2
+
+**fix(durable): a non-finite number is a strict JSON error whichever JSON package a value's own encoder used**
+
+- **Source:** PiG's own defect
+- **Symptom:** fix(durable): a non-finite number is a strict JSON error whichever JSON package a value's own encoder used
+- **Root cause:** Not recorded.
+- **User impact:** An operation failed or was rejected
+- **Platform:** All platforms
+- **Fixed in:** Unreleased
+- **Fix commits:** `579b4d240a` (2026-10-24)
+- **Tests:** None recorded.
 
 ### BF-57a1687
 
@@ -14077,6 +14093,20 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 - **Fix commits:** `db12780931` (2026-10-09)
 - **Tests:** `agent/convert_custom_upstream_test.go::TestConvertToLLMCustomMessagesMatchUpstreamConvertToLlm`, `agent/convert_custom_upstream_test.go::TestConvertToLLMToolFlowMatchesUpstreamTransformOrder`, `agent/convert_custom_upstream_test.go::TestCustomMessagesReachProvidersAsUpstreamContentBlocks`, `agent/transform_custom_user_boundary_test.go::TestAnthropicRequestAfterBranchSummaryHasNoOrphanToolResult`, `agent/transform_custom_user_boundary_test.go::TestConvertToLLMCustomMessageWithoutWireOutputKeepsToolFlow`, `agent/transform_custom_user_boundary_test.go::TestConvertToLLMCustomUserMessageInterruptsToolFlow`, `agent/transform_custom_user_boundary_test.go::TestConvertToLLMHoldsSystemMessageUntilToolFlowCloses`, `coding/session_tree_wire_oracle_test.go::TestNavigateTreeEveryPointSendsValidToolFlow`
 
+### BF-db1ee65
+
+**A lone UTF-16 surrogate in a tool result's details, in a nested tool call's result, or in a code mode call's…**
+
+- **Source:** PiG's own defect
+- **Symptom:** It became three U+FFFD characters (`encoding/json` has no lone-surrogate string), so the preview bytes in a stored result differed from Pi's.
+- **Root cause:** Not recorded.
+- **User impact:** An operation failed or was rejected
+- **Platform:** All platforms
+- **Fixed in:** Unreleased
+- **Fix commits:** `db1ee65be2` (2026-10-24)
+- **Tests:** `ai/lone_surrogate_json_pi_oracle_test.go::TestMessagesKeepALoneSurrogateAsPiDoes`, `coding/cli/lone_surrogate_json_lines_pi_oracle_test.go::TestJSONLinesOfAMessageWithALoneSurrogateAreWhatPisJSONStringifyWrites`, `durable/codemode/lone_surrogate_preview_test.go::TestAPreviewCutInsideASurrogatePairKeepsItsEscapeLikePi`, `durable/codemode/lone_surrogate_tool_result_test.go::TestAToolResultWithALoneSurrogateKeepsItThroughTheHarnessAndTheEntry`, `durable/json_lone_surrogate_test.go::TestToJsonValueAndFromJsonValueKeepALoneSurrogate`, `internal/codingagent/lone_surrogate_session_pi_oracle_test.go::TestSessionLinesWithALoneSurrogateAreWhatPisJSONStringifyWrites`
+- **Release note:** A lone UTF-16 surrogate in a tool result's details, in a nested tool call's result, or in a code mode call's argument or error preview now stays a lone surrogate through the Durable entry and its stored values, written as the `\ud83d` escape that Pi's `JSON.stringify` writes, with `<`, `>` and `&` left as they are. Before, it became three U+FFFD characters (`encoding/json` has no lone-surrogate string), so the preview bytes in a stored result differed from Pi's. The session file, JSON mode and RPC mode already wrote the escape and are unchanged.
+
 ### BF-db7007d
 
 **A Radius gateway model's `samplingParamsByThinkingLevel` now reaches the `pi-messages` model and the composed…**
@@ -16077,6 +16107,19 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 - **Fix commits:** `5731351f4e` (2026-10-09), `f98d129beb` (2026-10-09)
 - **Tests:** `agent/image_limit_test.go::TestLimitImagesPerRequestKeepsTheNewestImages`, `agent/queue_clear_user_test.go::TestClearUserMessagesKeepsCustomMessagesInOrder`, `coding/session_pi_bugs_test.go::TestAbortInOverThresholdSessionDoesNotCompactBeforeSettling`, `coding/session_pi_bugs_test.go::TestClearQueueKeepsExtensionCustomMessages`, `coding/session_pi_bugs_test.go::TestContextUsageSurvivesAnOmittedFailedRetryAttempt`, `coding/session_pi_bugs_test.go::TestPromptSendsAtMostTheModelsImagesPerRequest`, `internal/codingagent/compaction/compaction_oracle_test.go::TestCompactionMatchesPi`, `internal/codingagent/compaction/context_edit_retry_anchor_test.go::TestEstimateDropsUsageAnchorWhenTheAnchorOrEarlierInputIsEdited` and 2 more in docs/bug-ledger.json
 - **Release note:** A request carries at most the model's `inputLimits.images.maxPerRequest` images. Older images become a text placeholder in the request and stay in the session (D137, Pi #10162).
+
+### BF-f992050
+
+**fix(ai,durable): keep a value that is not JSON an error when a message or a nested result is encoded**
+
+- **Source:** PiG's own defect
+- **Symptom:** fix(ai,durable): keep a value that is not JSON an error when a message or a nested result is encoded
+- **Root cause:** Not recorded.
+- **User impact:** An operation failed or was rejected
+- **Platform:** All platforms
+- **Fixed in:** Unreleased
+- **Fix commits:** `f992050b6d` (2026-10-24)
+- **Tests:** None recorded.
 
 ### BF-fa3da97
 

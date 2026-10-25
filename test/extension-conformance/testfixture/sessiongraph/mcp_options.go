@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"path/filepath"
+	"strings"
 	"sync"
 
 	sdk "github.com/MichaelKinsy/PiG/extensions/sdk"
@@ -204,11 +205,11 @@ func mcpOptionsScript(ctx sdk.Context, args map[string]any) map[string]any {
 		if message["role"] != "toolResult" {
 			continue
 		}
-		text := ""
+		var text strings.Builder
 		for _, part := range message["content"].([]any) {
-			text += part.(map[string]any)["text"].(string)
+			text.WriteString(part.(map[string]any)["text"].(string))
 		}
-		messages = append(messages, text)
+		messages = append(messages, text.String())
 	}
 	seen := []any{}
 	for _, entry := range ok(manager.GetEntries()) {

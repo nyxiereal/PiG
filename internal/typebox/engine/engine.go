@@ -20,12 +20,7 @@ type state struct{ callstack, visited []string }
 func newState() state { return state{} }
 
 func canInstantiate(types ...any) bool {
-	for _, t := range types {
-		if isRef(t) {
-			return false
-		}
-	}
-	return true
+	return !slices.ContainsFunc(types, isRef)
 }
 
 func (e *eng) instantiateProperties(ctx *Obj, st state, properties any) *Obj {
@@ -561,10 +556,10 @@ func (e *eng) indexFromTuple(types []any, indexer any) any {
 	}
 	formatted := formatArrayIndexer(indexer)
 	elements := []any{}
-	for index := len(types) - 1; index >= 0; index-- {
+	for index, typ := range slices.Backward(types) {
 		check := e.extends(NewObj(), tLiteral(float64(index), nil), formatted)
 		if isExtendsTrueLike(check) {
-			elements = append([]any{types[index]}, elements...)
+			elements = append([]any{typ}, elements...)
 		}
 	}
 	return e.evaluateUnionFast(elements)

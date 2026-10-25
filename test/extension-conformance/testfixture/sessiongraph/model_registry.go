@@ -3,6 +3,7 @@ package sessiongraph
 import (
 	"context"
 	"fmt"
+	"maps"
 	"slices"
 
 	sdk "github.com/MichaelKinsy/PiG/extensions/sdk"
@@ -32,9 +33,7 @@ func modelRegistryScript(ctx sdk.Context, args map[string]any) map[string]any {
 		"oneOfTypeMissing": ok(registry.GetModelOfType(sdk.ModelTypeImage, "mr-local", "m1")) == nil, "imagesOfType": len(ok(registry.GetModelsOfType(sdk.ModelTypeImage, "mr-local"))), "availableOfType": availableOfType,
 	}
 	unknown := map[string]any{}
-	for key, value := range local {
-		unknown[key] = value
-	}
+	maps.Copy(unknown, local)
 	unknown["provider"] = "nope-prov"
 	apiKey := func(provider string) any {
 		if key := registry.GetApiKeyForProvider(provider); key != nil {
@@ -125,9 +124,7 @@ func modelRegistryScript(ctx sdk.Context, args map[string]any) map[string]any {
 	}
 	// A stored credential makes registration mark the provider configured at once (model-runtime.ts markProvisionallyConfigured); its auth check finds no key, so the availability refresh the registration launched replaces the mark and the settled state is unconfigured.
 	storedModel := map[string]any{}
-	for key, value := range nativeModel {
-		storedModel[key] = value
-	}
+	maps.Copy(storedModel, nativeModel)
 	storedModel["provider"] = "stored-prov"
 	storedProvider := ok(sdk.CreateProvider(sdk.CreateProviderOptions{
 		ID: "stored-prov", Name: "Stored Native",

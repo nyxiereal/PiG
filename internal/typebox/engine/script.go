@@ -40,8 +40,8 @@ func trim(input string) string {
 }
 
 func discardMultilineComment(input string) string {
-	if i := strings.Index(input, "*/"); i >= 0 {
-		return input[i+2:]
+	if _, after, ok := strings.Cut(input, "*/"); ok {
+		return after
 	}
 	return ""
 }

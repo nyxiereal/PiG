@@ -160,7 +160,7 @@ func extensionRunnerScript(ctx sdk.Context, args map[string]any) map[string]any 
 	// An extension process answers a tool renderer resolution on a later turn (D89): the first call answers what the base does, so ask until the answer is the extension's.
 	resolvedAlpha := func() any {
 		var answer any
-		for i := 0; i < 100; i++ {
+		for range 100 {
 			if answer = toolRenderers("alpha", func() *sdk.ResolvedToolRenderers { return nil }); answer != nil {
 				break
 			}

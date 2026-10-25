@@ -5,7 +5,9 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"maps"
 	"slices"
+	"strings"
 
 	sdk "github.com/MichaelKinsy/PiG/extensions/sdk"
 )
@@ -24,9 +26,7 @@ func createProviderScript() (report map[string]any, err error) {
 	M := func(id, api string, extra ...map[string]any) map[string]any {
 		model := map[string]any{"id": id, "name": id, "api": api, "provider": "cp"}
 		for _, fields := range extra {
-			for key, value := range fields {
-				model[key] = value
-			}
+			maps.Copy(model, fields)
 		}
 		return model
 	}
@@ -56,15 +56,15 @@ func createProviderScript() (report map[string]any, err error) {
 			types = append(types, event["type"].(string))
 		}
 		result := stream.Result()
-		text := ""
+		var text strings.Builder
 		for _, block := range result["content"].([]any) {
 			if value, ok := block.(map[string]any)["text"].(string); ok {
-				text += value
+				text.WriteString(value)
 			}
 		}
 		usage := result["usage"].(map[string]any)
 		return map[string]any{
-			"types": types, "text": text, "stopReason": result["stopReason"], "error": result["errorMessage"], "api": result["api"], "provider": result["provider"], "model": result["model"],
+			"types": types, "text": text.String(), "stopReason": result["stopReason"], "error": result["errorMessage"], "api": result["api"], "provider": result["provider"], "model": result["model"],
 			"usageZero": fmt.Sprint(usage["totalTokens"]) == "0", "timestampIsNumber": isNumber(result["timestamp"]),
 		}
 	}

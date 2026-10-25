@@ -3,6 +3,7 @@ package engine
 import (
 	"fmt"
 	"slices"
+	"strings"
 
 	"github.com/MichaelKinsy/PiG/internal/jsstring"
 )
@@ -331,8 +332,8 @@ func (e *eng) collapseUnionProperties(left, right any) any {
 
 func tupleElementsToProperties(types []any) *Obj {
 	result := NewObj()
-	for index := len(types) - 1; index >= 0; index-- {
-		result = Assign(NewObj(fmt.Sprint(index), types[index]), result)
+	for index, typ := range slices.Backward(types) {
+		result = Assign(NewObj(fmt.Sprint(index), typ), result)
 	}
 	return result
 }
@@ -1107,14 +1108,14 @@ func (e *eng) templateLiteralEncode(types any) *Obj {
 			for _, head := range asArray(get(t, "anyOf"), "reduce") {
 				result = append(result, encodeType(head, nil, ""))
 			}
-			joined := ""
+			var joined strings.Builder
 			for i, r := range result {
 				if i > 0 {
-					joined += "|"
+					joined.WriteString("|")
 				}
-				joined += r
+				joined.WriteString(r)
 			}
-			return encodeTypes(right, pattern+"("+joined+")")
+			return encodeTypes(right, pattern+"("+joined.String()+")")
 		}
 		return neverPattern
 	}

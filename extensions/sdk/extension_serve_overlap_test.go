@@ -31,7 +31,7 @@ func TestExtensionRefusesASecondConcurrentServe(t *testing.T) {
 	}
 
 	secondHost, secondExt := net.Pipe()
-	defer secondHost.Close()
+	defer func() { _ = secondHost.Close() }()
 	if err := ext.RunWithConn(secondExt); !errors.Is(err, errExtensionAlreadyServing) {
 		t.Fatalf("second concurrent RunWithConn = %v, want errExtensionAlreadyServing", err)
 	}

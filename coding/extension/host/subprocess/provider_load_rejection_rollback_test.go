@@ -30,8 +30,10 @@ func TestRejectedLoadRegistrationLeavesAnEarlierRegistrationIntact(t *testing.T)
 	bad := func(name string) *sdk.Extension {
 		ext := sdk.New(name)
 		ext.RegisterProvider(provider, sdk.ProviderConfig{"baseUrl": "https://" + name + ".invalid/v1", "headers": map[string]any{"x-from": name}, "oauth": &sdk.OAuthProvider{
-			Name:         name + " login",
-			Login:        func(*sdk.OAuthLoginCallbacks) (sdk.OAuthCredentials, error) { return sdk.OAuthCredentials{}, errors.New("unused") },
+			Name: name + " login",
+			Login: func(*sdk.OAuthLoginCallbacks) (sdk.OAuthCredentials, error) {
+				return sdk.OAuthCredentials{}, errors.New("unused")
+			},
 			RefreshToken: func(creds sdk.OAuthCredentials) (sdk.OAuthCredentials, error) { return creds, nil },
 			GetAPIKey:    func(creds sdk.OAuthCredentials) string { return creds.Access },
 		}})

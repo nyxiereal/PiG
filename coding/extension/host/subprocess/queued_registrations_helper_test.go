@@ -9,4 +9,3 @@ func applyQueuedRegistrations(h *Host) []*extension.ExtensionError {
 	runtime.BindProviderActions(runtime.BoundProviderActions(), func(err *extension.ExtensionError) { failures = append(failures, err) })
 	return failures
 }
-

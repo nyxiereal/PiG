@@ -1,6 +1,6 @@
 // reload-provider-failure: an .mjs extension whose provider registration is valid on its first load and rejected by the model runtime
 // on every later load (the module stays in Node's ESM cache across /reload, so the counter keeps counting). It shows how many times
-// its factory ran as a keyed status, which only a loaded extension can set.
+// its factory ran as a widget above the editor, which only a loaded extension can set.
 let factoryCalls = 0;
 
 export default function (pi) {
@@ -14,5 +14,5 @@ export default function (pi) {
     ...(calls === 1 ? { api: "openai-completions" } : {}),
     models: [model],
   });
-  pi.on("session_start", (_event, ctx) => ctx.ui.setStatus("reload-provider", `reload-provider-calls=${calls}`));
+  pi.on("session_start", (_event, ctx) => ctx.ui.setWidget("reload-provider", [`reload-provider-calls=${calls}`]));
 }

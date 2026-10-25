@@ -2,9 +2,9 @@ package durable
 
 import (
 	"encoding/json"
-	sdkjson "github.com/MichaelKinsy/PiG/extensions/sdk/json"
 
 	"github.com/MichaelKinsy/PiG/ai"
+	sdkjson "github.com/MichaelKinsy/PiG/extensions/sdk/json"
 )
 
 // nestedResultWire is NestedToolExecutionResult's JSON: taskId, structuredOutput, isError, details, diagnostics, usage,

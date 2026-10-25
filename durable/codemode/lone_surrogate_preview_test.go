@@ -1,6 +1,7 @@
 package codemode
 
 import (
+	"bytes"
 	"os/exec"
 	"strings"
 	"testing"
@@ -37,7 +38,7 @@ func TestAPreviewCutInsideASurrogatePairKeepsItsEscapeLikePi(t *testing.T) {
 	if !strings.Contains(string(want), `\ud83d`) {
 		t.Fatalf("the case does not cut inside a pair: %s", want)
 	}
-	if string(got) != string(want) {
+	if !bytes.Equal(got, want) {
 		t.Errorf("the preview in the details is %s, Pi's is %s", got, want)
 	}
 }

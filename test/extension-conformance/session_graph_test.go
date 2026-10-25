@@ -666,7 +666,7 @@ func TestSessionGraphExtensionFactoriesAcrossSDKs(t *testing.T) {
 var sessionGraphExtensionFactoriesWant string
 
 // sessionGraphToolModelServer is a model that calls the tool toolName with arguments on its first request and answers with text once a tool result is in the conversation.
-func sessionGraphToolModelServer(t *testing.T, toolName, arguments string) string {
+func sessionGraphToolModelServer(t testing.TB, toolName, arguments string) string {
 	t.Helper()
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
 		var body struct {

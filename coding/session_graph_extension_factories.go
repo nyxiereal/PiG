@@ -6,8 +6,12 @@ import (
 	"fmt"
 
 	"github.com/MichaelKinsy/PiG/coding/extension"
+	"github.com/MichaelKinsy/PiG/coding/extension/builtin/codemode"
+	"github.com/MichaelKinsy/PiG/coding/extension/builtin/toolsearch"
 	"github.com/MichaelKinsy/PiG/coding/extension/host/subprocess"
+	"github.com/MichaelKinsy/PiG/coding/mcpext"
 	"github.com/MichaelKinsy/PiG/extensions/sdk/json"
+	icodingagent "github.com/MichaelKinsy/PiG/internal/codingagent"
 )
 
 // graphExtensionFactory is one entry of the loader's extensionFactories option as it crosses the wire: the built-in's name and its JSON options.
@@ -20,11 +24,47 @@ type graphExtensionFactory struct {
 func (f graphExtensionFactory) factory(scope subprocess.SessionGraphScope, agentDir string) (extension.InlineExtension, error) {
 	switch f.Builtin {
 	case "codemode":
-		return f.codemode()
+		// index.ts CodemodeExtensionOptions: mode, inlineBudget and models (default true).
+		var options struct {
+			Mode         string   `json:"mode"`
+			InlineBudget *float64 `json:"inlineBudget"`
+			Models       *bool    `json:"models"`
+		}
+		if f.hasOptions() {
+			if err := json.Unmarshal(f.Options, &options); err != nil {
+				return nil, f.optionsError(err)
+			}
+		}
+		if options.Mode != "" && options.Mode != codemode.ModeOn && options.Mode != codemode.ModeOnly {
+			return nil, fmt.Errorf(`createCodemodeExtension option mode must be "on" or "only", got %q`, options.Mode)
+		}
+		built := codemode.Options{Mode: options.Mode, DisableModels: options.Models != nil && !*options.Models}
+		if options.InlineBudget != nil {
+			budget := int(*options.InlineBudget)
+			built.InlineBudget = &budget
+		}
+		return codemode.CreateCodemodeExtension(built), nil
 	case "tool-search":
-		return f.toolSearch()
+		return toolsearch.CreateToolSearchExtension(), nil
 	case "mcp":
-		return f.mcp(scope, agentDir)
+		// index.ts McpExtensionOptions: the data options logPath and startupWaitMs, and the function options (loadConfig, createTransport, credentials, openUrl, updateConfig), which the extension names by callback id (session_graph_mcp.go).
+		var options struct {
+			LogPath       string   `json:"logPath"`
+			StartupWaitMs *float64 `json:"startupWaitMs"`
+			graphMcpFunctions
+		}
+		if f.hasOptions() {
+			if err := json.Unmarshal(f.Options, &options); err != nil {
+				return nil, f.optionsError(err)
+			}
+		}
+		built := mcpext.Options{LogPath: options.LogPath, AgentDir: agentDir, ConfigDirName: icodingagent.ConfigDirName()}
+		if options.StartupWaitMs != nil {
+			wait := int(*options.StartupWaitMs)
+			built.StartupWaitMs = &wait
+		}
+		options.apply(scope, &built)
+		return mcpext.CreateMcpExtension(built), nil
 	}
 	return nil, fmt.Errorf("the host serves no compiled-in extension named %q", f.Builtin)
 }
@@ -35,9 +75,4 @@ func (f graphExtensionFactory) hasOptions() bool {
 
 func (f graphExtensionFactory) optionsError(err error) error {
 	return fmt.Errorf("options of the %s extension: %w", f.Builtin, err)
-}
-
-// strippedError is the answer of a build that left the named extension out (the pig_strip_* tags).
-func (f graphExtensionFactory) strippedError() error {
-	return fmt.Errorf("the %s extension is not in this build", f.Builtin)
 }

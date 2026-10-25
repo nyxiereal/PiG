@@ -1,5 +1,3 @@
-//go:build !pig_strip_mcp
-
 // pig-specific: the function options of createMcpExtension (extensions/mcp/index.ts McpExtensionOptions: loadConfig, createTransport, credentials, openUrl, updateConfig) for an extension that passes the compiled-in MCP extension to a DefaultResourceLoader it constructs. Pi's options are functions of the caller; they stay in the caller's process and the host calls them over the wire that exists, the session graph callback (subprocess.RequestSessionGraphCallback), with JSON in and JSON out. No request kind is added.
 
 package coding

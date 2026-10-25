@@ -4,6 +4,7 @@ import (
 	"math"
 	"strconv"
 	"strings"
+	"sync"
 
 	"github.com/MichaelKinsy/PiG/internal/jsstring"
 )
@@ -516,7 +517,12 @@ func keyword(word string, build func() any) parser {
 	return mapped(C(word), func(any) any { return build() })
 }
 
-func init() {
+// grammar builds the parsers on first use: the combinator closures are about 2 KB the pig binary must not allocate at startup.
+var grammarOnce sync.Once
+
+func grammar() { grammarOnce.Do(buildGrammar) }
+
+func buildGrammar() {
 	typ := ref(&rType)
 	listRule := func(item parser, delim parser, m func(any) any) parser {
 		// item (delim item)* delim?  |  empty
@@ -827,10 +833,19 @@ func init() {
 func slicesCloneAny(a []any) []any { return append([]any(nil), a...) }
 
 // scriptParse is Parser.Script(input).
-func scriptParse(input string) pr { return rScript(input) }
+func scriptParse(input string) pr {
+	grammar()
+	return rScript(input)
+}
 
 // scriptPattern is Parser.Pattern(input): a template literal's `^...$` pattern as the list of types it stands for.
-func scriptPattern(input string) pr { return rPattern(input) }
+func scriptPattern(input string) pr {
+	grammar()
+	return rPattern(input)
+}
 
 // scriptTemplateLiteralTypes is Parser.TemplateLiteralTypes(input).
-func scriptTemplateLiteralTypes(input string) pr { return rTemplateLiteralTypes(input) }
+func scriptTemplateLiteralTypes(input string) pr {
+	grammar()
+	return rTemplateLiteralTypes(input)
+}

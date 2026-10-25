@@ -77905,6 +77905,17 @@
       "shapeHash": "sha256:470093e9284c5d2bb2cf72519391e70c316a2036bf351e33578daaf384c4bacc"
     },
     {
+      "id": "go:github.com/MichaelKinsy/PiG/coding#graphExtensionFactory.codemodeFactory",
+      "package": "github.com/MichaelKinsy/PiG/coding",
+      "name": "graphExtensionFactory.codemodeFactory",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func() (github.com/MichaelKinsy/PiG/coding/extension.InlineExtension, error)"
+      },
+      "shapeHash": "sha256:57ac8d45d136db0669cee9d7bdb0786218951aeb59607904b8d7540f2652f7f9"
+    },
+    {
       "id": "go:github.com/MichaelKinsy/PiG/coding#graphExtensionFactory.factory",
       "package": "github.com/MichaelKinsy/PiG/coding",
       "name": "graphExtensionFactory.factory",
@@ -77927,6 +77938,17 @@
       "shapeHash": "sha256:f632619397f10a7f0e472ad47d2824ec7e080d15ac9eb0994e24800757b3fb96"
     },
     {
+      "id": "go:github.com/MichaelKinsy/PiG/coding#graphExtensionFactory.mcpFactory",
+      "package": "github.com/MichaelKinsy/PiG/coding",
+      "name": "graphExtensionFactory.mcpFactory",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func(scope github.com/MichaelKinsy/PiG/coding/extension/host/subprocess.SessionGraphScope, agentDir string) (github.com/MichaelKinsy/PiG/coding/extension.InlineExtension, error)"
+      },
+      "shapeHash": "sha256:87dc1e03abfe8ffb8c3de85072b88f97219e2398de82d5400eb73b5b3b61539c"
+    },
+    {
       "id": "go:github.com/MichaelKinsy/PiG/coding#graphExtensionFactory.optionsError",
       "package": "github.com/MichaelKinsy/PiG/coding",
       "name": "graphExtensionFactory.optionsError",
@@ -77936,6 +77958,17 @@
         "type": "func(err error) error"
       },
       "shapeHash": "sha256:757366f347b77fab18c96d624ec5206676e19d18aa9ceb4a88a9343171f303d5"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/coding#graphExtensionFactory.toolSearchFactory",
+      "package": "github.com/MichaelKinsy/PiG/coding",
+      "name": "graphExtensionFactory.toolSearchFactory",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func() (github.com/MichaelKinsy/PiG/coding/extension.InlineExtension, error)"
+      },
+      "shapeHash": "sha256:57ac8d45d136db0669cee9d7bdb0786218951aeb59607904b8d7540f2652f7f9"
     },
     {
       "id": "go:github.com/MichaelKinsy/PiG/coding#graphExtensionsOf",

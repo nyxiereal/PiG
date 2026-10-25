@@ -112,6 +112,7 @@ export async function extensionRunnerScript({ cwd, agentDir, runnerProbeA, runne
   r.bound = { activeTools: runner.getActiveTools(), errors: [] };
   const errors = [];
   const off = runner.onError((report) => errors.push({ extensionPath: report.extensionPath, event: report.event, error: report.error }));
+  runner.reportUnhandledMcpServers();
 
   // The emit family, each through two handlers that chain.
   const emits = {};

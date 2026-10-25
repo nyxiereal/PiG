@@ -313,6 +313,7 @@ pub fn extension_runner_script(ctx: &Context, args: &Value) -> io::Result<Value>
         let reported = reported.clone();
         Arc::new(move |report| reported.lock().unwrap().push(json!({"extensionPath": report["extensionPath"], "event": report["event"], "error": report["error"]})))
     })?;
+    runner.report_unhandled_mcp_servers()?;
 
     // The emit family, each through two handlers that chain.
     let mut emits = Map::new();

@@ -22,7 +22,7 @@ pub struct DefaultResourceLoaderOptions<'a> {
     pub cwd: String,
     pub agent_dir: String,
     pub settings_manager: Option<&'a SettingsManager>,
-    /// The runtime the loader loads its extensions against, which `create_extension_runtime` made. Pi's loader takes none (its loadExtensions does); this is how a runtime made first reaches the extensions. `None`: each reload makes its own, as Pi's does.
+    /// The runtime the loader loads its extensions against, which `create_extension_runtime` made. pig additive (D201): Pi's loader takes none (its loadExtensions does); this is how a runtime made first reaches the extensions. `None`: each reload makes its own, as Pi's does.
     pub runtime: Option<&'a ExtensionRuntime>,
     pub additional_extension_paths: Vec<String>,
     pub additional_skill_paths: Vec<String>,

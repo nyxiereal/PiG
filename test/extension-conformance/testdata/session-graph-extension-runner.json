@@ -201,6 +201,11 @@
 	},
 	"errors": [
 		{
+			"error": "MCP server \"probe-mcp\" is registered, but no loaded extension connects MCP servers; another extension may have replaced the built-in MCP support",
+			"event": "register_mcp_server",
+			"extensionPath": "\u003croot\u003e/probe/runner-a.mjs"
+		},
+		{
 			"error": "a failed",
 			"event": "agent_start",
 			"extensionPath": "\u003croot\u003e/probe/runner-a.mjs"
@@ -227,7 +232,7 @@
 				"b-flag": true,
 				"probe-flag": "dflt"
 			},
-			"mcpServers": 0,
+			"mcpServers": 1,
 			"nativeProviders": 0,
 			"providers": 0,
 			"virtualModels": 0

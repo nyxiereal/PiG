@@ -303,6 +303,9 @@ func extensionRunnerScript(ctx sdk.Context, args map[string]any) map[string]any 
 		reported = append(reported, map[string]any{"extensionPath": report.ExtensionPath, "event": report.Event, "error": report.Error})
 	}))
 
+	if err := runner.ReportUnhandledMcpServers(); err != nil {
+		panic(err)
+	}
 	// The emit family, each through two handlers that chain.
 	emits := map[string]any{}
 	ok(runner.Emit(map[string]any{"type": "session_start", "reason": "startup"}))

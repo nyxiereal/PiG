@@ -1149,6 +1149,7 @@ def extension_runner_script(ctx, args):
     r["bound"] = {"activeTools": runner.get_active_tools(), "errors": []}
     reported = []
     off = runner.on_error(lambda report: reported.append({"extensionPath": report["extensionPath"], "event": report["event"], "error": report["error"]}))
+    runner.report_unhandled_mcp_servers()
 
     emits = {}
 

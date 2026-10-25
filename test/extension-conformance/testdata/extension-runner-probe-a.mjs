@@ -4,6 +4,7 @@ export default function (pi) {
   const execute = async () => ({ content: [{ type: "text", text: "ok" }], details: {} });
   pi.registerFlag("probe-flag", { description: "A string flag", type: "string", default: "dflt" });
   pi.registerFlag("probe-bool", { description: "A flag without a default", type: "boolean" });
+  pi.registerMcpServer("probe-mcp", { command: "probe-mcp-server" });
   pi.registerTool({ name: "alpha", label: "Alpha", description: "Alpha tool", promptSnippet: "alpha snippet", parameters: schema, execute });
   pi.registerTool({ name: "shared", label: "Shared", description: "Shared tool from A", parameters: schema, execute });
   pi.registerCommand("hello", { description: "Hello from A", handler: async () => {} });

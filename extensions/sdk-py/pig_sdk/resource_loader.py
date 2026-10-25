@@ -34,6 +34,7 @@ class DefaultResourceLoader(_GraphObject):
         cwd: str,
         agent_dir: str,
         settings_manager: Any = None,
+        # pig additive (D201): the runtime the loader loads its extensions against; Pi's loader takes none (its loadExtensions does).
         runtime: ExtensionRuntime | None = None,
         additional_extension_paths: list[str] | None = None,
         additional_skill_paths: list[str] | None = None,

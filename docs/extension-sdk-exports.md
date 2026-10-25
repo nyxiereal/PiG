@@ -10,7 +10,7 @@ Use counts (`uses`) are the number of the 255 scanned npm packages that import t
 
 | Module | Rows | type-only (identity by kind) | Node served | Go gaps | Rust gaps | Python gaps |
 |---|---|---|---|---|---|---|
-| `pi-coding-agent` | 920 | 305 | 910 | 388 | 388 | 388 |
+| `pi-coding-agent` | 920 | 305 | 910 | 342 | 342 | 342 |
 | `pi-tui` | 365 | 85 | 364 | 147 | 147 | 147 |
 | `pi-ai` | 97 | 197 | 97 | 66 | 66 | 66 |
 | `pi-ai/compat` | 156 | 204 | 156 | 122 | 122 | 122 |
@@ -23,12 +23,12 @@ Use counts (`uses`) are the number of the 255 scanned npm packages that import t
 | C2Sessions | C2Sessions lane (createAgentSession family, E1/E6) | 0.5.2 | 399 | Conformance rows for createAgentSession, createAgentSessionRuntime and the pi-agent-core Agent loop in all four SDKs (branch feat/sdk-child-agent-sessions) |
 | SdkExportsLedger | SdkExportsLedger lane (Pi application internals no extension scan imports) | 0.5.2 | 1158 | Owner decision per export, listed with usage counts in handoffs/0.5.2/sdk-exports-internals.md: a numbered divergence in docs/parity/DIVERGENCES.md (cells become divergence:D<n>), or a real lane with a port and a conformance row |
 | SdkPiAiHelpers | SdkPiAiHelpers lane (pi-ai pure helpers, StringEnum, host getters, E17-E22) | 0.5.2 | 150 | Pure helpers with vector tests from Pi at the pin; host getters and the pi-ai compat calls with a conformance row per SDK |
-| SdkSessionGraph | SdkSessionGraph lane (SessionManager/SettingsManager/ModelRuntime/resource loader, E2-E5) | 0.5.2 | 348 | Host calls for session open/list/inMemory, scoped settings, standalone model runtime, resource loader and package manager, with a conformance row per SDK |
+| SdkSessionGraph | SdkSessionGraph lane (SessionManager/SettingsManager/ModelRuntime/resource loader, E2-E5) | 0.5.2 | 210 | Host calls for session open/list/inMemory, scoped settings, standalone model runtime, resource loader and package manager, with a conformance row per SDK |
 | SdkTuiHelpers | SdkTuiHelpers lane (pi-tui helpers, keys, keybindings, theme and rendering helpers, E8-E16) | 0.5.2 | 249 | Pure helpers ported per SDK with vector tests from Pi at the pin (test/parity/sdk-vectors), keybinding and theme helpers with a conformance row per SDK |
 
 ## High-use gaps (block the release gate)
 
-9 exports imported by 5 or more scanned packages have a gap.
+7 exports imported by 5 or more scanned packages have a gap.
 
 | Export | uses | Gaps |
 |---|---|---|
@@ -36,10 +36,8 @@ Use counts (`uses`) are the number of the 255 scanned npm packages that import t
 | `pi-ai: Type` | 14 | Go SdkPiAiHelpers; Rust SdkPiAiHelpers; Python SdkPiAiHelpers |
 | `pi-ai/compat: Type` | 14 | Go SdkPiAiHelpers; Rust SdkPiAiHelpers; Python SdkPiAiHelpers |
 | `pi-coding-agent: createAgentSessionRuntime` | 6 | Go SdkSessionGraph; Rust SdkSessionGraph; Python SdkSessionGraph |
-| `pi-coding-agent: createExtensionRuntime` | 6 | Go SdkSessionGraph; Rust SdkSessionGraph; Python SdkSessionGraph |
 | `pi-coding-agent: createMcpExtension` | 6 | Go C2Sessions; Rust C2Sessions; Python C2Sessions |
 | `pi-tui: TuiAltScreen` | 6 | Go SdkTuiHelpers; Rust SdkTuiHelpers; Python SdkTuiHelpers |
-| `pi-coding-agent: ExtensionRunner` | 5 | Go SdkSessionGraph; Rust SdkSessionGraph; Python SdkSessionGraph |
 | `pi-coding-agent: ModelRegistry` | 5 | Go SdkSessionGraph; Rust SdkSessionGraph; Python SdkSessionGraph |
 
 ## Realized cells no fixture reaches
@@ -315,51 +313,51 @@ None.
 | `ExtensionInputComponent.invalidate` | 0 | served | gap:SdkExportsLedger | gap:SdkExportsLedger | gap:SdkExportsLedger |
 | `ExtensionInputComponent.removeChild` | 0 | served | gap:SdkExportsLedger | gap:SdkExportsLedger | gap:SdkExportsLedger |
 | `ExtensionInputComponent.render` | 0 | served | gap:SdkExportsLedger | gap:SdkExportsLedger | gap:SdkExportsLedger |
-| `ExtensionRunner` | 5 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
-| `ExtensionRunner.bindCommandContext` | 0 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
-| `ExtensionRunner.bindCore` | 0 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
-| `ExtensionRunner.createCommandContext` | 0 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
-| `ExtensionRunner.createContext` | 0 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
-| `ExtensionRunner.createToolContext` | 0 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
-| `ExtensionRunner.emit` | 0 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
-| `ExtensionRunner.emitBeforeAgentStart` | 0 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
-| `ExtensionRunner.emitBeforeProviderHeaders` | 0 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
-| `ExtensionRunner.emitBeforeProviderRequest` | 0 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
-| `ExtensionRunner.emitBoundary` | 0 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
-| `ExtensionRunner.emitCacheWarmingDecision` | 0 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
-| `ExtensionRunner.emitContext` | 0 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
-| `ExtensionRunner.emitError` | 0 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
-| `ExtensionRunner.emitInput` | 0 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
-| `ExtensionRunner.emitMessageEnd` | 0 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
-| `ExtensionRunner.emitResourcesDiscover` | 0 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
-| `ExtensionRunner.emitToolCall` | 0 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
-| `ExtensionRunner.emitToolResult` | 0 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
-| `ExtensionRunner.emitUserBash` | 0 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
-| `ExtensionRunner.getActiveTools` | 0 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
-| `ExtensionRunner.getAllRegisteredTools` | 0 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
-| `ExtensionRunner.getCommand` | 0 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
-| `ExtensionRunner.getCommandDiagnostics` | 0 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
-| `ExtensionRunner.getEntryRenderer` | 0 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
-| `ExtensionRunner.getExtensionPaths` | 0 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
-| `ExtensionRunner.getFlagValues` | 0 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
-| `ExtensionRunner.getFlags` | 0 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
-| `ExtensionRunner.getMarkdownTransformers` | 0 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
-| `ExtensionRunner.getMessageRenderer` | 0 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
-| `ExtensionRunner.getModelRegistry` | 0 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
-| `ExtensionRunner.getRegisteredCommands` | 0 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
-| `ExtensionRunner.getShortcutDiagnostics` | 0 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
-| `ExtensionRunner.getShortcuts` | 0 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
-| `ExtensionRunner.getToolDefinition` | 0 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
-| `ExtensionRunner.getUIContext` | 0 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
-| `ExtensionRunner.hasHandlers` | 0 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
-| `ExtensionRunner.hasUI` | 0 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
-| `ExtensionRunner.invalidate` | 0 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
-| `ExtensionRunner.onError` | 0 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
-| `ExtensionRunner.reportUnhandledMcpServers` | 0 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
-| `ExtensionRunner.resolveToolRenderers` | 0 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
-| `ExtensionRunner.setFlagValue` | 0 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
-| `ExtensionRunner.setUIContext` | 0 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
-| `ExtensionRunner.shutdown` | 0 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
+| `ExtensionRunner` | 5 | served | native:ExtensionRunner | native:ExtensionRunner | native:ExtensionRunner |
+| `ExtensionRunner.bindCommandContext` | 0 | served | native:ExtensionRunner.BindCommandContext | native:ExtensionRunner::bind_command_context | native:ExtensionRunner.bind_command_context |
+| `ExtensionRunner.bindCore` | 0 | served | native:ExtensionRunner.BindCore | native:ExtensionRunner::bind_core | native:ExtensionRunner.bind_core |
+| `ExtensionRunner.createCommandContext` | 0 | served | native:ExtensionRunner.CreateCommandContext | native:ExtensionRunner::create_command_context | native:ExtensionRunner.create_command_context |
+| `ExtensionRunner.createContext` | 0 | served | native:ExtensionRunner.CreateContext | native:ExtensionRunner::create_context | native:ExtensionRunner.create_context |
+| `ExtensionRunner.createToolContext` | 0 | served | native:ExtensionRunner.CreateToolContext | native:ExtensionRunner::create_tool_context | native:ExtensionRunner.create_tool_context |
+| `ExtensionRunner.emit` | 0 | served | native:ExtensionRunner.Emit | native:ExtensionRunner::emit | native:ExtensionRunner.emit |
+| `ExtensionRunner.emitBeforeAgentStart` | 0 | served | native:ExtensionRunner.EmitBeforeAgentStart | native:ExtensionRunner::emit_before_agent_start | native:ExtensionRunner.emit_before_agent_start |
+| `ExtensionRunner.emitBeforeProviderHeaders` | 0 | served | native:ExtensionRunner.EmitBeforeProviderHeaders | native:ExtensionRunner::emit_before_provider_headers | native:ExtensionRunner.emit_before_provider_headers |
+| `ExtensionRunner.emitBeforeProviderRequest` | 0 | served | native:ExtensionRunner.EmitBeforeProviderRequest | native:ExtensionRunner::emit_before_provider_request | native:ExtensionRunner.emit_before_provider_request |
+| `ExtensionRunner.emitBoundary` | 0 | served | native:ExtensionRunner.EmitBoundary | native:ExtensionRunner::emit_boundary | native:ExtensionRunner.emit_boundary |
+| `ExtensionRunner.emitCacheWarmingDecision` | 0 | served | native:ExtensionRunner.EmitCacheWarmingDecision | native:ExtensionRunner::emit_cache_warming_decision | native:ExtensionRunner.emit_cache_warming_decision |
+| `ExtensionRunner.emitContext` | 0 | served | native:ExtensionRunner.EmitContext | native:ExtensionRunner::emit_context | native:ExtensionRunner.emit_context |
+| `ExtensionRunner.emitError` | 0 | served | native:ExtensionRunner.EmitError | native:ExtensionRunner::emit_error | native:ExtensionRunner.emit_error |
+| `ExtensionRunner.emitInput` | 0 | served | native:ExtensionRunner.EmitInput | native:ExtensionRunner::emit_input | native:ExtensionRunner.emit_input |
+| `ExtensionRunner.emitMessageEnd` | 0 | served | native:ExtensionRunner.EmitMessageEnd | native:ExtensionRunner::emit_message_end | native:ExtensionRunner.emit_message_end |
+| `ExtensionRunner.emitResourcesDiscover` | 0 | served | native:ExtensionRunner.EmitResourcesDiscover | native:ExtensionRunner::emit_resources_discover | native:ExtensionRunner.emit_resources_discover |
+| `ExtensionRunner.emitToolCall` | 0 | served | native:ExtensionRunner.EmitToolCall | native:ExtensionRunner::emit_tool_call | native:ExtensionRunner.emit_tool_call |
+| `ExtensionRunner.emitToolResult` | 0 | served | native:ExtensionRunner.EmitToolResult | native:ExtensionRunner::emit_tool_result | native:ExtensionRunner.emit_tool_result |
+| `ExtensionRunner.emitUserBash` | 0 | served | native:ExtensionRunner.EmitUserBash | native:ExtensionRunner::emit_user_bash | native:ExtensionRunner.emit_user_bash |
+| `ExtensionRunner.getActiveTools` | 0 | served | native:ExtensionRunner.GetActiveTools | native:ExtensionRunner::get_active_tools | native:ExtensionRunner.get_active_tools |
+| `ExtensionRunner.getAllRegisteredTools` | 0 | served | native:ExtensionRunner.GetAllRegisteredTools | native:ExtensionRunner::get_all_registered_tools | native:ExtensionRunner.get_all_registered_tools |
+| `ExtensionRunner.getCommand` | 0 | served | native:ExtensionRunner.GetCommand | native:ExtensionRunner::get_command | native:ExtensionRunner.get_command |
+| `ExtensionRunner.getCommandDiagnostics` | 0 | served | native:ExtensionRunner.GetCommandDiagnostics | native:ExtensionRunner::get_command_diagnostics | native:ExtensionRunner.get_command_diagnostics |
+| `ExtensionRunner.getEntryRenderer` | 0 | served | native:ExtensionRunner.GetEntryRenderer | native:ExtensionRunner::get_entry_renderer | native:ExtensionRunner.get_entry_renderer |
+| `ExtensionRunner.getExtensionPaths` | 0 | served | native:ExtensionRunner.GetExtensionPaths | native:ExtensionRunner::get_extension_paths | native:ExtensionRunner.get_extension_paths |
+| `ExtensionRunner.getFlagValues` | 0 | served | native:ExtensionRunner.GetFlagValues | native:ExtensionRunner::get_flag_values | native:ExtensionRunner.get_flag_values |
+| `ExtensionRunner.getFlags` | 0 | served | native:ExtensionRunner.GetFlags | native:ExtensionRunner::get_flags | native:ExtensionRunner.get_flags |
+| `ExtensionRunner.getMarkdownTransformers` | 0 | served | native:ExtensionRunner.GetMarkdownTransformers | native:ExtensionRunner::get_markdown_transformers | native:ExtensionRunner.get_markdown_transformers |
+| `ExtensionRunner.getMessageRenderer` | 0 | served | native:ExtensionRunner.GetMessageRenderer | native:ExtensionRunner::get_message_renderer | native:ExtensionRunner.get_message_renderer |
+| `ExtensionRunner.getModelRegistry` | 0 | served | native:ExtensionRunner.GetModelRegistry | native:ExtensionRunner::get_model_registry | native:ExtensionRunner.get_model_registry |
+| `ExtensionRunner.getRegisteredCommands` | 0 | served | native:ExtensionRunner.GetRegisteredCommands | native:ExtensionRunner::get_registered_commands | native:ExtensionRunner.get_registered_commands |
+| `ExtensionRunner.getShortcutDiagnostics` | 0 | served | native:ExtensionRunner.GetShortcutDiagnostics | native:ExtensionRunner::get_shortcut_diagnostics | native:ExtensionRunner.get_shortcut_diagnostics |
+| `ExtensionRunner.getShortcuts` | 0 | served | native:ExtensionRunner.GetShortcuts | native:ExtensionRunner::get_shortcuts | native:ExtensionRunner.get_shortcuts |
+| `ExtensionRunner.getToolDefinition` | 0 | served | native:ExtensionRunner.GetToolDefinition | native:ExtensionRunner::get_tool_definition | native:ExtensionRunner.get_tool_definition |
+| `ExtensionRunner.getUIContext` | 0 | served | native:ExtensionRunner.GetUIContext | native:ExtensionRunner::get_ui_context | native:ExtensionRunner.get_ui_context |
+| `ExtensionRunner.hasHandlers` | 0 | served | native:ExtensionRunner.HasHandlers | native:ExtensionRunner::has_handlers | native:ExtensionRunner.has_handlers |
+| `ExtensionRunner.hasUI` | 0 | served | native:ExtensionRunner.HasUI | native:ExtensionRunner::has_ui | native:ExtensionRunner.has_ui |
+| `ExtensionRunner.invalidate` | 0 | served | native:ExtensionRunner.Invalidate | native:ExtensionRunner::invalidate | native:ExtensionRunner.invalidate |
+| `ExtensionRunner.onError` | 0 | served | native:ExtensionRunner.OnError | native:ExtensionRunner::on_error | native:ExtensionRunner.on_error |
+| `ExtensionRunner.reportUnhandledMcpServers` | 0 | served | native:ExtensionRunner.ReportUnhandledMcpServers | native:ExtensionRunner::report_unhandled_mcp_servers | native:ExtensionRunner.report_unhandled_mcp_servers |
+| `ExtensionRunner.resolveToolRenderers` | 0 | served | native:ExtensionRunner.ResolveToolRenderers | native:ExtensionRunner::resolve_tool_renderers | native:ExtensionRunner.resolve_tool_renderers |
+| `ExtensionRunner.setFlagValue` | 0 | served | native:ExtensionRunner.SetFlagValue | native:ExtensionRunner::set_flag_value | native:ExtensionRunner.set_flag_value |
+| `ExtensionRunner.setUIContext` | 0 | served | native:ExtensionRunner.SetUIContext | native:ExtensionRunner::set_ui_context | native:ExtensionRunner.set_ui_context |
+| `ExtensionRunner.shutdown` | 0 | served | native:ExtensionRunner.Shutdown | native:ExtensionRunner::shutdown | native:ExtensionRunner.shutdown |
 | `ExtensionSelectorComponent` | 0 | served | gap:SdkExportsLedger | gap:SdkExportsLedger | gap:SdkExportsLedger |
 | `ExtensionSelectorComponent.addChild` | 0 | served | gap:SdkExportsLedger | gap:SdkExportsLedger | gap:SdkExportsLedger |
 | `ExtensionSelectorComponent.children` | 0 | served | gap:SdkExportsLedger | gap:SdkExportsLedger | gap:SdkExportsLedger |
@@ -880,7 +878,7 @@ None.
 | `createEditTool` | 3 | served | native:CreateEditTool | native:create_edit_tool | native:create_edit_tool |
 | `createEditToolDefinition` | 12 | served | native:CreateEditToolDefinition | native:create_edit_tool_definition | native:create_edit_tool_definition |
 | `createEventBus` | 4 | served | gap:SdkPiAiHelpers | gap:SdkPiAiHelpers | gap:SdkPiAiHelpers |
-| `createExtensionRuntime` | 6 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
+| `createExtensionRuntime` | 6 | served | native:CreateExtensionRuntime | native:create_extension_runtime | native:create_extension_runtime |
 | `createFindTool` | 4 | served | native:CreateFindTool | native:create_find_tool | native:create_find_tool |
 | `createFindToolDefinition` | 10 | served | native:CreateFindToolDefinition | native:create_find_tool_definition | native:create_find_tool_definition |
 | `createGrepTool` | 3 | served | native:CreateGrepTool | native:create_grep_tool | native:create_grep_tool |

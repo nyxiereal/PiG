@@ -143,7 +143,7 @@ type DefaultResourceLoaderOptions struct {
 	Cwd                           string
 	AgentDir                      string
 	SettingsManager               *SettingsManager
-	// Runtime is the runtime the loader loads its extensions against, which [CreateExtensionRuntime] made. Pi's loader takes none (its loadExtensions does); this is how a runtime made first reaches the extensions. Nil: each reload makes its own, as Pi's does.
+	// Runtime is the runtime the loader loads its extensions against, which [CreateExtensionRuntime] made. pig additive (D201): Pi's loader takes none (its loadExtensions does); this is how a runtime made first reaches the extensions. Nil: each reload makes its own, as Pi's does.
 	Runtime                       *ExtensionRuntime
 	AdditionalExtensionPaths      []string
 	AdditionalSkillPaths          []string

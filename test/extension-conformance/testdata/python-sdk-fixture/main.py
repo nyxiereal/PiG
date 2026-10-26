@@ -803,6 +803,18 @@ def new_extension() -> pig_sdk.Extension:
         ctx.register_tool(dataclasses.replace(bash, execute=bash_execute))
         return [read.name, bash.name]
 
+    def register_edit_override(ctx, factory_cwd):
+        edit = pig_sdk.create_edit_tool_definition(factory_cwd)
+        run_edit = edit.execute
+
+        def edit_execute(ctx, params):
+            result = run_edit(ctx, params)
+            blocks = [{**b, "text": "«edited:" + b["text"] + "»"} if i == 0 else b for i, b in enumerate(result["content"])]
+            return {**result, "content": blocks}
+
+        ctx.register_tool(dataclasses.replace(edit, execute=edit_execute))
+        return [edit.name]
+
     def local_probe(case):
         operations = pig_sdk.create_local_powershell_operations() if case.get("shell") == "powershell" else pig_sdk.create_local_bash_operations()
         signal = pig_sdk.ProviderSignal()
@@ -830,6 +842,16 @@ def new_extension() -> pig_sdk.Extension:
             report = {"cwd": ctx.cwd}
         elif kind == "register":
             report = {"registered": register_overrides(ctx, case["factoryCwd"])}
+        elif kind == "registerEdit":
+            report = {"registered": register_edit_override(ctx, case["factoryCwd"])}
+        elif kind == "prepare":
+            definition = factories[case["tool"]][0](case["factoryCwd"])
+            report = {"has": definition.prepare_arguments is not None}
+            if definition.prepare_arguments is not None:
+                try:
+                    report["prepared"] = definition.prepare_arguments(case.get("params") or {})
+                except Exception as error:  # noqa: BLE001
+                    report["error"] = str(error)
         elif kind == "local":
             report = local_probe(case)
         elif kind == "sets":

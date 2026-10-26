@@ -173,9 +173,14 @@ func startRun(t *testing.T, sandbox *codemode.Sandbox, code string, mutate ...fu
 	return r
 }
 
+// vmWait bounds a wait for the sandbox to do something. Starting a VM compiles QuickJS under whatever coverage and load the run has,
+// which took longer than 10 s in a portmap run on 4 CPUs (the 5 s and 10 s bounds these waits had), so the bound only ends a wait for
+// what never happens.
+const vmWait = 60 * time.Second
+
 func waitUntil(t *testing.T, check func() bool) {
 	t.Helper()
-	deadline := time.Now().Add(5 * time.Second)
+	deadline := time.Now().Add(vmWait)
 	for !check() {
 		if time.Now().After(deadline) {
 			t.Fatal("Condition was not reached")
@@ -693,7 +698,7 @@ func TestAVMThatIsToldTheSameResultNumberTwiceCrashes(t *testing.T) {
 	}, codemode.ServeOptions{MaxInterruptBudget: deterministicBudget})
 	select {
 	case <-done:
-	case <-time.After(10 * time.Second):
+	case <-time.After(vmWait):
 		t.Fatal("the VM was not crashed by a result number used twice")
 	}
 	mu.Lock()

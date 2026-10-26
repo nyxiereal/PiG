@@ -122,7 +122,7 @@ func TestRPCModelObjectsCarryTheRegistryModelType(t *testing.T) {
 		if want, builtin := pi[head.Provider+"/"+head.ID]; builtin && head.Provider != "custom-typeless" && string(raw) != want {
 			t.Errorf("get_available_models %s/%s:\n got %s\nwant %s", head.Provider, head.ID, raw, want)
 		}
-		if head.Provider == "custom-typeless" || head.Provider == "test-faux" {
+		if head.Provider == "custom-typeless" || head.Provider == "test-faux" { // provider-composer.ts:297 spreads the config, so an extension model whose config has no type has none
 			if ok {
 				t.Errorf("get_available_models %s/%s: type %q, want none (a models.json model and an extension model whose config has no type have none, provider-composer.ts extensionModelFromDefinition spreads the config)", head.Provider, head.ID, got)
 			}

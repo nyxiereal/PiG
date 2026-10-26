@@ -10,11 +10,11 @@ import (
 	"github.com/MichaelKinsy/PiG/internal/pigstrip"
 )
 
-// pig-specific: an extension that passes createToolSearchExtension() to a loader it constructs names this factory (internal/compiledin).
-func init() {
-	compiledin.Register("tool-search", func(json.RawMessage) (extension.InlineExtension, error) {
-		return toolsearch.CreateToolSearchExtension(), nil
-	})
+// registerToolSearchReference makes the tool-search extension the one an extension names with createToolSearchExtension() in a loader it constructs (internal/compiledin).
+func registerToolSearchReference() { compiledin.Register("tool-search", createToolSearchReference) }
+
+func createToolSearchReference(json.RawMessage) (extension.InlineExtension, error) {
+	return toolsearch.CreateToolSearchExtension(), nil
 }
 
 // toolSearchEntries is the tool-search registry row, absent while tool-search is stripped at runtime as in a build without it.

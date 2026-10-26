@@ -12,8 +12,8 @@ import (
 	"github.com/MichaelKinsy/PiG/internal/pigstrip"
 )
 
-// pig-specific: an extension that passes createCodemodeExtension(options) to a loader it constructs names this factory (internal/compiledin).
-func init() { compiledin.Register("codemode", createCodemodeReference) }
+// registerCodemodeReference makes the codemode extension the one an extension names with createCodemodeExtension(options) in a loader it constructs (internal/compiledin).
+func registerCodemodeReference() { compiledin.Register("codemode", createCodemodeReference) }
 
 // createCodemodeReference is createCodemodeExtension (index.ts CodemodeExtensionOptions: mode, inlineBudget and models, default true).
 func createCodemodeReference(raw json.RawMessage) (extension.InlineExtension, error) {

@@ -43,7 +43,7 @@ func hashGoModule(root string) string {
 	if !info.IsDir() {
 		return hashTree(abs)
 	}
-	return hashGoModuleFS(os.DirFS(abs), abs)
+	return hashGoModuleFS(newSharedDirFS(abs), abs)
 }
 
 // GoModuleSourceDigest is hashGoModule's identity as a digest for build locks: an error identity is returned as an error.

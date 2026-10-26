@@ -5,6 +5,7 @@ package codemode
 import (
 	"encoding/json"
 	"fmt"
+	"runtime"
 	"testing"
 )
 
@@ -150,8 +151,13 @@ func awaitGlobalsFinished(count int) restartStep {
 }
 
 // codemode.ts:966-1006: the journal's commit is one at a time: what finishes while a commit is in flight waits for it and goes
-// into the next, together.
+// into the next, together. A commit takes the acknowledgments pending when pump starts it (:972-974); the VM's report of the
+// first result's delivery is a message that comes after that, so the second commit does not carry the first result's count and
+// the later one carries all three. The VM here reports on its own goroutine, and with one processor Go's scheduler runs it while
+// pump yields, so its report is posted before the commit's own event: the commit must have taken its acknowledgments when pump
+// decided on it (on several processors a loaded machine does this at times).
 func TestResultsThatFinishWhileAJournalCommitIsInFlightJoinTheNextCommit(t *testing.T) {
+	defer runtime.GOMAXPROCS(runtime.GOMAXPROCS(1))
 	runRestartScenarios(t, []restartScenario{{
 		Name:    "three results, the first alone",
 		Code:    `const all = await Promise.all([gslow(1), gslow(2), gslow(3)]); await tools.hold({}); return all;`,

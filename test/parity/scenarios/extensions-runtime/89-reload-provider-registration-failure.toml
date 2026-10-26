@@ -37,8 +37,6 @@ pi_extensions = [
 [tmux]
 width = 120
 height = 40
-capture_start = "Reloaded keybindings"
-capture_end = "────────────────────"
 ready_pattern_pig = "(auto)"
 ready_pattern_pi = "(auto)"
 ready_timeout_seconds = 30

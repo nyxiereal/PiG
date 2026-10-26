@@ -37,24 +37,39 @@ func TestResolve(t *testing.T) {
 	}
 }
 
-func TestClipNote(t *testing.T) {
+// A wait the deadline cut short says so, so a failure in the last seconds of a package's -timeout is not read as a hang;
+// a wait the deadline did not touch says nothing.
+func TestResolveNotesACapFromTheDeadline(t *testing.T) {
 	for _, tc := range []struct {
 		name          string
-		full, budget  time.Duration
 		untilDeadline time.Duration
-		want          string
+		hasDeadline   bool
+		wantBudget    time.Duration
+		wantNote      bool
 	}{
-		{name: "whole bound", full: Default, budget: Default, untilDeadline: time.Hour},
-		{name: "bound cut by the deadline", full: Default, budget: 2400 * time.Millisecond, untilDeadline: 12400 * time.Millisecond,
-			want: "testbudget: the wait bound is 2.4s, cut from 2m0s because the go test -timeout deadline is 12.4s away; a wait that ends at this bound reports a package run that is out of time, not an awaited event that is late"},
-		{name: "override cut to the floor", full: 300 * time.Second, budget: time.Second, untilDeadline: 3 * time.Second,
-			want: "testbudget: the wait bound is 1s, cut from 5m0s because the go test -timeout deadline is 3s away; a wait that ends at this bound reports a package run that is out of time, not an awaited event that is late"},
+		{name: "no deadline", wantBudget: Default},
+		{name: "distant deadline", untilDeadline: time.Hour, hasDeadline: true, wantBudget: Default},
+		{name: "deadline inside the default", untilDeadline: 40 * time.Second, hasDeadline: true, wantBudget: 30 * time.Second, wantNote: true},
+		{name: "inside the grace", untilDeadline: 3 * time.Second, hasDeadline: true, wantBudget: time.Second, wantNote: true},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
-			if got := clipNote(tc.full, tc.budget, tc.untilDeadline); got != tc.want {
-				t.Fatalf("clipNote = %q, want %q", got, tc.want)
+			budget, note, err := resolve("", tc.untilDeadline, tc.hasDeadline)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if budget != tc.wantBudget || (note != "") != tc.wantNote {
+				t.Fatalf("budget = %s, note = %q; want %s, note %t", budget, note, tc.wantBudget, tc.wantNote)
+			}
+			if tc.wantNote && !strings.Contains(note, "is "+tc.untilDeadline.String()+" away") {
+				t.Fatalf("note %q does not name the time left, %s", note, tc.untilDeadline)
+			}
+			if tc.wantNote && !strings.Contains(note, "capped to "+tc.wantBudget.String()+".") {
+				t.Fatalf("note %q does not name the cap, %s", note, tc.wantBudget)
 			}
 		})
+	}
+	if _, _, err := resolve("0", time.Hour, true); err == nil {
+		t.Fatal("a zero override was accepted")
 	}
 }
 

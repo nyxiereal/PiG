@@ -37,40 +37,54 @@ const Default = 120 * time.Second
 // test's own diagnostics instead of the test binary's timeout panic.
 const grace = 10 * time.Second
 
-// clipNoted holds the names of the tests whose cut bound Wait already logged.
-var clipNoted sync.Map
-
 // Wait returns the hang bound for t: Default or the Env override, capped to
-// end before t's deadline. When the deadline cuts the bound, Wait logs that
-// once for t, so a failure at that bound names its cause: the package run is
-// out of time, and the awaited event is not late.
+// end before t's deadline. When the deadline cuts the bound short, Wait logs
+// [Capped] on t, once: a wait the package's deadline ended fails the test, or
+// kills the child process whose context carries the bound ("signal: killed"),
+// just as a hang does, and that line is what tells the two apart.
 func Wait(t *testing.T) time.Duration {
 	t.Helper()
 	deadline, hasDeadline := t.Deadline()
-	untilDeadline := time.Until(deadline)
-	budget, err := Resolve(os.Getenv(Env), untilDeadline, hasDeadline)
+	budget, note, err := resolve(os.Getenv(Env), time.Until(deadline), hasDeadline)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if hasDeadline {
-		full, _ := Resolve(os.Getenv(Env), 0, false)
-		if note := clipNote(full, budget, untilDeadline); note != "" {
-			if _, noted := clipNoted.LoadOrStore(t.Name(), struct{}{}); !noted {
-				t.Log(note)
-			}
+	if note != "" {
+		if _, seen := noted.LoadOrStore(t.Name(), true); !seen {
+			t.Log(note)
 		}
 	}
 	return budget
 }
 
-// clipNote describes a bound the go test deadline cut from full to budget, or
-// returns "" when the deadline left it whole.
-func clipNote(full, budget, untilDeadline time.Duration) string {
-	if budget >= full {
-		return ""
+// noted holds the names of the tests that were told their waits are capped, so
+// a test that waits in a loop hears it once.
+var noted sync.Map
+
+// resolve is [Resolve] plus the [Capped] note when the deadline lowered the
+// budget.
+func resolve(override string, untilDeadline time.Duration, hasDeadline bool) (budget time.Duration, note string, err error) {
+	budget, err = Resolve(override, untilDeadline, hasDeadline)
+	if err != nil {
+		return 0, "", err
 	}
-	return fmt.Sprintf("testbudget: the wait bound is %s, cut from %s because the go test -timeout deadline is %s away; a wait that ends at this bound reports a package run that is out of time, not an awaited event that is late",
-		budget.Round(time.Millisecond), full, untilDeadline.Round(time.Millisecond))
+	if uncapped, _ := Resolve(override, 0, false); budget < uncapped {
+		note = Capped(budget, untilDeadline)
+	}
+	return budget, note, nil
+}
+
+// Capped is the note Wait logs when the go test -timeout deadline, until away,
+// cuts a wait to budget. In that window nothing is known about the code under
+// test: a test that fails after the note may be a hang or may be healthy work
+// that the package's own slowness left no time for, and only the package's
+// total time tells them apart.
+func Capped(budget, until time.Duration) string {
+	return fmt.Sprintf("testbudget: the go test -timeout deadline is %s away, so this wait is capped to %s. "+
+		"A failure of this test after this line may be the package's own slowness, not a hang: check how long the package had run. "+
+		"A package that uses its whole -timeout starves every test that starts in its last %s, healthy or not, "+
+		"and needs more shards (automation/ci/test-grouped.sh, make test-cli), not a different test",
+		until.Round(time.Millisecond), budget, grace+time.Second)
 }
 
 // Context returns t.Context() bounded by Wait(t).

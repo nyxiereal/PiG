@@ -11,7 +11,7 @@ Use counts (`uses`) are the number of the 255 scanned npm packages that import t
 | Module | Rows | type-only (identity by kind) | Node served | Go gaps | Rust gaps | Python gaps |
 |---|---|---|---|---|---|---|
 | `pi-coding-agent` | 920 | 305 | 910 | 319 | 319 | 319 |
-| `pi-tui` | 365 | 85 | 364 | 147 | 147 | 147 |
+| `pi-tui` | 365 | 85 | 364 | 101 | 101 | 101 |
 | `pi-ai` | 97 | 197 | 97 | 65 | 65 | 65 |
 | `pi-ai/compat` | 156 | 204 | 156 | 121 | 121 | 121 |
 | `pi-agent-core` | 45 | 34 | 45 | 45 | 45 | 45 |
@@ -24,15 +24,11 @@ Use counts (`uses`) are the number of the 255 scanned npm packages that import t
 | SdkExportsLedger | SdkExportsLedger lane (Pi application internals no extension scan imports) | 0.5.2 | 1158 | Owner decision per export, listed with usage counts in handoffs/0.5.2/sdk-exports-internals.md: a numbered divergence in docs/parity/DIVERGENCES.md (cells become divergence:D<n>), or a real lane with a port and a conformance row |
 | SdkPiAiHelpers | SdkPiAiHelpers lane (pi-ai pure helpers, StringEnum, host getters, E17-E22) | 0.5.2 | 144 | Pure helpers with vector tests from Pi at the pin; host getters and the pi-ai compat calls with a conformance row per SDK |
 | SdkSessionGraph | SdkSessionGraph lane (SessionManager/SettingsManager/ModelRuntime/resource loader, E2-E5) | 0.5.2 | 189 | Host calls for session open/list/inMemory, scoped settings, standalone model runtime, resource loader and package manager, with a conformance row per SDK |
-| SdkTuiHelpers | SdkTuiHelpers lane (pi-tui helpers, keys, keybindings, theme and rendering helpers, E8-E16) | 0.5.2 | 249 | Pure helpers ported per SDK with vector tests from Pi at the pin (test/parity/sdk-vectors), keybinding and theme helpers with a conformance row per SDK |
+| SdkTuiHelpers | SdkTuiHelpers lane (pi-tui helpers, keys, keybindings, theme and rendering helpers, E8-E16) | 0.5.2 | 111 | Pure helpers ported per SDK with vector tests from Pi at the pin (test/parity/sdk-vectors), keybinding and theme helpers with a conformance row per SDK |
 
 ## High-use gaps (block the release gate)
 
-1 exports imported by 5 or more scanned packages have a gap.
-
-| Export | uses | Gaps |
-|---|---|---|
-| `pi-tui: TuiAltScreen` | 6 | Go SdkTuiHelpers; Rust SdkTuiHelpers; Python SdkTuiHelpers |
+None.
 
 ## Realized cells no fixture reaches
 
@@ -1180,52 +1176,52 @@ None.
 | `TruncatedText` | 4 | served | kit:TruncatedText | kit:TruncatedText | kit:TruncatedText |
 | `TruncatedText.invalidate` | 0 | served | divergence:D107 | divergence:D107 | divergence:D107 |
 | `TruncatedText.render` | 0 | served | divergence:D107 | divergence:D107 | divergence:D107 |
-| `TuiAltScreen` | 6 | served | gap:SdkTuiHelpers | gap:SdkTuiHelpers | gap:SdkTuiHelpers |
-| `TuiAltScreen.[Symbol.VIEWPORT_TUI]` | 0 | served | gap:SdkTuiHelpers | gap:SdkTuiHelpers | gap:SdkTuiHelpers |
-| `TuiAltScreen.addChild` | 0 | served | gap:SdkTuiHelpers | gap:SdkTuiHelpers | gap:SdkTuiHelpers |
-| `TuiAltScreen.addInputListener` | 0 | served | gap:SdkTuiHelpers | gap:SdkTuiHelpers | gap:SdkTuiHelpers |
-| `TuiAltScreen.children` | 0 | served | gap:SdkTuiHelpers | gap:SdkTuiHelpers | gap:SdkTuiHelpers |
-| `TuiAltScreen.clear` | 0 | served | gap:SdkTuiHelpers | gap:SdkTuiHelpers | gap:SdkTuiHelpers |
-| `TuiAltScreen.copyActiveSelectionToClipboard` | 0 | served | gap:SdkTuiHelpers | gap:SdkTuiHelpers | gap:SdkTuiHelpers |
-| `TuiAltScreen.flash` | 0 | served | gap:SdkTuiHelpers | gap:SdkTuiHelpers | gap:SdkTuiHelpers |
-| `TuiAltScreen.fullRedraws` | 0 | served | gap:SdkTuiHelpers | gap:SdkTuiHelpers | gap:SdkTuiHelpers |
-| `TuiAltScreen.getClearOnShrink` | 0 | served | gap:SdkTuiHelpers | gap:SdkTuiHelpers | gap:SdkTuiHelpers |
-| `TuiAltScreen.getCopyOnSelect` | 0 | served | gap:SdkTuiHelpers | gap:SdkTuiHelpers | gap:SdkTuiHelpers |
-| `TuiAltScreen.getFocusedComponent` | 0 | served | gap:SdkTuiHelpers | gap:SdkTuiHelpers | gap:SdkTuiHelpers |
-| `TuiAltScreen.getScreenLines` | 0 | served | gap:SdkTuiHelpers | gap:SdkTuiHelpers | gap:SdkTuiHelpers |
-| `TuiAltScreen.getShowHardwareCursor` | 0 | served | gap:SdkTuiHelpers | gap:SdkTuiHelpers | gap:SdkTuiHelpers |
-| `TuiAltScreen.handleMouse` | 0 | served | gap:SdkTuiHelpers | gap:SdkTuiHelpers | gap:SdkTuiHelpers |
-| `TuiAltScreen.hasActiveSelection` | 0 | served | gap:SdkTuiHelpers | gap:SdkTuiHelpers | gap:SdkTuiHelpers |
-| `TuiAltScreen.hasOverlay` | 0 | served | gap:SdkTuiHelpers | gap:SdkTuiHelpers | gap:SdkTuiHelpers |
-| `TuiAltScreen.hasOverlayEntries` | 0 | served | gap:SdkTuiHelpers | gap:SdkTuiHelpers | gap:SdkTuiHelpers |
-| `TuiAltScreen.hideOverlay` | 0 | served | gap:SdkTuiHelpers | gap:SdkTuiHelpers | gap:SdkTuiHelpers |
-| `TuiAltScreen.invalidate` | 0 | served | gap:SdkTuiHelpers | gap:SdkTuiHelpers | gap:SdkTuiHelpers |
-| `TuiAltScreen.isFollowingOutput` | 0 | served | gap:SdkTuiHelpers | gap:SdkTuiHelpers | gap:SdkTuiHelpers |
-| `TuiAltScreen.mode` | 0 | served | gap:SdkTuiHelpers | gap:SdkTuiHelpers | gap:SdkTuiHelpers |
-| `TuiAltScreen.onDebug` | 0 | served | gap:SdkTuiHelpers | gap:SdkTuiHelpers | gap:SdkTuiHelpers |
-| `TuiAltScreen.onTerminalColorSchemeChange` | 0 | served | gap:SdkTuiHelpers | gap:SdkTuiHelpers | gap:SdkTuiHelpers |
-| `TuiAltScreen.queryTerminalColors` | 0 | served | gap:SdkTuiHelpers | gap:SdkTuiHelpers | gap:SdkTuiHelpers |
-| `TuiAltScreen.removeChild` | 0 | served | gap:SdkTuiHelpers | gap:SdkTuiHelpers | gap:SdkTuiHelpers |
-| `TuiAltScreen.removeInputListener` | 0 | served | gap:SdkTuiHelpers | gap:SdkTuiHelpers | gap:SdkTuiHelpers |
-| `TuiAltScreen.render` | 0 | served | gap:SdkTuiHelpers | gap:SdkTuiHelpers | gap:SdkTuiHelpers |
-| `TuiAltScreen.renderNow` | 0 | served | gap:SdkTuiHelpers | gap:SdkTuiHelpers | gap:SdkTuiHelpers |
-| `TuiAltScreen.requestRender` | 0 | served | gap:SdkTuiHelpers | gap:SdkTuiHelpers | gap:SdkTuiHelpers |
-| `TuiAltScreen.resetTextSelection` | 0 | served | gap:SdkTuiHelpers | gap:SdkTuiHelpers | gap:SdkTuiHelpers |
-| `TuiAltScreen.scrollBy` | 0 | served | gap:SdkTuiHelpers | gap:SdkTuiHelpers | gap:SdkTuiHelpers |
-| `TuiAltScreen.scrollToBottom` | 0 | served | gap:SdkTuiHelpers | gap:SdkTuiHelpers | gap:SdkTuiHelpers |
-| `TuiAltScreen.scrollToTop` | 0 | served | gap:SdkTuiHelpers | gap:SdkTuiHelpers | gap:SdkTuiHelpers |
-| `TuiAltScreen.setClearOnShrink` | 0 | served | gap:SdkTuiHelpers | gap:SdkTuiHelpers | gap:SdkTuiHelpers |
-| `TuiAltScreen.setCopyOnSelect` | 0 | served | gap:SdkTuiHelpers | gap:SdkTuiHelpers | gap:SdkTuiHelpers |
-| `TuiAltScreen.setFocus` | 0 | served | gap:SdkTuiHelpers | gap:SdkTuiHelpers | gap:SdkTuiHelpers |
-| `TuiAltScreen.setLayoutRoot` | 0 | served | gap:SdkTuiHelpers | gap:SdkTuiHelpers | gap:SdkTuiHelpers |
-| `TuiAltScreen.setShowHardwareCursor` | 0 | served | gap:SdkTuiHelpers | gap:SdkTuiHelpers | gap:SdkTuiHelpers |
-| `TuiAltScreen.setTerminalColorSchemeNotifications` | 0 | served | gap:SdkTuiHelpers | gap:SdkTuiHelpers | gap:SdkTuiHelpers |
-| `TuiAltScreen.setWheelScrollLines` | 0 | served | gap:SdkTuiHelpers | gap:SdkTuiHelpers | gap:SdkTuiHelpers |
-| `TuiAltScreen.showOverlay` | 0 | served | gap:SdkTuiHelpers | gap:SdkTuiHelpers | gap:SdkTuiHelpers |
-| `TuiAltScreen.start` | 0 | served | gap:SdkTuiHelpers | gap:SdkTuiHelpers | gap:SdkTuiHelpers |
-| `TuiAltScreen.stop` | 0 | served | gap:SdkTuiHelpers | gap:SdkTuiHelpers | gap:SdkTuiHelpers |
-| `TuiAltScreen.terminal` | 0 | served | gap:SdkTuiHelpers | gap:SdkTuiHelpers | gap:SdkTuiHelpers |
-| `TuiAltScreen.viewportTop` | 0 | served | gap:SdkTuiHelpers | gap:SdkTuiHelpers | gap:SdkTuiHelpers |
+| `TuiAltScreen` | 6 | served | divergence:D204 | divergence:D204 | divergence:D204 |
+| `TuiAltScreen.[Symbol.VIEWPORT_TUI]` | 0 | served | divergence:D204 | divergence:D204 | divergence:D204 |
+| `TuiAltScreen.addChild` | 0 | served | divergence:D204 | divergence:D204 | divergence:D204 |
+| `TuiAltScreen.addInputListener` | 0 | served | divergence:D204 | divergence:D204 | divergence:D204 |
+| `TuiAltScreen.children` | 0 | served | divergence:D204 | divergence:D204 | divergence:D204 |
+| `TuiAltScreen.clear` | 0 | served | divergence:D204 | divergence:D204 | divergence:D204 |
+| `TuiAltScreen.copyActiveSelectionToClipboard` | 0 | served | divergence:D204 | divergence:D204 | divergence:D204 |
+| `TuiAltScreen.flash` | 0 | served | divergence:D204 | divergence:D204 | divergence:D204 |
+| `TuiAltScreen.fullRedraws` | 0 | served | divergence:D204 | divergence:D204 | divergence:D204 |
+| `TuiAltScreen.getClearOnShrink` | 0 | served | divergence:D204 | divergence:D204 | divergence:D204 |
+| `TuiAltScreen.getCopyOnSelect` | 0 | served | divergence:D204 | divergence:D204 | divergence:D204 |
+| `TuiAltScreen.getFocusedComponent` | 0 | served | divergence:D204 | divergence:D204 | divergence:D204 |
+| `TuiAltScreen.getScreenLines` | 0 | served | divergence:D204 | divergence:D204 | divergence:D204 |
+| `TuiAltScreen.getShowHardwareCursor` | 0 | served | divergence:D204 | divergence:D204 | divergence:D204 |
+| `TuiAltScreen.handleMouse` | 0 | served | divergence:D204 | divergence:D204 | divergence:D204 |
+| `TuiAltScreen.hasActiveSelection` | 0 | served | divergence:D204 | divergence:D204 | divergence:D204 |
+| `TuiAltScreen.hasOverlay` | 0 | served | divergence:D204 | divergence:D204 | divergence:D204 |
+| `TuiAltScreen.hasOverlayEntries` | 0 | served | divergence:D204 | divergence:D204 | divergence:D204 |
+| `TuiAltScreen.hideOverlay` | 0 | served | divergence:D204 | divergence:D204 | divergence:D204 |
+| `TuiAltScreen.invalidate` | 0 | served | divergence:D204 | divergence:D204 | divergence:D204 |
+| `TuiAltScreen.isFollowingOutput` | 0 | served | divergence:D204 | divergence:D204 | divergence:D204 |
+| `TuiAltScreen.mode` | 0 | served | divergence:D204 | divergence:D204 | divergence:D204 |
+| `TuiAltScreen.onDebug` | 0 | served | divergence:D204 | divergence:D204 | divergence:D204 |
+| `TuiAltScreen.onTerminalColorSchemeChange` | 0 | served | divergence:D204 | divergence:D204 | divergence:D204 |
+| `TuiAltScreen.queryTerminalColors` | 0 | served | divergence:D204 | divergence:D204 | divergence:D204 |
+| `TuiAltScreen.removeChild` | 0 | served | divergence:D204 | divergence:D204 | divergence:D204 |
+| `TuiAltScreen.removeInputListener` | 0 | served | divergence:D204 | divergence:D204 | divergence:D204 |
+| `TuiAltScreen.render` | 0 | served | divergence:D204 | divergence:D204 | divergence:D204 |
+| `TuiAltScreen.renderNow` | 0 | served | divergence:D204 | divergence:D204 | divergence:D204 |
+| `TuiAltScreen.requestRender` | 0 | served | divergence:D204 | divergence:D204 | divergence:D204 |
+| `TuiAltScreen.resetTextSelection` | 0 | served | divergence:D204 | divergence:D204 | divergence:D204 |
+| `TuiAltScreen.scrollBy` | 0 | served | divergence:D204 | divergence:D204 | divergence:D204 |
+| `TuiAltScreen.scrollToBottom` | 0 | served | divergence:D204 | divergence:D204 | divergence:D204 |
+| `TuiAltScreen.scrollToTop` | 0 | served | divergence:D204 | divergence:D204 | divergence:D204 |
+| `TuiAltScreen.setClearOnShrink` | 0 | served | divergence:D204 | divergence:D204 | divergence:D204 |
+| `TuiAltScreen.setCopyOnSelect` | 0 | served | divergence:D204 | divergence:D204 | divergence:D204 |
+| `TuiAltScreen.setFocus` | 0 | served | divergence:D204 | divergence:D204 | divergence:D204 |
+| `TuiAltScreen.setLayoutRoot` | 0 | served | divergence:D204 | divergence:D204 | divergence:D204 |
+| `TuiAltScreen.setShowHardwareCursor` | 0 | served | divergence:D204 | divergence:D204 | divergence:D204 |
+| `TuiAltScreen.setTerminalColorSchemeNotifications` | 0 | served | divergence:D204 | divergence:D204 | divergence:D204 |
+| `TuiAltScreen.setWheelScrollLines` | 0 | served | divergence:D204 | divergence:D204 | divergence:D204 |
+| `TuiAltScreen.showOverlay` | 0 | served | divergence:D204 | divergence:D204 | divergence:D204 |
+| `TuiAltScreen.start` | 0 | served | divergence:D204 | divergence:D204 | divergence:D204 |
+| `TuiAltScreen.stop` | 0 | served | divergence:D204 | divergence:D204 | divergence:D204 |
+| `TuiAltScreen.terminal` | 0 | served | divergence:D204 | divergence:D204 | divergence:D204 |
+| `TuiAltScreen.viewportTop` | 0 | served | divergence:D204 | divergence:D204 | divergence:D204 |
 | `TuiMainScreen` | 4 | served | gap:SdkTuiHelpers | gap:SdkTuiHelpers | gap:SdkTuiHelpers |
 | `TuiMainScreen.addChild` | 0 | served | gap:SdkTuiHelpers | gap:SdkTuiHelpers | gap:SdkTuiHelpers |
 | `TuiMainScreen.addInputListener` | 0 | served | gap:SdkTuiHelpers | gap:SdkTuiHelpers | gap:SdkTuiHelpers |

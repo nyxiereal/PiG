@@ -2618,6 +2618,7 @@ Parity allowance: the bundled catalog and every comparison of it with Pi (`TestC
 Remove when: Pi lists the routing variants (or OpenRouter lists them in `/models`), or the owner reverses the decision; then the derivation in `ai/openrouter_variants.go`, its markers, the allowance in the oracle test and this record go.
 
 SCRUTINIZED:approved
+
 ## D200 With no home directory PiG still runs the commands that load no resources, where Pi crashes at import, and fails with Pi's error where Pi's home lookup would run
 
 What: on a host where Node's `os.homedir()` throws (no `HOME`, and no entry for the process's user in the system's user database: a container run as a uid its passwd file does not list), the pinned Pi 1.4.0 fails to load in every mode, `--version` and `list` included. It exits 1 with Node's uncaught `SystemError [ERR_SYSTEM_ERROR]: A system error occurred: uv_os_homedir returned ENOENT (no such file or directory)`: `tools-manager.ts:11` evaluates `getBinDir()` at import, `getAgentDir()` expands even an explicit `PI_CODING_AGENT_DIR` through `normalizePath`, and `normalizePath` calls `homedir()` before it looks at its input (`utils/paths.ts:89`). PiG runs `--version`, `list` and every other command that loads no resources, and fails with the same message (exit 1, nothing on stdout) only where Pi's `resolve()` would look the home directory up, `getHomeDir()` at `package-manager.ts:2464`: startup in print, RPC and interactive mode, a reload and `pig config`.
@@ -2639,4 +2640,3 @@ Parity allowance: `TestNoHomeDirectoryPiCrashesAtImportWherePiGRunsResourceFreeC
 Remove when: Pi stops resolving the home directory at import (so `--version` and `list` run there without one), or an owner decision reverses this one; then PiG's startup fails at the same point as Pi's, the markers, the allowance test and this record go.
 
 SCRUTINIZED:approved
-

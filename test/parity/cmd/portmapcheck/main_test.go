@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"os"
 	"path/filepath"
@@ -849,7 +850,7 @@ func TestFailureReportNamesTheFailingTestsAndKeepsTheFullOutput(t *testing.T) {
 		}
 	}
 	_, file, _ := strings.Cut(report, "full output: ")
-	if kept, err := os.ReadFile(file); err != nil || string(kept) != string(out) {
+	if kept, err := os.ReadFile(file); err != nil || !bytes.Equal(kept, out) {
 		t.Fatalf("kept output %q, err %v", kept, err)
 	}
 }

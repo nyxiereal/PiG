@@ -208,11 +208,21 @@ func TestInteractiveSignalsRetainHandlersThroughDisposalAndDrain(t *testing.T) {
 				case <-keyTick.C:
 				}
 			}
+			// The drain starts with its first write after disposal: drainInput pops the keyboard protocol (terminal.ts:377-386), which pig writes as CSI < u. That write is the event to wait for. A fixed pause before the signal raced the drain's end: the drain also ends once no byte arrives for 50 ms, and the key writer, a shell that forks a sleep for every key, stalls that long on a loaded host, so the process left before the signal.
+			drainMark := output.mark()
 			if err := os.WriteFile(release, []byte("release"), 0o600); err != nil {
 				t.Fatal(err)
 			}
+			for !bytes.Contains(output.since(drainMark), []byte("\x1b[<u")) {
+				select {
+				case err := <-done:
+					t.Fatalf("process exited before its terminal drain began: %v\n%s", err, output.since(0))
+				case <-ctx.Done():
+					t.Fatalf("terminal drain did not begin: %v\n%s", ctx.Err(), output.since(0))
+				case <-keyTick.C:
+				}
+			}
 			waitFile(complete)
-			time.Sleep(100 * time.Millisecond)
 			if err := cmd.Process.Signal(syscall.SIGHUP); err != nil {
 				t.Fatalf("process left before drain signal: %v", err)
 			}

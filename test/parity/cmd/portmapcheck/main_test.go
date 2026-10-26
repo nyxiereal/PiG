@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"runtime"
 	"slices"
 	"strconv"
 	"strings"
@@ -852,5 +853,20 @@ func TestFailureReportNamesTheFailingTestsAndKeepsTheFullOutput(t *testing.T) {
 	_, file, _ := strings.Cut(report, "full output: ")
 	if kept, err := os.ReadFile(file); err != nil || !bytes.Equal(kept, out) {
 		t.Fatalf("kept output %q, err %v", kept, err)
+	}
+}
+
+// The evidence runs go workers() at a time, sized by the CPUs the process may use. runtime.NumCPU counts the host's CPUs, so a shard in a
+// container limited to 4 CPUs on a 192-CPU host ran 96 builds and test binaries at once, and the evidence tests failed on time bounds
+// that measured the starvation: a fixture build lock waited on for 180 s, Pi oracle runs cut off at the binary's timeout. GOMAXPROCS is
+// what Go sets from the container's CPU quota.
+func TestWorkersFollowTheCPUsTheProcessMayUse(t *testing.T) {
+	for procs, want := range map[int]int{1: 1, 2: 1, 4: 2, 8: 4} {
+		t.Run(strconv.Itoa(procs), func(t *testing.T) {
+			defer runtime.GOMAXPROCS(runtime.GOMAXPROCS(procs))
+			if got := workers(); got != want {
+				t.Fatalf("workers() = %d with GOMAXPROCS %d, want %d", got, procs, want)
+			}
+		})
 	}
 }

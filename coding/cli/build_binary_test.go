@@ -7,7 +7,6 @@ import (
 	"os/exec"
 	"path/filepath"
 	"runtime"
-	"sync"
 	"testing"
 
 	"github.com/MichaelKinsy/PiG/internal/testbudget"
@@ -22,18 +21,15 @@ func testExecutable(path string) string {
 	return path
 }
 
-// sharedTestBinary builds one pig variant once per test process. The first test to ask runs the build and passes its go test deadline; every later test reads the result.
+// sharedTestBinary builds one pig variant once per test process (testbudget.Once): the first test to ask runs the build under its go test deadline; every later test reads the result.
 type sharedTestBinary struct {
 	release bool
-	once    sync.Once
-	path    string
-	err     error
+	built   testbudget.Once[string]
 }
 
 func (b *sharedTestBinary) get(t *testing.T) (string, error) {
 	t.Helper()
-	b.once.Do(func() { b.path, b.err = compilePigBinary(testbudget.DeadlineContext(t), b.release) })
-	return b.path, b.err
+	return b.built.Do(t, func(ctx context.Context) (string, error) { return compilePigBinary(ctx, b.release) })
 }
 
 var pigTestBinary = &sharedTestBinary{}
@@ -59,9 +55,6 @@ func compilePigBinary(ctx context.Context, release bool) (string, error) {
 		cmd.Env = append(os.Environ(), "CGO_ENABLED=0")
 	}
 	if data, err := cmd.CombinedOutput(); err != nil {
-		if expired := testbudget.Expired(ctx); expired != "" {
-			return "", fmt.Errorf("build %s: %s\n%s", name, expired, data)
-		}
 		return "", fmt.Errorf("build %s: %w\n%s", name, err, data)
 	}
 	return out, nil

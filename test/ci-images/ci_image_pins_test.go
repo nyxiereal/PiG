@@ -9,6 +9,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"regexp"
+	"runtime"
 	"slices"
 	"strings"
 	"testing"
@@ -216,6 +217,14 @@ func contains(list []string, item string) bool {
 	return slices.Contains(list, item)
 }
 
+// The proposal jobs run on ubuntu-24.04 (ci-images.yml propose-lock, propose-pin) and call propose-ci-image-change.py by its shebang. The script runs ci-image-inputs.sh by its shebang too, and finds the gh CLI by name; Windows can execute neither (WinError 193, and the runner's own gh.exe shadows the extensionless fake), so the tests that run the whole tool against a fake gh have no Windows run to prove. The tests that reject malformed input stop before either call and keep running there.
+func requireShebangRunner(t *testing.T) {
+	t.Helper()
+	if runtime.GOOS == "windows" {
+		t.Skip("the proposal tool runs on the Ubuntu runners: it starts scripts by shebang and a fake gh, which Windows cannot execute")
+	}
+}
+
 // proposalRun runs propose-ci-image-change.py with a fake gh that logs every call and its standard input.
 func proposalRun(t *testing.T, failPR bool, args ...string) (string, string, error) {
 	t.Helper()
@@ -240,6 +249,7 @@ func proposalRun(t *testing.T, failPR bool, args ...string) (string, string, err
 }
 
 func TestLockProposalIsOneSignedCommitOnANewBranch(t *testing.T) {
+	requireShebangRunner(t)
 	root := repoRoot(t)
 	committed, err := os.ReadFile(filepath.Join(root, "automation/images/ci-go/packages.lock"))
 	if err != nil {
@@ -324,6 +334,7 @@ func TestProposalsRefuseMalformedInput(t *testing.T) {
 }
 
 func TestPinProposalRecordsDigestAndInputs(t *testing.T) {
+	requireShebangRunner(t)
 	publication := t.TempDir()
 	ref := "ghcr.io/michaelkinsy/pig-ci-go@sha256:" + strings.Repeat("d", 64)
 	writeCIFixture(t, publication, "pig-ci-go-publication/image-ref.txt", ref+"\n")

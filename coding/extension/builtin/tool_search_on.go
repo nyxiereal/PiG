@@ -3,9 +3,18 @@
 package builtin
 
 import (
+	"github.com/MichaelKinsy/PiG/coding/extension"
 	"github.com/MichaelKinsy/PiG/coding/extension/builtin/toolsearch"
+	"github.com/MichaelKinsy/PiG/internal/compiledin"
 	"github.com/MichaelKinsy/PiG/internal/pigstrip"
 )
+
+// pig-specific: an extension that passes createToolSearchExtension() to a loader it constructs names this factory (internal/compiledin).
+func init() {
+	compiledin.Register("tool-search", func(func(any) error) (extension.InlineExtension, error) {
+		return toolsearch.CreateToolSearchExtension(), nil
+	})
+}
 
 // toolSearchEntries is the tool-search registry row, absent while tool-search is stripped at runtime as in a build without it.
 // pig additive (D92): a runtime stripped tool-search registers nothing, like the pig_strip_tool_search build.

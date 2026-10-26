@@ -8,6 +8,7 @@ import (
 	"github.com/MichaelKinsy/PiG/coding/extension"
 	"github.com/MichaelKinsy/PiG/coding/extension/host/subprocess"
 	"github.com/MichaelKinsy/PiG/extensions/sdk/json"
+	"github.com/MichaelKinsy/PiG/internal/compiledin"
 )
 
 // graphExtensionFactory is one entry of the loader's extensionFactories option as it crosses the wire: the built-in's name and its JSON options.
@@ -17,17 +18,35 @@ type graphExtensionFactory struct {
 }
 
 // factory builds the host's factory of the named extension. agentDir is the loader's agent directory, where the MCP extension keeps its configuration, credentials and log. scope is the extension's connection, where the functions an option names run.
-// Each built-in's factory lives in a file of its own strip tag (session_graph_extension_{codemode,tool_search,mcp}*.go), so a build that strips a built-in links none of its packages.
+// The codemode and tool-search factories are registered by coding/extension/builtin (internal/compiledin), so a program that links this package without the built-ins links neither the sandbox nor the search index; the MCP factory lives in a file of its own strip tag (session_graph_extension_mcp*.go), so a build that strips it links none of its package.
 func (f graphExtensionFactory) factory(scope subprocess.SessionGraphScope, agentDir string) (extension.InlineExtension, error) {
 	switch f.Builtin {
-	case "codemode":
-		return f.codemodeFactory()
-	case "tool-search":
-		return f.toolSearchFactory()
+	case "codemode", "tool-search":
+		build, ok := compiledin.Lookup(f.Builtin)
+		if !ok {
+			return nil, f.absentError()
+		}
+		return build(f.decodeOptions)
 	case "mcp":
 		return f.mcpFactory(scope, agentDir)
 	}
 	return nil, fmt.Errorf("the host serves no compiled-in extension named %q", f.Builtin)
+}
+
+// absentError is the failure of a reference to a compiled-in extension this program does not link.
+func (f graphExtensionFactory) absentError() error {
+	return fmt.Errorf("the compiled-in extension %q is not in this build", f.Builtin)
+}
+
+// decodeOptions fills v from the options the extension passed; it does nothing when it passed none.
+func (f graphExtensionFactory) decodeOptions(v any) error {
+	if !f.hasOptions() {
+		return nil
+	}
+	if err := json.Unmarshal(f.Options, v); err != nil {
+		return f.optionsError(err)
+	}
+	return nil
 }
 
 func (f graphExtensionFactory) hasOptions() bool {

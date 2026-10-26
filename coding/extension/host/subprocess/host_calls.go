@@ -15,7 +15,6 @@ import (
 	"github.com/MichaelKinsy/PiG/coding/extension"
 	"github.com/MichaelKinsy/PiG/coding/extension/host/inproc"
 	"github.com/MichaelKinsy/PiG/internal/jsloop"
-	"github.com/MichaelKinsy/PiG/internal/typebox/engine"
 )
 
 // Upstream extensions call the host in process, so every synchronous host API
@@ -479,7 +478,7 @@ func (h *Host) runCall(me *managedExt, conn *Conn, callID string, call *CallPayl
 	case call.Method == CallHighlightCode:
 		result, err = h.handleHighlightCode(call)
 	case call.Method == CallTypeEngine:
-		result = &CallResultPayload{Result: engine.Serve(call.Args)}
+		result, err = h.handleTypeEngine(call)
 	case call.Method == CallLoadTheme:
 		result, err = h.handleLoadTheme(call)
 	case call.Method == CallFileMutationEnter:

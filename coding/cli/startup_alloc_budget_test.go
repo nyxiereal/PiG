@@ -60,6 +60,15 @@ import (
 // provider refresh phase about 165, availability reload about 250) and the cold json type caches for the registered provider's config (about 525). The registered object's catalog
 // record is composed once per registration (it was once per read: 1,569 -> 746 allocs for a registration and six reads, BenchmarkRegisterExtensionProviderAndRead). Byte budgets and
 // production (no PIG_TEST_FAUX) budgets are unchanged. Profiles: xd670 ~/tern-v5/trees/faux-reg/tmp/prof1 against ~/tern-v5/trees/faux-main/tmp/prof0.
+//
+// Platform siblings of that raise (the same owner approval, 2026-10-25): darwin models.json 18,950 -> 21,850, windows warm first prompt 18,950 -> 21,100 and windows models.json
+// 22,370 -> 25,200, each about 0.5% over the measured value, as the Linux raises are. Measured on the hosted runners, min of 3, main f2f028f845 against the batch 4a384df786 (diag runs 40304098670
+// and 40305356345; the 0.6.0 CI run 40287205705 read 21,756 on macOS and 20,980 / 25,098 on Windows): warm first prompt Windows 18,363 -> 21,001, macOS 15,236 -> 17,658 (the darwin budget of 20,200 already
+// holds it), Linux 15,204 -> 17,596; with models.json Windows 21,843 -> 25,100, macOS 18,724 -> 21,752, Linux 18,703 -> 21,732. A control run without PIG_TEST_FAUX (a models.json local provider, print mode,
+// --no-extensions) is identical on main and the batch within noise (Windows 45,381-45,391 against 45,374-45,390 objects, macOS 42,004-42,022 against 42,007-42,013, Linux 41,912-41,916 against 41,919-41,921) and
+// the macOS and Windows allocation profiles of the two differ by 14 objects at most in any function, so the whole delta is the registration. Its parts match the Linux profile: Models.Refresh 644-656, refresh signals 344, provider
+// refresh phase 166-175, json type caches 523-527. Windows is about 245 objects above Linux because the availability reload checks every provider's auth once more (env lookups 456 -> 684 objects) and an
+// os.LookupEnv costs two allocations on Windows and none on Linux. Byte budgets are unchanged.
 type startupAllocBudget struct{ versionBytes, versionObjects, promptBytes, promptObjects uint64 }
 
 func startupAllocBudgetFor(goos string) startupAllocBudget {
@@ -126,7 +135,7 @@ func startupModelsAllocBudgetFor(goos string) (bytes, objects uint64) {
 		return windowsModelsPromptBytes, windowsModelsPromptObjects
 	}
 	if goos == "darwin" {
-		return 2_934_000, 18_950
+		return 2_934_000, 21_850
 	}
 	return 2_940_000, 21_800
 }
@@ -178,9 +187,9 @@ const (
 	windowsVersionBytes        = 824_000
 	windowsVersionObjects      = 5_800
 	windowsPromptBytes         = 2_924_000
-	windowsPromptObjects       = 18_950
+	windowsPromptObjects       = 21_100
 	windowsModelsPromptBytes   = 3_265_000
-	windowsModelsPromptObjects = 22_370
+	windowsModelsPromptObjects = 25_200
 	windowsLevelObjectsCeiling = 33
 	windowsLevelBytesCeiling   = 6_690
 )

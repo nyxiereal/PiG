@@ -9,6 +9,7 @@ import (
 	"slices"
 	"testing"
 
+	"github.com/MichaelKinsy/PiG/coding/extension"
 	"github.com/MichaelKinsy/PiG/coding/extension/host/inproc"
 )
 

@@ -119177,6 +119177,28 @@
       "shapeHash": "sha256:cd0972c7c1e2397a53126079612288914815b86514f194870a6254b8f803838f"
     },
     {
+      "id": "go:github.com/MichaelKinsy/PiG/coding/extension/host/subprocess#BuiltinToolPrepareArgumentsArgs",
+      "package": "github.com/MichaelKinsy/PiG/coding/extension/host/subprocess",
+      "name": "BuiltinToolPrepareArgumentsArgs",
+      "kind": "type",
+      "exported": true,
+      "shape": {
+        "type": "BuiltinToolPrepareArgumentsArgs"
+      },
+      "shapeHash": "sha256:4798f150ddf55d0c34abea37acd3ae797254e47a1bd45092cf1cc2f3d876e4a2"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/coding/extension/host/subprocess#BuiltinToolPrepareArgumentsJSON",
+      "package": "github.com/MichaelKinsy/PiG/coding/extension/host/subprocess",
+      "name": "BuiltinToolPrepareArgumentsJSON",
+      "kind": "function",
+      "exported": true,
+      "shape": {
+        "type": "func(argsJSON []byte) ([]byte, error)"
+      },
+      "shapeHash": "sha256:26e1ef61d90cfd7a7e08180dbab6d7d1613d543556040cf6146d143e90cc0047"
+    },
+    {
       "id": "go:github.com/MichaelKinsy/PiG/coding/extension/host/subprocess#CallBuiltinToolDefinition",
       "package": "github.com/MichaelKinsy/PiG/coding/extension/host/subprocess",
       "name": "CallBuiltinToolDefinition",
@@ -119202,6 +119224,17 @@
       "id": "go:github.com/MichaelKinsy/PiG/coding/extension/host/subprocess#CallBuiltinToolLocalExec",
       "package": "github.com/MichaelKinsy/PiG/coding/extension/host/subprocess",
       "name": "CallBuiltinToolLocalExec",
+      "kind": "constant",
+      "exported": true,
+      "shape": {
+        "type": "untyped string"
+      },
+      "shapeHash": "sha256:7eabd192b9f1c379102c8dc793881875f1f949f6b752e15a20b93080cb0b311d"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/coding/extension/host/subprocess#CallBuiltinToolPrepareArguments",
+      "package": "github.com/MichaelKinsy/PiG/coding/extension/host/subprocess",
+      "name": "CallBuiltinToolPrepareArguments",
       "kind": "constant",
       "exported": true,
       "shape": {
@@ -123190,6 +123223,17 @@
         "type": "func(ctx context.Context, conn *Conn, call *CallPayload) (*CallResultPayload, error)"
       },
       "shapeHash": "sha256:3fb7723bcac0ac54523006d93762b9da9cffc1fdcd1576c08d9adba31018379d"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/coding/extension/host/subprocess#Host.handleBuiltinToolPrepareArguments",
+      "package": "github.com/MichaelKinsy/PiG/coding/extension/host/subprocess",
+      "name": "Host.handleBuiltinToolPrepareArguments",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func(call *CallPayload) (*CallResultPayload, error)"
+      },
+      "shapeHash": "sha256:48ba20b637c5cc8881a5189c9f9ddc328a18d94b91de3fa7765b9f03d8531257"
     },
     {
       "id": "go:github.com/MichaelKinsy/PiG/coding/extension/host/subprocess#Host.handleChildSessionCall",
@@ -192921,6 +192965,17 @@
       "shapeHash": "sha256:f1fb8e26896dc09dbde07cfef89a7495eeb47f15071b7f7166084307b9fb1967"
     },
     {
+      "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#builtinPrepareCall",
+      "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
+      "name": "builtinPrepareCall",
+      "kind": "type",
+      "exported": false,
+      "shape": {
+        "type": "builtinPrepareCall"
+      },
+      "shapeHash": "sha256:b7c2894e10e51d18c13be4bdda6ab1e52df7d38a33828e36eb33287a624d7dd5"
+    },
+    {
       "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#builtinRegistry",
       "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
       "name": "builtinRegistry",
@@ -192974,6 +193029,17 @@
         "type": "func(hook *HostHelpers, toolCallID string, rawParams []byte, signal context.Context, onUpdate func(AgentToolResult)) (AgentToolResult, error)"
       },
       "shapeHash": "sha256:2626848a069f1f349aacdc3e453233de3d9d32d127955f6db5641490cd81834e"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#builtinSpec.prepareArguments",
+      "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
+      "name": "builtinSpec.prepareArguments",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func(params map[string]any) (map[string]any, error)"
+      },
+      "shapeHash": "sha256:37e70f7311537c53f9527a57a595a22736ec1bcb0f46980dbac0562f457d9646"
     },
     {
       "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#builtinSpec.setOperations",
@@ -193166,6 +193232,17 @@
       "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#callBuiltinToolLocalExec",
       "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
       "name": "callBuiltinToolLocalExec",
+      "kind": "constant",
+      "exported": false,
+      "shape": {
+        "type": "untyped string"
+      },
+      "shapeHash": "sha256:7eabd192b9f1c379102c8dc793881875f1f949f6b752e15a20b93080cb0b311d"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/extensions/sdk#callBuiltinToolPrepareArgs",
+      "package": "github.com/MichaelKinsy/PiG/extensions/sdk",
+      "name": "callBuiltinToolPrepareArgs",
       "kind": "constant",
       "exported": false,
       "shape": {

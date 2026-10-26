@@ -14666,6 +14666,27 @@
       ]
     },
     {
+      "id": "BF-6b97207",
+      "title": "An extension that overrides the `edit` tool with a definition built by the Go, Rust or Python SDK's…",
+      "symptom": "An extension that overrides the `edit` tool with a definition built by the Go, Rust or Python SDK's `createEditToolDefinition` now has the model's legacy edit shapes normalised, as Pi's `{ ...createEditToolDefinition(cwd), execute }` does.",
+      "rootCause": "Pi's createEditToolDefinition returns prepareArguments (edit.ts:158), so an override spread from it normalises `edits` as a JSON string, a single edit object and the legacy top-level {path, oldText, newText}. The SDK definitions (Go, Rust, Python) dropped it, and an override built from them got the legacy shape unnormalised: the edit was silently not applied. The definition reply now says whether the built-in has the hook and the SDKs' hook asks the host to run the built-in's own (builtinTool.prepareArguments; a fused Go extension calls it directly), keeping no copy of the normaliser.",
+      "rootCauseSource": "commit",
+      "userImpact": "Lost or altered data",
+      "platform": "All platforms",
+      "class": "own",
+      "fixedIn": "Unreleased",
+      "releaseNote": "An extension that overrides the `edit` tool with a definition built by the Go, Rust or Python SDK's `createEditToolDefinition` now has the model's legacy edit shapes normalised, as Pi's `{ ...createEditToolDefinition(cwd), execute }` does. The SDK definition dropped the built-in's `prepareArguments`, so `edits` sent as a JSON string, a single edit object or the legacy top-level `{path, oldText, newText}` reached the override unnormalised and the edit was silently not applied, while the model's turn still reported success. The definition's `PrepareArguments` / `prepare_arguments` now runs the built-in's own normaliser on the host (a new `builtinTool.prepareArguments` host call; a fused Go extension calls it directly), and write, read and the other built-ins have none, as in Pi.",
+      "origin": "release note",
+      "commits": [
+        {
+          "hash": "6b97207807",
+          "date": "2026-10-25",
+          "pr": "322"
+        }
+      ],
+      "tests": []
+    },
+    {
       "id": "BF-6cb29f0",
       "title": "Started from a directory reached through a symlink, `pig install`/`remove`/`list`/`update` resolve local…",
       "symptom": "Started from a directory reached through a symlink, `pig install`/`remove`/`list`/`update` resolve local sources against the physical working directory, and `--session` with an empty file records the physical directory as the session cwd, as Pi does.",

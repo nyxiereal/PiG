@@ -25572,6 +25572,31 @@
       ]
     },
     {
+      "id": "BF-bf45320",
+      "title": "Go embedding hosts can bind extension appends through `coding.Session.AppendExtensionEntry`, retaining…",
+      "symptom": "Previously, calling `AppendCustomEntry` allocated a new identity instead of retaining the subprocess ID and timestamp because the public Session API lacked a way to pass them through, leaving duplicate entries in the Node session mirror.",
+      "rootCause": "Previously, calling `AppendCustomEntry` allocated a new identity instead of retaining the subprocess ID and timestamp because the public Session API lacked a way to pass them through, leaving duplicate entries in the Node session mirror.",
+      "rootCauseSource": "release note",
+      "userImpact": "Wrong output or ordering",
+      "platform": "All platforms",
+      "class": "own",
+      "fixedIn": "Unreleased",
+      "releaseNote": "Go embedding hosts can bind extension appends through `coding.Session.AppendExtensionEntry`, retaining subprocess IDs and timestamps through the native Session writer and preserving `entry_appended` semantics. Previously, calling `AppendCustomEntry` allocated a new identity instead of retaining the subprocess ID and timestamp because the public Session API lacked a way to pass them through, leaving duplicate entries in the Node session mirror.",
+      "origin": "release note",
+      "commits": [
+        {
+          "hash": "bf453203b6",
+          "date": "2026-10-23"
+        }
+      ],
+      "tests": [
+        "coding/session_custom_entries_test.go::TestAppendExtensionEntryPreservesIdentityAndEventSemantics",
+        "coding/session_custom_entries_test.go::TestAppendExtensionEntryRejectsWithoutChangingTheLog",
+        "coding/session_custom_entries_test.go::TestAppendExtensionEntrySharesTheNativeAppendLock",
+        "coding/session_custom_entries_test.go::TestAppendExtensionEntryThroughNodeHost"
+      ]
+    },
+    {
       "id": "BF-bfae6a0",
       "title": "Fullscreen double-click selection no longer splits paths and tokens at `~`, `.`, `\\`, `+` and `_`: the word…",
       "symptom": "Fullscreen double-click selection no longer splits paths and tokens at `~`, `.`, `\\`, `+` and `_`: the word characters are iTerm2 defaults.",

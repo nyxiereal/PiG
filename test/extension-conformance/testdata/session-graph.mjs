@@ -683,7 +683,12 @@ async function modelRegistryScript({ mrAuth, mrModels, mrStore, mrServer }) {
   const nativeEvents = [];
   for await (const event of nativeStream) nativeEvents.push(event.type);
   const nativeMessage = await nativeStream.result();
+  // Pi's refresh that follows a registration is unawaited, and a refresh that queues its availability pass before an earlier one supersedes that pass and returns at once: `await registry.refresh()` can come back before the latest pass has published. The probes below wait until the settled state shows (the other SDKs' registration waits for it).
+  const settled = async (read, want) => {
+    for (let i = 0; i < 400 && read() !== want; i++) await new Promise((resolve) => setTimeout(resolve, 25));
+  };
   await registry.refresh({ allowNetwork: false });
+  await settled(() => registry.hasConfiguredAuth(nativeModel), true);
   r.native = {
     registered: registry.getRegisteredNativeProvider("nreg")?.id ?? null, same: registry.getRegisteredNativeProvider("nreg") === provider, viaGetProvider: registry.getProvider("nreg")?.id ?? null, viaRuntime: rt.getProvider("nreg")?.id ?? null,
     viaRuntimeRegistered: rt.getRegisteredNativeProvider("nreg")?.id ?? null, none: registry.getRegisteredNativeProvider("nope-prov") === undefined, noneProvider: registry.getProvider("nope-prov") === undefined,
@@ -699,6 +704,7 @@ async function modelRegistryScript({ mrAuth, mrModels, mrStore, mrServer }) {
   const storedProvider = createProvider({ id: "stored-prov", name: "Stored Native", auth: { apiKey: { name: "Key", check: async () => undefined, resolve: async () => undefined } }, models: [storedModel], api: { "nat-api": { stream: scripted("s.stream"), streamSimple: scripted("s.simple") } } });
   registry.registerProvider(storedProvider);
   await registry.refresh({ allowNetwork: false });
+  await settled(() => registry.hasConfiguredAuth(storedModel), false);
   r.native.storedSettled = { configured: registry.hasConfiguredAuth(storedModel), status: registry.getProviderAuthStatus("stored-prov"), available: registry.getAvailable().some((model) => model.provider === "stored-prov") };
   registry.unregisterProvider("stored-prov");
   await registry.refresh({ allowNetwork: false });

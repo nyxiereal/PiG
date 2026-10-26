@@ -9,21 +9,8 @@ import (
 	"slices"
 	"testing"
 
-	"github.com/MichaelKinsy/PiG/coding/extension"
 	"github.com/MichaelKinsy/PiG/coding/extension/host/inproc"
 )
-
-// llamaBuiltInEntry is the production llama.cpp entry of builtInExtensions, the first entry of extensions/index.ts.
-func llamaBuiltInEntry(t *testing.T) extension.NamedInlineExtension {
-	t.Helper()
-	for _, input := range builtInExtensions {
-		if named, ok := input.(extension.NamedInlineExtension); ok && named.Builtin && named.Name == llamaBuiltinName {
-			return named
-		}
-	}
-	t.Fatalf("builtInExtensions has no %q entry; extensions/index.ts lists llama.cpp first", llamaBuiltinName)
-	return extension.NamedInlineExtension{}
-}
 
 func commandNames(runner *inproc.Runner) []string {
 	var names []string

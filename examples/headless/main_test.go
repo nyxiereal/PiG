@@ -165,7 +165,7 @@ func TestHeadlessEmbedDoesNotLinkTheTypeChecker(t *testing.T) {
 	if err != nil {
 		t.Fatalf("go list -deps: %v", err)
 	}
-	for _, dependency := range strings.Fields(string(out)) {
+	for dependency := range strings.FieldsSeq(string(out)) {
 		if dependency == "go/types" || strings.HasSuffix(dependency, "/extensions/sdk/upgrade") {
 			t.Errorf("the headless embed depends on %s", dependency)
 		}

@@ -26,7 +26,7 @@ func (f graphExtensionFactory) factory(scope subprocess.SessionGraphScope, agent
 		if !ok {
 			return nil, f.absentError()
 		}
-		return build(f.decodeOptions)
+		return build(f.Options)
 	case "mcp":
 		return f.mcpFactory(scope, agentDir)
 	}
@@ -36,17 +36,6 @@ func (f graphExtensionFactory) factory(scope subprocess.SessionGraphScope, agent
 // absentError is the failure of a reference to a compiled-in extension this program does not link.
 func (f graphExtensionFactory) absentError() error {
 	return fmt.Errorf("the compiled-in extension %q is not in this build", f.Builtin)
-}
-
-// decodeOptions fills v from the options the extension passed; it does nothing when it passed none.
-func (f graphExtensionFactory) decodeOptions(v any) error {
-	if !f.hasOptions() {
-		return nil
-	}
-	if err := json.Unmarshal(f.Options, v); err != nil {
-		return f.optionsError(err)
-	}
-	return nil
 }
 
 func (f graphExtensionFactory) hasOptions() bool {

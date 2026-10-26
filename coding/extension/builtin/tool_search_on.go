@@ -5,13 +5,14 @@ package builtin
 import (
 	"github.com/MichaelKinsy/PiG/coding/extension"
 	"github.com/MichaelKinsy/PiG/coding/extension/builtin/toolsearch"
+	"github.com/MichaelKinsy/PiG/extensions/sdk/json"
 	"github.com/MichaelKinsy/PiG/internal/compiledin"
 	"github.com/MichaelKinsy/PiG/internal/pigstrip"
 )
 
 // pig-specific: an extension that passes createToolSearchExtension() to a loader it constructs names this factory (internal/compiledin).
 func init() {
-	compiledin.Register("tool-search", func(func(any) error) (extension.InlineExtension, error) {
+	compiledin.Register("tool-search", func(json.RawMessage) (extension.InlineExtension, error) {
 		return toolsearch.CreateToolSearchExtension(), nil
 	})
 }

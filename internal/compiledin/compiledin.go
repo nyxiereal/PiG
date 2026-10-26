@@ -7,10 +7,25 @@
 // link fails as in a build that strips it.
 package compiledin
 
-import "github.com/MichaelKinsy/PiG/coding/extension"
+import (
+	"fmt"
 
-// Factory builds one compiled-in extension. decode fills v from the options the extension passed, and does nothing when it passed none; its error names the extension.
-type Factory func(decode func(v any) error) (extension.InlineExtension, error)
+	"github.com/MichaelKinsy/PiG/coding/extension"
+	"github.com/MichaelKinsy/PiG/extensions/sdk/json"
+)
+
+// Factory builds one compiled-in extension from the JSON options the extension passed (empty or null when it passed none). It decodes them into a struct of its own.
+type Factory func(options json.RawMessage) (extension.InlineExtension, error)
+
+// HasOptions reports whether the extension passed options.
+func HasOptions(options json.RawMessage) bool {
+	return len(options) != 0 && string(options) != "null"
+}
+
+// OptionsError is the failure of the extension name to read its options.
+func OptionsError(name string, err error) error {
+	return fmt.Errorf("options of the %s extension: %w", name, err)
+}
 
 // factories is written by Register during package initialization and only read after it.
 var factories = map[string]Factory{}

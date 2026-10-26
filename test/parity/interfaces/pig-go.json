@@ -72757,6 +72757,17 @@
       "shapeHash": "sha256:cec5db9da5af46bce6483c341ee148056fb3d9e5d654b8e4f2f452dab663a786"
     },
     {
+      "id": "go:github.com/MichaelKinsy/PiG/coding#Session.AppendExtensionEntry",
+      "package": "github.com/MichaelKinsy/PiG/coding",
+      "name": "Session.AppendExtensionEntry",
+      "kind": "function",
+      "exported": true,
+      "shape": {
+        "type": "func(customType string, data any, direct *github.com/MichaelKinsy/PiG/coding/extension/host/subprocess.DirectEntryAppend) (string, error)"
+      },
+      "shapeHash": "sha256:298391d1cb4a19f78a3e7a670dc554a61edba5851598a18214560c5f77401d36"
+    },
+    {
       "id": "go:github.com/MichaelKinsy/PiG/coding#Session.AutoCompactionEnabled",
       "package": "github.com/MichaelKinsy/PiG/coding",
       "name": "Session.AutoCompactionEnabled",
@@ -86879,6 +86890,17 @@
         "type": "func() github.com/MichaelKinsy/PiG/coding/extension/host/subprocess.ChildSessionInfo"
       },
       "shapeHash": "sha256:deebda87d0ba4a11d68f59d82eb35c52a8ca73063d6cf0dab6ad538ad14528cd"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/coding/cli#classifyBuildDrift",
+      "package": "github.com/MichaelKinsy/PiG/coding/cli",
+      "name": "classifyBuildDrift",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func(output []byte, source func(path string) ([]byte, error)) ([]github.com/MichaelKinsy/PiG/coding/extension/host/runtimecell.Drift, int)"
+      },
+      "shapeHash": "sha256:0453f2a81d58147fe3c45bea51344403bcd256d72a6831ad95aec0f62c590d37"
     },
     {
       "id": "go:github.com/MichaelKinsy/PiG/coding/cli#classifyRewriteBuild",
@@ -117362,6 +117384,28 @@
       "shapeHash": "sha256:4d5d1b30a8221dc3ae509995e8d6c96c85296a12437e10bc7d003806d448194b"
     },
     {
+      "id": "go:github.com/MichaelKinsy/PiG/coding/extension/host/runtimecell#Drift",
+      "package": "github.com/MichaelKinsy/PiG/coding/extension/host/runtimecell",
+      "name": "Drift",
+      "kind": "type",
+      "exported": true,
+      "shape": {
+        "type": "Drift"
+      },
+      "shapeHash": "sha256:140e470965410b5190a6fc8c535a57252cc96d421200db79b063af6471d3af06"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/coding/extension/host/runtimecell#DriftClassifier",
+      "package": "github.com/MichaelKinsy/PiG/coding/extension/host/runtimecell",
+      "name": "DriftClassifier",
+      "kind": "type",
+      "exported": true,
+      "shape": {
+        "type": "DriftClassifier"
+      },
+      "shapeHash": "sha256:8aa59c5614d60bb78f4fdc1e300fc3d28fd9992e8fd8b110c6f57293b9c589f3"
+    },
+    {
       "id": "go:github.com/MichaelKinsy/PiG/coding/extension/host/runtimecell#EntryIdentity",
       "package": "github.com/MichaelKinsy/PiG/coding/extension/host/runtimecell",
       "name": "EntryIdentity",
@@ -117703,6 +117747,17 @@
       "shapeHash": "sha256:cbca0c9fefb5a16b8b483367002b488f82abcac5c198b8d9149313c4347b8017"
     },
     {
+      "id": "go:github.com/MichaelKinsy/PiG/coding/extension/host/runtimecell#SetDriftClassifier",
+      "package": "github.com/MichaelKinsy/PiG/coding/extension/host/runtimecell",
+      "name": "SetDriftClassifier",
+      "kind": "function",
+      "exported": true,
+      "shape": {
+        "type": "func(classify DriftClassifier)"
+      },
+      "shapeHash": "sha256:339d97959ad0507e6f5359149e09f6ffd7ed657d0bc7c4a035d56d63a33c01c9"
+    },
+    {
       "id": "go:github.com/MichaelKinsy/PiG/coding/extension/host/runtimecell#SetPrebuiltResolver",
       "package": "github.com/MichaelKinsy/PiG/coding/extension/host/runtimecell",
       "name": "SetPrebuiltResolver",
@@ -118028,9 +118083,9 @@
       "kind": "function",
       "exported": false,
       "shape": {
-        "type": "func(dir string) github.com/MichaelKinsy/PiG/extensions/sdk/upgrade.FileSource"
+        "type": "func(dir string) func(path string) ([]byte, error)"
       },
-      "shapeHash": "sha256:eb2985dcc36128c98023a3eb540a501648ec00a819c6203399787732bdc13b79"
+      "shapeHash": "sha256:44706092288930eb8ae26c88aa7af0e94905d2b449fde37bfe9793a704abb6b7"
     },
     {
       "id": "go:github.com/MichaelKinsy/PiG/coding/extension/host/runtimecell#buildGoPackedCell",
@@ -118636,6 +118691,17 @@
         "type": "func(line []byte) (message string, located string, ok bool)"
       },
       "shapeHash": "sha256:e0e5897408c20495fdf32d80f7b7b13a10b390a50756d38a1a826ed4681eb9e9"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/coding/extension/host/runtimecell#driftClassifier",
+      "package": "github.com/MichaelKinsy/PiG/coding/extension/host/runtimecell",
+      "name": "driftClassifier",
+      "kind": "variable",
+      "exported": false,
+      "shape": {
+        "type": "DriftClassifier"
+      },
+      "shapeHash": "sha256:8aa59c5614d60bb78f4fdc1e300fc3d28fd9992e8fd8b110c6f57293b9c589f3"
     },
     {
       "id": "go:github.com/MichaelKinsy/PiG/coding/extension/host/runtimecell#embedPatterns",
@@ -119480,9 +119546,9 @@
       "kind": "function",
       "exported": false,
       "shape": {
-        "type": "func(drifts []github.com/MichaelKinsy/PiG/extensions/sdk/upgrade.Drift, dir string) *BuildFailure"
+        "type": "func(drifts []Drift, dir string) *BuildFailure"
       },
-      "shapeHash": "sha256:788a27462d4741e99c658a3a22aa290eac515d8281d71990a45d5fa9097ae361"
+      "shapeHash": "sha256:78ddca836f59f7178f968864399f0e21b7b095ffeb28004d64160ef107861137"
     },
     {
       "id": "go:github.com/MichaelKinsy/PiG/coding/extension/host/runtimecell#oneLine",
@@ -120360,9 +120426,9 @@
       "kind": "function",
       "exported": false,
       "shape": {
-        "type": "func(output []byte, dir string) ([]github.com/MichaelKinsy/PiG/extensions/sdk/upgrade.Drift, bool)"
+        "type": "func(output []byte, dir string) ([]Drift, bool)"
       },
-      "shapeHash": "sha256:76e509a4c208cd1f3205fd3d2a952eff6a01c877e9d393a63394574a4c80bb47"
+      "shapeHash": "sha256:6e3ad345d611c3a4fed68fe24440b9ecca5671ba82bf5f3d24550daa0859b7be"
     },
     {
       "id": "go:github.com/MichaelKinsy/PiG/coding/extension/host/runtimecell#sdkVersionFor",
@@ -154003,6 +154069,17 @@
       "shapeHash": "sha256:9f921b0d645d262778fe26bdf2928fddc34adea94eefae075778b323fc6302de"
     },
     {
+      "id": "go:github.com/MichaelKinsy/PiG/coding/extension/pigsdk#gunzip",
+      "package": "github.com/MichaelKinsy/PiG/coding/extension/pigsdk",
+      "name": "gunzip",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func(data []byte) ([]byte, error)"
+      },
+      "shapeHash": "sha256:1e2662f020a6655ff6e9728291f2d9c8cb9a9c583ba37da57d66b63c64a906c5"
+    },
+    {
       "id": "go:github.com/MichaelKinsy/PiG/coding/extension/pigsdk#hashBuffers",
       "package": "github.com/MichaelKinsy/PiG/coding/extension/pigsdk",
       "name": "hashBuffers",
@@ -154320,6 +154397,17 @@
         "type": "func(dir string) string"
       },
       "shapeHash": "sha256:7dec8db0ac0cf691c1e0d5b9aa813102a848cd55b19ad90e0b05922ff22488d6"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/coding/extension/pigsdk#stagedName",
+      "package": "github.com/MichaelKinsy/PiG/coding/extension/pigsdk",
+      "name": "stagedName",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func(embedded string) string"
+      },
+      "shapeHash": "sha256:7a05291168bbbfffe90b33e8b0dad7c2951d8faed7ca34aaf22c176476c11d00"
     },
     {
       "id": "go:github.com/MichaelKinsy/PiG/coding/extension/pigsdk#stagedSDK",

@@ -107,6 +107,32 @@ func Expired(ctx context.Context) string {
 	return "the go test -timeout deadline arrived (minus " + grace.String() + " left to report): the package run is out of time, and this step is not hung"
 }
 
+// Once runs one build per test process and keeps its result for every later
+// test: the shape of a shared fixture binary. The build runs under
+// [DeadlineContext] of the first test that asks, so it ends at the go test
+// deadline and not at a fixed bound, and a build that the deadline cut reports
+// that ([Expired]). A failed build is kept, not retried.
+type Once[T any] struct {
+	once  sync.Once
+	value T
+	err   error
+}
+
+// Do returns the build's result, running build on the first call.
+func (o *Once[T]) Do(t *testing.T, build func(ctx context.Context) (T, error)) (T, error) {
+	t.Helper()
+	o.once.Do(func() {
+		ctx := DeadlineContext(t)
+		o.value, o.err = build(ctx)
+		if o.err != nil {
+			if expired := Expired(ctx); expired != "" {
+				o.err = fmt.Errorf("%s: %w", expired, o.err)
+			}
+		}
+	})
+	return o.value, o.err
+}
+
 // deadlineBound is the time left before a deadline, less grace, with a floor of
 // one second.
 func deadlineBound(untilDeadline time.Duration) time.Duration {

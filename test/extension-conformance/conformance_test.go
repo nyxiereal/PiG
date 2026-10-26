@@ -3278,7 +3278,7 @@ func buildSDKFixture(t *testing.T) string {
 		}
 		return p
 	}
-	binPath, err := sdkFixtureBinary()
+	binPath, err := sdkFixtureBinary.Do(t, buildSDKFixtureBinary)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -3305,7 +3305,7 @@ func buildRustSDKFixture(t *testing.T) string {
 		}
 		return p
 	}
-	binPath, err := rustFixtureBinary()
+	binPath, err := rustFixtureBinary.Do(t, buildRustFixtureBinary)
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -2,6 +2,7 @@ package testbudget
 
 import (
 	"context"
+	"errors"
 	"strings"
 	"testing"
 	"time"
@@ -80,5 +81,29 @@ func TestExpiredNamesTheDeadlineOnlyWhenItEndedTheContext(t *testing.T) {
 	<-ctx.Done()
 	if got := Expired(ctx); !strings.Contains(got, "go test -timeout deadline") {
 		t.Fatalf("Expired(ended) = %q, want it to name the go test deadline", got)
+	}
+}
+
+func TestOnceBuildsOnceAndKeepsTheResult(t *testing.T) {
+	var once Once[string]
+	calls := 0
+	build := func(context.Context) (string, error) {
+		calls++
+		return "artifact", nil
+	}
+	for range 3 {
+		if got, err := once.Do(t, build); err != nil || got != "artifact" {
+			t.Fatalf("Do = %q, %v", got, err)
+		}
+	}
+	if calls != 1 {
+		t.Fatalf("build ran %d times, want 1", calls)
+	}
+	var failed Once[string]
+	want := errors.New("link failed")
+	for range 2 {
+		if _, err := failed.Do(t, func(context.Context) (string, error) { return "", want }); !errors.Is(err, want) {
+			t.Fatalf("Do error = %v, want %v", err, want)
+		}
 	}
 }

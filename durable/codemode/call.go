@@ -144,12 +144,10 @@ type call struct {
 	// queue are finished calls waiting for their journal commit.
 	queue []queued
 	// acks are the acknowledged counts to record, by result number (0: the script's first run), in the order first set.
-	acks       []ack
+	acks []ack
+	// committing is whether a journal commit is in flight: pump starts another only when it ends.
 	committing bool
-	// commitPosted is whether pump posted a commit that has not started yet; commitAcks are the acknowledgments it takes.
-	commitPosted bool
-	commitAcks   []ack
-	// journalCommit is closed once the last started journal commit returned; the outcome commit waits for it.
+	// journalCommit is closed once the last journal commit returned; the outcome commit waits for it.
 	journalCommit chan struct{}
 	// ended is set once the call decided an outcome other than the script's own (divergence, mismatch).
 	ended   *storedResult
@@ -424,8 +422,6 @@ func (c *call) execute(source string) (durable.ToolExecutionResult, error) {
 	for !c.finished {
 		c.events.next()()
 	}
-	// A commit pump decided on starts, as it would have when pump ran; its result is dropped with the rest.
-	c.flushPostedCommit()
 	// What is still running is stopped: a nested call's wait ends with the context, a commit's result is dropped.
 	c.events.close()
 	c.abort(nil)
@@ -633,8 +629,7 @@ func (c *call) complete(result cm.Result) {
 	if result.OK {
 		writes = &result.StoreWrites
 	}
-	// The journal's last commit lands before the outcome's: a commit still posted starts now, and the outcome waits for it.
-	c.flushPostedCommit()
+	// The journal's last commit lands before the outcome's.
 	journalCommit := c.journalCommit
 	c.spawn(func() {
 		if journalCommit != nil {
@@ -1393,16 +1388,15 @@ func (c *call) details() ToolDetails {
 // pump journals finished calls and acknowledged counts in one commit, then delivers the calls and launches the calls the
 // counts cover; one commit in flight at a time, so what arrives meanwhile goes into the next.
 //
-// Pi's pump takes the acknowledged counts when it starts the commit (codemode.ts:973-974), and what the VM reports after
-// that, a message that arrives later, goes in a later commit. The VM here reports on its own goroutine, so a report can be
-// posted between the pump's decision and the commit that starts from an event it posted (below): the acknowledgments the
-// commit carries are the ones pending when pump decided on it.
+// Pi's pump takes the finished calls and the acknowledged counts in the synchronous step that decides on the commit and
+// starts it there (codemode.ts:972-974); what finishes or what the VM reports after that goes in a later commit. So does
+// this pump: the commit carries what was queued and acknowledged when pump decided on it, whichever goroutine posts first.
 //
-// Pi's results that finish together join one commit because their callbacks all run in one microtask drain before the
-// commit's awaits resume. Here each result is posted by its own goroutine, and the executor and commit goroutines hand the
-// processor to each other ahead of goroutines already runnable, so with one processor each result would commit alone. The
-// commit therefore starts from an event posted after a yield: results that finish together post first and join it. A commit
-// pump decided on always starts: the call's end and its outcome start one still posted (flushPostedCommit).
+// Pi's results that finish together share a commit because their callbacks all run in one microtask drain before the first
+// commit's awaits resume: the ones after the first are queued while it is in flight and join the next. Here each result is
+// posted by its own goroutine, and the executor and commit goroutines hand the processor to each other ahead of goroutines
+// already runnable, so with one processor each result would commit alone. pump therefore yields once before it starts the
+// commit: results that finish together post first, into the queue the next commit takes.
 func (c *call) pump() {
 	if c.committing || c.stopped() {
 		return
@@ -1411,32 +1405,17 @@ func (c *call) pump() {
 		return
 	}
 	c.committing = true
-	c.commitPosted = true
-	c.commitAcks, c.acks = c.acks, nil
+	batch, acks := c.queue, c.acks
+	c.queue, c.acks = nil, nil
 	runtime.Gosched()
-	c.post(c.commitQueued)
+	c.commit(batch, acks)
 }
 
-// flushPostedCommit starts the commit pump posted, when it has not started yet.
-func (c *call) flushPostedCommit() {
-	if c.commitPosted {
-		c.commitQueued()
-	}
-}
-
-// commitQueued is pump's commit of the acknowledgments pump took and everything queued when it runs. pump checked that the
-// call had not stopped, so it starts as it would have there.
-func (c *call) commitQueued() {
-	if !c.commitPosted {
-		return
-	}
-	c.commitPosted = false
+// commit journals batch and the acknowledged counts in one commit, then delivers batch to the VM and launches the calls the
+// counts cover.
+func (c *call) commit(batch []queued, acks []ack) {
 	done := make(chan struct{})
 	c.journalCommit = done
-	batch := c.queue
-	c.queue = nil
-	acks := c.commitAcks
-	c.commitAcks = nil
 	c.spawn(func() {
 		_, err := c.api.Commit(c.ctx, func(tx durable.Tx) (any, error) {
 			journal, err := durable.TxDoc[journalState](tx, JournalDoc, c.api.TaskId())

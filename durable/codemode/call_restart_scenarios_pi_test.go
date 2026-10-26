@@ -172,6 +172,27 @@ func TestResultsThatFinishWhileAJournalCommitIsInFlightJoinTheNextCommit(t *test
 	}})
 }
 
+// codemode.ts:968-974: pump takes the results queued, as it takes the acknowledgments, in the synchronous step that decides on
+// the commit, so a result that finishes after that step is in the next commit even when the commit decided on carries only
+// acknowledgments (the VM's report of the last result delivered, with nothing queued). Here the report and the release of the
+// second result come in one step, report first, so the first commit is decided on the report alone. The result is posted by its
+// own goroutine while pump yields before it starts that commit (with one processor, where this runs, it always is): the commit
+// must carry only what pump took when it decided on it.
+func TestAResultThatFinishesAfterAnAcknowledgmentOnlyCommitWasDecidedOnJoinsTheNextCommit(t *testing.T) {
+	defer runtime.GOMAXPROCS(runtime.GOMAXPROCS(1))
+	runRestartScenarios(t, []restartScenario{{
+		Name:    "the second result finishes right after the report of the first",
+		Code:    `const a = gslow(1); const b = gslow(2); await a; await b; await tools.hold({});`,
+		Globals: []string{"gslow"},
+		Steps: []restartStep{
+			restartOp("open"), restartOp("start"), awaitFirstIssued(2),
+			restartOp("hold-events"), restartOp("queue-commits"), releaseSlow(1), awaitCommits(1), releaseCommit(""), awaitHeldEvents(1),
+			restartOp("release-events"), releaseSlow(2), awaitGlobalsFinished(2), awaitCommits(2),
+			releaseCommit(""), awaitCommits(3), restartOp("unqueue-commits"), awaitStep("hold"), awaitIssuedAfter(1, 3), observeAt("journaled"),
+		},
+	}})
+}
+
 // codemode.ts:678-683 and 812-818: a nested call that fails while the call's own signal is aborted fails the call, which a
 // later attempt resumes; it is not the script taking another path. The VM keeps running after the call asked to stop it, so
 // that the failure reaches the call before the VM's end does.

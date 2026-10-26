@@ -28032,6 +28032,25 @@
       ]
     },
     {
+      "id": "BF-d38f3be",
+      "title": "fix(durable): record the requested thinking level without boxing a string in the turn package",
+      "symptom": "fix(durable): record the requested thinking level without boxing a string in the turn package",
+      "rootCause": "durable-core-budget failed with \"turn: 711 sites \u003e 709\" (durable/core/budget/allocs.json). Cause: (Pi: the requested thinking level on assistant messages) added the only two sites, both in generation_classify.go: message.Set(\"thinkingLevel\", req.thinking) and cp.Set(\"thinkingLevel\", req.thinking) take an `any`, and converting the string field to it is a heap allocation under TinyGo.",
+      "rootCauseSource": "commit",
+      "userImpact": "Behavior differed from Pi",
+      "platform": "All platforms",
+      "class": "own",
+      "fixedIn": "Unreleased",
+      "origin": "commit",
+      "commits": [
+        {
+          "hash": "d38f3be25c",
+          "date": "2026-10-25"
+        }
+      ],
+      "tests": []
+    },
+    {
       "id": "BF-d39069d",
       "title": "Tool cards rebuilt when a session is resumed now follow the `showImages` and `imageWidthCells` settings",
       "symptom": "Tool cards rebuilt when a session is resumed now follow the `showImages` and `imageWidthCells` settings.",

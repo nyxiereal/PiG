@@ -307,12 +307,14 @@ func TestRPCTurnProcessGate(t *testing.T) {
 	checkExitState(t, "process.rpc_turn", large, tempLeft, true)
 }
 
-// RSS and PSS at ready, the memory metric the Rust port rpi publishes: RPC mode is ready when it has answered its first command (get_state). Peak RSS over the run is gated beside it.
+// Memory at ready, the metric the Rust port rpi publishes (its "RSS at ready"): RPC mode is ready when it has answered its first command (get_state). The gate is the anonymous memory of the process, ceiling 4.5 MB (process.rpc_ready.anon_bytes); RSS, PSS and the run's peak RSS are reported beside it, not gated.
+//
+// RSS and PSS include every page of the pig binary and of the libraries it maps that the kernel has in its page cache, and how many of them are resident when the process is sampled depends on readahead and on what else read the file, not on pig: 24 runs of one binary on one idle host measured an RSS of 42.5 to 47.4 MB (peak 44.3 to 49.1 MB), and 5 of the 24 failed the former 46 MB RSS ceiling with no change to pig. The anonymous memory (smaps_rollup Anonymous: heap, stacks, written data) is what pig itself allocates and keeps: 80 runs, idle and beside 12 busy loops, measured 3.88 to 4.03 MB, and the 4.5 MB ceiling is the largest of them plus 12%. The owner chose it as the gated figure over RSS.
 func TestRPCReadyMemoryGate(t *testing.T) {
 	home := newPigHome(t)
 	args := []string{"-ne", "--no-session", "--mode", "rpc", "--model", "test-faux/faux-1"}
 	home.run(args, nil)
-	var rss, pss float64
+	var memory perfgate.Memory
 	record := home.run(args, func(pid int, stdin io.Writer, stdout *bufio.Reader) {
 		if _, err := io.WriteString(stdin, `{"id":"ready","type":"get_state"}`+"\n"); err != nil {
 			t.Fatal(err)
@@ -330,10 +332,11 @@ func TestRPCReadyMemoryGate(t *testing.T) {
 				break
 			}
 		}
-		rss, pss = perfgate.ProcessMemory(t, pid)
+		memory = perfgate.ProcessMemory(t, pid)
 	})
-	t.Logf("perfgate: process.rpc_ready rss %.0f pss %.0f peak %d", rss, pss, record.MaxRSSBytes)
-	perfgate.Check(t, "process.rpc_ready.rss_bytes", rss)
-	perfgate.Check(t, "process.rpc_ready.pss_bytes", pss)
-	perfgate.Check(t, "process.rpc_ready.max_rss_bytes", float64(record.MaxRSSBytes))
+	t.Logf("perfgate: process.rpc_ready %+v peak %d", memory, record.MaxRSSBytes)
+	perfgate.Report(t, "process.rpc_ready.rss_bytes", memory.Rss)
+	perfgate.Report(t, "process.rpc_ready.pss_bytes", memory.Pss)
+	perfgate.Report(t, "process.rpc_ready.max_rss_bytes", float64(record.MaxRSSBytes))
+	perfgate.Check(t, "process.rpc_ready.anon_bytes", memory.Anon)
 }

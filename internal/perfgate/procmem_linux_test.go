@@ -13,10 +13,57 @@ import (
 	"testing"
 )
 
+var mappedFileSink byte
+
 func TestProcessMemoryReadsThisProcess(t *testing.T) {
-	rss, pss := ProcessMemory(t, os.Getpid())
-	if rss <= 0 || pss <= 0 || pss > rss {
-		t.Fatalf("rss %v pss %v", rss, pss)
+	memory := ProcessMemory(t, os.Getpid())
+	if memory.Rss <= 0 || memory.Pss <= 0 || memory.Pss > memory.Rss || memory.Anon <= 0 || memory.Anon > memory.Rss {
+		t.Fatalf("%+v", memory)
+	}
+}
+
+// The gated figure is Anon: pages the process wrote must raise it, and file pages it only mapped and read must raise Rss but not Anon.
+func TestProcessMemoryAnonCountsWrittenPagesAndNotMappedFiles(t *testing.T) {
+	const size = 16 << 20
+	page := os.Getpagesize()
+	before := ProcessMemory(t, os.Getpid())
+
+	path := filepath.Join(t.TempDir(), "mapped")
+	if err := os.WriteFile(path, make([]byte, size), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	file, err := os.Open(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer file.Close()
+	mapped, err := syscall.Mmap(int(file.Fd()), 0, size, syscall.PROT_READ, syscall.MAP_SHARED)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer syscall.Munmap(mapped)
+	for i := 0; i < size; i += page {
+		mappedFileSink += mapped[i] // a package variable, so the compiler cannot drop the reads that fault the pages in
+	}
+	afterRead := ProcessMemory(t, os.Getpid())
+	if grew := afterRead.Rss - before.Rss; grew < size*3/4 {
+		t.Fatalf("Rss grew %.0f B after reading %d B of a mapped file, want at least three quarters of it", grew, size)
+	}
+	if grew := afterRead.Anon - before.Anon; grew > size/4 {
+		t.Fatalf("Anon grew %.0f B after only reading a mapped file of %d B", grew, size)
+	}
+
+	heap, err := syscall.Mmap(-1, 0, size, syscall.PROT_READ|syscall.PROT_WRITE, syscall.MAP_ANON|syscall.MAP_PRIVATE)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer syscall.Munmap(heap)
+	for i := 0; i < size; i += page {
+		heap[i] = 1
+	}
+	afterWrite := ProcessMemory(t, os.Getpid())
+	if grew := afterWrite.Anon - afterRead.Anon; grew < size*3/4 {
+		t.Fatalf("Anon grew %.0f B after writing %d B of anonymous pages, want at least three quarters of it", grew, size)
 	}
 }
 

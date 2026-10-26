@@ -229,3 +229,10 @@ commit = "7a49fc497e"
 class = "CITE"
 cite = "packages/ai/src/models.ts:1255"
 reason = "Pi 7c22a93d0 makes calculateCost write usage.cost.totalFromProvider = false after the total (models.ts:1255), so each catalog-priced usage JSON expected here carries \"totalFromProvider\":false right after \"total\", the position Pi's calculateCost gives the key; the commit verified the strings by running Pi's calculateCost. Pi has no test of these provider usage strings, so there is no upstream line for them beyond that write; the values around the flag are unchanged."
+
+[[entry]]
+path = "tui/terminal_pipe_windows_test.go"
+commit = "8c2fe46dda772e91ad0cdab8441177c06e2045b1"
+class = "NOBEHAVIOR"
+cite = ""
+reason = "The Windows pipe tests are PiG-original: Pi reads a pipe stdin through libuv and has no counterpart, so no Pi line governs them. The commit makes the reader read a Windows pipe in one cancellable ReadFile instead of waiting on the handle first (a pipe handle is signalled whether or not input is queued), so the tests move from asserting terminalInputWaiter.wait's ready or not-ready answer to asserting what terminalReader.read returns: the bytes, nil for a timeout, io.EOF for the end of the pipe, the context's error for a cancel. Each case keeps the behavior it proved (an empty pipe times out, input is delivered, an emptied pipe times out again, a closed writer ends the input, a cancel ends a read of an empty pipe, input wakes a blocked read, a timed-out read leaves no stale abort, an idle read costs no CPU); only the call that reports it changed."

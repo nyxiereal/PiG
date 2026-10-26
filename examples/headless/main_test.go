@@ -171,3 +171,40 @@ func TestHeadlessEmbedDoesNotLinkTheTypeChecker(t *testing.T) {
 		}
 	}
 }
+
+// The word segmenter's dictionaries (6.3 MB) belong to the terminal editor, which a program that draws no terminal never
+// links (subprocess.EnableEditorViews registers it). A stock build of the example holds none of their bytes: the probe is
+// the middle 256 bytes of each embedded dictionary, searched in the linked binary.
+func TestHeadlessEmbedBinaryHoldsNoWordDictionary(t *testing.T) {
+	if testing.Short() {
+		t.Skip("builds the example")
+	}
+	binary := filepath.Join(t.TempDir(), "headless")
+	build := exec.CommandContext(t.Context(), "go", "build", "-trimpath", "-buildvcs=false", "-ldflags", "-s -w", "-o", binary, ".")
+	build.Env = append(os.Environ(), "CGO_ENABLED=0")
+	if data, err := build.CombinedOutput(); err != nil {
+		t.Fatalf("go build: %v\n%s", err, data)
+	}
+	linked, err := os.ReadFile(binary)
+	if err != nil {
+		t.Fatal(err)
+	}
+	dictionaries, err := filepath.Glob(filepath.Join("..", "..", "internal", "wordsegmenter", "*_dictionary.bin"))
+	if err != nil || len(dictionaries) == 0 {
+		t.Fatalf("word dictionaries = %v, %v", dictionaries, err)
+	}
+	for _, path := range dictionaries {
+		data, err := os.ReadFile(path)
+		if err != nil {
+			t.Fatal(err)
+		}
+		const probe = 256
+		if len(data) < 2*probe {
+			t.Fatalf("%s is %d bytes, too short to probe", path, len(data))
+		}
+		middle := len(data) / 2
+		if bytes.Contains(linked, data[middle:middle+probe]) {
+			t.Errorf("the headless embed links %s: the terminal editor reached a program that draws no terminal", filepath.Base(path))
+		}
+	}
+}

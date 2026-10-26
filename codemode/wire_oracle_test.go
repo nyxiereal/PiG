@@ -433,15 +433,6 @@ func (c wireCase) runClient(t *testing.T) wireRecord {
 		mu.Unlock()
 		recording := func(ctx context.Context, messages []RemoteMessage, reply func(*RemoteReply, error)) {
 			frame := &wireFrame{Messages: canonical(t, messages), Reply: "none"}
-			if c.CloseOnCall {
-				for _, message := range messages {
-					if message.Type == MessageCall {
-						// Close waits for this very Execute to return, so it runs beside it.
-						go func() { _ = sandbox.Close() }()
-						break
-					}
-				}
-			}
 			mu.Lock()
 			frames = append(frames, frame)
 			mu.Unlock()
@@ -458,6 +449,17 @@ func (c wireCase) runClient(t *testing.T) wireRecord {
 				mu.Unlock()
 				reply(answer, err)
 			})
+			// Pi closes from a microtask queued before it awaits the exchange (wire_oracle.mjs), so the host has handled the call, and
+			// recorded it, when the close runs. Here the host handles it when exchange returns: a close started before that can end
+			// the execution first, which then has no record of the call. Close waits for this very Execute to return, so it runs beside it.
+			if c.CloseOnCall {
+				for _, message := range messages {
+					if message.Type == MessageCall {
+						go func() { _ = sandbox.Close() }()
+						break
+					}
+				}
+			}
 		}
 		c.serve(ctx, request, recording)
 		return nil

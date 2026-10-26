@@ -22,7 +22,7 @@ const asyncPreemptionChildEnv = "PIG_TEST_WITHOUT_ASYNC_PREEMPTION_CHILD"
 // read returns end of file at once while the retried open waits for a counterpart that is gone. The Go runtime's SIGURG preemption signals reach such opens in a process whose goroutines
 // are busy. The runtime sends none with GODEBUG=asyncpreemptoff=1, so on macOS this runs the test again in a child test binary with it set and reports the child's verdict: true means the
 // child ran the test and the caller must return, false means the caller is the child, or the host is not macOS (no other kernel has the race) and the test runs where it is. A subtest
-// is selected by its whole name. Signals the test itself provokes (SIGCHLD from a child that exits during the open) are not covered.
+// is selected by its whole name. SIGCHLD from a child that exits while an open sleeps is not covered, so a test that starts a child must wait for it to exit before its next FIFO open (readFIFO in env does).
 func RerunWithoutAsyncPreemption(t *testing.T) bool {
 	t.Helper()
 	if runtime.GOOS != "darwin" || os.Getenv(asyncPreemptionChildEnv) != "" {

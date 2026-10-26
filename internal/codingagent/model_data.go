@@ -91,7 +91,7 @@ func modelDefinitionEntry(providerID string, prov providerConfig, md modelDefini
 	}
 	var record string
 	if registered && (md.Type == "" || md.Type == ai.ModelTypeChat) {
-		record = ai.ExtensionModelRecord(md.registration, ai.API(api), providerID, baseURL)
+		record = md.registeredRecord(ai.API(api), providerID, baseURL)
 	}
 	var inputCost, outputCost, cacheReadCost, cacheWriteCost float64
 	var costTiers []ai.CostTier

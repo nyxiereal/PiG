@@ -587,10 +587,6 @@ func (runtime *ModelRuntime) knowsProvider(model *ai.Model, provider ai.Provider
 	if _, registryBuilt := provider.(*requestOptionsProvider); registryBuilt {
 		return true
 	}
-	// The PIG_TEST_FAUX provider stands for the provider Pi's parity harness registers from an extension, which Models knows.
-	if provider != nil && provider.ID() == "test-faux" && os.Getenv("PIG_TEST_FAUX") == "1" {
-		return true
-	}
 	id := model.ProviderMeta.ProviderID
 	if id == "" && provider != nil {
 		id = provider.ID()
@@ -742,7 +738,7 @@ func mergeRuntimeHeaders(base map[string]string, override ai.ProviderHeaders) ai
 // modelRuntimeRequiresAuth reports whether a provider without a registered auth contract needs configured auth. Amazon Bedrock needs it: its upstream auth (amazon-bedrock.ts bedrockAuth.resolve) requires a stored key or an AWS env signal.
 func modelRuntimeRequiresAuth(providerID string) bool {
 	switch providerID {
-	case "ollama", "test-faux":
+	case "ollama":
 		return false
 	default:
 		return true
@@ -782,7 +778,7 @@ func registerHarnessTestFaux(reg *icodingagent.ModelRegistry) error {
 		APIKey:  "unused",
 		API:     "test-faux",
 		Models: []extension.ProviderModelConfig{{
-			ID: "faux-1", Name: "Test Faux", API: "test-faux", BaseURL: "http://localhost:0",
+			ID: "faux-1", Name: "Test Faux", API: "test-faux", Provider: "test-faux", BaseURL: "http://localhost:0",
 			Input: []string{"text", "image"}, ContextWindow: ai.TestFauxContextWindow, MaxTokens: ai.TestFauxMaxTokens,
 		}},
 	})

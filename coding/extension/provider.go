@@ -75,7 +75,13 @@ type ProviderModelConfig struct {
 	API ai.API `json:"api,omitempty"`
 	// Output is the output types of an image entry: it always includes "image"; "text" means the model can also return text blocks.
 	// upstream: types.ts:1969 (ProviderImageModelConfig.output)
-	Output           []string            `json:"output,omitempty"`
+	Output []string `json:"output,omitempty"`
+	// Provider is a member the config may carry that Pi's ProviderModelConfig does not declare: the registered model is the config spread with
+	// api, provider and baseUrl set (provider-composer.ts extensionModelFromDefinition), so a config's own provider keeps its place among the
+	// model's members, and one the config lacks is appended after them. The registry sets the member's value to the registering provider either way;
+	// empty is no member.
+	// upstream: packages/coding-agent/src/core/provider-composer.ts:299 (`{ ...definition, api, provider: providerId, baseUrl, headers: undefined }`)
+	Provider         string              `json:"provider,omitempty"`
 	BaseURL          string              `json:"baseUrl,omitempty"`
 	Reasoning        bool                `json:"reasoning"`
 	ThinkingLevelMap ai.ThinkingLevelMap `json:"thinkingLevelMap,omitempty"`

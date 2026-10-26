@@ -12,7 +12,6 @@ package codingagent
 
 import (
 	"context"
-	"os"
 	"slices"
 	"strings"
 
@@ -20,15 +19,6 @@ import (
 	"github.com/MichaelKinsy/PiG/coding/extension"
 	"github.com/MichaelKinsy/PiG/internal/configvalue"
 )
-
-// testFauxProviderID is the scripted provider the parity harness registers
-// from an extension under Pi (test/parity/testdata/test-faux-provider.ts, apiKey
-// "unused") and PiG builds in under PIG_TEST_FAUX.
-const testFauxProviderID = "test-faux"
-
-func testFauxProvider(providerID string) bool {
-	return providerID == testFauxProviderID && os.Getenv("PIG_TEST_FAUX") == "1"
-}
 
 // ExtensionModelRegistryState returns the registry snapshot for extension
 // processes: the catalog under "models", each provider's display name, base
@@ -207,7 +197,7 @@ func (r *ModelRegistry) extensionProviderState(providerID string) map[string]any
 	if status.Label != "" {
 		authStatus["label"] = status.Label
 	}
-	configured := r.HasConfiguredAuth(providerID) || testFauxProvider(providerID)
+	configured := r.HasConfiguredAuth(providerID)
 	state := map[string]any{
 		"name":       r.GetProviderDisplayName(providerID),
 		"authStatus": authStatus,
@@ -274,10 +264,6 @@ func (r *ModelRegistry) ExtensionProviderAuthStatus(providerID string) ai.AuthSt
 	if r.hasStoredCredential(providerID) {
 		return ai.AuthStatus{Configured: true, Source: ai.AuthSourceStored}
 	}
-	if testFauxProvider(providerID) {
-		// The harness registration's literal apiKey is upstream's "fallback".
-		return ai.AuthStatus{Configured: true, Source: ai.AuthSourceFallback}
-	}
 	r.mu.RLock()
 	value, fromExtension := "", false
 	if dynamic, ok := r.dynamic[providerID]; ok && dynamic.APIKey != "" {
@@ -332,9 +318,6 @@ func (r *ModelRegistry) usingOAuth(providerID string) bool {
 func (r *ModelRegistry) ExtensionProviderAuth(ctx context.Context, providerID string) (*ai.AuthResult, error) {
 	if r.NativeProvider(providerID) != nil {
 		return r.NativeProviderAuth(ctx, providerID, ai.AuthResolutionOverrides{})
-	}
-	if testFauxProvider(providerID) {
-		return &ai.AuthResult{Auth: ai.ModelAuth{APIKey: "unused"}, Source: "configured API key"}, nil
 	}
 	r.mu.Lock()
 	credentials := r.runtimeCredentialsLocked()

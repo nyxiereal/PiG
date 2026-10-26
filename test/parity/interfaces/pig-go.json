@@ -78851,6 +78851,17 @@
       "shapeHash": "sha256:b8e1b4a5cc3e10263a4666afcc71a8789aef4ce21102f6f13bd8e042b33f037d"
     },
     {
+      "id": "go:github.com/MichaelKinsy/PiG/coding#registerHarnessTestFaux",
+      "package": "github.com/MichaelKinsy/PiG/coding",
+      "name": "registerHarnessTestFaux",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func(reg *github.com/MichaelKinsy/PiG/internal/codingagent.ModelRegistry) error"
+      },
+      "shapeHash": "sha256:6103ec5ed43c4dcb04790152121f15321010e6f08f310a76e325d7028377184f"
+    },
+    {
       "id": "go:github.com/MichaelKinsy/PiG/coding#registeredStreamProvider",
       "package": "github.com/MichaelKinsy/PiG/coding",
       "name": "registeredStreamProvider",
@@ -91081,17 +91092,6 @@
         "type": "func(event github.com/MichaelKinsy/PiG/ai.AssistantMessageEvent) any"
       },
       "shapeHash": "sha256:3634253e98dc76bcddd5f010b16229b50574f0a2815e7f9704842717e9400383"
-    },
-    {
-      "id": "go:github.com/MichaelKinsy/PiG/coding/cli#rpcAvailableModels",
-      "package": "github.com/MichaelKinsy/PiG/coding/cli",
-      "name": "rpcAvailableModels",
-      "kind": "function",
-      "exported": false,
-      "shape": {
-        "type": "func(services *github.com/MichaelKinsy/PiG/coding.AgentSessionServices, current *github.com/MichaelKinsy/PiG/ai.Model) []*github.com/MichaelKinsy/PiG/ai.Model"
-      },
-      "shapeHash": "sha256:6550f33ef740591692069a7ad98d3425388c3f83a05b68ba9258a2aa66ca8d6e"
     },
     {
       "id": "go:github.com/MichaelKinsy/PiG/coding/cli#rpcAwaitHandler",
@@ -265774,6 +265774,17 @@
       "shapeHash": "sha256:2e7a46ef7c2011cd2aa41a3ad171f9b6f5461f06a15b57547cff43508937a222"
     },
     {
+      "id": "go:github.com/MichaelKinsy/PiG/internal/codingagent#modelDefinition.registeredRecord",
+      "package": "github.com/MichaelKinsy/PiG/internal/codingagent",
+      "name": "modelDefinition.registeredRecord",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func(api github.com/MichaelKinsy/PiG/ai.API, providerID string, baseURL string) string"
+      },
+      "shapeHash": "sha256:e9f96fa48d250180342f699dc4cc495dd142948f66f0a42f965a1a1eac50fc2c"
+    },
+    {
       "id": "go:github.com/MichaelKinsy/PiG/internal/codingagent#modelDefinitionEntry",
       "package": "github.com/MichaelKinsy/PiG/internal/codingagent",
       "name": "modelDefinitionEntry",
@@ -272660,6 +272671,17 @@
       "shapeHash": "sha256:e2e6c6bd0ef7eab12c617a1f9cf6c9ad5b1e293d40106cb4781f368adce749bc"
     },
     {
+      "id": "go:github.com/MichaelKinsy/PiG/internal/codingagent#registrationRecordMemo",
+      "package": "github.com/MichaelKinsy/PiG/internal/codingagent",
+      "name": "registrationRecordMemo",
+      "kind": "type",
+      "exported": false,
+      "shape": {
+        "type": "registrationRecordMemo"
+      },
+      "shapeHash": "sha256:335de2831493ab64cdd8cf4764e0d72ff5d50c671e223d9d5545ad52351e077b"
+    },
+    {
       "id": "go:github.com/MichaelKinsy/PiG/internal/codingagent#registrationRefresh",
       "package": "github.com/MichaelKinsy/PiG/internal/codingagent",
       "name": "registrationRefresh",
@@ -279412,28 +279434,6 @@
         "type": "func(process *os.Process) error"
       },
       "shapeHash": "sha256:0ef5a40ec643b4c3a22d129effb3f9839e7eba0038f4b5d1af1e3fe6fa2d5493"
-    },
-    {
-      "id": "go:github.com/MichaelKinsy/PiG/internal/codingagent#testFauxProvider",
-      "package": "github.com/MichaelKinsy/PiG/internal/codingagent",
-      "name": "testFauxProvider",
-      "kind": "function",
-      "exported": false,
-      "shape": {
-        "type": "func(providerID string) bool"
-      },
-      "shapeHash": "sha256:ead0f5f0d21b275eac669debe690cbe283f347b126b45567b8258f3bdf3f1fbb"
-    },
-    {
-      "id": "go:github.com/MichaelKinsy/PiG/internal/codingagent#testFauxProviderID",
-      "package": "github.com/MichaelKinsy/PiG/internal/codingagent",
-      "name": "testFauxProviderID",
-      "kind": "constant",
-      "exported": false,
-      "shape": {
-        "type": "untyped string"
-      },
-      "shapeHash": "sha256:7eabd192b9f1c379102c8dc793881875f1f949f6b752e15a20b93080cb0b311d"
     },
     {
       "id": "go:github.com/MichaelKinsy/PiG/internal/codingagent#textBlank",

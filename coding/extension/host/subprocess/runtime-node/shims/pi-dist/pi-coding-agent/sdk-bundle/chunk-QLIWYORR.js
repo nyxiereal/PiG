@@ -12232,15 +12232,20 @@ function splitThinkingSuffix(text) {
 }
 __name(splitThinkingSuffix, "splitThinkingSuffix");
 function splitProviderPrefix(text, models) {
-  const slashIndex = text.indexOf("/");
-  if (slashIndex === -1)
-    return void 0;
-  const prefix = text.substring(0, slashIndex).trim().toLowerCase();
-  const modelText = text.substring(slashIndex + 1).trim();
-  if (!prefix || !modelText)
-    return void 0;
-  const provider = models.find((model) => model.provider.toLowerCase() === prefix)?.provider;
-  return provider ? { provider, modelText } : void 0;
+  const lowerText = text.toLowerCase();
+  let best;
+  for (const { provider } of models) {
+    const prefix = provider.trim().toLowerCase();
+    if (!prefix || best && best.provider.length >= provider.length)
+      continue;
+    const slashIndex = lowerText.indexOf("/", prefix.length);
+    if (slashIndex === -1 || lowerText.substring(0, slashIndex).trim() !== prefix)
+      continue;
+    const modelText = text.substring(slashIndex + 1).trim();
+    if (modelText)
+      best = { provider, modelText };
+  }
+  return best;
 }
 __name(splitProviderPrefix, "splitProviderPrefix");
 function resolveModelReference(request, models, usable) {
@@ -13756,7 +13761,7 @@ var ModelRuntime = class _ModelRuntime {
 
 // pi-dist/pi-coding-agent/core/package-manager.js
 import { createHash } from "node:crypto";
-import { chmodSync, existsSync as existsSync8, globSync, mkdirSync as mkdirSync4, readdirSync as readdirSync5, readFileSync as readFileSync7, rmSync, statSync as statSync5, writeFileSync as writeFileSync5 } from "node:fs";
+import { chmodSync, existsSync as existsSync8, globSync, mkdirSync as mkdirSync4, readdirSync as readdirSync5, readFileSync as readFileSync7, realpathSync, rmSync, statSync as statSync5, writeFileSync as writeFileSync5 } from "node:fs";
 import { homedir } from "node:os";
 import { basename as basename6, dirname as dirname8, join as join10, relative as relative2, resolve as resolve5, sep as sep3 } from "node:path";
 import ignore2 from "../../../ignore/index.js";
@@ -15475,7 +15480,8 @@ var DefaultPackageManager = class {
     const npmCommand = this.getNpmCommand();
     return this.runCommandSync(npmCommand.command, [...npmCommand.args, ...args]);
   }
-  getNpmInstallArgs(specs, installRoot) {
+  getNpmInstallArgs(specs, root) {
+    const installRoot = existsSync8(root) ? realpathSync(root) : root;
     const packageManagerName = this.getPackageManagerName();
     if (packageManagerName === "bun") {
       return ["install", ...specs, "--cwd", installRoot, "--omit=peer"];
@@ -15499,10 +15505,11 @@ var DefaultPackageManager = class {
     await this.runNpmCommand(this.getNpmInstallArgs([source.spec], installRoot));
   }
   async uninstallNpm(source, scope) {
-    const installRoot = this.getNpmInstallRoot(scope, false);
-    if (!existsSync8(installRoot)) {
+    const root = this.getNpmInstallRoot(scope, false);
+    if (!existsSync8(root)) {
       return;
     }
+    const installRoot = realpathSync(root);
     const packageManagerName = this.getPackageManagerName();
     if (packageManagerName === "bun") {
       await this.runNpmCommand(["uninstall", source.name, "--cwd", installRoot]);

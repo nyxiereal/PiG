@@ -23,15 +23,18 @@ import (
 //
 //	faux    the faux provider: the publication of the delta, its event, the consumer's await of it, and since Pi f715a15c1 the
 //	        provider's own ToolCallArgumentsStream.Append of the delta (faux.ts:429-439), whose partial arguments every
-//	        snapshot of the partial message carries (13.5 after lw-quiet, 12.5 at 63e93632d6 before f715a15c1, 22.5 with
-//	        the incremental parse: the +10 are Append, its open-path copy and the clones of the arguments each snapshot takes,
-//	        all in streamWithDeltas, none in the consumer; the ceiling keeps its 7.5 of room above the measured cost)
-//	openai  openai-completions over local HTTP, one SSE record per delta: the record's decoding too (21.7 after lw-quiet)
+//	        snapshot of the partial message carries (13.5 after lw-quiet, 12.5 at 63e93632d6 before f715a15c1, 18.5 now). The
+//	        +6 over 12.5 are what Pi's incremental parse and a growing argument map cost: the parser's open-path copy (2) and
+//	        the string it places (1), the boxed block each snapshot and each assignment now needs because its arguments changed
+//	        (2), and the consumer-owned copy of the growing arguments (1). The parser records no changes and the cell keeps
+//	        the parser's immutable snapshot instead of copying it again (22.5 before those two were removed).
+//	openai  openai-completions over local HTTP, one SSE record per delta: the record's decoding too (21.7 after lw-quiet,
+//	        23.8 with the eager copy of the arguments, 18.3 now)
 const (
 	printTextFauxDeltaAllocsBase      = 45
-	printTextFauxDeltaAllocsCeiling   = 30
+	printTextFauxDeltaAllocsCeiling   = 20
 	printTextOpenAIDeltaAllocsBase    = 71.5
-	printTextOpenAIDeltaAllocsCeiling = 35
+	printTextOpenAIDeltaAllocsCeiling = 25
 )
 
 // In `-p` text mode nothing observes a message_update (the Session discards its events and has no listener or

@@ -1,5 +1,5 @@
 {
- "pin": "1.4.0+38ff9917",
+ "pin": "1.4.0+d5b3de22",
  "package": "pi-ai@1.4.0",
  "module": "pi-ai",
  "export": "resolveTranscriptTools",

@@ -72,7 +72,7 @@ func (r *run) request(cp *jv.Object) {
 							r.fail(err)
 							return
 						}
-						r.classify(requestInfo{attempt: attempt, compacted: compacted, model: ref, cutoff: cutoff, messages: view.SystemMessages()}, message)
+						r.classify(requestInfo{attempt: attempt, compacted: compacted, model: ref, thinking: thinking, cutoff: cutoff, messages: view.SystemMessages()}, message)
 					})
 				})
 			})
@@ -250,6 +250,7 @@ type requestInfo struct {
 	attempt   float64
 	compacted ID
 	model     ModelRef
+	thinking  string // the level the request asked for; "" when the checkpoint has none (a record of an earlier version)
 	cutoff    ID
 	messages  []*jv.Object // committed model context through cutoff, when the phase already derived it
 	pollAt    *float64     // set when the message came from polling, so a still deferred result polls strictly later
@@ -410,6 +411,6 @@ func (r *run) poll(cp *jv.Object) {
 			r.fail(err)
 			return
 		}
-		r.classify(requestInfo{attempt: num(cp, "attempt"), compacted: idField(cp, "compacted"), model: ref, cutoff: idField(cp, "cutoff"), pollAt: &pollAt}, message)
+		r.classify(requestInfo{attempt: num(cp, "attempt"), compacted: idField(cp, "compacted"), model: ref, thinking: str(cp, "thinkingLevel"), cutoff: idField(cp, "cutoff"), pollAt: &pollAt}, message)
 	})
 }

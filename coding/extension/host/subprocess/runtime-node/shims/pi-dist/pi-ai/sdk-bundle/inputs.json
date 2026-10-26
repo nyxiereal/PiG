@@ -259,7 +259,7 @@
     },
     {
       "path": "pi-dist/pi-ai/providers/data/.manifest.json",
-      "sha256": "de58def5948977cba03a50c2d4f1c7d98802055ecea1c552d7b0df796976aa51"
+      "sha256": "49cff3979b159914aba89b897bc07c93a6f70c7354769b717f964a04afbd136c"
     },
     {
       "path": "pi-dist/pi-ai/providers/data/amazon-bedrock.json",
@@ -323,7 +323,7 @@
     },
     {
       "path": "pi-dist/pi-ai/providers/data/kimi-coding.json",
-      "sha256": "728d5ddb63ef52130552022d5ae2fd138fdc131ff854ac8c3b10ccaad355ab39"
+      "sha256": "e6d5bce9045cf533ca9e0d563a7d30a6a1ed48c89a0f539ed4c9d3ac53d4ac8b"
     },
     {
       "path": "pi-dist/pi-ai/providers/data/meta.json",
@@ -343,11 +343,11 @@
     },
     {
       "path": "pi-dist/pi-ai/providers/data/moonshotai-cn.json",
-      "sha256": "0dbd6b063a0abdbe55d5dc59dd4dade566c2ea817ad6184bc8d20655ecba1daf"
+      "sha256": "1a15468b1edf9205956e4c5ea41fc4cacc14eabf00523b9143e23a38264f57f7"
     },
     {
       "path": "pi-dist/pi-ai/providers/data/moonshotai.json",
-      "sha256": "1da2c4e34f22aef17a07c974d85bdee8e1b68b6dc712e3769c935b3f1e7dadca"
+      "sha256": "f31cdf2e6c81a403c4cb0e6b7e759ceff2820f966b08dbec80cfafa3f80dfc63"
     },
     {
       "path": "pi-dist/pi-ai/providers/data/nvidia.json",
@@ -363,15 +363,15 @@
     },
     {
       "path": "pi-dist/pi-ai/providers/data/opencode-go.json",
-      "sha256": "4d3b6505c87e3959624430b789b534d6a36a22b1d475b4b5ca0d7a9f6845038c"
+      "sha256": "8047701bebc473b5b83c758c5f381bfb69abd363fcadc793204383a2457a4822"
     },
     {
       "path": "pi-dist/pi-ai/providers/data/opencode.json",
-      "sha256": "cbe65d07905d409ef4d81ec5d9258157e0f5b75a62c2dbf7d153133fdba3dc6d"
+      "sha256": "9129a2dec632e36e853edd5a385a2a7084555fd94ed4c3293f32e2afeafad523"
     },
     {
       "path": "pi-dist/pi-ai/providers/data/openrouter.json",
-      "sha256": "3d86ced827be7ea715895dac24ea87b855f32f29e7b73ab66bfedec451209942"
+      "sha256": "d9544e6b305b036dd33ec22cafdab4083a0cf25e899d814cda18d1bf0ec03432"
     },
     {
       "path": "pi-dist/pi-ai/providers/data/qwen-token-plan-cn.json",
@@ -399,7 +399,7 @@
     },
     {
       "path": "pi-dist/pi-ai/providers/data/vercel-ai-gateway.json",
-      "sha256": "e0b0941566640832d1fe505899fa8ffb8cf6d1e461ae78b2b3266ed54da0c4d7"
+      "sha256": "7c30f5c5fe5dc86934bfbf5ea26a9e03b55962bb2be3d945b756587d078c604e"
     },
     {
       "path": "pi-dist/pi-ai/providers/data/xai.json",

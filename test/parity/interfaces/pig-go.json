@@ -265983,17 +265983,6 @@
       "shapeHash": "sha256:2e7a46ef7c2011cd2aa41a3ad171f9b6f5461f06a15b57547cff43508937a222"
     },
     {
-      "id": "go:github.com/MichaelKinsy/PiG/internal/codingagent#modelDefinition.registeredRecord",
-      "package": "github.com/MichaelKinsy/PiG/internal/codingagent",
-      "name": "modelDefinition.registeredRecord",
-      "kind": "function",
-      "exported": false,
-      "shape": {
-        "type": "func(api github.com/MichaelKinsy/PiG/ai.API, providerID string, baseURL string) string"
-      },
-      "shapeHash": "sha256:e9f96fa48d250180342f699dc4cc495dd142948f66f0a42f965a1a1eac50fc2c"
-    },
-    {
       "id": "go:github.com/MichaelKinsy/PiG/internal/codingagent#modelDefinitionEntry",
       "package": "github.com/MichaelKinsy/PiG/internal/codingagent",
       "name": "modelDefinitionEntry",
@@ -272900,17 +272889,6 @@
         "type": "func(oauth bool, apiKey string) *github.com/MichaelKinsy/PiG/ai.AuthCheck"
       },
       "shapeHash": "sha256:e2e6c6bd0ef7eab12c617a1f9cf6c9ad5b1e293d40106cb4781f368adce749bc"
-    },
-    {
-      "id": "go:github.com/MichaelKinsy/PiG/internal/codingagent#registrationRecordMemo",
-      "package": "github.com/MichaelKinsy/PiG/internal/codingagent",
-      "name": "registrationRecordMemo",
-      "kind": "type",
-      "exported": false,
-      "shape": {
-        "type": "registrationRecordMemo"
-      },
-      "shapeHash": "sha256:335de2831493ab64cdd8cf4764e0d72ff5d50c671e223d9d5545ad52351e077b"
     },
     {
       "id": "go:github.com/MichaelKinsy/PiG/internal/codingagent#registrationRefresh",

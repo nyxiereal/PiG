@@ -69,6 +69,8 @@ type HostHelpers struct {
 	ResizeImage func(input []byte, mimeType string, options *ImageResizeOptions) (ResizedImage, bool, error)
 	// BuiltinToolDefinition answers builtinTool.definition: the JSON of its arguments in, the JSON of its reply out.
 	BuiltinToolDefinition func(args []byte) ([]byte, error)
+	// BuiltinToolPrepareArguments answers builtinTool.prepareArguments: the JSON of its arguments in, the JSON of the prepared tool arguments out.
+	BuiltinToolPrepareArguments func(args []byte) ([]byte, error)
 	// LocalExec answers builtinTool.localExec in the host's own process: the JSON of its arguments in (the executeId is unused), the JSON of Pi's `{ exitCode }` out.
 	// The command ends with ctx. Each output chunk goes to onData in order before LocalExec returns, and an error from onData ends the command and is LocalExec's.
 	// The call has no Context, so a connection of its own would be any running extension's, which ends when that extension does, whichever made the call.

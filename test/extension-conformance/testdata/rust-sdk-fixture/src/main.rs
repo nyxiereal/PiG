@@ -4469,6 +4469,7 @@ fn builtin_probe(ctx: &pig_sdk::Context, case: &Value) -> Result<Value, String> 
     match kind {
         "cwd" => return Ok(json!({"cwd": ctx.cwd()})),
         "register" => return builtin_register(ctx, &factory_cwd),
+        "registerEdit" => return builtin_register_edit(ctx, &factory_cwd),
         "local" => return Ok(builtin_local(case)),
         "sets" => {
             let names = |tools: Vec<pig_sdk::BuiltinTool>| tools.into_iter().map(|tool| tool.name).collect::<Vec<_>>();
@@ -4483,7 +4484,7 @@ fn builtin_probe(ctx: &pig_sdk::Context, case: &Value) -> Result<Value, String> 
     let tool = case["tool"].as_str().unwrap_or("bash");
     macro_rules! create {
         ($definition:ident, $tool:ident, $options:expr) => {
-            if kind == "definition" { Created::Definition(pig_sdk::$definition(&factory_cwd, Some($options)).map_err(|e| e.to_string())?) } else if case["noContext"].as_bool() == Some(true) { Created::Tool(pig_sdk::$tool(&factory_cwd, Some($options)).map_err(|e| e.to_string())?) } else { Created::Executor(pig_sdk::$definition(&factory_cwd, Some($options)).map_err(|e| e.to_string())?) }
+            if kind == "definition" || kind == "prepare" { Created::Definition(pig_sdk::$definition(&factory_cwd, Some($options)).map_err(|e| e.to_string())?) } else if case["noContext"].as_bool() == Some(true) { Created::Tool(pig_sdk::$tool(&factory_cwd, Some($options)).map_err(|e| e.to_string())?) } else { Created::Executor(pig_sdk::$definition(&factory_cwd, Some($options)).map_err(|e| e.to_string())?) }
         };
     }
     let created = match tool {
@@ -4496,6 +4497,17 @@ fn builtin_probe(ctx: &pig_sdk::Context, case: &Value) -> Result<Value, String> 
         "powershell" => create!(create_powershell_tool_definition, create_powershell_tool, options.powershell),
         _ => create!(create_bash_tool_definition, create_bash_tool, options.bash),
     };
+    if kind == "prepare" {
+        let Created::Definition(built) = created else { unreachable!() };
+        let mut report = json!({"has": built.definition.prepare_arguments.is_some()});
+        if let Some(prepare) = &built.definition.prepare_arguments {
+            match prepare(case.get("params").cloned().unwrap_or_else(|| json!({}))) {
+                Ok(prepared) => report["prepared"] = prepared,
+                Err(error) => report["error"] = json!(error),
+            }
+        }
+        return Ok(report);
+    }
     if kind == "definition" {
         let Created::Definition(built) = created else { unreachable!() };
         let d = &built.definition;
@@ -4585,6 +4597,23 @@ fn builtin_register(ctx: &pig_sdk::Context, factory_cwd: &str) -> Result<Value, 
     let bash_name = bash.definition.name.clone();
     ctx.register_tool(bash.definition).map_err(|e| e.to_string())?;
     Ok(json!({"registered": [read_name, bash_name]}))
+}
+
+/// Overrides the edit tool with a wrapped built-in, as `pi.registerTool({ ...createEditToolDefinition(cwd), execute })` does: the definition carries the
+/// built-in's prepareArguments, so the model's legacy shapes reach the wrapper normalised, and only an edit the host really applied can produce the sentinel text.
+fn builtin_register_edit(ctx: &pig_sdk::Context, factory_cwd: &str) -> Result<Value, String> {
+    let mut edit = pig_sdk::create_edit_tool_definition(factory_cwd, None).map_err(|e| e.to_string())?;
+    let run_edit = edit.executor();
+    edit.definition.execute = Box::new(move |ctx, params| match run_edit.execute(ctx, params) {
+        Ok(mut result) => {
+            wrap_first_text(&mut result, |text| format!("«edited:{text}»"));
+            result.into_tool_result()
+        }
+        Err(error) => ToolResult::error(error.to_string()),
+    });
+    let name = edit.definition.name.clone();
+    ctx.register_tool(edit.definition).map_err(|e| e.to_string())?;
+    Ok(json!({"registered": [name]}))
 }
 
 fn builtin_local(case: &Value) -> Value {

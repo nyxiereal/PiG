@@ -29,6 +29,7 @@ import (
 	"github.com/MichaelKinsy/PiG/coding/extension/host/runtimecell"
 	extsource "github.com/MichaelKinsy/PiG/coding/extension/source"
 	"github.com/MichaelKinsy/PiG/internal/buildprogress"
+	"github.com/MichaelKinsy/PiG/internal/execfile"
 	"github.com/MichaelKinsy/PiG/internal/pigsdklock"
 	"github.com/MichaelKinsy/PiG/internal/toolchain"
 )
@@ -437,11 +438,11 @@ func walkDirSources(root string, exts []string, visit func(path, rel string) err
 	if err != nil {
 		return err
 	}
-	// WalkDir does not traverse a symlink used as its root. Resolve only the
-	// admitted root; nested symlink entries remain excluded by WalkDir.
+	// WalkDirShared, like filepath.WalkDir, does not traverse a symlink used as its root. Resolve only the
+	// admitted root; nested symlink entries remain excluded by the walk.
 	root = physicalRoot
 	vanish := runtimecell.NewVanishTracker()
-	if err := filepath.WalkDir(root, func(path string, d fs.DirEntry, err error) error {
+	if err := runtimecell.WalkDirShared(root, func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
 			// A directory deleted after its parent listed it held no source of this build, as in runtimecell's hashGoModuleDir
 			// (on Windows one still being deleted fails to open instead of reporting not-exist; see VanishTracker). A directory
@@ -1006,14 +1007,20 @@ func buildRust(ctx context.Context, cacheRoot, srcDir, outPath, stagedSDK string
 
 	// Copy to temp, then rename (atomic).
 	tmpPath := outPath + ".tmp"
-	data, err := os.ReadFile(builtBin)
-	if err != nil {
-		return err
-	}
-	if err := os.WriteFile(tmpPath, data, 0o755); err != nil {
+	if err := copyBuiltBinary(builtBin, tmpPath); err != nil {
 		return err
 	}
 	return os.Rename(tmpPath, outPath)
+}
+
+// copyBuiltBinary copies the binary cargo built to dst, the program the host executes once the build is published. execfile writes the copy: a concurrent fork must not leave a child that holds its write descriptor, which makes the exec fail with ETXTBSY.
+func copyBuiltBinary(src, dst string) error {
+	input, err := os.Open(src)
+	if err != nil {
+		return err
+	}
+	defer func() { _ = input.Close() }() // Read-only: close cannot lose data.
+	return execfile.Write(dst, os.O_CREATE|os.O_TRUNC, 0o755, input)
 }
 
 func cargoBuildTargetDirectory(workingDirectory string) string {

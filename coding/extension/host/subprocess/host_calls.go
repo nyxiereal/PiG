@@ -470,6 +470,8 @@ func (h *Host) runCall(me *managedExt, conn *Conn, callID string, call *CallPayl
 		result, err = h.handleResizeImage(call)
 	case call.Method == CallBuiltinToolDefinition:
 		result, err = h.handleBuiltinToolDefinition(call)
+	case call.Method == CallBuiltinToolPrepareArguments:
+		result, err = h.handleBuiltinToolPrepareArguments(call)
 	case call.Method == CallBuiltinToolExecute:
 		result, err = h.handleBuiltinToolExecute(callCtx, conn, call)
 	case call.Method == CallBuiltinToolLocalExec:

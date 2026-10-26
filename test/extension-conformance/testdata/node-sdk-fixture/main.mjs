@@ -877,6 +877,17 @@ export default function (pi) {
       pi.registerTool({ ...bash, async execute(...a) { const r = await bash.execute(...a); r.content = r.content.map((b, i) => i === 0 ? { ...b, text: `«${b.text}»` } : b); return r; } });
       return emit({ registered: [read.name, bash.name] });
     }
+    if (c.kind === "registerEdit") {
+      const edit = piCodingAgent.createEditToolDefinition(c.factoryCwd);
+      pi.registerTool({ ...edit, async execute(...a) { const r = await edit.execute(...a); r.content = r.content.map((b, i) => i === 0 ? { ...b, text: `«edited:${b.text}»` } : b); return r; } });
+      return emit({ registered: [edit.name] });
+    }
+    if (c.kind === "prepare") {
+      const def = builtinFactories[c.tool][0](c.factoryCwd);
+      const report = { has: typeof def.prepareArguments === "function" };
+      if (report.has) { try { report.prepared = def.prepareArguments(c.params ?? {}); } catch (error) { report.error = error.message; } }
+      return emit(report);
+    }
     if (c.kind === "sets") return emit({ coding: piCodingAgent.createCodingTools(c.factoryCwd).map((t) => t.name), readOnly: piCodingAgent.createReadOnlyTools(c.factoryCwd).map((t) => t.name) });
     if (c.kind === "local") {
       const operations = c.shell === "powershell" ? piCodingAgent.createLocalPowerShellOperations() : piCodingAgent.createLocalBashOperations();

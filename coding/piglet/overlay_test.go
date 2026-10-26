@@ -81,7 +81,9 @@ strip:
 	if core := p.Extensions[0]; len(core.Origins) != 0 || core.Tools == nil || (*core.Tools)[0] != "core_tool" {
 		t.Fatalf("baked extension changed: %#v", core)
 	}
-	if extra := p.Extensions[1]; len(extra.Origins) != 1 || !strings.HasPrefix(extra.Origins[0], "local:"+dir) {
+	// Stock --piglet resolution (and so the overlay's) anchors origins at the canonical overlay path: the real directory,
+	// not the symlinked /var or 8.3 short-named temp directory t.TempDir returns on macOS and Windows.
+	if extra := p.Extensions[1]; len(extra.Origins) != 1 || extra.Origins[0] != "local:"+filepath.Join(evalDir(t, dir), "extra") {
 		t.Fatalf("overlay extension origin not anchored at the overlay file: %#v", extra)
 	}
 	if got := skillNames(p.Skills); len(got) != 2 || got[0] != "guide" || p.Skills[0].Content != "guide body" {

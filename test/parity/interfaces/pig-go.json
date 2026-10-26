@@ -239275,6 +239275,17 @@
       "shapeHash": "sha256:d4b6738c102e9e0b0a378c9b6f7a8cdf03773547ab112c39f3b5439563266312"
     },
     {
+      "id": "go:github.com/MichaelKinsy/PiG/internal/codingagent#RealPathSync",
+      "package": "github.com/MichaelKinsy/PiG/internal/codingagent",
+      "name": "RealPathSync",
+      "kind": "function",
+      "exported": true,
+      "shape": {
+        "type": "func(path string) (string, error)"
+      },
+      "shapeHash": "sha256:f40d4f34dc5bbd0e74838ec92049f48e4ae39f2b85f7c153e0f98d59ea7e6036"
+    },
+    {
       "id": "go:github.com/MichaelKinsy/PiG/internal/codingagent#ReconcileSessionMarkers",
       "package": "github.com/MichaelKinsy/PiG/internal/codingagent",
       "name": "ReconcileSessionMarkers",

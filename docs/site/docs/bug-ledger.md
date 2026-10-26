@@ -298,6 +298,7 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 | [BF-5443b6c](#bf-5443b6c) | `durable/images` is the image processor of pi-durable: `images.CreatePhotonImages()` (also `images/node` and… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-54a5bf6](#bf-54a5bf6) | The host answers a parsed frontmatter with `<`, `>`, `&` and U+2028 as they are (as `JSON.stringify` writes… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-54dc372](#bf-54dc372) | fix(release): carry main's PigVersion 0.5.3 and the post-bump goldens and pins | PiG's own defect | All platforms | Unreleased |
+| [BF-54e3983](#bf-54e3983) | fix(packagemanager): npm gets Node's realpathSync of the install root, and the npm tests expect it | PiG's own defect | All platforms | Unreleased |
 | [BF-55573f4](#bf-55573f4) | fix(sdk): Rust and Python fuzzy match score contiguous occurrences (Pi) | PiG's own defect | All platforms | Unreleased |
 | [BF-5654e71](#bf-5654e71) | MCP OAuth discovery and resource selection now read URLs the way Node's `URL` does (default ports, dot… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-5654e71-2](#bf-5654e71-2) | A JSON-RPC request or notification with a malformed `error` member is no longer rejected, and a `method` that… | PiG's own defect | All platforms | 0.5.0 |
@@ -1060,6 +1061,7 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 | [BF-e54c2a7](#bf-e54c2a7) | `openai-decisions` writes the image input's user message, text part and image parts with their members in… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-e55895a](#bf-e55895a) | Durable: opening a store that pi-durable 1.3.0 wrote no longer leaves you unable to go back to it | PiG's own defect | All platforms | 0.5.2 |
 | [BF-e55cdc2](#bf-e55cdc2) | The Codex catalog entry for GPT-6.1 Sol reports the 500K context window the Codex models endpoint returns… | PiG's own defect | All platforms | 0.5.0 |
+| [BF-e57444c](#bf-e57444c) | fix(extension/host): the Node runtime holds the frames read after a run beginning until the immediates queued… | PiG's own defect | All platforms | Unreleased |
 | [BF-e59f3f6](#bf-e59f3f6) | Fixed tool-call arguments losing a field and every field after it when the model wrote an invalid `\u` escape… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-e5a345e](#bf-e5a345e) | An Anthropic request holds a mid-conversation system update until an assistant message that is actually sent… | A fix Pi shipped that PiG ported | All platforms | 0.5.3 |
 | [BF-e5aae63](#bf-e5aae63) | The editor now enters bash mode (bash border color, Escape clears it) when the text starts with `!` after any… | PiG's own defect | All platforms | 0.5.0 |
@@ -5049,6 +5051,19 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 - **Fixed in:** Unreleased
 - **Fix commits:** `54dc372dae` (2026-10-23)
 - **Tests:** `bench/k8s/cmd/k8sbench/pireference_test.go::TestCommittedPinHasAgentPins`, `internal/codingagent/changelog_test.go::TestParseChangelog_RealFile`
+
+### BF-54e3983
+
+**fix(packagemanager): npm gets Node's realpathSync of the install root, and the npm tests expect it**
+
+- **Source:** PiG's own defect
+- **Symptom:** fix(packagemanager): npm gets Node's realpathSync of the install root, and the npm tests expect it
+- **Root cause:** Pi passes realpathSync(root) as --prefix. PiG's port used filepath.EvalSymlinks, which on Windows expands 8.3 short names (C:\Users\RUNNER~1) and the case of every component to the stored form, where Node's realpathSync keeps every component that is not a link as the caller spelled it. RealInstallRoot and the uninstall path now use codingagent.RealPathSync (Node's realpathSync, the walk CanonicalizePath and the self-update tier already use), so npm is given the spelling Pi gives it.
+- **User impact:** Behavior differed from Pi
+- **Platform:** All platforms
+- **Fixed in:** Unreleased
+- **Fix commits:** `54e3983c76` (2026-10-26)
+- **Tests:** `internal/codingagent/canonical_path_relative_test.go::TestRealPathSyncMatchesNodeRealpathSync`
 
 ### BF-55573f4
 
@@ -15659,6 +15674,19 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 - **Fix commits:** `e55cdc239a` (2026-10-14)
 - **Tests:** `ai/supports_xhigh_upstream_test.go::TestSupportsXHighUpstream`
 - **Release note:** The Codex catalog entry for GPT-6.1 Sol reports the 500K context window the Codex models endpoint returns; other Codex models keep 272K (carried Pi fix, Pi 5712b134, #10840).
+
+### BF-e57444c
+
+**fix(extension/host): the Node runtime holds the frames read after a run beginning until the immediates queued…**
+
+- **Source:** PiG's own defect
+- **Symptom:** fix(extension/host): the Node runtime holds the frames read after a run beginning until the immediates queued before it ran
+- **Root cause:** A print prompt's input handler queues an immediate that Pi runs during the run, at the bash tool's I/O, before session_shutdown. The runtime blocks its event loop until the host's next step, the run beginning. A process the OS schedules late reads the run beginning, the run's end and the shutdown request in one pass of the wait, and its serve loop ran the shutdown handler in the microtasks after the wait, before the check phase, then waited again: the immediate never ran. TestPrintInputCallbackRunsDuringTheRun failed in half of the runs with eight copies sharing a macOS runner; origin/main fails the same way and its CI passed by timing. The frames read after the run beginning now wait for…
+- **User impact:** Behavior differed from Pi
+- **Platform:** All platforms
+- **Fixed in:** Unreleased
+- **Fix commits:** `e57444c856` (2026-10-26)
+- **Tests:** `coding/cli/print_prompt_end_binary_test.go::TestPrintInputCallbackRunsDuringTheRun`, `coding/extension/host/subprocess/runtime_node_run_beginning_test.go::TestNodeRunBeginningRunsTheInputsImmediateBeforeTheFramesReadWithIt`
 
 ### BF-e59f3f6
 

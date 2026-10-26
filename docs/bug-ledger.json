@@ -22123,6 +22123,29 @@
       ]
     },
     {
+      "id": "BF-D203",
+      "title": "registerProvider with an empty `apiKey` leaves the provider unconfigured where Pi treats the empty string as…",
+      "symptom": "the inconsistency above: `\"\"` is a configured key to `configuredApiKey`, `configuredRequestAuthStatus` and the composed `check`, and a missing one to `provider-composer.ts:318`.",
+      "rootCause": "Pi's behaviour is an accident of `??` on a string. The empty string is not a form the option documents (`packages/coding-agent/src/core/extensions/types.ts:1936`: \"API key literal, env interpolation ($ENV_VAR or ${ENV_VAR}), or leading !command\"), and Pi treats `\"\"` as missing where it validates the same option (`provider-composer.ts:318`, `!config.apiKey`). Its effect is a provider that reads configured and available whose every request fails with `No API key for provider: \u003cid\u003e` (for example `packages/ai/src/api/openai-completions.ts:95`), so an extension that passes `process.env.KEY ?? \"\"` gets a selectable provider that cannot answer. Distinguishing `\"\"` from an absent key needs presence…",
+      "rootCauseSource": "divergence record",
+      "userImpact": "Behavior differed from Pi",
+      "platform": "All platforms",
+      "class": "ahead-of-pi",
+      "divergence": "D203",
+      "removeWhen": "Pi treats `\"\"` as missing in `configuredApiKey`, or the SDK API gains explicit presence for `apiKey` (a pointer or an option) and an owner decision asks for Pi's behaviour; then the three markers, the test and this record go.",
+      "fixedIn": "Unreleased",
+      "origin": "divergence",
+      "commits": [
+        {
+          "hash": "90ffbef9d1",
+          "date": "2026-10-25"
+        }
+      ],
+      "tests": [
+        "coding/register_provider_empty_apikey_test.go::TestRegisterProviderWithEmptyAPIKeyIsNotConfigured"
+      ]
+    },
+    {
       "id": "BF-a076a50",
       "title": "A model request on a reused connection gets the full HTTP idle timeout to receive its first response bytes…",
       "symptom": "The time the connection had spent idle in the pool was deducted from the next request's timeout.",
@@ -36366,6 +36389,11 @@
       "id": "D190",
       "title": "The built-in file mutation queue also orders mutations of one existing file reached through a hard link or a…",
       "entry": "BF-648ff3e-13"
+    },
+    {
+      "id": "D203",
+      "title": "registerProvider with an empty `apiKey` leaves the provider unconfigured where Pi treats the empty string as…",
+      "entry": "BF-D203"
     }
   ],
   "exemptCommits": {

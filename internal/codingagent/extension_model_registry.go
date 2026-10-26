@@ -280,6 +280,7 @@ func (r *ModelRegistry) ExtensionProviderAuthStatus(providerID string) ai.AuthSt
 	}
 	r.mu.RLock()
 	value, fromExtension := "", false
+	// pig divergence (D203): an empty apiKey is no key (Pi keeps "" as a configured raw key, provider-composer.ts:397,723-736).
 	if dynamic, ok := r.dynamic[providerID]; ok && dynamic.APIKey != "" {
 		value, fromExtension = dynamic.APIKey, true
 	} else if r.config != nil {
@@ -339,6 +340,7 @@ func (r *ModelRegistry) ExtensionProviderAuth(ctx context.Context, providerID st
 	r.mu.Lock()
 	credentials := r.runtimeCredentialsLocked()
 	value := ""
+	// pig divergence (D203): an empty apiKey is no key (Pi keeps "" as a configured raw key, provider-composer.ts:397,450-457).
 	if dynamic, ok := r.dynamic[providerID]; ok && dynamic.APIKey != "" {
 		value = dynamic.APIKey
 	} else if r.config != nil {

@@ -111202,6 +111202,17 @@
       "shapeHash": "sha256:1dca398e6021f0d2c504c66adce9dd1058a8fbec15ea727f337e188067a1efe8"
     },
     {
+      "id": "go:github.com/MichaelKinsy/PiG/coding/extension/builtin#createToolSearchReference",
+      "package": "github.com/MichaelKinsy/PiG/coding/extension/builtin",
+      "name": "createToolSearchReference",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func(github.com/MichaelKinsy/PiG/extensions/sdk/json.RawMessage) (github.com/MichaelKinsy/PiG/coding/extension.InlineExtension, error)"
+      },
+      "shapeHash": "sha256:a5cd36e22d514282200ef6194cfe674056feaee920d647cf190793fe49168430"
+    },
+    {
       "id": "go:github.com/MichaelKinsy/PiG/coding/extension/builtin#mcpEntries",
       "package": "github.com/MichaelKinsy/PiG/coding/extension/builtin",
       "name": "mcpEntries",
@@ -111222,6 +111233,39 @@
         "type": "func() []Extension"
       },
       "shapeHash": "sha256:157caa9aae4403523f7014d80e4efd817a709fde43063d06fe27bba8358b415f"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/coding/extension/builtin#registerCodemodeReference",
+      "package": "github.com/MichaelKinsy/PiG/coding/extension/builtin",
+      "name": "registerCodemodeReference",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func()"
+      },
+      "shapeHash": "sha256:032e891204f123caf14d3d421fa9728efc3f31299c17e98859c219dccddd74fb"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/coding/extension/builtin#registerCompiledInReferences",
+      "package": "github.com/MichaelKinsy/PiG/coding/extension/builtin",
+      "name": "registerCompiledInReferences",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func()"
+      },
+      "shapeHash": "sha256:032e891204f123caf14d3d421fa9728efc3f31299c17e98859c219dccddd74fb"
+    },
+    {
+      "id": "go:github.com/MichaelKinsy/PiG/coding/extension/builtin#registerToolSearchReference",
+      "package": "github.com/MichaelKinsy/PiG/coding/extension/builtin",
+      "name": "registerToolSearchReference",
+      "kind": "function",
+      "exported": false,
+      "shape": {
+        "type": "func()"
+      },
+      "shapeHash": "sha256:032e891204f123caf14d3d421fa9728efc3f31299c17e98859c219dccddd74fb"
     },
     {
       "id": "go:github.com/MichaelKinsy/PiG/coding/extension/builtin#toolSearchEntries",

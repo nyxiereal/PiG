@@ -32,6 +32,11 @@ ready_pattern_pi = "(auto)"
 ready_timeout_seconds = 30
 capture_start = "parity-snap-cwd-"
 capture_start_last = true
+# "(auto)" and the cwd row can show before the provider count is set (Pi's capture without the prefix was observed in a gate run),
+# so wait for the prefixed label before capturing.
+[[tmux.steps]]
+wait_visible_contains = ["(test-faux) faux-1"]
+wait_timeout_seconds = 20
 
 [assert]
 both_reach_ready = true

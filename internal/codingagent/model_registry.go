@@ -152,33 +152,7 @@ type modelDefinition struct {
 	// registration is the definition as the registering extension wrote it (extension.ProviderModelConfig.Definition); nil for a
 	// models.json model. Pi's model object is that definition spread (provider-composer.ts extensionModelFromDefinition), not the
 	// member-by-member object modelFromJson builds, so the definition fixes its members and their order.
-	registration json.RawMessage
-	// record memoizes the registered object's catalog record (ai.ExtensionModelRecord): it is a pure function of registration and the composed api, provider and baseUrl, and every read of the
-	// registry recomposes the model. Shared by the copies of this definition; nil when registration is nil.
-	record *registrationRecordMemo
-}
-
-// registrationRecordMemo holds the last record composed for one registered definition and the inputs it was composed from.
-type registrationRecordMemo struct {
-	mu                         sync.Mutex
-	api                        ai.API
-	providerID, baseURL, value string
-	set                        bool
-}
-
-// registeredRecord is ai.ExtensionModelRecord of the definition, composed once per distinct api, provider and baseUrl.
-func (md modelDefinition) registeredRecord(api ai.API, providerID, baseURL string) string {
-	memo := md.record
-	if memo == nil {
-		return ai.ExtensionModelRecord(md.registration, api, providerID, baseURL)
-	}
-	memo.mu.Lock()
-	defer memo.mu.Unlock()
-	if !memo.set || memo.api != api || memo.providerID != providerID || memo.baseURL != baseURL {
-		memo.api, memo.providerID, memo.baseURL = api, providerID, baseURL
-		memo.value, memo.set = ai.ExtensionModelRecord(md.registration, api, providerID, baseURL), true
-	}
-	return memo.value
+	registration *registeredDefinition
 }
 
 type modelCostJSON struct {
@@ -971,8 +945,9 @@ func providerConfigFromRegistration(configMap extension.ProviderConfig) (provide
 		if err != nil {
 			return providerConfig{}, false
 		}
-		provider.Models[i].registration = definition
-		provider.Models[i].record = new(registrationRecordMemo)
+		if definition != nil {
+			provider.Models[i].registration = &registeredDefinition{raw: definition}
+		}
 	}
 	if configMap.Headers != nil && provider.Headers == nil {
 		provider.Headers = map[string]*string{}

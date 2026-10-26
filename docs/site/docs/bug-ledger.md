@@ -620,6 +620,7 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 | [BF-89d167f](#bf-89d167f) | Fix in shipped code | PiG's own defect | All platforms | Unreleased |
 | [BF-8a18a6b](#bf-8a18a6b) | A Node extension no longer keeps reading an entry the host refused | PiG's own defect | All platforms | 0.5.2 |
 | [BF-8a25539](#bf-8a25539) | `llama-cpp-classify` answers match Pi bit for bit: the softmax uses `jsmath.Exp`, V8's fdlibm `Math.exp`… | PiG's own defect | All platforms | 0.5.0 |
+| [BF-8a88c34](#bf-8a88c34) | On Windows, a custom theme edited in a rapid burst of writes no longer stays on a stale version | PiG's own defect | Windows | Unreleased |
 | [BF-8a9bb40](#bf-8a9bb40) | fix(ai): Anthropic retry-delay message and Codex error body without an error member | PiG's own defect | All platforms | Unreleased |
 | [BF-8ab5a89](#bf-8ab5a89) | A long session no longer holds each tool result twice | PiG's own defect | All platforms | 0.5.0 |
 | [BF-8ab86c8](#bf-8ab86c8) | RPC `get_state` sent right after `new_session`, `fork`, `clone`, `switch_session` or `export_html` now… | PiG's own defect | All platforms | 0.5.0 |
@@ -9517,6 +9518,20 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 - **Commit that wrote the release note (the fix commit is not identified):** `8a25539ce3` (2026-10-13)
 - **Tests:** `test/docs-drift/changelog_fragments_test.go::TestChangelogFragmentsFollowTheRules`, `test/docs-drift/public_claims_test.go::TestPublicClaimsMatchTheEvidence`
 - **Release note:** `llama-cpp-classify` answers match Pi bit for bit: the softmax uses `jsmath.Exp`, V8's fdlibm `Math.exp` (Go's `math.Exp` differs in the last bit for some arguments on amd64). Its requests are written with their members in Pi's order, and a failed lookup no longer cancels the sibling requests of the same `Promise.all`, so the server receives what it receives from Pi.
+
+### BF-8a88c34
+
+**On Windows, a custom theme edited in a rapid burst of writes no longer stays on a stale version**
+
+- **Source:** PiG's own defect
+- **Symptom:** On Windows, a custom theme edited in a rapid burst of writes no longer stays on a stale version.
+- **Root cause:** An overflow of the native change buffer loses events but leaves the watch armed. The run loop closed the native watcher on every error, so a burst of writes that overflowed the Windows ReadDirectoryChangesW buffer ended the watch and the final write was never reloaded. An overflow now schedules a reload, as Pi does for a change without a filename, and keeps watching; any other error still closes the watcher.
+- **User impact:** Lost or altered data
+- **Platform:** Windows
+- **Fixed in:** Unreleased
+- **Fix commits:** `8a88c34d51` (2026-10-26)
+- **Tests:** `tui/theme_watcher_upstream_test.go::TestThemeWatcherOtherErrorsCloseNativeWatcher`, `tui/theme_watcher_upstream_test.go::TestThemeWatcherOverflowReloadsAndKeepsWatching`
+- **Release note:** On Windows, a custom theme edited in a rapid burst of writes no longer stays on a stale version. A burst that overflowed the native change buffer made the watcher treat the overflow as a failure and close its watch, so writes after the overflow were never seen and the theme kept an older version of the file (seen as `accent="#123456" want="#000064"` in Windows CI, only while the machine was loaded). An overflow now reloads the theme file, as Pi reloads on a change without a filename, and the watcher keeps watching; any other watch failure still closes it, as in Pi.
 
 ### BF-8a9bb40
 

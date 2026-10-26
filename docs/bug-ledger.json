@@ -18132,6 +18132,29 @@
       ]
     },
     {
+      "id": "BF-8a88c34",
+      "title": "On Windows, a custom theme edited in a rapid burst of writes no longer stays on a stale version",
+      "symptom": "On Windows, a custom theme edited in a rapid burst of writes no longer stays on a stale version.",
+      "rootCause": "An overflow of the native change buffer loses events but leaves the watch armed. The run loop closed the native watcher on every error, so a burst of writes that overflowed the Windows ReadDirectoryChangesW buffer ended the watch and the final write was never reloaded. An overflow now schedules a reload, as Pi does for a change without a filename, and keeps watching; any other error still closes the watcher.",
+      "rootCauseSource": "commit",
+      "userImpact": "Lost or altered data",
+      "platform": "Windows",
+      "class": "own",
+      "fixedIn": "Unreleased",
+      "releaseNote": "On Windows, a custom theme edited in a rapid burst of writes no longer stays on a stale version. A burst that overflowed the native change buffer made the watcher treat the overflow as a failure and close its watch, so writes after the overflow were never seen and the theme kept an older version of the file (seen as `accent=\"#123456\" want=\"#000064\"` in Windows CI, only while the machine was loaded). An overflow now reloads the theme file, as Pi reloads on a change without a filename, and the watcher keeps watching; any other watch failure still closes it, as in Pi.",
+      "origin": "release note",
+      "commits": [
+        {
+          "hash": "8a88c34d51",
+          "date": "2026-10-26"
+        }
+      ],
+      "tests": [
+        "tui/theme_watcher_upstream_test.go::TestThemeWatcherOtherErrorsCloseNativeWatcher",
+        "tui/theme_watcher_upstream_test.go::TestThemeWatcherOverflowReloadsAndKeepsWatching"
+      ]
+    },
+    {
       "id": "BF-8a9bb40",
       "title": "fix(ai): Anthropic retry-delay message and Codex error body without an error member",
       "symptom": "fix(ai): Anthropic retry-delay message and Codex error body without an error member",

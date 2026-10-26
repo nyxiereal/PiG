@@ -132,6 +132,18 @@ jobs:
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version-file: .node-version
+      # BenchmarkDecodeFileEntryPiFixture reads Pi's large-session.jsonl from .upstream/current. The mirror takes the pinned oracle's provider data (mirror-upstream.sh), so the steps are the race job's: the npm toolchain, the oracle, the mirror. The toolchain's bin directory stays off the later steps' PATH, which the measured benchmarks run under.
+      - name: Install the pinned Pi oracle and mirror its source
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm_version="$(awk '/^  NPM_VERSION:/ { print $2; exit }' .github/workflows/ci.yml)"
+          automation/ci/install-npm-toolchain.sh
+          export PATH="$PWD/automation/ci/npm-toolchain/node_modules/.bin:$PATH"
+          test "$(npm --version)" = "$npm_version"
+          python3 automation/pin/pin.py install-oracle
+          ./automation/gen/mirror-upstream.sh
+          python3 automation/pin/pin.py check-oracle
       - name: Compare allocs/op with the committed baseline
         env:
           CI: '1'

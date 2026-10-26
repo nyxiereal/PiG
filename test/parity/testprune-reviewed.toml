@@ -1,3 +1,4 @@
+# Reviewed per-file ledger for testprune lint: each entry satisfies the expected-value finding of exactly one commit+path.
 
 [[entry]]
 path = "agent/proxy_non_object_arguments_test.go"
@@ -47,3 +48,10 @@ commit = "8153bc7a9e2627452f2460cb96c9edd75098fcf6"
 class = "CITE"
 cite = "packages/durable/src/harness/generation.ts:729"
 reason = "Pi 38ff99177 makes a tool round that requests a handoff append the handoff's reset and continue the run in the new context (generation.ts:729-741), ending it only when the round also terminates: the cases that expected the run to end on the tool-calling answer expect the continuing run's answer, the transcript with the new generation's answer, and the follow-ups after it."
+
+[[entry]]
+path = "tui/terminal_pipe_windows_test.go"
+commit = "8c2fe46dda772e91ad0cdab8441177c06e2045b1"
+class = "NOBEHAVIOR"
+cite = ""
+reason = "The Windows pipe tests are PiG-original: Pi reads a pipe stdin through libuv and has no counterpart, so no Pi line governs them. The commit makes the reader read a Windows pipe in one cancellable ReadFile instead of waiting on the handle first (a pipe handle is signalled whether or not input is queued), so the tests move from asserting terminalInputWaiter.wait's ready or not-ready answer to asserting what terminalReader.read returns: the bytes, nil for a timeout, io.EOF for the end of the pipe, the context's error for a cancel. Each case keeps the behavior it proved (an empty pipe times out, input is delivered, an emptied pipe times out again, a closed writer ends the input, a cancel ends a read of an empty pipe, input wakes a blocked read, a timed-out read leaves no stale abort, an idle read costs no CPU); only the call that reports it changed."

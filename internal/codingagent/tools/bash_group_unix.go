@@ -46,6 +46,8 @@ func killProcessTree(kill func(pid int, sig syscall.Signal) error, darwin bool, 
 
 // processGroupMayHoldOutput reports true: a detached descendant can leave the
 // process group (setsid) and still hold the pipe, so upstream's grace applies.
+// Whether a descendant does is what the pipe itself tells childwait.Wait
+// (poll(2): no write end left, or bytes still unread); the process group does not.
 func processGroupMayHoldOutput(*os.Process) bool { return true }
 
 // shellExitCode mirrors upstream createLocalShellOperations: a shell killed by

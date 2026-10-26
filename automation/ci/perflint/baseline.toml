@@ -1229,14 +1229,6 @@ class = "hot-kept: unfixed at integrate-042 tip, fix pending on a port lane; shr
 
 [[hit]]
 file = "coding/cli/rpc_mode.go"
-func = "rpcAvailableModels"
-pattern = "env-stat"
-detail = "os.Getenv"
-count = 1
-class = "hot-kept: unfixed at integrate-042 tip, fix pending on a port lane; shrink-only"
-
-[[hit]]
-file = "coding/cli/rpc_mode.go"
 func = "rpcUserBashOverride"
 pattern = "json-roundtrip"
 detail = "marshal+unmarshal"
@@ -3325,14 +3317,6 @@ class = "cold: once per session switch or fork"
 
 [[hit]]
 file = "coding/services.go"
-func = "ModelRuntime.knowsProvider"
-pattern = "env-stat"
-detail = "os.Getenv"
-count = 1
-class = "hot-kept: unfixed at integrate-042 tip, fix pending on a port lane; shrink-only"
-
-[[hit]]
-file = "coding/services.go"
 func = "newConfiguredServices"
 pattern = "env-stat"
 detail = "os.Getenv"
@@ -3884,14 +3868,6 @@ count = 2
 class = "hot-kept: unfixed at integrate-042 tip, fix pending on a port lane; shrink-only"
 
 [[hit]]
-file = "internal/codingagent/extension_model_registry.go"
-func = "testFauxProvider"
-pattern = "env-stat"
-detail = "os.Getenv"
-count = 1
-class = "hot-kept: unfixed at integrate-042 tip, fix pending on a port lane; shrink-only"
-
-[[hit]]
 file = "internal/codingagent/extension_package_warnings.go"
 func = "ExtensionPackageWarnings"
 pattern = "loop-format"
@@ -4016,14 +3992,6 @@ file = "internal/codingagent/interactive_commands.go"
 func = "InteractiveMode.buildSlashContext"
 pattern = "loop-format"
 detail = "string+="
-count = 1
-class = "hot-kept: unfixed at integrate-042 tip, fix pending on a port lane; shrink-only"
-
-[[hit]]
-file = "internal/codingagent/interactive_extensions.go"
-func = "WireModelOperations"
-pattern = "env-stat"
-detail = "os.Getenv"
 count = 1
 class = "hot-kept: unfixed at integrate-042 tip, fix pending on a port lane; shrink-only"
 

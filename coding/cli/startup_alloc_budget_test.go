@@ -52,6 +52,14 @@ import (
 // (GODEBUG=inittrace=1, Windows build under Wine) of a table only an error path reads. They are built on first use: init 616,296 -> 607,112
 // bytes, pig --version 756.5-761.9 KB -> 747.8-753.2 KB under Wine, Linux 717,952-723,688 bytes / 3,794-3,802 objects in two runs, so the
 // linux byte budget is 723,688 plus under 2%.
+//
+// Owner-approved raise (2026-10-25) of the linux warm-first-prompt object budgets, 16,820 -> 17,700 and (models.json) 18,830 -> 21,800: PIG_TEST_FAUX now registers the
+// harness's test-faux provider through the model registry, as Pi's parity harness registers it from an extension (registerHarnessTestFaux), so the measured run carries one
+// more registered provider. Measured on the Linux lab host, warm first prompt: 17,659 objects / 2,490,176 bytes (main 15,197 / 2,570,920), with models.json 21,771 / 2,924,904
+// (main 18,688 / 2,914,688). The extra objects are Pi-equivalent work: the deferred registration refresh pass (Models.Refresh about 640 objects, refresh signals about 345,
+// provider refresh phase about 165, availability reload about 250) and the cold json type caches for the registered provider's config (about 525). The registered object's catalog
+// record is composed once per registration (it was once per read: 1,569 -> 746 allocs for a registration and six reads, BenchmarkRegisterExtensionProviderAndRead). Byte budgets and
+// production (no PIG_TEST_FAUX) budgets are unchanged. Profiles: xd670 ~/tern-v5/trees/faux-reg/tmp/prof1 against ~/tern-v5/trees/faux-main/tmp/prof0.
 type startupAllocBudget struct{ versionBytes, versionObjects, promptBytes, promptObjects uint64 }
 
 func startupAllocBudgetFor(goos string) startupAllocBudget {
@@ -61,7 +69,7 @@ func startupAllocBudgetFor(goos string) startupAllocBudget {
 	if goos == "darwin" {
 		return startupAllocBudget{versionBytes: 760_000, versionObjects: 4_240, promptBytes: 2_970_000, promptObjects: 20_200}
 	}
-	return startupAllocBudget{versionBytes: 738_000, versionObjects: 3_880, promptBytes: 2_589_000, promptObjects: 16_820}
+	return startupAllocBudget{versionBytes: 738_000, versionObjects: 3_880, promptBytes: 2_589_000, promptObjects: 17_700}
 }
 
 func TestStartupAllocationBudget(t *testing.T) {
@@ -120,7 +128,7 @@ func startupModelsAllocBudgetFor(goos string) (bytes, objects uint64) {
 	if goos == "darwin" {
 		return 2_934_000, 18_950
 	}
-	return 2_940_000, 18_830
+	return 2_940_000, 21_800
 }
 
 func TestStartupAllocationBudgetWithModelsJSON(t *testing.T) {

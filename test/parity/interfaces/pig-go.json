@@ -79060,17 +79060,6 @@
       "shapeHash": "sha256:6af1cd6889de8772da28bb1f2998d0262659331d5ba93f6bf1933b49a3efd5e9"
     },
     {
-      "id": "go:github.com/MichaelKinsy/PiG/coding#graphExtensionFactory.decodeOptions",
-      "package": "github.com/MichaelKinsy/PiG/coding",
-      "name": "graphExtensionFactory.decodeOptions",
-      "kind": "function",
-      "exported": false,
-      "shape": {
-        "type": "func(v any) error"
-      },
-      "shapeHash": "sha256:c14a5c4abf6a4f50a0f15083d7c299358ae140006bf6330141252157789a5405"
-    },
-    {
       "id": "go:github.com/MichaelKinsy/PiG/coding#graphExtensionFactory.factory",
       "package": "github.com/MichaelKinsy/PiG/coding",
       "name": "graphExtensionFactory.factory",
@@ -111208,9 +111197,9 @@
       "kind": "function",
       "exported": false,
       "shape": {
-        "type": "func(decode func(any) error) (github.com/MichaelKinsy/PiG/coding/extension.InlineExtension, error)"
+        "type": "func(raw github.com/MichaelKinsy/PiG/extensions/sdk/json.RawMessage) (github.com/MichaelKinsy/PiG/coding/extension.InlineExtension, error)"
       },
-      "shapeHash": "sha256:d0c2fe9f0d7e119b467b1219211b4a3107dfab99c29cc929c44d9794c974fc51"
+      "shapeHash": "sha256:1dca398e6021f0d2c504c66adce9dd1058a8fbec15ea727f337e188067a1efe8"
     },
     {
       "id": "go:github.com/MichaelKinsy/PiG/coding/extension/builtin#mcpEntries",

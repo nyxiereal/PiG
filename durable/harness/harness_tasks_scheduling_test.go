@@ -260,9 +260,10 @@ func TestTaskRuntime(t *testing.T) {
 		if len(reports) != 1 || reports[0].Error() != "reported" {
 			t.Fatalf("reports %v, want [reported]", reports)
 		}
-		// The step after the phase ends the invocation.
-		flush()
+		// The step after the phase ends the invocation, on its own goroutine and after the outcome the wait above returned
+		// on; the end marks the invocation ended before it cancels the runtime signal (scheduler.ts:1100-1107).
 		runtime, _ := captured.get()
+		<-runtime.Signal().Done()
 		_, snapshotErr := runtime.SnapshotErased(testContext, notes, opened.root.Id())
 		tkContainsError(t, snapshotErr, "invocation has ended")
 		var documents durable.DocumentReader = runtime

@@ -111,12 +111,14 @@ def cmd_pin(args: argparse.Namespace, repo: str, base_sha: str, run_id: str) -> 
         if not REF.fullmatch(ref):
             raise ProposalError(f"{record}: {ref!r} is not a digest-pinned ghcr.io/michaelkinsy/pig-ci-* reference")
         inputs = subprocess.run([str(ROOT / "automation/ci/ci-image-inputs.sh"), image], capture_output=True, text=True, check=True).stdout.strip()
+        # REUSE-IgnoreStart
         files[f"automation/images/{directory}/published.env"] = (
             "# SPDX-License-Identifier: MIT\n#\n"
             "# The published CI image this tree pins by digest, and the SHA-256 of the inputs it was built from\n"
             "# (automation/ci/ci-image-inputs.sh). Written by the CI images workflow's pin proposal; do not edit.\n\n"
             f"IMAGE_REF={ref}\nINPUTS_SHA256={inputs}\n"
         ).encode()
+        # REUSE-IgnoreEnd
     if not files:
         raise ProposalError("no publication record found")
     propose(

@@ -211,6 +211,7 @@ func TestInteractiveSignalsRetainHandlersThroughDisposalAndDrain(t *testing.T) {
 				case <-keyTick.C:
 				}
 			}
+
 			drainMark := output.mark()
 			if err := os.WriteFile(release, []byte("release"), 0o600); err != nil {
 				t.Fatal(err)

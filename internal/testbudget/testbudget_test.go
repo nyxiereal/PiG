@@ -1,6 +1,8 @@
 package testbudget
 
 import (
+	"context"
+	"strings"
 	"testing"
 	"time"
 )
@@ -53,5 +55,30 @@ func TestClipNote(t *testing.T) {
 				t.Fatalf("clipNote = %q, want %q", got, tc.want)
 			}
 		})
+	}
+}
+
+func TestDeadlineBound(t *testing.T) {
+	for _, tc := range []struct{ until, want time.Duration }{
+		{time.Hour, time.Hour - grace},
+		{40 * time.Second, 30 * time.Second},
+		{5 * time.Second, time.Second},
+		{-time.Second, time.Second},
+	} {
+		if got := deadlineBound(tc.until); got != tc.want {
+			t.Errorf("deadlineBound(%s) = %s, want %s", tc.until, got, tc.want)
+		}
+	}
+}
+
+func TestExpiredNamesTheDeadlineOnlyWhenItEndedTheContext(t *testing.T) {
+	if got := Expired(context.Background()); got != "" {
+		t.Fatalf("Expired(live) = %q, want empty", got)
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), time.Nanosecond)
+	defer cancel()
+	<-ctx.Done()
+	if got := Expired(ctx); !strings.Contains(got, "go test -timeout deadline") {
+		t.Fatalf("Expired(ended) = %q, want it to name the go test deadline", got)
 	}
 }

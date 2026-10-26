@@ -9,7 +9,8 @@ import (
 	"runtime"
 	"sync"
 	"testing"
-	"time"
+
+	"github.com/MichaelKinsy/PiG/internal/testbudget"
 )
 
 // testExecutable returns path as a name the platform can start: Windows runs
@@ -21,11 +22,25 @@ func testExecutable(path string) string {
 	return path
 }
 
-var pigTestBinary = sync.OnceValues(func() (string, error) { return compilePigBinary(false) })
-var releaseTestBinary = sync.OnceValues(func() (string, error) { return compilePigBinary(true) })
+// sharedTestBinary builds one pig variant once per test process. The first test to ask runs the build and passes its go test deadline; every later test reads the result.
+type sharedTestBinary struct {
+	release bool
+	once    sync.Once
+	path    string
+	err     error
+}
 
-// Both variants use the Go build cache but retain distinct compile flags. Consumers own processes and homes, not the immutable executable.
-func compilePigBinary(release bool) (string, error) {
+func (b *sharedTestBinary) get(t *testing.T) (string, error) {
+	t.Helper()
+	b.once.Do(func() { b.path, b.err = compilePigBinary(testbudget.DeadlineContext(t), b.release) })
+	return b.path, b.err
+}
+
+var pigTestBinary = &sharedTestBinary{}
+var releaseTestBinary = &sharedTestBinary{release: true}
+
+// Both variants use the Go build cache but retain distinct compile flags. Consumers own processes and homes, not the immutable executable. The build ends when it finishes or when ctx ends at the go test deadline: its length is what the host needs to link pig, so no fixed bound fits it, and a starved host fails with the deadline named instead of with a killed go command.
+func compilePigBinary(ctx context.Context, release bool) (string, error) {
 	name := "pig"
 	// -pgo=off: the allocation and startup gates measure the committed source. The default -pgo=auto picks up a cmd/pig/default.pgo that is not tracked (a developer's profile), and a PGO build inlines and escapes differently: one more turn measured 306 KB with a profile and 316-320 KB without.
 	args := []string{"build", "-pgo=off"}
@@ -38,14 +53,15 @@ func compilePigBinary(release bool) (string, error) {
 		return "", err
 	}
 	out := testExecutable(filepath.Join(binDir, name))
-	ctx, cancel := context.WithTimeout(context.Background(), 120*time.Second)
-	defer cancel()
 	cmd := exec.CommandContext(ctx, "go", append(args, "-o", out, ".")...)
 	cmd.Dir = filepath.Join(fixtureSourceRoot, "cmd", "pig")
 	if release {
 		cmd.Env = append(os.Environ(), "CGO_ENABLED=0")
 	}
 	if data, err := cmd.CombinedOutput(); err != nil {
+		if expired := testbudget.Expired(ctx); expired != "" {
+			return "", fmt.Errorf("build %s: %s\n%s", name, expired, data)
+		}
 		return "", fmt.Errorf("build %s: %w\n%s", name, err, data)
 	}
 	return out, nil
@@ -53,7 +69,7 @@ func compilePigBinary(release bool) (string, error) {
 
 func buildPigBinaryForSignalTest(t *testing.T) string {
 	t.Helper()
-	out, err := pigTestBinary()
+	out, err := pigTestBinary.get(t)
 	if err != nil {
 		t.Fatal(err)
 	}

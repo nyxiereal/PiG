@@ -311,7 +311,7 @@ func (m *PackageManager) uninstallManagedNPM(source string, local bool) error {
 		return nil
 	}
 	// npm writes broken nested package-lock.json paths when --prefix goes through a symlink (package-manager.ts uninstallNpm).
-	installRoot, err := filepath.EvalSymlinks(root)
+	installRoot, err := codingagent.RealPathSync(root)
 	if err != nil {
 		return err
 	}

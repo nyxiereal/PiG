@@ -356,7 +356,7 @@ func TestPackageManagerNpmUninstallAndUpdateCheckUseTheConfiguredCommand(t *test
 	}
 	calls, _ := os.ReadFile(log)
 	// npm gets the real path of the install root, as package-manager.ts uninstallNpm passes it (a temporary directory may be a symlink).
-	realRoot, err := filepath.EvalSymlinks(root)
+	realRoot, err := codingagent.RealPathSync(root)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -386,7 +386,7 @@ func TestPackageManagerNpmInstallAndUninstallPassTheRealPathWhenTheAgentDirIsASy
 	if err := pm.Remove("npm:left-pad", false); err != nil {
 		t.Fatal(err)
 	}
-	realRoot, err := filepath.EvalSymlinks(filepath.Join(realAgent, "npm"))
+	realRoot, err := codingagent.RealPathSync(filepath.Join(realAgent, "npm"))
 	if err != nil {
 		t.Fatal(err)
 	}

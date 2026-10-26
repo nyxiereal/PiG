@@ -9033,6 +9033,27 @@
       ]
     },
     {
+      "id": "BF-54e3983",
+      "title": "fix(packagemanager): npm gets Node's realpathSync of the install root, and the npm tests expect it",
+      "symptom": "fix(packagemanager): npm gets Node's realpathSync of the install root, and the npm tests expect it",
+      "rootCause": "Pi passes realpathSync(root) as --prefix. PiG's port used filepath.EvalSymlinks, which on Windows expands 8.3 short names (C:\\Users\\RUNNER~1) and the case of every component to the stored form, where Node's realpathSync keeps every component that is not a link as the caller spelled it. RealInstallRoot and the uninstall path now use codingagent.RealPathSync (Node's realpathSync, the walk CanonicalizePath and the self-update tier already use), so npm is given the spelling Pi gives it.",
+      "rootCauseSource": "commit",
+      "userImpact": "Behavior differed from Pi",
+      "platform": "All platforms",
+      "class": "own",
+      "fixedIn": "Unreleased",
+      "origin": "commit",
+      "commits": [
+        {
+          "hash": "54e3983c76",
+          "date": "2026-10-26"
+        }
+      ],
+      "tests": [
+        "internal/codingagent/canonical_path_relative_test.go::TestRealPathSyncMatchesNodeRealpathSync"
+      ]
+    },
+    {
       "id": "BF-55573f4",
       "title": "fix(sdk): Rust and Python fuzzy match score contiguous occurrences (Pi)",
       "symptom": "fix(sdk): Rust and Python fuzzy match score contiguous occurrences (Pi)",
@@ -32659,6 +32680,28 @@
       ],
       "tests": [
         "ai/supports_xhigh_upstream_test.go::TestSupportsXHighUpstream"
+      ]
+    },
+    {
+      "id": "BF-e57444c",
+      "title": "fix(extension/host): the Node runtime holds the frames read after a run beginning until the immediates queued…",
+      "symptom": "fix(extension/host): the Node runtime holds the frames read after a run beginning until the immediates queued before it ran",
+      "rootCause": "A print prompt's input handler queues an immediate that Pi runs during the run, at the bash tool's I/O, before session_shutdown. The runtime blocks its event loop until the host's next step, the run beginning. A process the OS schedules late reads the run beginning, the run's end and the shutdown request in one pass of the wait, and its serve loop ran the shutdown handler in the microtasks after the wait, before the check phase, then waited again: the immediate never ran. TestPrintInputCallbackRunsDuringTheRun failed in half of the runs with eight copies sharing a macOS runner; origin/main fails the same way and its CI passed by timing. The frames read after the run beginning now wait for…",
+      "rootCauseSource": "commit",
+      "userImpact": "Behavior differed from Pi",
+      "platform": "All platforms",
+      "class": "own",
+      "fixedIn": "Unreleased",
+      "origin": "commit",
+      "commits": [
+        {
+          "hash": "e57444c856",
+          "date": "2026-10-26"
+        }
+      ],
+      "tests": [
+        "coding/cli/print_prompt_end_binary_test.go::TestPrintInputCallbackRunsDuringTheRun",
+        "coding/extension/host/subprocess/runtime_node_run_beginning_test.go::TestNodeRunBeginningRunsTheInputsImmediateBeforeTheFramesReadWithIt"
       ]
     },
     {

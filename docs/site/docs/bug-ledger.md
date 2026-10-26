@@ -957,6 +957,7 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 | [BF-d305b76](#bf-d305b76) | A Go extension whose `go.mod` replace (or a Rust extension whose `pig-sdk` path dependency) points at an SDK… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-d36b329](#bf-d36b329) | The edit tool no longer accepts a JSON-string `edits` value that starts or ends with non-JSON whitespace such… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-d37c769](#bf-d37c769) | A replacement request body from a `before_provider_request` hook on Anthropic Messages, and every OpenAI… | PiG's own defect | All platforms | 0.5.0 |
+| [BF-d38f3be](#bf-d38f3be) | fix(durable): record the requested thinking level without boxing a string in the turn package | PiG's own defect | All platforms | Unreleased |
 | [BF-d39069d](#bf-d39069d) | Tool cards rebuilt when a session is resumed now follow the `showImages` and `imageWidthCells` settings | PiG's own defect | All platforms | 0.5.0 |
 | [BF-d3b3618](#bf-d3b3618) | Fix in shipped code | PiG's own defect | All platforms | Unreleased |
 | [BF-d42aebb](#bf-d42aebb) | `ai.ValidateToolArguments` and `ai.ValidateToolCall` list a failed validation's errors in the order the… | PiG's own defect | All platforms | 0.5.0 |
@@ -14231,6 +14232,19 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 - **Fix commits:** `d37c76932f` (2026-10-10)
 - **Tests:** `ai/request_body_member_order_test.go::TestAnthropicReplacementBodyKeepsItsMemberOrder`, `ai/request_body_member_order_test.go::TestCodexWebSocketMessageKeepsTheRequestBodyMemberOrder`
 - **Release note:** A replacement request body from a `before_provider_request` hook on Anthropic Messages, and every OpenAI Codex WebSocket `response.create` message, now leave in Pi's member order (`type` first for the WebSocket message) instead of sorted keys.
+
+### BF-d38f3be
+
+**fix(durable): record the requested thinking level without boxing a string in the turn package**
+
+- **Source:** PiG's own defect
+- **Symptom:** fix(durable): record the requested thinking level without boxing a string in the turn package
+- **Root cause:** durable-core-budget failed with "turn: 711 sites > 709" (durable/core/budget/allocs.json). Cause: (Pi: the requested thinking level on assistant messages) added the only two sites, both in generation_classify.go: message.Set("thinkingLevel", req.thinking) and cp.Set("thinkingLevel", req.thinking) take an `any`, and converting the string field to it is a heap allocation under TinyGo.
+- **User impact:** Behavior differed from Pi
+- **Platform:** All platforms
+- **Fixed in:** Unreleased
+- **Fix commits:** `d38f3be25c` (2026-10-25)
+- **Tests:** None recorded.
 
 ### BF-d39069d
 

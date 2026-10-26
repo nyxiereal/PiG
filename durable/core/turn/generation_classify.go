@@ -28,7 +28,7 @@ func (r *run) classify(req requestInfo, message *jv.Object) {
 		return
 	}
 	// Record the requested level, as pi-agent-core's agent loop does.
-	if req.thinking != "" {
+	if req.thinking != nil {
 		message.Set("thinkingLevel", req.thinking)
 	}
 	stop := str(message, "stopReason")
@@ -54,7 +54,7 @@ func (r *run) classify(req requestInfo, message *jv.Object) {
 			cp := jobj("phase", phasePoll, "attempt", req.attempt)
 			withCompacted(cp, req.compacted)
 			cp.Set("model", req.model.object())
-			if req.thinking != "" {
+			if req.thinking != nil {
 				cp.Set("thinkingLevel", req.thinking)
 			}
 			cp.Set("cutoff", float64(req.cutoff))

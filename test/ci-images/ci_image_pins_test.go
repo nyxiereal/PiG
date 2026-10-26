@@ -9,6 +9,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"regexp"
+	"slices"
 	"strings"
 	"testing"
 
@@ -212,12 +213,7 @@ func TestCIImageInputsFollowEveryInput(t *testing.T) {
 }
 
 func contains(list []string, item string) bool {
-	for _, entry := range list {
-		if entry == item {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(list, item)
 }
 
 // proposalRun runs propose-ci-image-change.py with a fake gh that logs every call and its standard input.

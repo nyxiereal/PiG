@@ -126,20 +126,21 @@ func writeSpriteProbe(t *testing.T, language string) string {
 	return root
 }
 
-// buildSpriteProbe loads the probe once in print mode, so the extension is built and cached under pigHome before a
+// prebuildExtension loads the extension at probe once in print mode, so it is built and cached under pigHome before a
 // pseudo-terminal session starts. The build is the one step whose duration no per-wait budget can bound: cargo locks the
 // package's shared target directory (internal/testenv.SharedCargoTargetDir), so a Rust build waits for every other build
 // into it, in this package and in any other run on the host that shares the cache, and a cold target compiles every SDK
-// dependency first. Inside a session the build comes before the header, so the "starting" wait covered it and failed with
+// dependency first. Inside a session the build comes before the header, so the first wait covered it and failed with
 // "Building extensions [0/1]" as the last output once the queue and the compile outlasted testbudget.Wait. Here the wait
 // is the process's exit, which ends the moment the build and the run finish; a build that never ends fails at the go test
-// deadline.
-func buildSpriteProbe(t *testing.T, binary, pigHome, agentDir, probe string) {
+// deadline. env adds to the probe's environment.
+func prebuildExtension(t *testing.T, binary, pigHome, agentDir, probe string, env ...string) {
 	t.Helper()
 	seedFirstRunDone(t, agentDir)
 	cmd := exec.CommandContext(t.Context(), binary, "-e", probe, "--model", "test-faux/faux-1", "--mode", "text", "-p", "What is 20+22?")
 	cmd.Dir = t.TempDir()
 	cmd.Env = append(os.Environ(), "PIG_HOME="+pigHome, "PIG_CODING_AGENT_DIR="+agentDir, "PIG_TEST_FAUX=1", "PIG_TEST_FAUX_SCENARIO=parity-basic")
+	cmd.Env = append(cmd.Env, env...)
 	if output, err := cmd.CombinedOutput(); err != nil {
 		t.Fatalf("building the probe in print mode: %v\n%s", err, output)
 	}
@@ -239,7 +240,7 @@ func TestExtensionSpriteJoinsSpriteAndPersistsAcrossRestarts(t *testing.T) {
 			probe := writeSpriteProbe(t, language)
 			pigHome, agentDir := t.TempDir(), t.TempDir()
 
-			buildSpriteProbe(t, binary, pigHome, agentDir, probe)
+			prebuildExtension(t, binary, pigHome, agentDir, probe)
 
 			first := startSpriteSession(t, binary, pigHome, agentDir, "-e", probe)
 			first.await("starting", 0, "v")

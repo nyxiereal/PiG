@@ -1,7 +1,7 @@
 # Pi binds an extension's ctx.mode to the mode it runs in: "tui" (interactive-mode.ts bindExtensions), "rpc" (rpc-mode.ts), "json" or "print" (print-mode.ts).
 # The fixture runs the real CLI in interactive mode on a PTY and in print, json and rpc mode on pipes, with an extension that records ctx.mode at session_start,
 # and prints the mode each run recorded. A host that never sent the run mode leaves every extension on the "print" default, so the tui, json and rpc runs differ from Pi's.
-name = "88-extension-run-mode"
+name = "90-extension-run-mode"
 description = "An extension reads ctx.mode as tui, print, json and rpc in the run mode of the CLI that loaded it."
 covers = ["packages/coding-agent/src/core/extensions/runner.ts", "packages/coding-agent/src/core/extensions/types.ts"]
 tags = ["fast", "hermetic"]

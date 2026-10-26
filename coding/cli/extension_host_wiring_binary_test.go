@@ -131,7 +131,7 @@ func TestExtensionVirtualModelFlushFailureStopsStartup(t *testing.T) {
 	}
 }
 
-// Pi binds a mode's extensions with that mode: print-mode.ts bindExtensions passes "json" for --mode json and "print" otherwise, and rpc-mode.ts passes "rpc"; the interactive mode passes "tui" (interactive-mode.ts), which the parity scenario 88-extension-run-mode drives on a PTY. An extension reads it as ctx.mode. Pig's host sends the mode in the ready payload, and every SDK that never receives one reports "print" (issue 360), so only json and rpc tell a host that sends the mode from one that does not.
+// Pi binds a mode's extensions with that mode: print-mode.ts bindExtensions passes "json" for --mode json and "print" otherwise, and rpc-mode.ts passes "rpc"; the interactive mode passes "tui" (interactive-mode.ts), which the parity scenario 90-extension-run-mode drives on a PTY. An extension reads it as ctx.mode. Pig's host sends the mode in the ready payload, and every SDK that never receives one reports "print" (issue 360), so only json and rpc tell a host that sends the mode from one that does not.
 func TestExtensionContextModeIsTheRunMode(t *testing.T) {
 	t.Parallel()
 	for _, fixture := range []string{"host-wiring-run-mode.mjs", "host-wiring-run-mode.py"} {

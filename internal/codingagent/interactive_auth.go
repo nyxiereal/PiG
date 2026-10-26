@@ -782,17 +782,12 @@ func (m *InteractiveMode) updateProviderInfo() {
 		return
 	}
 	items := m.availableModelItems()
-	scoped := m.scopedModelItems(items)
-	if len(scoped) > 0 {
+	if scoped := m.scopedModelItems(items); len(scoped) > 0 {
 		items = scoped
 	}
 	providers := make(map[string]struct{})
 	for _, item := range items {
 		providers[item.Provider] = struct{}{}
-	}
-	// Under Pi the parity harness registers test-faux from an extension with a configured key, so it is one of the available providers; PiG builds it in under PIG_TEST_FAUX and the registry does not list it.
-	if len(scoped) == 0 && testFauxProvider(testFauxProviderID) {
-		providers[testFauxProviderID] = struct{}{}
 	}
 	m.statusLine.SetProviderCount(len(providers))
 

@@ -1301,6 +1301,46 @@ func TestPublicationAtAdoption(t *testing.T) {
 		<-closing
 	})
 
+	// A reconcile pass ends with an idle settle, on its own goroutine, after it left the Session line. Upstream's continuation
+	// there runs before the next job on the line, so it never sees a commit adopted and not yet published to the host
+	// listeners; this goroutine can run while such a commit is published. The listener plays that settle: it runs one on the
+	// state its commit changed, and the idle waits it could resolve must stay pending until the listener returned.
+	t.Run("keeps an idle wait pending when an idle settle outside the publication runs on a commit before its host listeners returned", func(t *testing.T) {
+		gate := deferred()
+		gated := tkGated("test.settle-in-listener", gate)
+		opened := tkOpenRoot(t, []durable.AnyTask{gated.Erased()})
+		id := tkStart(t, opened.root, gated.Erased())
+		tasks := opened.harness.(*harnessImpl).tasks
+		var order syncList[string]
+		opened.harness.SubscribeCommits(func(_ context.Context, publication durable.CommitPublication) {
+			if publicationTerminal(publication, id) {
+				tasks.resolveIdleWaiters()
+				order.add(fmt.Sprintf("host pending=%d", len(tasks.idleHarness.Keys())+len(tasks.idleWaiters.Keys())))
+			}
+		})
+		opened.harness.Resume()
+		idled := make(chan struct{}, 2)
+		callAsync(func() {
+			_ = opened.harness.WaitForIdle(testContext)
+			order.add("harness idle")
+			idled <- struct{}{}
+		})
+		callAsync(func() {
+			_ = opened.root.WaitForIdle(testContext)
+			order.add("conversation idle")
+			idled <- struct{}{}
+		})
+		gate.resolve()
+		<-idled
+		<-idled
+		got := order.all()
+		slices.Sort(got[1:])
+		if want := []string{"host pending=2", "conversation idle", "harness idle"}; !reflect.DeepEqual(got, want) {
+			t.Fatalf("order %v, want %v", got, want)
+		}
+		mustClose(t, opened.harness)
+	})
+
 	t.Run("keeps a task wait resolved when the Harness closes after adoption, before the storage resolved", func(t *testing.T) {
 		store := newLateResolvingStorage()
 		gate := deferred()

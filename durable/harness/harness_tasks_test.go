@@ -1291,28 +1291,25 @@ func TestPublicationAtAdoption(t *testing.T) {
 
 	// Upstream's listener calls close(), whose seal runs inside the listener, before the publication wakes the waits: the wait
 	// the terminal commit settled keeps its receipt. A Go listener closes on a goroutine of its own, so this one waits until the
-	// seal has rejected what it rejects, which it learns from the pending idle wait the seal rejects after the task waits, and
-	// only then returns for the publication to wake them.
+	// seal has rejected what it rejects, which it learns from a Harness wait under a key no settle resolves (the seal rejects
+	// the Harness waits last), and only then returns for the publication to wake the waits.
 	t.Run("keeps a task wait resolved when a host listener's close has sealed the Harness before the publication wakes the waits", func(t *testing.T) {
 		gate := deferred()
 		gated := tkGated("test.seal-in-listener", gate)
 		opened := tkOpenRoot(t, []durable.AnyTask{gated.Erased()})
 		id := tkStart(t, opened.root, gated.Erased())
-		idled := make(chan error, 1)
+		sealed := opened.harness.(*harnessImpl).tasks.idleHarness.Add(testContext, false)
 		closing := make(chan struct{})
 		var once sync.Once
 		opened.harness.SubscribeCommits(func(_ context.Context, publication durable.CommitPublication) {
 			if publicationTerminal(publication, id) {
 				once.Do(func() {
 					go func() { _ = opened.harness.Close(testContext); close(closing) }()
-					if err := <-idled; err == nil || !strings.Contains(err.Error(), "closed") {
-						t.Errorf("the seal did not reject the idle wait: %v", err)
-					}
+					<-sealed.Done()
 				})
 			}
 		})
 		opened.harness.Resume()
-		callAsync(func() { idled <- opened.harness.WaitForIdle(testContext) })
 		waited := make(chan durable.SettledTask[durable.JsonValue], 1)
 		callAsync(func() {
 			receipt, err := opened.harness.WaitForTask(testContext, id)
@@ -1332,41 +1329,74 @@ func TestPublicationAtAdoption(t *testing.T) {
 	// A reconcile pass ends with an idle settle, on its own goroutine, after it left the Session line. Upstream's continuation
 	// there runs before the next job on the line, so it never sees a commit adopted and not yet published to the host
 	// listeners; this goroutine can run while such a commit is published. The listener plays that settle: it runs one on the
-	// state its commit changed, and the idle waits it could resolve must stay pending until the listener returned.
-	t.Run("keeps an idle wait pending when an idle settle outside the publication runs on a commit before its host listeners returned", func(t *testing.T) {
+	// state its commit changed, and the idle waits registered before the commit must not be awake until the listener returned.
+	t.Run("keeps an idle wait asleep when an idle settle outside the publication runs on a commit before its host listeners returned", func(t *testing.T) {
 		gate := deferred()
 		gated := tkGated("test.settle-in-listener", gate)
 		opened := tkOpenRoot(t, []durable.AnyTask{gated.Erased()})
 		id := tkStart(t, opened.root, gated.Erased())
 		tasks := opened.harness.(*harnessImpl).tasks
-		var order syncList[string]
+		conversationWait := tasks.idleWaiters.Add(testContext, opened.root.Id())
+		harnessWait := tasks.idleHarness.Add(testContext, true)
+		awake := make(chan int, 1)
 		opened.harness.SubscribeCommits(func(_ context.Context, publication durable.CommitPublication) {
 			if publicationTerminal(publication, id) {
 				tasks.resolveIdleWaiters()
-				order.add(fmt.Sprintf("host pending=%d", len(tasks.idleHarness.Keys())+len(tasks.idleWaiters.Keys())))
+				count := 0
+				for _, wait := range []*Waiter[struct{}]{conversationWait, harnessWait} {
+					select {
+					case <-wait.Done():
+						count++
+					default:
+					}
+				}
+				awake <- count
 			}
 		})
 		opened.harness.Resume()
-		idled := make(chan struct{}, 2)
-		callAsync(func() {
-			_ = opened.harness.WaitForIdle(testContext)
-			order.add("harness idle")
-			idled <- struct{}{}
-		})
-		callAsync(func() {
-			_ = opened.root.WaitForIdle(testContext)
-			order.add("conversation idle")
-			idled <- struct{}{}
-		})
 		gate.resolve()
-		<-idled
-		<-idled
-		got := order.all()
-		slices.Sort(got[1:])
-		if want := []string{"host pending=2", "conversation idle", "harness idle"}; !reflect.DeepEqual(got, want) {
-			t.Fatalf("order %v, want %v", got, want)
+		if count := <-awake; count != 0 {
+			t.Fatalf("%d idle waits woke before the host listeners returned", count)
+		}
+		for _, wait := range []*Waiter[struct{}]{conversationWait, harnessWait} {
+			if _, err := wait.Wait(); err != nil {
+				t.Fatal(err)
+			}
 		}
 		mustClose(t, opened.harness)
+	})
+
+	// Upstream settles an idle wait inside the observer, at the commit that made its scope idle, so a close whose seal runs
+	// before the code awaiting it resumes cannot reject it. A Go listener closes on a goroutine of its own, so this one
+	// waits until the seal has rejected what it rejects, which it learns from a Harness wait under a key no settle resolves
+	// (the seal rejects the Harness waits last), and only then returns for the publication to wake the waits.
+	t.Run("keeps an idle wait resolved when a host listener's close has sealed the Harness before the publication wakes the waits", func(t *testing.T) {
+		gate := deferred()
+		gated := tkGated("test.seal-idle-in-listener", gate)
+		opened := tkOpenRoot(t, []durable.AnyTask{gated.Erased()})
+		id := tkStart(t, opened.root, gated.Erased())
+		sealed := opened.harness.(*harnessImpl).tasks.idleHarness.Add(testContext, false)
+		closing := make(chan struct{})
+		var once sync.Once
+		opened.harness.SubscribeCommits(func(_ context.Context, publication durable.CommitPublication) {
+			if publicationTerminal(publication, id) {
+				once.Do(func() {
+					go func() { _ = opened.harness.Close(testContext); close(closing) }()
+					<-sealed.Done()
+				})
+			}
+		})
+		opened.harness.Resume()
+		idled := make(chan error, 2)
+		callAsync(func() { idled <- opened.harness.WaitForIdle(testContext) })
+		callAsync(func() { idled <- opened.root.WaitForIdle(testContext) })
+		gate.resolve()
+		for range 2 {
+			if err := <-idled; err != nil {
+				t.Error(err)
+			}
+		}
+		<-closing
 	})
 
 	t.Run("keeps a task wait resolved when the Harness closes after adoption, before the storage resolved", func(t *testing.T) {

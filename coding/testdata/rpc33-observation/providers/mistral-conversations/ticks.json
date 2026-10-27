@@ -1,6 +1,6 @@
 {
   "piVersion": "1.4.0+6c384aa3",
-  "node": "v24.22.1",
+  "node": "v24.19.0",
   "scenarios": [
     {
       "name": "oneChunk",
@@ -191,7 +191,7 @@
         "stopReason": "toolUse",
         "responseId": "r1",
         "rawStopReason": "tool_calls",
-        "durationMs": 35
+        "durationMs": 38
       }
     },
     {
@@ -2777,7 +2777,7 @@
         "stopReason": "toolUse",
         "responseId": "r1",
         "rawStopReason": "tool_calls",
-        "durationMs": 0
+        "durationMs": 1
       }
     },
     {
@@ -2965,7 +2965,7 @@
         "responseId": "r1",
         "rawStopReason": "error",
         "errorMessage": "Provider stopped with: error (server error)",
-        "durationMs": 0
+        "durationMs": 1
       }
     },
     {
@@ -3137,7 +3137,7 @@
         "stopReason": "length",
         "responseId": "r1",
         "rawStopReason": "model_length",
-        "durationMs": 0
+        "durationMs": 1
       }
     },
     {
@@ -4334,7 +4334,7 @@
         "stopReason": "stop",
         "responseId": "r1",
         "rawStopReason": "stop",
-        "durationMs": 1
+        "durationMs": 0
       }
     },
     {
@@ -4658,7 +4658,7 @@
         },
         "stopReason": "error",
         "errorMessage": "body failed",
-        "durationMs": 1
+        "durationMs": 0
       }
     },
     {
@@ -4711,7 +4711,7 @@
         },
         "stopReason": "error",
         "errorMessage": "Mistral stream ended without a finish reason",
-        "durationMs": 1
+        "durationMs": 0
       }
     }
   ]

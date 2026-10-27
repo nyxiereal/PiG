@@ -109,10 +109,6 @@
   },
   {
     "provider": "opencode",
-    "id": "deepseek-v4-flash"
-  },
-  {
-    "provider": "opencode",
     "id": "deepseek-v4-pro"
   },
   {

@@ -2845,9 +2845,6 @@
         "chord/watch_upstream_test.go#TestWatchKeepsMaxPendingOpsPendingOpsAfterFoldingAndReplacesTheRootPastThem",
         "chord/watch_upstream_test.go#TestWatchNeverFoldsTheInFlightCallIntoAnOverflow",
         "chord/watch_upstream_test.go#TestWatchStartsFoldingAgainAfterAnOverflowWasDelivered",
-        "chord/watch_upstream_test.go#TestWatchRetirementDeliversTheLastCallThenEndsRetired",
-        "chord/watch_upstream_test.go#TestWatchRetirementDropsPendingFramesAlsoAnOverflowForTheRetirement",
-        "chord/watch_upstream_test.go#TestWatchEndsRetiredOnlyOnItsSourcesRetirementNeverOnANullValue",
         "chord/watch_upstream_test.go#TestWatchDiscardsARetirementStillPendingWhenTheSourceEnds",
         "chord/watch_upstream_test.go#TestWatchStopsIdempotentlyAndRejectsARepeatedOrLateStart",
         "chord/watch_upstream_test.go#TestWatchEndsEndedOrFailedFromItsSourceDroppingPendingFrames",
@@ -2865,7 +2862,9 @@
         "chord/watch_upstream_test.go#TestWatchableWatchHoldsTheCurrentValueThenOneFramePerChangeAndEndsWithItsContext",
         "chord/watch_upstream_test.go#TestNativeWatchableWatchHoldsTheCurrentValueThenOneFramePerNewValueAndEndsWithItsContext",
         "chord/watch_upstream_test.go#TestWatchReportsARetirementInTheNextCallWithTheValueTheSourceGivesAndGoesOn",
-        "chord/watch_upstream_test.go#TestWatchFoldsARetirementAndTheFramesAroundItIntoOneCallThatReportsIt"
+        "chord/watch_upstream_test.go#TestWatchFoldsARetirementAndTheFramesAroundItIntoOneCallThatReportsIt",
+        "chord/watch_upstream_test.go#TestWatchKeepsReportingTheRetirementPastAnOverflow",
+        "chord/watch_upstream_test.go#TestWatchTreatsANullValueAsAValueNeverAsARetirement"
       ],
       "rationale": "All 24 cases of watch.test.ts are ported to chord/watch_upstream_test.go against chord/watch_impl.go (Watch, NativeWatch, DeliveryScheduler), with upstream's flush() as DeliveryScheduler.Wait. Go mapping: a started listener runs on a delivery goroutine, so \"never inline\" asserts a goroutine other than the advancing one; the WeakRef/gc reference tests check that an ended watch holds no detach, report, replace, listener, scheduler, signal or pending frame and keeps its last value; the Retire type-level test (@ts-expect-error for a number watch) has no Go counterpart, since Go's Retire delivers the zero value of any T. A thrown non-Error is a panic with a non-error value, wrapped as the listener error. Pi d8d99950a rewrites the Watch cases for folding: one call with the newest value and the folded ops, a slow listener getting about one call per busy period, the cap at 10,000 pending ops with the root replaced past it, retirement over pending commits, and NativeWatch's per-value queue with replace. All are ported (the slow-listener case drives a gated listener through 600 commits instead of fake timers); the reference tests now check that an ended watch holds no pending ops and no newest frame."
     },

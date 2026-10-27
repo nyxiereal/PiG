@@ -18,6 +18,7 @@ const windowsOverflowMessage = "short read in readEvents()"
 
 // isWatchOverflow reports whether err says events were lost while the native watch stays armed. A reload re-reads the file, so lost events need no other recovery.
 func isWatchOverflow(err error) bool {
+	//portlint:allow erroridentity fsnotify v1.5.4's Windows backend returns errors.New("short read in readEvents()") with no sentinel, so the message is its only identity
 	return errors.Is(err, fsnotify.ErrEventOverflow) || err != nil && err.Error() == windowsOverflowMessage
 }
 

@@ -374,10 +374,10 @@ func (m *InteractiveMode) runLoginRegisteredOAuth(loginCtx context.Context, prov
 			notify()
 		},
 		OnAuth: func(info ai.OAuthAuthInfo) {
-			dlg.ShowAuth(info.URL, info.Instructions)
+			target := dlg.ShowAuth(info.URL, info.Instructions)
 			notify()
-			if !parityHarnessEnabled() {
-				_ = openBrowser(info.URL)
+			if target != "" && !parityHarnessEnabled() {
+				_ = openBrowser(target)
 			}
 		},
 		OnManualCodeInput:        func() (string, error) { return manualCode(context.Background(), manualCodeMessage) },
@@ -561,10 +561,10 @@ func (m *InteractiveMode) runLoginOpenAICodex(loginCtx context.Context) error {
 			notify()
 		},
 		OnAuth: func(info ai.OAuthAuthInfo) {
-			dlg.ShowAuth(info.URL, info.Instructions)
+			target := dlg.ShowAuth(info.URL, info.Instructions)
 			notify()
-			if !parityHarnessEnabled() {
-				_ = openBrowser(info.URL)
+			if target != "" && !parityHarnessEnabled() {
+				_ = openBrowser(target)
 			}
 		},
 		OnManualCodeInput: func() (string, error) {
@@ -859,9 +859,8 @@ func (m *InteractiveMode) footerUsageTotals() footerUsageTotals {
 func notifyAuthDialog(dlg *tui.LoginDialogComponent, event ai.AuthEvent) {
 	switch e := event.(type) {
 	case ai.AuthURLEvent:
-		dlg.ShowAuth(e.URL, e.Instructions)
-		if !parityHarnessEnabled() {
-			_ = openBrowser(e.URL)
+		if target := dlg.ShowAuth(e.URL, e.Instructions); target != "" && !parityHarnessEnabled() {
+			_ = openBrowser(target)
 		}
 	case ai.AuthDeviceCodeEvent:
 		info := tui.OAuthDeviceCodeInfo{UserCode: e.UserCode, VerificationURI: e.VerificationURI, OpenBrowserOnConfirm: e.OpenBrowserOnConfirm, CopyCodeOnConfirm: e.CopyCodeOnConfirm}

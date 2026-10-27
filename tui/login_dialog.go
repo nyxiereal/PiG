@@ -4,14 +4,43 @@ package tui
 
 import (
 	"fmt"
-	"net/url"
 	"runtime"
 	"slices"
 	"strings"
 	"sync"
 
 	"github.com/MichaelKinsy/PiG/internal/jsstring"
+	"github.com/MichaelKinsy/PiG/internal/nodeurl"
+	"github.com/MichaelKinsy/PiG/tui/widthx"
 )
+
+// webURL is login-dialog.ts webUrl: the normalized href of the http: or https: URL value names, and false for anything else. The shared launcher also opens
+// files and custom protocols, so login only opens web URLs; normalizing percent-encodes control characters, which would otherwise end a terminal hyperlink early.
+func webURL(value string) (string, bool) {
+	parsed, err := nodeurl.ParseHTTPHref(value)
+	if err != nil {
+		return "", false
+	}
+	return parsed.Href, true
+}
+
+// displayURL is login-dialog.ts displayUrl: value normalized as a web URL, else with control characters replaced, since an untrusted string printed as it is
+// could end a hyperlink early or send its own escape sequences to the terminal.
+func displayURL(value string) string {
+	if href, ok := webURL(value); ok {
+		return href
+	}
+	return widthx.ReplaceControlCharacters(value)
+}
+
+// webLink is login-dialog.ts webLink: text as a terminal hyperlink to url when that is a web URL, else plain text.
+func webLink(text, url string) string {
+	target, ok := webURL(url)
+	if !ok {
+		return text
+	}
+	return Hyperlink(text, target)
+}
 
 const secretInputSuffixCharacters = 4 // pig divergence (D80): reveal only the final four characters of inputs longer than four.
 const secretInputMaxDots = 8          // pig divergence (D80): bound the preview independently of input length; the counter reports the full length.
@@ -150,12 +179,18 @@ func loginKeyHint(action TUIKeybinding, description string) string {
 	return ActiveTheme().Fg("dim", key) + ActiveTheme().Fg("muted", " "+description)
 }
 
-// ShowAuth replaces the dialog content with a URL and optional instructions.
-func (d *LoginDialogComponent) ShowAuth(url, instructions string) {
+// ShowAuth replaces the dialog content with a URL and optional instructions. It returns the URL the caller opens in the browser, which is the normalized
+// href of a web URL and empty for any other URL (login-dialog.ts showAuth opens only that target).
+func (d *LoginDialogComponent) ShowAuth(url, instructions string) (browserTarget string) {
 	d.mu.Lock()
 	defer d.mu.Unlock()
 	d.clearDeviceCodeActionLocked()
-	d.authURL = NewAuthURL(url, d.copyText, func() {
+	target, isWeb := webURL(url)
+	shown := target
+	if !isWeb {
+		shown = widthx.ReplaceControlCharacters(url)
+	}
+	d.authURL = NewAuthURL(shown, d.copyText, func() {
 		d.Invalidate()
 		if d.requestRender != nil {
 			d.requestRender()
@@ -169,6 +204,7 @@ func (d *LoginDialogComponent) ShowAuth(url, instructions string) {
 		d.addLine(" " + ActiveTheme().Fg("warning", d.redactLocked(instructions)))
 	}
 	d.Invalidate()
+	return target
 }
 
 // OAuthDeviceCodeInfo is the user code and verification URL a device-code login shows (Pi's OAuthDeviceCodeInfo, ai compat/extension-oauth-types.ts:17). OpenBrowserOnConfirm and CopyCodeOnConfirm
@@ -266,24 +302,21 @@ func (d *LoginDialogComponent) activateDeviceCodeLocked(info OAuthDeviceCodeInfo
 		d.setDeviceCodeStatusLocked(hint, "Browser open requested")
 	}
 	if info.OpenBrowserOnConfirm != nil && *info.OpenBrowserOnConfirm && d.openBrowser != nil {
-		if target, err := url.Parse(info.VerificationURI); err == nil && (target.Scheme == "https" || target.Scheme == "http") && target.Host != "" {
-			if target.Path == "" {
-				target.Path = "/"
-			}
-			d.openBrowser(target.String())
+		if target, ok := webURL(info.VerificationURI); ok {
+			d.openBrowser(target)
 		}
 	}
 }
 
 // linkedURLLines renders the hyperlinked URL and the platform's click hint.
-func linkedURLLines(url string) []string {
+func linkedURLLines(verificationURI string) []string {
 	t := ActiveTheme()
-	linked := func(label string) string { return "\x1b]8;;" + url + "\x07" + label + "\x1b]8;;\x07" }
+	shown := displayURL(verificationURI)
 	hint := "Ctrl+click to open"
 	if runtime.GOOS == "darwin" {
 		hint = "Cmd+click to open"
 	}
-	return []string{" " + t.Fg("accent", linked(url)), " " + t.Fg("dim", linked(hint))}
+	return []string{" " + t.Fg("accent", webLink(shown, shown)), " " + t.Fg("dim", webLink(hint, verificationURI))}
 }
 
 // ShowDetails replaces the content with informational lines before a provider prompt.
@@ -311,11 +344,12 @@ func (d *LoginDialogComponent) ShowInfo(message string, links []AuthInfoLink, sh
 	d.addSpacer()
 	d.addLine(" " + t.Fg("text", d.redactLocked(message)))
 	for _, link := range links {
-		text := link.URL
+		shown := displayURL(link.URL)
+		text := shown
 		if link.Label != "" {
-			text = link.Label + ": " + link.URL
+			text = link.Label + ": " + shown
 		}
-		d.addLine(" " + t.Fg("accent", "\x1b]8;;"+link.URL+"\x07"+text+"\x1b]8;;\x07"))
+		d.addLine(" " + t.Fg("accent", webLink(text, shown)))
 	}
 	if showCloseHint {
 		d.addSpacer()

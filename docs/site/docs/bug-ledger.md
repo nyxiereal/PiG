@@ -111,6 +111,7 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 | [BF-1f7fa2f](#bf-1f7fa2f) | In print and JSON mode, an extension in its own Node process no longer runs its callbacks with a stale ctx… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-1fbdabb](#bf-1fbdabb) | A CRLF that a proxy splits across two network chunks no longer aborts an Anthropic turn with `Could not parse… | A Pi defect that PiG fixed first | All platforms | 0.5.0 |
 | [BF-1fcf017](#bf-1fcf017) | `toUpperCase` ports use a shared JavaScript `jsstring.ToUpper` (matches Node over every code point).… | PiG's own defect | All platforms | 0.5.0 |
+| [BF-2022c75](#bf-2022c75) | sdk-py: fix the ruff findings in the type engine, child session and type vector tests | PiG's own defect | All platforms | Unreleased |
 | [BF-202b8f1](#bf-202b8f1) | On arm64 and other CPUs with a fused multiply-add, the OKHSL saturation of a color (used when generating the… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-205933e](#bf-205933e) | fix(ai): a Gemini model outside the catalog carries the provider's API, so replay's isSameModel matches Pi… | PiG's own defect | All platforms | Unreleased |
 | [BF-20718f7](#bf-20718f7) | fix(coding-agent): resolve model references through one provider selection policy (Pi) | PiG's own defect | All platforms | Unreleased |
@@ -2447,6 +2448,19 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 - **Fix commits:** `1d02c73a90` (2026-10-10), `1fcf01772a` (2026-10-10), `79b035f49f` (2026-10-10)
 - **Tests:** `durable/core/history/js_space_agreement_test.go::TestIsJSSpaceAgreesWithJsstringIsSpace`, `internal/chord/chordjson/own_keys_index_bound_test.go::TestOwnKeysArrayIndexStopsBelowTwoToTheThirtyTwoMinusOne`, `internal/jsstring/upper_oracle_test.go::TestToUpperMatchesNode`, `internal/minimatch/canonicalize_upper_test.go::TestCanonicalizeUsesJavaScriptUpperCase`, `tui/select_page_keys_test.go::TestSelectListFilterLowercasesAsJavaScriptDoes`, `tui/widthx/js_space_agreement_test.go::TestIsJSSpaceAgreesWithJsstringIsSpace`
 - **Release note:** `toUpperCase` ports use a shared JavaScript `jsstring.ToUpper` (matches Node over every code point). minimatch `nocase` folds `ᾀ` and `ß` as JavaScript does.
+
+### BF-2022c75
+
+**sdk-py: fix the ruff findings in the type engine, child session and type vector tests**
+
+- **Source:** PiG's own defect
+- **Symptom:** sdk-py: fix the ruff findings in the type engine, child session and type vector tests
+- **Root cause:** SessionManager is imported for type checking where the child session's return annotation names it; unused imports are removed.
+- **User impact:** Behavior differed from Pi
+- **Platform:** All platforms
+- **Fixed in:** Unreleased
+- **Fix commits:** `2022c75e94` (2026-10-26)
+- **Tests:** None recorded.
 
 ### BF-202b8f1
 

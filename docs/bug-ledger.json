@@ -2981,6 +2981,25 @@
       ]
     },
     {
+      "id": "BF-2022c75",
+      "title": "sdk-py: fix the ruff findings in the type engine, child session and type vector tests",
+      "symptom": "sdk-py: fix the ruff findings in the type engine, child session and type vector tests",
+      "rootCause": "SessionManager is imported for type checking where the child session's return annotation names it; unused imports are removed.",
+      "rootCauseSource": "commit",
+      "userImpact": "Behavior differed from Pi",
+      "platform": "All platforms",
+      "class": "own",
+      "fixedIn": "Unreleased",
+      "origin": "commit",
+      "commits": [
+        {
+          "hash": "2022c75e94",
+          "date": "2026-10-26"
+        }
+      ],
+      "tests": []
+    },
+    {
       "id": "BF-202b8f1",
       "title": "On arm64 and other CPUs with a fused multiply-add, the OKHSL saturation of a color (used when generating the…",
       "symptom": "It differed from Pi's in the last bit for about 9% of sRGB colors.",

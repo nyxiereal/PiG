@@ -1,0 +1,35 @@
+pkg:chord/.#NativeWatch	chord	child-gap	chord/watch_impl.go#NativeWatch
+pkg:chord/.#NativeWatch::property:endAfterDelivery	chord	member-missing	chord/watch_impl.go#NativeWatch
+pkg:chord/.#NativeWatch::property:endAfterDelivery::call:0	chord	member-missing	chord/watch_impl.go#NativeWatch
+pkg:chord/.#NativeWatchChange	chord	no-go-symbol	
+pkg:chord/.#Watch	chord	child-gap	chord/watch_impl.go#Watch
+pkg:chord/.#Watch::property:advance	chord	child-gap	chord/watch_impl.go#Watch.Advance
+pkg:chord/.#Watch::property:advance::call:0	chord	signature-mismatch	chord/watch_impl.go#Watch.Advance
+pkg:chord/.#Watch::property:endAfterDelivery	chord	member-missing	chord/watch_impl.go#Watch
+pkg:chord/.#Watch::property:endAfterDelivery::call:0	chord	member-missing	chord/watch_impl.go#Watch
+pkg:chord/.#Watch::property:start	chord	child-gap	chord/watch_impl.go#Watch.Start
+pkg:chord/.#Watch::property:start::call:0	chord	signature-mismatch	chord/watch_impl.go#Watch.Start
+pkg:chord/.#WatchChange	chord	no-go-symbol	
+pkg:chord/.#WatchHandle	chord	child-gap	chord/watch.go#WatchHandle
+pkg:chord/.#WatchHandle::property:start	chord	child-gap	chord/watch.go#WatchHandle.Start
+pkg:chord/.#WatchHandle::property:start::call:0	chord	signature-mismatch	chord/watch.go#WatchHandle.Start
+pkg:durable/.#AgentEventStream	durable	child-gap	durable/harness/events.go#AgentEventStream
+pkg:durable/.#AgentEventStream::property:start	durable	child-gap	durable/harness/events.go#AgentEventStream.Start
+pkg:durable/.#AgentEventStream::property:start::call:0	durable	undecidable	durable/harness/events.go#AgentEventStream.Start
+pkg:durable/.#HostCallback	durable	type-mismatch	durable/types.go#HostCallback
+pkg:durable/.#NativeWatchChange	durable	no-go-symbol	
+pkg:durable/.#Observation	durable	no-go-symbol	
+pkg:durable/.#Observer	durable	no-go-symbol	
+pkg:durable/.#Session	durable	child-gap	durable/types.go#Session
+pkg:durable/.#Session::property:observeDoc	durable	member-missing	durable/types.go#Session
+pkg:durable/.#Session::property:observeDoc::call:0	durable	member-missing	durable/types.go#Session
+pkg:durable/.#Session::property:observeDoc::call:1	durable	member-missing	durable/types.go#Session
+pkg:durable/.#Session::property:observeDoc::call:2	durable	member-missing	durable/types.go#Session
+pkg:durable/.#Session::property:observeDoc::call:3	durable	member-missing	durable/types.go#Session
+pkg:durable/.#Session::property:observeDoc::call:4	durable	member-missing	durable/types.go#Session
+pkg:durable/.#Session::property:observeDoc::call:5	durable	member-missing	durable/types.go#Session
+pkg:durable/.#WatchChange	durable	type-mismatch	durable/env/env.go#WatchChange
+pkg:durable/.#WatchHandle	durable	child-gap	durable/types.go#WatchHandle
+pkg:durable/.#WatchHandle::property:start	durable	child-gap	chord/watch.go#WatchHandle.Start
+pkg:durable/.#WatchHandle::property:start::call:0	durable	signature-mismatch	chord/watch.go#WatchHandle.Start
+pkg:durable/env#FileChange	durable	no-go-symbol	

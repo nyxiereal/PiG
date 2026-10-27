@@ -11,11 +11,13 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"slices"
 	"strings"
 	"testing"
 	"time"
 
 	"github.com/MichaelKinsy/PiG/env/daemon"
+	"github.com/MichaelKinsy/PiG/internal/jsstring"
 )
 
 // windowFiles are the outputs the window cases print with one write each, so both daemons see the same chunks.
@@ -417,7 +419,7 @@ func watchCases() []watchCase {
 }
 
 // TestDaemonWatchMatchesPisDaemon makes the same changes under a watch of each daemon: the ready event, and the paths each change
-// reports, in the order the daemon sorts them. A sentinel file made after each change marks the end of its events.
+// reports. A sentinel file made after each change marks the end of its events; the paths of those events are one watchWindow.
 func TestDaemonWatchMatchesPisDaemon(t *testing.T) {
 	for _, test := range watchCases() {
 		t.Run(test.name, func(t *testing.T) {
@@ -451,7 +453,7 @@ func TestDaemonWatchMatchesPisDaemon(t *testing.T) {
 					if !test.single {
 						mustDo(os.WriteFile(filepath.Join(root, sentinel), nil, 0o644))
 					}
-					var paths []string
+					window := newWatchWindow(filepath.Join(root, sentinel), touched, reported)
 					for done := false; !done; {
 						frame := d.next()
 						if frame.ID != id || frame.Kind != daemon.FrameEvent {
@@ -463,21 +465,16 @@ func TestDaemonWatchMatchesPisDaemon(t *testing.T) {
 							done = true
 							continue
 						}
+						batch := make([]string, 0, len(event["paths"].([]any)))
 						for _, path := range event["paths"].([]any) {
-							switch name := path.(string); {
-							case name == filepath.Join(root, sentinel):
-								done = true
-							case oldSentinel.MatchString(name), reported[name] && !touched[name]:
-							default:
-								paths = append(paths, strings.ReplaceAll(name, root, "{ROOT}"))
-								reported[name] = true
-							}
+							batch = append(batch, path.(string))
 						}
-						if test.single {
-							done = true
+						if !inJavaScriptOrder(batch) {
+							t.Fatalf("change %d: an event's paths are not in JavaScript's sort order: %q", index, batch)
 						}
+						done = window.add(batch) || test.single
 					}
-					fmt.Fprintf(&text, "change %d: %q\n", index, paths)
+					fmt.Fprintf(&text, "change %d: %q\n", index, window.paths(root))
 				}
 				d.send(daemon.FrameCancel, id, object(), nil)
 				// The remaining events are the ones the changes caused after the sentinel; the end is the result.
@@ -493,6 +490,60 @@ func TestDaemonWatchMatchesPisDaemon(t *testing.T) {
 			compareWire(t, test.name, pi, pig)
 		})
 	}
+}
+
+// watchWindow is what one change of a watch reports: the paths of the change events that arrive until its sentinel's does.
+//
+// Where a poll's scan, or a native event's debounce, falls among the operations of one change decides how the paths reach the watch.
+// A file is created and then written, a truncating write is a truncation and then a write, and a rename between two targets is scanned
+// from one target and then from the other; a scan between two such operations reports the path, and the next scan reports it again,
+// or reports half a rename's paths and then the rest. A machine that stalls the test between two operations for a poll interval makes
+// that happen in both daemons alike. So a window is compared as the set of paths its events reported, the paths of one change, and
+// the order within an event, which the daemon sorts, is checked as each event arrives (inJavaScriptOrder).
+type watchWindow struct {
+	sentinel string
+	// touched is what the change made differ, and reported is every path an earlier window of this watch reported.
+	touched, reported map[string]bool
+	seen              map[string]bool
+}
+
+func newWatchWindow(sentinel string, touched, reported map[string]bool) *watchWindow {
+	return &watchWindow{sentinel: sentinel, touched: touched, reported: reported, seen: map[string]bool{}}
+}
+
+// add takes the paths of one change event and reports whether the window's sentinel was among them.
+func (w *watchWindow) add(batch []string) (ended bool) {
+	for _, name := range batch {
+		switch {
+		case name == w.sentinel:
+			ended = true
+		case oldSentinel.MatchString(name), w.reported[name] && !w.touched[name]:
+		default:
+			w.seen[name] = true
+			w.reported[name] = true
+		}
+	}
+	return ended
+}
+
+// paths is the window's set of paths, root replaced by {ROOT}, sorted.
+func (w *watchWindow) paths(root string) []string {
+	names := make([]string, 0, len(w.seen))
+	for name := range w.seen {
+		names = append(names, strings.ReplaceAll(name, root, "{ROOT}"))
+	}
+	slices.SortFunc(names, compareUTF16)
+	return names
+}
+
+// compareUTF16 orders strings by UTF-16 code unit, as JavaScript's default sort does.
+func compareUTF16(a, b string) int {
+	return slices.Compare(jsstring.ToUTF16(a), jsstring.ToUTF16(b))
+}
+
+// inJavaScriptOrder reports whether paths are in the order Pi's daemon sorts the paths of one event.
+func inJavaScriptOrder(paths []string) bool {
+	return slices.IsSortedFunc(paths, compareUTF16)
 }
 
 // TestDaemonWatchRequestsMatchPisDaemon compares the answers to watch requests that fail before they start, and the end of a watch

@@ -191,7 +191,7 @@ func compareUTF16(a, b string) int {
 // watchers before they are scanned again, so nothing written into them before the watcher existed is missed.
 type nodeFileWatcher struct {
 	targets        []resolvedTarget
-	onChange       func(durableenv.WatchChange)
+	onChange       func(durableenv.FileChange)
 	pollInterval   time.Duration
 	maxDirectories int
 
@@ -220,7 +220,7 @@ var _ durableenv.FileWatcher = (*nodeFileWatcher)(nil)
 
 // Watch reports changes to the targets; see FileSystem.Watch. Coverage is established when it returns: the watchers
 // come first, then the snapshot later changes are compared with.
-func (env *NodeExecutionEnv) Watch(ctx context.Context, targets []durableenv.WatchTarget, onChange func(durableenv.WatchChange)) (durableenv.FileWatcher, error) {
+func (env *NodeExecutionEnv) Watch(ctx context.Context, targets []durableenv.WatchTarget, onChange func(durableenv.FileChange)) (durableenv.FileWatcher, error) {
 	if err := abortedFileError(ctx, ""); err != nil {
 		return nil, err
 	}
@@ -236,7 +236,7 @@ func (env *NodeExecutionEnv) Watch(ctx context.Context, targets []durableenv.Wat
 	return watcher, nil
 }
 
-func openFileWatcher(targets []durableenv.WatchTarget, resolve func(string) string, onChange func(durableenv.WatchChange), options NodeWatchOptions) (*nodeFileWatcher, error) {
+func openFileWatcher(targets []durableenv.WatchTarget, resolve func(string) string, onChange func(durableenv.FileChange), options NodeWatchOptions) (*nodeFileWatcher, error) {
 	resolved := make([]resolvedTarget, len(targets))
 	paths := make([]string, len(targets))
 	for index, target := range targets {
@@ -345,7 +345,7 @@ func (watcher *nodeFileWatcher) stop() {
 }
 
 // deliver calls onChange unless the watcher is closed; a panic in the callback must not stop watching.
-func (watcher *nodeFileWatcher) deliver(change durableenv.WatchChange) {
+func (watcher *nodeFileWatcher) deliver(change durableenv.FileChange) {
 	watcher.deliverMu.Lock()
 	defer watcher.deliverMu.Unlock()
 	watcher.mu.Lock()
@@ -437,7 +437,7 @@ func (watcher *nodeFileWatcher) runFlush() {
 			if _, ok := errors.AsType[budgetExceeded](err); ok {
 				fileError = durableenv.NewFileError(durableenv.FileErrorInvalid, err.Error(), "", nil)
 			}
-			watcher.deliver(durableenv.WatchChangeError{Error: fileError})
+			watcher.deliver(durableenv.FileChangeError{Error: fileError})
 			watcher.stop()
 			return
 		}
@@ -450,7 +450,7 @@ func (watcher *nodeFileWatcher) runFlush() {
 				paths = append(paths, path)
 			}
 			slices.SortFunc(paths, compareUTF16)
-			watcher.deliver(durableenv.WatchChangePaths{Paths: paths})
+			watcher.deliver(durableenv.FileChangePaths{Paths: paths})
 		}
 		watcher.mu.Lock()
 		again := watcher.dirty && !watcher.closed
@@ -784,7 +784,7 @@ func (watcher *nodeFileWatcher) switchToPolling() {
 	if fsw != nil {
 		_ = fsw.Close()
 	}
-	watcher.deliver(durableenv.WatchChangeOverflow{})
+	watcher.deliver(durableenv.FileChangeOverflow{})
 	watcher.schedulePoll()
 }
 

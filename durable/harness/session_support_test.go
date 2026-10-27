@@ -139,7 +139,9 @@ func (s *controlledStorage) setAfterAdopt(after func()) {
 var errReclaimFailed = errors.New("reclaim failed")
 
 // lateWork is how long lateResolvingStorage works after adopting: a macrotask upstream, long enough here for the Session to
-// notice a commit parked in work after adopt even on a loaded or race-instrumented machine.
+// notice a commit parked in work after adopt on an unloaded machine. It is not a guarantee: the Session publishes once
+// the storage's goroutine is parked in a wait, which under heavy load can take longer, so a gap that needs what adopt
+// published (host listeners, the waits it resolved) waits for that effect itself.
 const lateWork = 25 * time.Millisecond
 
 // lateResolvingStorage is controlled storage whose commits resolve a scheduling turn after they adopted the batch, as a

@@ -338,7 +338,9 @@ type TaskScheduler struct {
 	reconciles     int
 	reconcilesIdle chan struct{}
 	cascadePending bool
-	enabled        bool
+	// idlePending counts the commits observe adopted whose idle settle, queued behind their host listeners, has not run.
+	idlePending int
+	enabled     bool
 	// sealing is the closing flag: set by the close listener before anything else, without the mutex (see seal).
 	sealing  atomic.Bool
 	sealed   chan struct{}
@@ -1097,25 +1099,48 @@ func (s *TaskScheduler) observe(publication session.ObservedCommit) {
 		s.scheduleReconcileLocked()
 	}
 	s.sweepLocked()
+	if changed {
+		// In the same critical section as the state this commit changed: from here until its idle settle runs, after the host
+		// listeners, no other idle settle may decide on that state.
+		s.idlePending++
+	}
 	s.mu.Unlock()
+	// Upstream resolves a wait here, inside the observer, so it is settled for good and only the code awaiting it resumes
+	// after the host listeners. The wait is settled now and woken after them, so a close that begins in the meantime, inside a
+	// listener or between the adoption and the publication, does not reject a wait whose task ended.
 	for _, record := range terminal {
-		s.options.Session.DeferUntilPublished(func() { s.taskWaiters.Resolve(record.Id, record) })
+		s.options.Session.DeferUntilPublished(s.taskWaiters.Settle(record.Id, record))
 	}
 	if !changed {
 		return
 	}
-	s.options.Session.DeferUntilPublished(s.resolveIdleWaiters)
+	s.options.Session.DeferUntilPublished(s.resolveIdleWaitersPublished)
 	s.kick()
 }
 
-// resolveIdleWaiters resolves idle waiters, and drops each kept context whose conversation has been idle for the
-// retention period (scheduler.ts #settleIdle).
-func (s *TaskScheduler) resolveIdleWaiters() {
+// resolveIdleWaitersPublished is the idle settle observe queues behind the host listeners of the commit it observed.
+func (s *TaskScheduler) resolveIdleWaitersPublished() { s.settleIdle(true) }
+
+// resolveIdleWaiters is the idle settle that runs outside a publication: at the end of a reconcile pass and on the context
+// expiry timer. Upstream's continuation there runs before the next job on the Session line, so it never sees a commit
+// adopted and not yet published to the host listeners; a goroutine here can. While such a commit is pending it leaves the
+// settle to the one queued behind that commit's listeners, which decides on the same state, after them.
+func (s *TaskScheduler) resolveIdleWaiters() { s.settleIdle(false) }
+
+// settleIdle resolves idle waiters, and drops each kept context whose conversation has been idle for the retention period
+// (scheduler.ts #settleIdle). published marks the settle observe queued, which ends the commit's pending count.
+func (s *TaskScheduler) settleIdle(published bool) {
 	now := s.options.Now()
 	// #settleIdle and the #scheduleExpiry it calls each read the setting, so a failing source is reported twice.
 	retention := s.contextRetentionMs()
 	expiryRetention := s.contextRetentionMs()
 	s.mu.Lock()
+	if published {
+		s.idlePending--
+	} else if s.idlePending > 0 {
+		s.mu.Unlock()
+		return
+	}
 	var idle []durable.ConversationId
 	for _, conversationId := range s.idleWaiters.Keys() {
 		if s.idleLocked(&conversationId) {

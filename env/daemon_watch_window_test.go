@@ -26,10 +26,11 @@ func TestWatchWindowHoldsTheSetOfPathsOfAChange(t *testing.T) {
 		ended int
 	}{
 		{
-			name:   "a file seen empty, then written",
-			events: [][]string{{"/r/staging/n2"}, {"/r/staging/n2", "/r/watched/zz-sentinel-1"}},
-			want:   []string{"{ROOT}/staging/n2"},
-			ended:  2,
+			name:    "a file seen empty, then written",
+			touched: []string{"/r/staging/n2"},
+			events:  [][]string{{"/r/staging/n2"}, {"/r/staging/n2", "/r/watched/zz-sentinel-1"}},
+			want:    []string{"{ROOT}/staging/n2"},
+			ended:   2,
 		},
 		{
 			name:    "a touched file two events reported",

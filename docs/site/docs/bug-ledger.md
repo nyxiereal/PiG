@@ -788,6 +788,7 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 | [BF-D195](#bf-d195) | An empty AWS_BEARER_TOKEN_BEDROCK is no token, where Pi's AWS SDK treats the variable as set and the request… | A Pi defect that PiG fixed first | All platforms | Unreleased |
 | [BF-D196](#bf-d196) | Under skip-auth a bearer token from the process environment is not sent over an http:// endpoint, where Pi's… | A Pi defect that PiG fixed first | All platforms | Unreleased |
 | [BF-D197](#bf-d197) | The env daemon's limit of open files is the hard limit, where Pi's daemon keeps the soft limit it inherited | A Pi defect that PiG fixed first | All platforms | Unreleased |
+| [BF-D198](#bf-d198) | The Go, Rust and Python `Type` has no Codec family (`Codec`, `Decode`, `Encode`, `DecodeBuilder`… | A Pi defect that PiG fixed first | All platforms | Unreleased |
 | [BF-D200](#bf-d200) | With no home directory PiG still runs the commands that load no resources, where Pi crashes at import, and… | A Pi defect that PiG fixed first | All platforms | Unreleased |
 | [BF-a076a50](#bf-a076a50) | A model request on a reused connection gets the full HTTP idle timeout to receive its first response bytes… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-a09da26](#bf-a09da26) | `pi.getSettings()` in a subprocess extension lists the settings in Pi's order: the global settings file's… | PiG's own defect | All platforms | 0.5.0 |
@@ -11897,6 +11898,21 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 - **Fix commits:** `811a09f9d5` (2026-10-24)
 - **Tests:** `env/daemon/descriptor_limit_linux_test.go::TestDescriptorLimitIsTheHardLimit`, `env/daemon_descriptor_limit_divergence_test.go::TestDaemonDescriptorLimitIsTheHardLimitUnlikePisDaemon`, `env/daemon_wire_oracle_test.go::TestDaemonHandlesAreLimitedLikePisDaemon`
 
+### BF-D198
+
+**The Go, Rust and Python `Type` has no Codec family (`Codec`, `Decode`, `Encode`, `DecodeBuilder`…**
+
+- **Source:** A Pi defect that PiG fixed first (divergence D198)
+- **Symptom:** none.
+- **Root cause:** a Codec's callbacks have no consumer outside `Value.Decode` and `Value.Encode` (`typebox/build/value/codec/callback.mjs`, the only reader of `~codec`), which pi-ai does not export (`ai/src/index.ts` exports `Static`, `TSchema` and `Type` from typebox) and no SDK serves. Pi's own tool-argument validation does not call them (`ai/src/utils/validation.ts` uses `Value.Convert` and `Compile(schema).Check`). A port could store the callbacks, but nothing in any SDK or in the host could ever call them, which is an inert member that accepts the call and does nothing.
+- **User impact:** Behavior differed from Pi
+- **Platform:** All platforms
+- **Fixed in:** Unreleased
+- **Pi issue:** none recorded
+- **Removed when Pi fixes it:** an SDK serves `Value.Decode`/`Value.Encode` (or a host call runs a codec) so a stored callback pair has a consumer.
+- **Fix commits:** `a8c3cdfb85` (2026-10-24), `eb9071495b` (2026-10-25)
+- **Tests:** `extensions/sdk/type_vectors_test.go::TestTypeOmitsTheCodecFamily`, `test/extension-conformance/type_schema_registration_test.go::TestConformance_TypeSchemaToolParametersAgreeAcrossSDKs`
+
 ### BF-D200
 
 **With no home directory PiG still runs the commands that load no resources, where Pi crashes at import, and…**
@@ -17898,6 +17914,8 @@ Each divergence record is accounted for here. A divergence that fixes a Pi defec
 | D195 | An empty AWS_BEARER_TOKEN_BEDROCK is no token, where Pi's AWS SDK treats the variable as set and the request… | [BF-D195](#bf-d195) |
 | D196 | Under skip-auth a bearer token from the process environment is not sent over an http:// endpoint, where Pi's… | [BF-D196](#bf-d196) |
 | D197 | The env daemon's limit of open files is the hard limit, where Pi's daemon keeps the soft limit it inherited | [BF-D197](#bf-d197) |
+| D198 | The Go, Rust and Python `Type` has no Codec family (`Codec`, `Decode`, `Encode`, `DecodeBuilder`… | [BF-D198](#bf-d198) |
+| D199 | PiG lists OpenRouter's :nitro and :floor routing variants beside every OpenRouter model, where Pi lists only… | deliberate difference |
 | D200 | With no home directory PiG still runs the commands that load no resources, where Pi crashes at import, and… | [BF-D200](#bf-d200) |
 
 ## Fix-titled commits that are not bugs in a release

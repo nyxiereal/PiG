@@ -56,7 +56,7 @@ test("watchDoc delivers the first value, then each published frame to the listen
   watch.start(async ({ value, ops }) => { if (++running > 1) overlap = true; await tick(); seen.push([value, ops]); running-- })
   pump(h)
   await tick(); await tick(); await tick()
-  assert.deepEqual(seen, [[{ n: 2 }, [["r", { n: 2 }]]], [{ n: 3 }, [["r", { n: 3 }]]]])
+  assert.deepEqual(seen, [[{ n: 3 }, [["r", { n: 3 }]]]], "frames that arrive before a call runs fold into it: the newest value and the folded ops")
   assert.equal(overlap, false, "the listener never runs twice at once")
   assert.deepEqual(watch.value, { n: 3 }, "value is the latest delivered revision")
 })
@@ -473,6 +473,6 @@ test("a view's creator takes the frames of its answer's step while an observer j
   const seenSecond: unknown[] = [second.value]
   second.start(async ({ value }: { value: unknown }) => { seenSecond.push(value) })
   await tick(); await tick()
-  assert.deepEqual(seenFirst, [{ n: 1 }, { n: 1.5 }, { n: 2 }])
+  assert.deepEqual(seenFirst, [{ n: 1 }, { n: 2 }], "the frames that arrive while the listener is not running fold into one call")
   assert.deepEqual(seenSecond, [{ n: 2 }])
 })

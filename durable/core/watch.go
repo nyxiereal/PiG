@@ -100,6 +100,15 @@ func (h *handler) publishWatches(pub *session.Publication) {
 	if len(h.watches) == 0 {
 		return
 	}
+	h.publishDocWatches(pub)
+}
+
+// publishDocWatches is the work of publishWatches for the document watches that are open. It is a function of its own so that the
+// hot publishWatches, which every commit runs, stays small (the function-size gate of the Cloudflare host: V8 compiles a hot
+// function whole).
+//
+//go:noinline
+func (h *handler) publishDocWatches(pub *session.Publication) {
 	ids := make([]uint32, 0, len(h.watches))
 	for id := range h.watches {
 		ids = append(ids, id)

@@ -615,13 +615,11 @@ func (s *Scheduler) WaitForIdle(conversationID ID, cancel *Cancel, then func(err
 
 // deliverIdle calls then with err in a job of its own, a hop later when late.
 func (s *Scheduler) deliverIdle(then func(error), late bool, err error) {
-	s.loop.Defer(func() {
-		if late {
-			s.loop.Defer(func() { then(err) })
-			return
-		}
-		then(err)
-	})
+	if late {
+		s.loop.Defer(func() { s.deliverIdle(then, false, err) })
+		return
+	}
+	s.loop.Defer(func() { then(err) })
 }
 
 func (s *Scheduler) waitForIdle(conversationID ID, cancel *Cancel, late bool, then func(error)) {
@@ -655,7 +653,7 @@ func (s *Scheduler) waitForIdle(conversationID ID, cancel *Cancel, late bool, th
 			if len(s.idleWaiters[conversationID]) == 0 {
 				s.dropIdleKey(conversationID)
 			}
-			s.deliverIdle(then, late, ErrAborted)
+			s.deliverIdle(w.done, w.late, ErrAborted)
 		})
 	}
 }

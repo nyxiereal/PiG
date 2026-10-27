@@ -224,7 +224,9 @@ func (submissions *Submissions) observe(publication session.ObservedCommit) {
 		if !ok || !isSettledSubmission(write.Value) {
 			continue
 		}
-		submissions.line.DeferUntilPublished(func() { submissions.waiters.Resolve(write.Value.Id, write.Value) })
+		// Upstream resolves the wait here, inside the observer: it is settled for good, and only the code awaiting it resumes
+		// after the host listeners. A close that seals before the wake does not reject a wait whose submission settled.
+		submissions.line.DeferUntilPublished(submissions.waiters.Settle(write.Value.Id, write.Value))
 	}
 }
 

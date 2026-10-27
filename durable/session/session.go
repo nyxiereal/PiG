@@ -1160,6 +1160,7 @@ func (session *SessionImpl) armPublication() {
 	}
 	adopting := goroutineid.Current()
 	//portlint:allow asyncorder joined: finishPublication waits for the publication to run, and Storage.Commit never returns to the Session before it
+	//portlint:allow golifetime the goroutine ends when the publication is claimed (pub.claim closes), by it or by finishPublication, which waits for pub.done
 	go func() {
 		entered.Await(adopting, pub.claim)
 		if session.claim(pub) {

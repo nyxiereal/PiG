@@ -263,6 +263,45 @@ func TestPiMessagesErrorsWhenStreamEndsWithoutTerminal(t *testing.T) {
 	}
 }
 
+// Ported from pi-messages.test.ts "rejects content indexes that are not the next or an existing block".
+func TestPiMessagesRejectsContentIndexesThatAreNotTheNextOrAnExistingBlock(t *testing.T) {
+	for _, test := range []struct {
+		name   string
+		events []any
+		want   string
+	}{
+		{"huge start", []any{map[string]any{"type": "text_start", "contentIndex": 4294967000}}, "Invalid contentIndex 4294967000 in pi-messages text_start event"},
+		{"string start", []any{map[string]any{"type": "text_start", "contentIndex": "__proto__"}}, `Invalid contentIndex "__proto__" in pi-messages text_start event`},
+		{"string end", []any{
+			map[string]any{"type": "text_start", "contentIndex": 0},
+			map[string]any{"type": "toolcall_end", "contentIndex": "__proto__", "toolCall": map[string]any{"polluted": true}},
+		}, `Invalid contentIndex "__proto__" in pi-messages toolcall_end event`},
+		{"delta without a block", []any{map[string]any{"type": "text_delta", "contentIndex": 0, "delta": "x"}}, "Invalid contentIndex 0 in pi-messages text_delta event"},
+		{"negative", []any{map[string]any{"type": "text_start", "contentIndex": -1}}, "Invalid contentIndex -1 in pi-messages text_start event"},
+		{"fraction", []any{map[string]any{"type": "text_start", "contentIndex": 0.5}}, "Invalid contentIndex 0.5 in pi-messages text_start event"},
+		{"null", []any{map[string]any{"type": "text_start", "contentIndex": nil}}, "Invalid contentIndex null in pi-messages text_start event"},
+		{"skipped block", []any{
+			map[string]any{"type": "text_start", "contentIndex": 0},
+			map[string]any{"type": "text_start", "contentIndex": 2},
+		}, "Invalid contentIndex 2 in pi-messages text_start event"},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			events := append([]any{map[string]any{"type": "start"}}, test.events...)
+			events = append(events, map[string]any{"type": "done", "reason": "stop", "usage": piMessagesTestUsage})
+			baseURL, _ := startPiMessagesServer(t, piMessagesResponder{events: events})
+
+			_, message := collectPiMessages(t, newTestPiMessagesProvider(baseURL, nil), StreamOptions{})
+
+			if message.StopReason != StopReasonError || !strings.Contains(message.ErrorMessage, test.want) {
+				t.Fatalf("message = %+v, want an error containing %q", message, test.want)
+			}
+			if len(message.Content) > 1 {
+				t.Fatalf("content = %+v, want at most the block started before the bad event", message.Content)
+			}
+		})
+	}
+}
+
 func TestPiMessagesCacheRetentionPrecedence(t *testing.T) {
 	environments := []struct {
 		name  string

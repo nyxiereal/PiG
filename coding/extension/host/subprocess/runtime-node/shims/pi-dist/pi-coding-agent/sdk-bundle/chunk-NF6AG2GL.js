@@ -93,6 +93,15 @@ function createToolSearchDocument(tool, namespace) {
   return { name: tool.name, text: parts.filter((part) => part.trim()).join(" ") };
 }
 __name(createToolSearchDocument, "createToolSearchDocument");
+function normalizeName(name) {
+  return name.trim().toLowerCase().replace(/[^a-z0-9_$]/g, "_");
+}
+__name(normalizeName, "normalizeName");
+function isNameQuery(query, name) {
+  const normalized = normalizeName(name);
+  return normalized === query || normalized.endsWith(`__${query}`);
+}
+__name(isNameQuery, "isNameQuery");
 var Bm25Ranker = class {
   static {
     __name(this, "Bm25Ranker");
@@ -119,6 +128,7 @@ var Bm25Ranker = class {
       const frequency = termCounts.filter((counts) => counts.has(term)).length;
       return [term, Math.log(1 + (documents.length - frequency + 0.5) / (frequency + 0.5))];
     }));
+    const nameQuery = normalizeName(query);
     const matches = [];
     documents.forEach((document, index) => {
       let score = 0;
@@ -130,9 +140,9 @@ var Bm25Ranker = class {
         score += (idf.get(term) ?? 0) * (count * (this.k1 + 1) / (count + norm));
       }
       if (score > 0)
-        matches.push({ name: document.name, score });
+        matches.push({ name: document.name, score, named: isNameQuery(nameQuery, document.name) });
     });
-    return matches.sort((a, b) => b.score - a.score).slice(0, limit);
+    return matches.sort((a, b) => Number(b.named) - Number(a.named) || b.score - a.score).slice(0, limit).map(({ name, score }) => ({ name, score }));
   }
 };
 var toolSearchSchema = Type.Object({
@@ -194,7 +204,7 @@ import { CODEMODE_SOURCE_GRAMMAR } from "../../pi-codemode/source.js";
 import { Type as Type2 } from "../../../typebox.mjs";
 
 // pi-dist/pi-coding-agent/extensions/codemode/execute.lazy.js
-var loadCodemodeExecutor = /* @__PURE__ */ __name(() => import("./chunk-FUOCRXE5.js"), "loadCodemodeExecutor");
+var loadCodemodeExecutor = /* @__PURE__ */ __name(() => import("./chunk-NY2GJK4E.js"), "loadCodemodeExecutor");
 
 // pi-dist/pi-coding-agent/extensions/codemode/renderer.js
 import { Container, Spacer, Text } from "../../../pi-tui.mjs";

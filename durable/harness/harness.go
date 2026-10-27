@@ -320,6 +320,20 @@ func (harness *harnessImpl) Usage(ctx context.Context) (UsageState, error) {
 	return total, nil
 }
 
+func (harness *harnessImpl) ObserveTaskGraph(ctx context.Context, observer durable.Observer[TaskGraph]) (durable.Observation[TaskGraph], error) {
+	if err := harness.checkOpen(); err != nil {
+		return nil, err
+	}
+	return harness.taskGraph.Observe(ctx, observer)
+}
+
+func (harness *harnessImpl) ObserveConversation(ctx context.Context, id durable.ConversationId, observer durable.Observer[ConversationView]) (durable.Observation[ConversationView], error) {
+	if err := harness.checkOpen(); err != nil {
+		return nil, err
+	}
+	return harness.host.views.Observe(ctx, id, observer)
+}
+
 func (harness *harnessImpl) WatchTaskGraph(ctx context.Context) (TaskGraphWatch, error) {
 	return harness.taskGraph.Watch(ctx)
 }

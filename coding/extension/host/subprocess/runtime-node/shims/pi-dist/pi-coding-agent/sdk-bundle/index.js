@@ -164,7 +164,7 @@ import {
   TOOL_SEARCH_TOOL_NAME,
   createCodemodeToolDefinition,
   createToolSearchToolDefinition
-} from "./chunk-4B2T6DM6.js";
+} from "./chunk-NF6AG2GL.js";
 import {
   SETTINGS_DEFAULTS,
   addUsageToTotals,
@@ -6442,7 +6442,7 @@ import * as os3 from "node:os";
 import * as path4 from "node:path";
 import { isRetryableAssistantError } from "../../pi-ai/sdk-bundle/compat.js";
 import * as TuiLayouts from "../../../pi-tui.mjs";
-import { CombinedAutocompleteProvider, Container as Container31, fuzzyFilter as fuzzyFilter8, getCapabilities as getCapabilities3, hyperlink as hyperlink3, Markdown as Markdown7, matchesKey as matchesKey2, Spacer as Spacer28, setCapabilityOverrides as setCapabilityOverrides2, setKeybindings as setKeybindings3, Text as Text31, TruncatedText as TruncatedText3, TuiAltScreen as TuiAltScreen3, TuiMainScreen as TuiMainScreen3, visibleWidth as visibleWidth7 } from "../../../pi-tui.mjs";
+import { CombinedAutocompleteProvider, Container as Container31, fuzzyFilter as fuzzyFilter8, getCapabilities as getCapabilities3, hyperlink as hyperlink4, Markdown as Markdown7, matchesKey as matchesKey2, Spacer as Spacer28, setCapabilityOverrides as setCapabilityOverrides2, setKeybindings as setKeybindings3, Text as Text31, TruncatedText as TruncatedText3, TuiAltScreen as TuiAltScreen3, TuiMainScreen as TuiMainScreen3, visibleWidth as visibleWidth7 } from "../../../pi-tui.mjs";
 import chalk5 from "../../../chalk/source/index.js";
 import { spawn as spawn4 } from "child_process";
 
@@ -8726,7 +8726,23 @@ var FooterComponent = class {
 };
 
 // pi-dist/pi-coding-agent/modes/interactive/components/login-dialog.js
-import { Container as Container18, getKeybindings as getKeybindings6, Input as Input5, Spacer as Spacer17, Text as Text18, TruncatedText } from "../../../pi-tui.mjs";
+import { Container as Container18, getKeybindings as getKeybindings6, hyperlink as hyperlink3, Input as Input5, replaceControlCharacters, Spacer as Spacer17, Text as Text18, TruncatedText } from "../../../pi-tui.mjs";
+function webUrl(value) {
+  if (!URL.canParse(value))
+    return void 0;
+  const url = new URL(value);
+  return url.protocol === "https:" || url.protocol === "http:" ? url.href : void 0;
+}
+__name(webUrl, "webUrl");
+function displayUrl(value) {
+  return webUrl(value) ?? replaceControlCharacters(value);
+}
+__name(displayUrl, "displayUrl");
+function webLink(text, url) {
+  const target = webUrl(url);
+  return target === void 0 ? text : hyperlink3(text, target);
+}
+__name(webLink, "webLink");
 var LoginDialogComponent = class extends Container18 {
   static {
     __name(this, "LoginDialogComponent");
@@ -8806,13 +8822,15 @@ var LoginDialogComponent = class extends Container18 {
     this.clearDeviceCodeAction();
     this.contentContainer.clear();
     this.contentContainer.addChild(new Spacer17(1));
-    this.authUrl = new AuthUrlComponent(this.tui, url);
+    const target = webUrl(url);
+    this.authUrl = new AuthUrlComponent(this.tui, target ?? replaceControlCharacters(url));
     this.contentContainer.addChild(this.authUrl);
     if (instructions) {
       this.contentContainer.addChild(new Spacer17(1));
       this.contentContainer.addChild(new Text18(theme.fg("warning", instructions), 1, 0));
     }
-    openBrowser(url);
+    if (target !== void 0)
+      openBrowser(target);
     this.tui.requestRender();
   }
   /**
@@ -8828,11 +8846,10 @@ var LoginDialogComponent = class extends Container18 {
     this.clearDeviceCodeAction();
     this.contentContainer.clear();
     this.contentContainer.addChild(new Spacer17(1));
-    const linkedUrl = `\x1B]8;;${info.verificationUri}\x07${info.verificationUri}\x1B]8;;\x07`;
-    this.contentContainer.addChild(new Text18(theme.fg("accent", linkedUrl), 1, 0));
+    const shownUrl = displayUrl(info.verificationUri);
+    this.contentContainer.addChild(new Text18(theme.fg("accent", webLink(shownUrl, shownUrl)), 1, 0));
     const clickHint = process.platform === "darwin" ? "Cmd+click to open" : "Ctrl+click to open";
-    const hyperlink4 = `\x1B]8;;${info.verificationUri}\x07${clickHint}\x1B]8;;\x07`;
-    this.contentContainer.addChild(new Text18(theme.fg("dim", hyperlink4), 1, 0));
+    this.contentContainer.addChild(new Text18(theme.fg("dim", webLink(clickHint, info.verificationUri)), 1, 0));
     this.contentContainer.addChild(new Spacer17(1));
     this.contentContainer.addChild(new Text18(theme.fg("warning", `Enter code: ${info.userCode}`), 1, 0));
     if (!this.signal.aborted && (info.openBrowserOnConfirm || info.copyCodeOnConfirm)) {
@@ -8858,9 +8875,9 @@ var LoginDialogComponent = class extends Container18 {
     }
     if (info.openBrowserOnConfirm) {
       try {
-        const url = new URL(info.verificationUri);
-        if (url.protocol === "https:" || url.protocol === "http:")
-          openBrowser(url.href);
+        const target = webUrl(info.verificationUri);
+        if (target !== void 0)
+          openBrowser(target);
       } catch {
       }
     }
@@ -8917,9 +8934,9 @@ var LoginDialogComponent = class extends Container18 {
     this.contentContainer.addChild(new Spacer17(1));
     this.contentContainer.addChild(new Text18(theme.fg("text", message), 1, 0));
     for (const link of links) {
-      const text = link.label ? `${link.label}: ${link.url}` : link.url;
-      const hyperlink4 = `\x1B]8;;${link.url}\x07${text}\x1B]8;;\x07`;
-      this.contentContainer.addChild(new Text18(theme.fg("accent", hyperlink4), 1, 0));
+      const url = displayUrl(link.url);
+      const text = link.label ? `${link.label}: ${url}` : url;
+      this.contentContainer.addChild(new Text18(theme.fg("accent", webLink(text, url)), 1, 0));
     }
     if (showCloseHint) {
       this.contentContainer.addChild(new Spacer17(1));
@@ -16318,7 +16335,7 @@ ${this.crashReportInstructions()}`);
     const updateInstruction = /* @__PURE__ */ __name(() => theme.fg("muted", `New version ${release.version} is available. Run `) + theme.fg("accent", `${APP_NAME} update`), "updateInstruction");
     const changelogUrl = "https://pi.dev/changelog";
     const changelogLine = /* @__PURE__ */ __name(() => {
-      const changelogLink = getCapabilities3().hyperlinks ? hyperlink3(theme.fg("accent", changelogUrl), changelogUrl) : theme.fg("accent", changelogUrl);
+      const changelogLink = getCapabilities3().hyperlinks ? hyperlink4(theme.fg("accent", changelogUrl), changelogUrl) : theme.fg("accent", changelogUrl);
       return theme.fg("muted", "Changelog: ") + changelogLink;
     }, "changelogLine");
     const note = release.note?.trim();

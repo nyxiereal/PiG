@@ -168,9 +168,10 @@ type HarnessOptions struct {
 	// OnWake wakes the process for sleeping tasks instead of a SetTimer timer. Without it, while scheduling runs, a timer
 	// that keeps the process alive resumes sleeping tasks when they are due. With it, the Harness arms no timer for
 	// them: it calls OnWake after open and whenever Harness.Wake() changes, and the host arms its own wakeup, such as a
-	// Durable Object alarm, and calls Resume() when it fires. Called off the Session line, after the commit that changed
-	// the value, so a host arms a recovery wakeup before calls that can start work. It may call Wake and Resume, and
-	// must not block. A panic is reported, and the value is offered again at the next change.
+	// Durable Object alarm, and calls Resume() when it fires. Called in a goroutine the Session line never waits for,
+	// after the commit that changed the value was adopted, so a host arms a recovery wakeup before calls that can start
+	// work. It may call Wake and Resume, and must not block. A panic is reported, and the value is offered again at the
+	// next change.
 	OnWake func(wake Wake)
 	// OnReport receives failures that do not fail the calling operation, such as a panicking hook or listener, a task
 	// that faulted, and the error that fails the Session, once. info says what happened: a host can tell a failed
@@ -262,6 +263,7 @@ type Conversation interface {
 	// WaitForIdle returns when the ordinary ownership scope has no live non-background task.
 	WaitForIdle(ctx context.Context) error
 	// Watch returns the structural view (spec §9.3) as a serialized watch; commits made while its listener runs arrive folded.
+	// It is built on the same mount as Harness.ObserveConversation.
 	Watch(ctx context.Context) (ConversationWatch, error)
 }
 
@@ -303,6 +305,15 @@ type Harness interface {
 	// WatchTaskGraph returns every live task with its owner edge, status, and owned conversations (spec §9.5), as a
 	// serialized watch; commits made while its listener runs arrive folded.
 	WatchTaskGraph(ctx context.Context) (TaskGraphWatch, error)
+	// ObserveConversation attaches a synchronous Observer to a conversation's structural view (spec §9.3), atomically on
+	// the Session line, for adapters: Advance gets each next revision with its operations as memory adopts the commit,
+	// inside Storage's adopt for a stored one and before it is stored for a deferred one, so it only records it. ctx governs
+	// only the attachment.
+	ObserveConversation(ctx context.Context, id durable.ConversationId, observer durable.Observer[ConversationView]) (durable.Observation[ConversationView], error)
+	// ObserveTaskGraph attaches a synchronous Observer to the task graph (spec §9.5), as ObserveConversation does to a view. A
+	// blocked reason that changes without a commit (a registry change, a failed migration) advances it on the Session line
+	// outside any commit and adopt, with the background context.
+	ObserveTaskGraph(ctx context.Context, observer durable.Observer[TaskGraph]) (durable.Observation[TaskGraph], error)
 }
 
 // DefaultHarnessIdentity is the request identity of a Harness's model requests: the ai package's defaults with provider attribution to PiG.

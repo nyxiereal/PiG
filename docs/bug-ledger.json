@@ -1617,7 +1617,6 @@
         "durable/interop/interop_test.go::TestScriptedSessionStoresMatchPiDurable",
         "durable/interop/interop_test.go::TestScriptedSessionsViewIdentically",
         "durable/interop/interop_test.go::TestSecondScriptedSessionStoresMatchPiDurable",
-        "durable/session/watch_doc_typed_test.go::TestWatchDocTypedDecodesRevisionsAndReportsRetirementAsNil",
         "internal/codingagent/prompts/hidden_tools_upstream_test.go::TestUpstreamSystemPromptHiddenTools"
       ]
     },
@@ -6915,6 +6914,32 @@
       ]
     },
     {
+      "id": "BF-439c708",
+      "title": "fix(ai): open only http(s) URLs a login server supplies, and reject pi-messages content indexes that are not…",
+      "symptom": "fix(ai): open only http(s) URLs a login server supplies, and reject pi-messages content indexes that are not the next or an existing block (Pi)",
+      "rootCause": "",
+      "rootCauseSource": "",
+      "userImpact": "Behavior differed from Pi",
+      "platform": "All platforms",
+      "class": "own",
+      "fixedIn": "Unreleased",
+      "origin": "commit",
+      "commits": [
+        {
+          "hash": "439c708ebc",
+          "date": "2026-10-26"
+        }
+      ],
+      "tests": [
+        "ai/oauth_kimi_test.go::TestTrustedHTTPURL",
+        "ai/oauth_radius_test.go::TestRadiusOAuthBrowserDiscoveryRejectsNonHTTPAuthorizationEndpoint",
+        "ai/oauth_radius_test.go::TestRadiusOAuthDeviceLoginRejectsNonHTTPVerificationURI",
+        "ai/oauth_radius_test.go::TestRadiusOAuthThrowsFetchErrorsForCredentialedGatewayAndInvalidEndpoint",
+        "ai/pi_messages_test.go::TestPiMessagesRejectsContentIndexesThatAreNotTheNextOrAnExistingBlock",
+        "ai/trusted_url_oracle_test.go::TestTrustedVerificationURLsMatchPi"
+      ]
+    },
+    {
       "id": "BF-43a2293",
       "title": "Key order of non-index keys stays byte order (a Go map has no insertion order): question Q-state-order filed",
       "symptom": "Key order of non-index keys stays byte order (a Go map has no insertion order): question Q-state-order filed",
@@ -7171,6 +7196,25 @@
         {
           "hash": "44f8d86c29",
           "date": "2026-10-20"
+        }
+      ],
+      "tests": []
+    },
+    {
+      "id": "BF-4534a2b",
+      "title": "fix(durable): put the lifetime note of the publication goroutine on its line",
+      "symptom": "fix(durable): put the lifetime note of the publication goroutine on its line",
+      "rootCause": "",
+      "rootCauseSource": "",
+      "userImpact": "Behavior differed from Pi",
+      "platform": "All platforms",
+      "class": "own",
+      "fixedIn": "Unreleased",
+      "origin": "commit",
+      "commits": [
+        {
+          "hash": "4534a2b904",
+          "date": "2026-10-26"
         }
       ],
       "tests": []
@@ -16922,6 +16966,25 @@
       "tests": []
     },
     {
+      "id": "BF-7bcd404",
+      "title": "fix(durable): state the lifetime of the goroutine that publishes an adopted commit",
+      "symptom": "fix(durable): state the lifetime of the goroutine that publishes an adopted commit",
+      "rootCause": "",
+      "rootCauseSource": "",
+      "userImpact": "Behavior differed from Pi",
+      "platform": "All platforms",
+      "class": "own",
+      "fixedIn": "Unreleased",
+      "origin": "commit",
+      "commits": [
+        {
+          "hash": "7bcd404f4b",
+          "date": "2026-10-26"
+        }
+      ],
+      "tests": []
+    },
+    {
       "id": "BF-7c59949",
       "title": "fix(codingagent): session selector keeps Pi's out-of-range selected index",
       "symptom": "fix(codingagent): session selector keeps Pi's out-of-range selected index",
@@ -24394,6 +24457,32 @@
         "internal/codingagent/session_held_entry_test.go::TestHeldMessageEntryMatchesTheRecordDecode",
         "internal/codingagent/session_line_capacity_test.go::TestMessageEntryRecordKeepsNoSpareCapacity",
         "test/perfgate/process_test.go::TestRPCTurnProcessGate"
+      ]
+    },
+    {
+      "id": "BF-ae1ee6d",
+      "title": "fix(tui): replace control characters in terminal titles, and open and print only web URLs in the login dialog…",
+      "symptom": "fix(tui): replace control characters in terminal titles, and open and print only web URLs in the login dialog (Pi)",
+      "rootCause": "",
+      "rootCauseSource": "",
+      "userImpact": "Behavior differed from Pi",
+      "platform": "All platforms",
+      "class": "own",
+      "fixedIn": "Unreleased",
+      "origin": "commit",
+      "commits": [
+        {
+          "hash": "ae1ee6d132",
+          "date": "2026-10-26"
+        }
+      ],
+      "tests": [
+        "tui/login_dialog_device_code_test.go::TestLoginURLsKeepControlCharactersFromEndingTerminalHyperlinks",
+        "tui/login_dialog_device_code_test.go::TestLoginURLsOpenOnlyHTTPSignInURLs",
+        "tui/login_dialog_device_code_test.go::TestLoginURLsReplaceControlCharactersInURLsThatAreNotWebURLs",
+        "tui/login_dialog_gaps_test.go::TestLoginDialogComponentShowsAuthDeviceCodeDetailsAndInfo",
+        "tui/terminal_test.go::TestProcessTerminalSetTitleReplacesControlCharacters",
+        "tui/widthx/grapheme_range_test.go::TestReplaceControlCharacters"
       ]
     },
     {
@@ -32308,6 +32397,28 @@
         "ai/mistral_chunk_member_type_oracle_test.go::TestMistralChunkMistypedMembersMatchPi",
         "ai/openai_completions_member_type_oracle_test.go::TestOpenAICompletionsMistypedMembersMatchPi",
         "ai/openai_responses_member_type_oracle_test.go::TestOpenAIResponsesMistypedMembersMatchPi"
+      ]
+    },
+    {
+      "id": "BF-e16cbba",
+      "title": "fix(coding): rank a tool first when the search query is its name (Pi)",
+      "symptom": "fix(coding): rank a tool first when the search query is its name (Pi)",
+      "rootCause": "",
+      "rootCauseSource": "",
+      "userImpact": "Behavior differed from Pi",
+      "platform": "All platforms",
+      "class": "own",
+      "fixedIn": "Unreleased",
+      "origin": "commit",
+      "commits": [
+        {
+          "hash": "e16cbbaf76",
+          "date": "2026-10-26"
+        }
+      ],
+      "tests": [
+        "coding/extension/builtin/toolsearch/toolsearch_oracle_test.go::TestToolSearchNameQueriesMatchPi",
+        "coding/extension/builtin/toolsearch/toolsearch_upstream_test.go::TestBm25RankerRanksAToolFirstWhenTheQueryIsItsName"
       ]
     },
     {

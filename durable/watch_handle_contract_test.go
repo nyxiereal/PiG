@@ -91,7 +91,8 @@ func TestWatchHandleContract(t *testing.T) {
 		var mu sync.Mutex
 		var delivered []any
 		inline := true
-		handle.Start(func(_ context.Context, value durable.JsonObject, _ []durable.Op) error {
+		handle.Start(func(_ context.Context, change durable.WatchChange[durable.JsonObject]) error {
+			value := change.Value
 			mu.Lock()
 			defer mu.Unlock()
 			if inline {
@@ -142,7 +143,8 @@ func TestWatchHandleContract(t *testing.T) {
 		var mu sync.Mutex
 		var delivered []string
 		inStart := true
-		handle.Start(func(_ context.Context, value durable.JsonObject, _ []durable.Op) error {
+		handle.Start(func(_ context.Context, change durable.WatchChange[durable.JsonObject]) error {
+			value := change.Value
 			mu.Lock()
 			defer mu.Unlock()
 			if inStart {
@@ -166,7 +168,7 @@ func TestWatchHandleContract(t *testing.T) {
 
 	t.Run("accepts one start and none after stop", func(t *testing.T) {
 		harness := open()
-		listener := func(context.Context, durable.JsonObject, []durable.Op) error { return nil }
+		listener := func(_ context.Context, change durable.WatchChange[durable.JsonObject]) error { return nil }
 		started := watch(harness)
 		started.Start(listener)
 		panics("already started", func() { started.Start(listener) })
@@ -179,10 +181,12 @@ func TestWatchHandleContract(t *testing.T) {
 	t.Run("ends only the watch whose listener failed", func(t *testing.T) {
 		harness := open()
 		failed, healthy := watch(harness), watch(harness)
-		failed.Start(func(context.Context, durable.JsonObject, []durable.Op) error { return errors.New("listener failed") })
+		failed.Start(func(_ context.Context, change durable.WatchChange[durable.JsonObject]) error {
+			return errors.New("listener failed")
+		})
 		var mu sync.Mutex
 		calls := 0
-		healthy.Start(func(context.Context, durable.JsonObject, []durable.Op) error {
+		healthy.Start(func(_ context.Context, change durable.WatchChange[durable.JsonObject]) error {
 			mu.Lock()
 			calls++
 			mu.Unlock()

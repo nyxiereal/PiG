@@ -3,6 +3,7 @@ package harness
 import (
 	"context"
 	"encoding/json"
+	"github.com/MichaelKinsy/PiG/chord"
 	"reflect"
 	"slices"
 	"strings"
@@ -204,7 +205,8 @@ func TestTheHarnessStoresExactlyWhatCallersAndEventsGetAndKeepsAStoredNull(t *te
 	stream := must(WatchEvents(testContext, harness, root.Id()))
 	var mu sync.Mutex
 	var ends []string
-	stream.Start(func(_ context.Context, batch []AgentEvent) error {
+	stream.Start(func(_ context.Context, change chord.NativeWatchChange[[]AgentEvent]) error {
+		batch := change.Value
 		mu.Lock()
 		defer mu.Unlock()
 		for _, event := range batch {

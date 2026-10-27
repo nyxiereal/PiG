@@ -356,8 +356,9 @@ type AgentEventStream struct {
 	watch    *chord.NativeWatch[[]AgentEvent]
 }
 
-// Start installs the sole listener; it never runs inline.
-func (stream *AgentEventStream) Start(listener func(ctx context.Context, events []AgentEvent) error) {
+// Start installs the sole listener; it never runs inline. Each call's Value is one commit's batch, or a snapshot after an
+// overflow.
+func (stream *AgentEventStream) Start(listener func(ctx context.Context, change chord.NativeWatchChange[[]AgentEvent]) error) {
 	stream.watch.Start(listener)
 }
 

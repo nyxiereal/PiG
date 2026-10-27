@@ -3,6 +3,7 @@ package harness
 import (
 	"context"
 	"errors"
+	"github.com/MichaelKinsy/PiG/chord"
 	"slices"
 	"sync"
 	"testing"
@@ -66,7 +67,8 @@ func TestListenerAndReportErrors(t *testing.T) {
 		}
 		watch := must(root.Watch(testContext))
 		seen := make(chan ConversationView, 8)
-		watch.Start(func(_ context.Context, value ConversationView, _ []durable.Op) error {
+		watch.Start(func(_ context.Context, change chord.WatchChange[ConversationView]) error {
+			value := change.Value
 			seen <- value
 			return nil
 		})
@@ -112,7 +114,8 @@ func TestListenerAndReportErrors(t *testing.T) {
 		graph.mount.observers = append([]taskGraphObserver{throwingGraphObserver{failure}}, graph.mount.observers...)
 		graph.mu.Unlock()
 		seen := make(chan TaskGraph, 8)
-		watch.Start(func(_ context.Context, value TaskGraph, _ []durable.Op) error {
+		watch.Start(func(_ context.Context, change chord.WatchChange[TaskGraph]) error {
+			value := change.Value
 			seen <- value
 			return nil
 		})
@@ -149,7 +152,7 @@ func TestListenerAndReportErrors(t *testing.T) {
 		harness, root, reports := sfStarted(t, newControlledStorage(), &signalLog{})
 		watch := must(harness.WatchDocErased(testContext, LiveDoc, root.Id()))
 		failure := errors.New("listener broke")
-		watch.Start(func(context.Context, durable.JsonObject, []durable.Op) error { return failure })
+		watch.Start(func(context.Context, chord.WatchChange[durable.JsonObject]) error { return failure })
 		if _, err := root.Commit(testContext, func(tx durable.Tx) (any, error) {
 			live, err := docDraft(tx, LiveDoc, root.Id())
 			if err != nil {
@@ -170,7 +173,7 @@ func TestListenerAndReportErrors(t *testing.T) {
 
 type throwingGraphObserver struct{ failure error }
 
-func (observer throwingGraphObserver) Advance(context.Context, TaskGraph, []durable.Op) {
+func (observer throwingGraphObserver) Advance(context.Context, chord.WatchChange[TaskGraph]) {
 	panic(observer.failure)
 }
 
@@ -269,7 +272,7 @@ func TestAThrownValueThatCannotBeFormatted(t *testing.T) {
 		harness, _, _ := openTasks(t, newControlledStorage(), []durable.AnyTask{throws.Erased()})
 		root := mustRoot(t, harness, nil)
 		watch := must(harness.WatchDocErased(testContext, LiveDoc, root.Id()))
-		watch.Start(func(context.Context, durable.JsonObject, []durable.Op) error { panic(unformattable{}) })
+		watch.Start(func(context.Context, chord.WatchChange[durable.JsonObject]) error { panic(unformattable{}) })
 		id := must(durable.Commit(testContext, root, func(tx durable.Tx) (durable.TaskId, error) {
 			return durable.CreateTask(tx, throws, struct{}{}, durable.TaskOptions{Ownership: durable.TaskOwnership{Kind: durable.TaskOwnedByConversation}})
 		}))

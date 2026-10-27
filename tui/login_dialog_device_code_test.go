@@ -230,3 +230,65 @@ func TestDeviceCodeLoginOpensOnlyWebURLs(t *testing.T) {
 		t.Fatalf("opened %q, want nothing", got)
 	}
 }
+
+// Ports login-dialog-device-code.test.ts "login URLs" / "opens only http(s) sign-in URLs": ShowAuth names the URL its caller opens.
+func TestLoginURLsOpenOnlyHTTPSignInURLs(t *testing.T) {
+	dialog := NewLoginDialogComponent(nil, "custom-provider", nil, "")
+	if target := dialog.ShowAuth("file:///Users/victim/Downloads/payload.app", ""); target != "" {
+		t.Fatalf("a file: URL is opened as %q", target)
+	}
+	if target := dialog.ShowAuth("https://example.com/authorize", ""); target != "https://example.com/authorize" {
+		t.Fatalf("target = %q", target)
+	}
+	if target := dialog.ShowAuth("HTTPS://Example.com", ""); target != "https://example.com/" {
+		t.Fatalf("a web URL is opened as its normalized href, got %q", target)
+	}
+}
+
+// Ports login-dialog-device-code.test.ts "keeps control characters in URLs from ending terminal hyperlinks".
+func TestLoginURLsKeepControlCharactersFromEndingTerminalHyperlinks(t *testing.T) {
+	dialog := NewLoginDialogComponent(nil, "custom-provider", nil, "")
+	dialog.ShowDeviceCode(OAuthDeviceCodeInfo{UserCode: "ABCD-EFGH", VerificationURI: "https://example.com/device\x07\x1b]52;c;Zm9v\x07"})
+	deviceView := renderedPlain(dialog)
+	deviceRaw := strings.Join(dialog.Render(120), "\n")
+	dialog.ShowInfo("Docs", []AuthInfoLink{{Label: "Help", URL: "https://example.com/help\x07\x1b]52;c;Zm9v\x07"}}, false)
+	infoRaw := strings.Join(dialog.Render(120), "\n")
+
+	if strings.Contains(deviceRaw, "\x1b]52") || strings.Contains(infoRaw, "\x1b]52") {
+		t.Fatalf("an injected OSC 52 reached the terminal:\n%q\n%q", deviceRaw, infoRaw)
+	}
+	if !strings.Contains(deviceView, "https://example.com/device%07%1B]52;c;Zm9v") {
+		t.Fatalf("device view = %q", deviceView)
+	}
+	if view := renderedPlain(dialog); !strings.Contains(view, "Help: https://example.com/help%07%1B]52;c;Zm9v") {
+		t.Fatalf("info view = %q", view)
+	}
+}
+
+// Ports login-dialog-device-code.test.ts "replaces control characters in URLs that are not web URLs".
+func TestLoginURLsReplaceControlCharactersInURLsThatAreNotWebURLs(t *testing.T) {
+	injected := "x\x07\x1b]52;c;Zm9v\x07"
+	dialog := NewLoginDialogComponent(nil, "custom-provider", nil, "")
+	if target := dialog.ShowAuth("file:///tmp/"+injected, ""); target != "" {
+		t.Fatalf("a file: URL is opened as %q", target)
+	}
+	if raw := strings.Join(dialog.Render(120), "\n"); strings.Contains(raw, "\x1b]52") {
+		t.Fatalf("auth view carries an injected OSC 52: %q", raw)
+	}
+
+	dialog.ShowDeviceCode(OAuthDeviceCodeInfo{UserCode: "ABCD-EFGH", VerificationURI: injected})
+	if raw := strings.Join(dialog.Render(120), "\n"); strings.Contains(raw, "\x1b]52") {
+		t.Fatalf("device view carries an injected OSC 52: %q", raw)
+	}
+	if view := renderedPlain(dialog); !strings.Contains(view, "x ]52;c;Zm9v") {
+		t.Fatalf("device view = %q", view)
+	}
+
+	dialog.ShowInfo("Docs", []AuthInfoLink{{Label: "Help", URL: injected}}, false)
+	if raw := strings.Join(dialog.Render(120), "\n"); strings.Contains(raw, "\x1b]52") {
+		t.Fatalf("info view carries an injected OSC 52: %q", raw)
+	}
+	if view := renderedPlain(dialog); !strings.Contains(view, "Help: x ]52;c;Zm9v") {
+		t.Fatalf("info view = %q", view)
+	}
+}

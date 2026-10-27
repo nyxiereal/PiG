@@ -770,7 +770,8 @@ func TestPublicationsOfDeferredCommits(t *testing.T) {
 		must(t, err)
 		var mu sync.Mutex
 		values := []any{}
-		watch.Start(func(_ ctxT, value obj, _ []durable.Op) error {
+		watch.Start(func(_ context.Context, change durable.WatchChange[obj]) error {
+			value := change.Value
 			mu.Lock()
 			values = append(values, value.Value("text"))
 			mu.Unlock()

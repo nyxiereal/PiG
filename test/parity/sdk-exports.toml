@@ -1329,6 +1329,7 @@ closing = "Pure helpers ported per SDK with vector tests from Pi at the pin (tes
 "pi-tui: renderFakeCursor" = { go = "gap:SdkExportsLedger", rust = "gap:SdkExportsLedger", python = "gap:SdkExportsLedger" }
 "pi-tui: renderImage" = { go = "gap:SdkExportsLedger", rust = "gap:SdkExportsLedger", python = "gap:SdkExportsLedger" }
 "pi-tui: renderLatex" = { go = "gap:SdkExportsLedger", rust = "gap:SdkExportsLedger", python = "gap:SdkExportsLedger" }
+"pi-tui: replaceControlCharacters" = { go = "gap:SdkExportsLedger", rust = "gap:SdkExportsLedger", python = "gap:SdkExportsLedger" }
 "pi-tui: resetCapabilitiesCache" = { go = "native:tui.ResetCapabilitiesCache", rust = "native:tui::reset_capabilities_cache", python = "native:tui.reset_capabilities_cache" }
 "pi-tui: rgbColor" = { go = "native:tui.NewRgbColor", rust = "native:tui::rgb_color", python = "native:tui.rgb_color" }
 "pi-tui: setCapabilities" = { go = "native:tui.SetCapabilities", rust = "native:tui::set_capabilities", python = "native:tui.set_capabilities" }

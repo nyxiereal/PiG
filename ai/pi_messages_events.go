@@ -6,9 +6,12 @@ package ai
 import (
 	"encoding/json"
 	"fmt"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/MichaelKinsy/PiG/internal/jsjson"
+	"github.com/MichaelKinsy/PiG/internal/jsonstringify"
 	"github.com/MichaelKinsy/PiG/internal/orderedjson"
 )
 
@@ -94,9 +97,16 @@ func (c *piMessagesEventConverter) convert(raw json.RawMessage) ([]AssistantMess
 	if len(raw) > 0 && raw[0] != '{' {
 		return nil, nil
 	}
-	var event PiMessagesEvent
-	if err := json.Unmarshal(jsjson.NormalizeIntegers(raw), &event); err != nil {
+	var wire piMessagesWireEvent
+	if err := json.Unmarshal(jsjson.NormalizeIntegers(raw), &wire); err != nil {
 		return nil, err
+	}
+	event := wire.PiMessagesEvent
+	if wire.ContentIndex.present {
+		if err := c.checkContentIndex(raw, event.Type, wire.ContentIndex); err != nil {
+			return nil, err
+		}
+		event.ContentIndex = wire.ContentIndex.index
 	}
 	if event.Rewrite != nil {
 		if parsed, err := orderedjson.Parse(raw); err == nil {
@@ -160,6 +170,48 @@ func (c *piMessagesEventConverter) apply(event PiMessagesEvent) (AssistantMessag
 	}
 	// upstream: pi-messages.ts createEventConverter returns `{ ...event, partial }` for any other type; the stream carries it and every consumer's switch ignores it, so it changes nothing here.
 	return nil, nil
+}
+
+// piMessagesWireEvent is a backend event as it arrives: the contentIndex is read for what it is, not as the integer the event struct holds.
+type piMessagesWireEvent struct {
+	PiMessagesEvent
+	ContentIndex piMessagesContentIndex `json:"contentIndex"`
+}
+
+// piMessagesContentIndex is an event's contentIndex member: present when the member is there, and index with valid set only when it is an integer.
+type piMessagesContentIndex struct {
+	present bool
+	valid   bool
+	index   int
+}
+
+func (field *piMessagesContentIndex) UnmarshalJSON(data []byte) error {
+	field.present = true
+	if index, err := strconv.ParseInt(string(data), 10, 64); err == nil && int64(int(index)) == index {
+		field.index, field.valid = int(index), true
+	}
+	return nil
+}
+
+// checkContentIndex is the check at the top of createEventConverter's returned function (pi-messages.ts:198-205): the index comes from the wire and keys the
+// content array, so an event that carries one must name the next block (a start, which adds it) or an existing one (any other event).
+func (c *piMessagesEventConverter) checkContentIndex(raw json.RawMessage, eventType PiMessagesEventType, field piMessagesContentIndex) error {
+	limit := len(c.partial.Content) - 1
+	if strings.HasSuffix(string(eventType), "_start") {
+		limit++
+	}
+	if field.valid && field.index >= 0 && field.index <= limit {
+		return nil
+	}
+	var member struct {
+		ContentIndex json.RawMessage `json:"contentIndex"`
+	}
+	_ = json.Unmarshal(raw, &member)
+	text, err := jsonstringify.Canonicalize(member.ContentIndex)
+	if err != nil {
+		text = member.ContentIndex
+	}
+	return fmt.Errorf("Invalid contentIndex %s in pi-messages %s event", text, eventType)
 }
 
 func (c *piMessagesEventConverter) finish(event PiMessagesEvent) {

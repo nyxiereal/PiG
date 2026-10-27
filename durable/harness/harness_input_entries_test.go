@@ -8,6 +8,7 @@ package harness
 import (
 	"context"
 	"errors"
+	"github.com/MichaelKinsy/PiG/chord"
 	"path/filepath"
 	"strings"
 	"sync"
@@ -302,7 +303,8 @@ func TestDataOnlyWrites(t *testing.T) {
 		harness, root := openChat(t, storage.NewMemoryStorage(), setup)
 		var events []AgentEvent
 		stream := must(WatchEvents(testContext, harness, root.Id()))
-		stream.Start(func(_ context.Context, batch []AgentEvent) error {
+		stream.Start(func(_ context.Context, change chord.NativeWatchChange[[]AgentEvent]) error {
+			batch := change.Value
 			mu.Lock()
 			events = append(events, batch...)
 			mu.Unlock()

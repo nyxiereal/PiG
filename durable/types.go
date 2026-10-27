@@ -635,7 +635,8 @@ type ReportTask struct {
 	ConversationId ConversationId `json:"conversationId"`
 }
 
-// HostCallback is a host callback, by its HarnessOptions name; env is the environment builder, models a provider call.
+// HostCallback is a host callback, by its HarnessOptions name; env is the environment builder, models a provider call,
+// and telemetry a telemetry adapter call made while a commit is published, which must not fail it.
 type HostCallback string
 
 // The host callbacks a report can name.
@@ -647,6 +648,8 @@ const (
 	HostCallbackModels   HostCallback = "models"
 	HostCallbackSetTimer HostCallback = "setTimer"
 	HostCallbackOnWake   HostCallback = "onWake"
+	// HostCallbackTelemetry names a telemetry adapter that panicked while a commit was published.
+	HostCallbackTelemetry HostCallback = "telemetry"
 )
 
 // ReportType is what a report to HarnessOptions.OnReport is about.
@@ -1111,7 +1114,6 @@ type WatchEndReason = chord.WatchEndReason
 const (
 	WatchStopped       = chord.WatchStopped
 	WatchCancelled     = chord.WatchCancelled
-	WatchRetired       = chord.WatchRetired
 	WatchEnded         = chord.WatchEnded
 	WatchListenerError = chord.WatchListenerError
 	// WatchFailed ends a watch when the Session failed; Error is the failure, usually a Storage error (see SessionFailed).
@@ -1124,10 +1126,43 @@ type WatchEnd = chord.WatchEnd
 // WatchHandle is a serialized observation of an immutable value: one listener call at a time; changes made meanwhile arrive folded into the next call.
 type WatchHandle[T any] = chord.WatchHandle[T]
 
-// DocumentWatch is a watch of one committed document incarnation. A retirement delivers [["r", null]] with a nil value,
-// then ends the watch as retired; the Session's close ends it as ended, its failure as failed with the error that failed
+// WatchChange is one call of a JSON watch's listener: the newest value, the ops that turn the previous value into it,
+// and whether the document the watch follows was retired since the previous call; it is Chord's.
+type WatchChange[T any] = chord.WatchChange[T]
+
+// NativeWatchChange is one call of a native watch's listener: the new value; it is Chord's.
+type NativeWatchChange[T any] = chord.NativeWatchChange[T]
+
+// DocumentWatch is a watch of one document address (kind, scope, and key), from the incarnation found at acquisition on.
+// A retirement is a call with Retired set, the last value the watch was given and no ops (a change made in the retiring
+// commit itself is not shown: that commit publishes the retirement only); the watch goes on, and a document created at
+// the address later arrives as [["r", value]], folded with what is pending. It ends ended when its scope's owner ends: a
+// task document's watch once the retirement call of the commit that makes its task terminal returned, every watch at
+// Session close (a pending retirement dropped); failed with the error that failed the Session.
+type DocumentWatch[T any] = WatchHandle[T]
+
+// Observer is a synchronous observer of committed Durable state, for adapters such as a Chord source
+// (Session.ObserveDocErased, Harness.ObserveConversation, Harness.ObserveTaskGraph). Advance gets every change, unfolded, as
+// memory adopts it: for a stored commit inside Storage's adopt, for a deferred one before it is stored. A view or the
+// graph gets at most one call per commit, a document observer one per change at its address (two for a commit that
+// retires and recreates it); the task graph also advances outside any commit and adopt, on the Session line, when a
+// registry change or a failed migration changes a blocked reason. Calls may come before the attaching call returns; their
+// ops apply from Observation.Value. Advance must only record the change, synchronously and quickly, never wait, call the
+// Session, or panic. A panic is reported as listener_error, detaches the observer, and ends it with the error. End is
+// called once, when the Session closes (failure nil) or fails (failure is the error), or when the observed scope's owner
+// ends (a task document's task, after its retirement change, inside that commit's adopt), and never after Detach.
+type Observer[T any] interface {
+	Advance(ctx context.Context, change WatchChange[T])
+	End(failure error)
+}
+
+// Observation is an attached Observer: the value at attachment, which every later Advance starts from, and how to detach
 // it.
-type DocumentWatch[T any] = WatchHandle[*T]
+type Observation[T any] interface {
+	Value() T
+	// Detach is idempotent: no Advance or End follows it, not even for the rest of a commit underway.
+	Detach()
+}
 
 // DocumentReader holds committed document reads (Session.snapshot and snapshotAsOf).
 type DocumentReader interface {
@@ -1210,13 +1245,23 @@ func SingleCommitOptions(options []CommitOptions) (CommitOptions, error) {
 type Session interface {
 	DocumentObserver
 	DocumentReader
+	// ObserveDocErased attaches a synchronous Observer to one document address, atomically on the Session line, as
+	// WatchDocErased acquires a watch: the observation's value includes every commit before it, and Advance gets every
+	// later one, retirements and later incarnations included. The observation is nil when the address is absent. ctx
+	// governs only the attachment: cancelled while attaching, the call fails and nothing stays attached. args are the
+	// owner ID and family key as for WatchDocErased. Typed observers use ObserveDoc.
+	ObserveDocErased(ctx context.Context, token AnyDocToken, observer Observer[JsonObject], args ...any) (Observation[JsonObject], error)
 	// Commit runs one atomic transaction on the Session mutation line. Inside the callback read only through tx: Snapshot, WatchDoc, GetTask and the other Session and runtime reads may queue on the line the callback holds, and then never return. At most one options value may follow; Persistence may defer storing it (CommitPersistence).
 	Commit(ctx context.Context, change func(tx Tx) (any, error), options ...CommitOptions) (any, error)
 	// Close seals admission, settles admitted commits, then closes storage.
 	Close(ctx context.Context) error
-	// SubscribeCommits observes stored commits synchronously after adoption, each with exactly what it stored; a commit
-	// held in memory is published when it is stored (CommitPublication). The listener must not panic, block, or call
-	// Session APIs.
+	// SubscribeCommits observes stored commits, each with exactly what it stored, except that a document the commit
+	// retires is published as its retirement only; a commit held in memory is published when it is stored
+	// (CommitPublication). Storage's adoption of the commit queues one dispatch, which runs once adopt returned (when the
+	// storage then waits, at once; otherwise when Storage.Commit returns, before the Session sees it resolve), before
+	// every wait the commit resolves and every abort it queues, and calls the listeners registered by then; a commit
+	// adopted while none was registered has no dispatch. There is no order relative to watch listeners. The
+	// listener runs synchronously and must not panic, block, or call Session APIs.
 	SubscribeCommits(listener func(ctx context.Context, publication CommitPublication)) func()
 	// SubscribeClose observes close synchronously when it begins. The listener must not panic, block, or call
 	// Session APIs.
@@ -1257,9 +1302,9 @@ type EntryAt struct {
 type Storage interface {
 	// Commit atomically persists one batch and returns its sequence. Once the batch is durable, call adopt(seq)
 	// exactly once, synchronously and before this storage's next commit starts, then return seq; a commit that fails
-	// before it is durable never calls adopt. adopt is the caller's in-memory adoption of the batch, so memory always
-	// shows a complete prefix of the log; it must not panic. Once it returns, later reads through this storage observe
-	// the batch.
+	// before it is durable never calls adopt. adopt is the caller's in-memory adoption and publication of the batch, so
+	// memory and the Session's views always show a complete prefix of the log; it runs the Session's own observers, which
+	// call no Storage method, and never panics. Once it returns, later reads through this storage observe the batch.
 	Commit(ctx context.Context, writes []StorageWrite, adopt func(seq Seq)) (Seq, error)
 	// MintId returns a fresh candidate from the Session-global numeric ID namespace, greater than every ID minted since
 	// this storage was opened and every ID stored, also across reopen.

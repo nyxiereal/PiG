@@ -1,5 +1,5 @@
 {
-  "piVersion": "1.4.0+d5b3de22",
+  "piVersion": "1.4.0+6c384aa3",
   "openaiVersion": "7.19.0",
   "gapCap": 64,
   "axes": {
@@ -75,7 +75,7 @@
               }
             },
             "stopReason": "pending",
-            "timestamp": 1792942568823
+            "timestamp": 1793072863737
           }
         },
         {
@@ -109,7 +109,7 @@
               }
             },
             "stopReason": "pending",
-            "timestamp": 1792942568823,
+            "timestamp": 1793072863737,
             "responseId": "response-r2"
           }
         },
@@ -145,7 +145,7 @@
               }
             },
             "stopReason": "pending",
-            "timestamp": 1792942568823,
+            "timestamp": 1793072863737,
             "responseId": "response-r2"
           }
         },
@@ -181,7 +181,7 @@
               }
             },
             "stopReason": "pending",
-            "timestamp": 1792942568823,
+            "timestamp": 1793072863737,
             "responseId": "response-r2"
           }
         },
@@ -217,7 +217,7 @@
               }
             },
             "stopReason": "pending",
-            "timestamp": 1792942568823,
+            "timestamp": 1793072863737,
             "responseId": "response-r2"
           }
         },
@@ -253,10 +253,10 @@
               }
             },
             "stopReason": "stop",
-            "timestamp": 1792942568823,
+            "timestamp": 1793072863737,
             "responseId": "response-r2",
             "rawStopReason": "completed",
-            "durationMs": 45
+            "durationMs": 44
           }
         }
       ]
@@ -292,7 +292,7 @@
               }
             },
             "stopReason": "pending",
-            "timestamp": 1792942568870
+            "timestamp": 1793072863784
           }
         },
         {
@@ -326,7 +326,7 @@
               }
             },
             "stopReason": "pending",
-            "timestamp": 1792942568870,
+            "timestamp": 1793072863784,
             "responseId": "response-r2"
           }
         },
@@ -362,7 +362,7 @@
               }
             },
             "stopReason": "pending",
-            "timestamp": 1792942568870,
+            "timestamp": 1793072863784,
             "responseId": "response-r2"
           }
         },
@@ -398,7 +398,7 @@
               }
             },
             "stopReason": "pending",
-            "timestamp": 1792942568870,
+            "timestamp": 1793072863784,
             "responseId": "response-r2"
           }
         },
@@ -434,7 +434,7 @@
               }
             },
             "stopReason": "pending",
-            "timestamp": 1792942568870,
+            "timestamp": 1793072863784,
             "responseId": "response-r2"
           }
         },
@@ -470,10 +470,10 @@
               }
             },
             "stopReason": "stop",
-            "timestamp": 1792942568870,
+            "timestamp": 1793072863784,
             "responseId": "response-r2",
             "rawStopReason": "completed",
-            "durationMs": 10
+            "durationMs": 9
           }
         }
       ]
@@ -509,7 +509,7 @@
               }
             },
             "stopReason": "pending",
-            "timestamp": 1792942568881
+            "timestamp": 1793072863794
           }
         },
         {
@@ -543,7 +543,7 @@
               }
             },
             "stopReason": "pending",
-            "timestamp": 1792942568881,
+            "timestamp": 1793072863794,
             "responseId": "response-r2"
           }
         },
@@ -579,7 +579,7 @@
               }
             },
             "stopReason": "pending",
-            "timestamp": 1792942568881,
+            "timestamp": 1793072863794,
             "responseId": "response-r2"
           }
         },
@@ -615,7 +615,7 @@
               }
             },
             "stopReason": "pending",
-            "timestamp": 1792942568881,
+            "timestamp": 1793072863794,
             "responseId": "response-r2"
           }
         },
@@ -651,7 +651,7 @@
               }
             },
             "stopReason": "pending",
-            "timestamp": 1792942568881,
+            "timestamp": 1793072863794,
             "responseId": "response-r2"
           }
         },
@@ -687,658 +687,7 @@
               }
             },
             "stopReason": "stop",
-            "timestamp": 1792942568881,
-            "responseId": "response-r2",
-            "rawStopReason": "completed",
-            "durationMs": 35
-          }
-        }
-      ]
-    },
-    {
-      "api": "azure-openai-responses",
-      "layers": 0,
-      "shape": "thinking",
-      "fixture": "buffered",
-      "events": [
-        {
-          "type": "start",
-          "gap": 4,
-          "io": false,
-          "partial": {
-            "role": "assistant",
-            "content": [],
-            "api": "azure-openai-responses",
-            "provider": "probe-provider",
-            "model": "probe",
-            "usage": {
-              "input": 0,
-              "output": 0,
-              "cacheRead": 0,
-              "cacheWrite": 0,
-              "totalTokens": 0,
-              "cost": {
-                "input": 0,
-                "output": 0,
-                "cacheRead": 0,
-                "cacheWrite": 0,
-                "total": 0
-              }
-            },
-            "stopReason": "pending",
-            "timestamp": 1792942568916
-          }
-        },
-        {
-          "type": "thinking_start",
-          "contentIndex": 0,
-          "gap": 19,
-          "io": false,
-          "partial": {
-            "role": "assistant",
-            "content": [
-              {
-                "type": "thinking",
-                "thinking": ""
-              }
-            ],
-            "api": "azure-openai-responses",
-            "provider": "probe-provider",
-            "model": "probe",
-            "usage": {
-              "input": 0,
-              "output": 0,
-              "cacheRead": 0,
-              "cacheWrite": 0,
-              "totalTokens": 0,
-              "cost": {
-                "input": 0,
-                "output": 0,
-                "cacheRead": 0,
-                "cacheWrite": 0,
-                "total": 0
-              }
-            },
-            "stopReason": "pending",
-            "timestamp": 1792942568916,
-            "responseId": "response-r2"
-          }
-        },
-        {
-          "type": "thinking_delta",
-          "contentIndex": 0,
-          "delta": "one",
-          "gap": 7,
-          "io": false,
-          "partial": {
-            "role": "assistant",
-            "content": [
-              {
-                "type": "thinking",
-                "thinking": "one"
-              }
-            ],
-            "api": "azure-openai-responses",
-            "provider": "probe-provider",
-            "model": "probe",
-            "usage": {
-              "input": 0,
-              "output": 0,
-              "cacheRead": 0,
-              "cacheWrite": 0,
-              "totalTokens": 0,
-              "cost": {
-                "input": 0,
-                "output": 0,
-                "cacheRead": 0,
-                "cacheWrite": 0,
-                "total": 0
-              }
-            },
-            "stopReason": "pending",
-            "timestamp": 1792942568916,
-            "responseId": "response-r2"
-          }
-        },
-        {
-          "type": "thinking_delta",
-          "contentIndex": 0,
-          "delta": " two",
-          "gap": 7,
-          "io": false,
-          "partial": {
-            "role": "assistant",
-            "content": [
-              {
-                "type": "thinking",
-                "thinking": "one two"
-              }
-            ],
-            "api": "azure-openai-responses",
-            "provider": "probe-provider",
-            "model": "probe",
-            "usage": {
-              "input": 0,
-              "output": 0,
-              "cacheRead": 0,
-              "cacheWrite": 0,
-              "totalTokens": 0,
-              "cost": {
-                "input": 0,
-                "output": 0,
-                "cacheRead": 0,
-                "cacheWrite": 0,
-                "total": 0
-              }
-            },
-            "stopReason": "pending",
-            "timestamp": 1792942568916,
-            "responseId": "response-r2"
-          }
-        },
-        {
-          "type": "thinking_end",
-          "contentIndex": 0,
-          "gap": 7,
-          "io": false,
-          "partial": {
-            "role": "assistant",
-            "content": [
-              {
-                "type": "thinking",
-                "thinking": "one two",
-                "thinkingSignature": "{\"type\":\"reasoning\",\"id\":\"rs_r2\",\"summary\":[{\"type\":\"summary_text\",\"text\":\"one two\"}]}"
-              }
-            ],
-            "api": "azure-openai-responses",
-            "provider": "probe-provider",
-            "model": "probe",
-            "usage": {
-              "input": 0,
-              "output": 0,
-              "cacheRead": 0,
-              "cacheWrite": 0,
-              "totalTokens": 0,
-              "cost": {
-                "input": 0,
-                "output": 0,
-                "cacheRead": 0,
-                "cacheWrite": 0,
-                "total": 0
-              }
-            },
-            "stopReason": "pending",
-            "timestamp": 1792942568916,
-            "responseId": "response-r2"
-          }
-        },
-        {
-          "type": "done",
-          "gap": 64,
-          "io": true,
-          "partial": {
-            "role": "assistant",
-            "content": [
-              {
-                "type": "thinking",
-                "thinking": "one two",
-                "thinkingSignature": "{\"type\":\"reasoning\",\"id\":\"rs_r2\",\"summary\":[{\"type\":\"summary_text\",\"text\":\"one two\"}]}"
-              }
-            ],
-            "api": "azure-openai-responses",
-            "provider": "probe-provider",
-            "model": "probe",
-            "usage": {
-              "input": 0,
-              "output": 0,
-              "cacheRead": 0,
-              "cacheWrite": 0,
-              "totalTokens": 0,
-              "cost": {
-                "input": 0,
-                "output": 0,
-                "cacheRead": 0,
-                "cacheWrite": 0,
-                "total": 0,
-                "totalFromProvider": false
-              }
-            },
-            "stopReason": "stop",
-            "timestamp": 1792942568916,
-            "responseId": "response-r2",
-            "rawStopReason": "completed",
-            "durationMs": 5
-          }
-        }
-      ]
-    },
-    {
-      "api": "azure-openai-responses",
-      "layers": 0,
-      "shape": "thinking",
-      "fixture": "pending",
-      "events": [
-        {
-          "type": "start",
-          "gap": 4,
-          "io": false,
-          "partial": {
-            "role": "assistant",
-            "content": [],
-            "api": "azure-openai-responses",
-            "provider": "probe-provider",
-            "model": "probe",
-            "usage": {
-              "input": 0,
-              "output": 0,
-              "cacheRead": 0,
-              "cacheWrite": 0,
-              "totalTokens": 0,
-              "cost": {
-                "input": 0,
-                "output": 0,
-                "cacheRead": 0,
-                "cacheWrite": 0,
-                "total": 0
-              }
-            },
-            "stopReason": "pending",
-            "timestamp": 1792942568922
-          }
-        },
-        {
-          "type": "thinking_start",
-          "contentIndex": 0,
-          "gap": 64,
-          "io": true,
-          "partial": {
-            "role": "assistant",
-            "content": [
-              {
-                "type": "thinking",
-                "thinking": ""
-              }
-            ],
-            "api": "azure-openai-responses",
-            "provider": "probe-provider",
-            "model": "probe",
-            "usage": {
-              "input": 0,
-              "output": 0,
-              "cacheRead": 0,
-              "cacheWrite": 0,
-              "totalTokens": 0,
-              "cost": {
-                "input": 0,
-                "output": 0,
-                "cacheRead": 0,
-                "cacheWrite": 0,
-                "total": 0
-              }
-            },
-            "stopReason": "pending",
-            "timestamp": 1792942568922,
-            "responseId": "response-r2"
-          }
-        },
-        {
-          "type": "thinking_delta",
-          "contentIndex": 0,
-          "delta": "one",
-          "gap": 7,
-          "io": false,
-          "partial": {
-            "role": "assistant",
-            "content": [
-              {
-                "type": "thinking",
-                "thinking": "one"
-              }
-            ],
-            "api": "azure-openai-responses",
-            "provider": "probe-provider",
-            "model": "probe",
-            "usage": {
-              "input": 0,
-              "output": 0,
-              "cacheRead": 0,
-              "cacheWrite": 0,
-              "totalTokens": 0,
-              "cost": {
-                "input": 0,
-                "output": 0,
-                "cacheRead": 0,
-                "cacheWrite": 0,
-                "total": 0
-              }
-            },
-            "stopReason": "pending",
-            "timestamp": 1792942568922,
-            "responseId": "response-r2"
-          }
-        },
-        {
-          "type": "thinking_delta",
-          "contentIndex": 0,
-          "delta": " two",
-          "gap": 7,
-          "io": false,
-          "partial": {
-            "role": "assistant",
-            "content": [
-              {
-                "type": "thinking",
-                "thinking": "one two"
-              }
-            ],
-            "api": "azure-openai-responses",
-            "provider": "probe-provider",
-            "model": "probe",
-            "usage": {
-              "input": 0,
-              "output": 0,
-              "cacheRead": 0,
-              "cacheWrite": 0,
-              "totalTokens": 0,
-              "cost": {
-                "input": 0,
-                "output": 0,
-                "cacheRead": 0,
-                "cacheWrite": 0,
-                "total": 0
-              }
-            },
-            "stopReason": "pending",
-            "timestamp": 1792942568922,
-            "responseId": "response-r2"
-          }
-        },
-        {
-          "type": "thinking_end",
-          "contentIndex": 0,
-          "gap": 7,
-          "io": false,
-          "partial": {
-            "role": "assistant",
-            "content": [
-              {
-                "type": "thinking",
-                "thinking": "one two",
-                "thinkingSignature": "{\"type\":\"reasoning\",\"id\":\"rs_r2\",\"summary\":[{\"type\":\"summary_text\",\"text\":\"one two\"}]}"
-              }
-            ],
-            "api": "azure-openai-responses",
-            "provider": "probe-provider",
-            "model": "probe",
-            "usage": {
-              "input": 0,
-              "output": 0,
-              "cacheRead": 0,
-              "cacheWrite": 0,
-              "totalTokens": 0,
-              "cost": {
-                "input": 0,
-                "output": 0,
-                "cacheRead": 0,
-                "cacheWrite": 0,
-                "total": 0
-              }
-            },
-            "stopReason": "pending",
-            "timestamp": 1792942568922,
-            "responseId": "response-r2"
-          }
-        },
-        {
-          "type": "done",
-          "gap": 64,
-          "io": true,
-          "partial": {
-            "role": "assistant",
-            "content": [
-              {
-                "type": "thinking",
-                "thinking": "one two",
-                "thinkingSignature": "{\"type\":\"reasoning\",\"id\":\"rs_r2\",\"summary\":[{\"type\":\"summary_text\",\"text\":\"one two\"}]}"
-              }
-            ],
-            "api": "azure-openai-responses",
-            "provider": "probe-provider",
-            "model": "probe",
-            "usage": {
-              "input": 0,
-              "output": 0,
-              "cacheRead": 0,
-              "cacheWrite": 0,
-              "totalTokens": 0,
-              "cost": {
-                "input": 0,
-                "output": 0,
-                "cacheRead": 0,
-                "cacheWrite": 0,
-                "total": 0,
-                "totalFromProvider": false
-              }
-            },
-            "stopReason": "stop",
-            "timestamp": 1792942568922,
-            "responseId": "response-r2",
-            "rawStopReason": "completed",
-            "durationMs": 5
-          }
-        }
-      ]
-    },
-    {
-      "api": "azure-openai-responses",
-      "layers": 0,
-      "shape": "thinking",
-      "fixture": "chunked",
-      "events": [
-        {
-          "type": "start",
-          "gap": 4,
-          "io": false,
-          "partial": {
-            "role": "assistant",
-            "content": [],
-            "api": "azure-openai-responses",
-            "provider": "probe-provider",
-            "model": "probe",
-            "usage": {
-              "input": 0,
-              "output": 0,
-              "cacheRead": 0,
-              "cacheWrite": 0,
-              "totalTokens": 0,
-              "cost": {
-                "input": 0,
-                "output": 0,
-                "cacheRead": 0,
-                "cacheWrite": 0,
-                "total": 0
-              }
-            },
-            "stopReason": "pending",
-            "timestamp": 1792942568927
-          }
-        },
-        {
-          "type": "thinking_start",
-          "contentIndex": 0,
-          "gap": 64,
-          "io": true,
-          "partial": {
-            "role": "assistant",
-            "content": [
-              {
-                "type": "thinking",
-                "thinking": ""
-              }
-            ],
-            "api": "azure-openai-responses",
-            "provider": "probe-provider",
-            "model": "probe",
-            "usage": {
-              "input": 0,
-              "output": 0,
-              "cacheRead": 0,
-              "cacheWrite": 0,
-              "totalTokens": 0,
-              "cost": {
-                "input": 0,
-                "output": 0,
-                "cacheRead": 0,
-                "cacheWrite": 0,
-                "total": 0
-              }
-            },
-            "stopReason": "pending",
-            "timestamp": 1792942568927,
-            "responseId": "response-r2"
-          }
-        },
-        {
-          "type": "thinking_delta",
-          "contentIndex": 0,
-          "delta": "one",
-          "gap": 64,
-          "io": true,
-          "partial": {
-            "role": "assistant",
-            "content": [
-              {
-                "type": "thinking",
-                "thinking": "one"
-              }
-            ],
-            "api": "azure-openai-responses",
-            "provider": "probe-provider",
-            "model": "probe",
-            "usage": {
-              "input": 0,
-              "output": 0,
-              "cacheRead": 0,
-              "cacheWrite": 0,
-              "totalTokens": 0,
-              "cost": {
-                "input": 0,
-                "output": 0,
-                "cacheRead": 0,
-                "cacheWrite": 0,
-                "total": 0
-              }
-            },
-            "stopReason": "pending",
-            "timestamp": 1792942568927,
-            "responseId": "response-r2"
-          }
-        },
-        {
-          "type": "thinking_delta",
-          "contentIndex": 0,
-          "delta": " two",
-          "gap": 64,
-          "io": true,
-          "partial": {
-            "role": "assistant",
-            "content": [
-              {
-                "type": "thinking",
-                "thinking": "one two"
-              }
-            ],
-            "api": "azure-openai-responses",
-            "provider": "probe-provider",
-            "model": "probe",
-            "usage": {
-              "input": 0,
-              "output": 0,
-              "cacheRead": 0,
-              "cacheWrite": 0,
-              "totalTokens": 0,
-              "cost": {
-                "input": 0,
-                "output": 0,
-                "cacheRead": 0,
-                "cacheWrite": 0,
-                "total": 0
-              }
-            },
-            "stopReason": "pending",
-            "timestamp": 1792942568927,
-            "responseId": "response-r2"
-          }
-        },
-        {
-          "type": "thinking_end",
-          "contentIndex": 0,
-          "gap": 64,
-          "io": true,
-          "partial": {
-            "role": "assistant",
-            "content": [
-              {
-                "type": "thinking",
-                "thinking": "one two",
-                "thinkingSignature": "{\"type\":\"reasoning\",\"id\":\"rs_r2\",\"summary\":[{\"type\":\"summary_text\",\"text\":\"one two\"}]}"
-              }
-            ],
-            "api": "azure-openai-responses",
-            "provider": "probe-provider",
-            "model": "probe",
-            "usage": {
-              "input": 0,
-              "output": 0,
-              "cacheRead": 0,
-              "cacheWrite": 0,
-              "totalTokens": 0,
-              "cost": {
-                "input": 0,
-                "output": 0,
-                "cacheRead": 0,
-                "cacheWrite": 0,
-                "total": 0
-              }
-            },
-            "stopReason": "pending",
-            "timestamp": 1792942568927,
-            "responseId": "response-r2"
-          }
-        },
-        {
-          "type": "done",
-          "gap": 64,
-          "io": true,
-          "partial": {
-            "role": "assistant",
-            "content": [
-              {
-                "type": "thinking",
-                "thinking": "one two",
-                "thinkingSignature": "{\"type\":\"reasoning\",\"id\":\"rs_r2\",\"summary\":[{\"type\":\"summary_text\",\"text\":\"one two\"}]}"
-              }
-            ],
-            "api": "azure-openai-responses",
-            "provider": "probe-provider",
-            "model": "probe",
-            "usage": {
-              "input": 0,
-              "output": 0,
-              "cacheRead": 0,
-              "cacheWrite": 0,
-              "totalTokens": 0,
-              "cost": {
-                "input": 0,
-                "output": 0,
-                "cacheRead": 0,
-                "cacheWrite": 0,
-                "total": 0,
-                "totalFromProvider": false
-              }
-            },
-            "stopReason": "stop",
-            "timestamp": 1792942568927,
+            "timestamp": 1793072863794,
             "responseId": "response-r2",
             "rawStopReason": "completed",
             "durationMs": 36
@@ -1349,1248 +698,12 @@
     {
       "api": "azure-openai-responses",
       "layers": 0,
-      "shape": "tool",
-      "fixture": "buffered",
-      "events": [
-        {
-          "type": "start",
-          "gap": 4,
-          "io": false,
-          "partial": {
-            "role": "assistant",
-            "content": [],
-            "api": "azure-openai-responses",
-            "provider": "probe-provider",
-            "model": "probe",
-            "usage": {
-              "input": 0,
-              "output": 0,
-              "cacheRead": 0,
-              "cacheWrite": 0,
-              "totalTokens": 0,
-              "cost": {
-                "input": 0,
-                "output": 0,
-                "cacheRead": 0,
-                "cacheWrite": 0,
-                "total": 0
-              }
-            },
-            "stopReason": "pending",
-            "timestamp": 1792942568964
-          }
-        },
-        {
-          "type": "toolcall_start",
-          "contentIndex": 0,
-          "gap": 19,
-          "io": false,
-          "partial": {
-            "role": "assistant",
-            "content": [
-              {
-                "type": "toolCall",
-                "id": "call-r2|fc_r2",
-                "name": "read",
-                "arguments": {}
-              }
-            ],
-            "api": "azure-openai-responses",
-            "provider": "probe-provider",
-            "model": "probe",
-            "usage": {
-              "input": 0,
-              "output": 0,
-              "cacheRead": 0,
-              "cacheWrite": 0,
-              "totalTokens": 0,
-              "cost": {
-                "input": 0,
-                "output": 0,
-                "cacheRead": 0,
-                "cacheWrite": 0,
-                "total": 0
-              }
-            },
-            "stopReason": "pending",
-            "timestamp": 1792942568964,
-            "responseId": "response-r2"
-          }
-        },
-        {
-          "type": "toolcall_delta",
-          "contentIndex": 0,
-          "delta": "{\"path\":\"target.txt\"}",
-          "gap": 7,
-          "io": false,
-          "partial": {
-            "role": "assistant",
-            "content": [
-              {
-                "type": "toolCall",
-                "id": "call-r2|fc_r2",
-                "name": "read",
-                "arguments": {
-                  "path": "target.txt"
-                }
-              }
-            ],
-            "api": "azure-openai-responses",
-            "provider": "probe-provider",
-            "model": "probe",
-            "usage": {
-              "input": 0,
-              "output": 0,
-              "cacheRead": 0,
-              "cacheWrite": 0,
-              "totalTokens": 0,
-              "cost": {
-                "input": 0,
-                "output": 0,
-                "cacheRead": 0,
-                "cacheWrite": 0,
-                "total": 0
-              }
-            },
-            "stopReason": "pending",
-            "timestamp": 1792942568964,
-            "responseId": "response-r2"
-          }
-        },
-        {
-          "type": "toolcall_end",
-          "contentIndex": 0,
-          "gap": 7,
-          "io": false,
-          "partial": {
-            "role": "assistant",
-            "content": [
-              {
-                "type": "toolCall",
-                "id": "call-r2|fc_r2",
-                "name": "read",
-                "arguments": {
-                  "path": "target.txt"
-                }
-              }
-            ],
-            "api": "azure-openai-responses",
-            "provider": "probe-provider",
-            "model": "probe",
-            "usage": {
-              "input": 0,
-              "output": 0,
-              "cacheRead": 0,
-              "cacheWrite": 0,
-              "totalTokens": 0,
-              "cost": {
-                "input": 0,
-                "output": 0,
-                "cacheRead": 0,
-                "cacheWrite": 0,
-                "total": 0
-              }
-            },
-            "stopReason": "pending",
-            "timestamp": 1792942568964,
-            "responseId": "response-r2"
-          }
-        },
-        {
-          "type": "done",
-          "gap": 64,
-          "io": true,
-          "partial": {
-            "role": "assistant",
-            "content": [
-              {
-                "type": "toolCall",
-                "id": "call-r2|fc_r2",
-                "name": "read",
-                "arguments": {
-                  "path": "target.txt"
-                }
-              }
-            ],
-            "api": "azure-openai-responses",
-            "provider": "probe-provider",
-            "model": "probe",
-            "usage": {
-              "input": 0,
-              "output": 0,
-              "cacheRead": 0,
-              "cacheWrite": 0,
-              "totalTokens": 0,
-              "cost": {
-                "input": 0,
-                "output": 0,
-                "cacheRead": 0,
-                "cacheWrite": 0,
-                "total": 0,
-                "totalFromProvider": false
-              }
-            },
-            "stopReason": "toolUse",
-            "timestamp": 1792942568964,
-            "responseId": "response-r2",
-            "rawStopReason": "completed",
-            "durationMs": 6
-          }
-        }
-      ]
-    },
-    {
-      "api": "azure-openai-responses",
-      "layers": 0,
-      "shape": "tool",
-      "fixture": "pending",
-      "events": [
-        {
-          "type": "start",
-          "gap": 4,
-          "io": false,
-          "partial": {
-            "role": "assistant",
-            "content": [],
-            "api": "azure-openai-responses",
-            "provider": "probe-provider",
-            "model": "probe",
-            "usage": {
-              "input": 0,
-              "output": 0,
-              "cacheRead": 0,
-              "cacheWrite": 0,
-              "totalTokens": 0,
-              "cost": {
-                "input": 0,
-                "output": 0,
-                "cacheRead": 0,
-                "cacheWrite": 0,
-                "total": 0
-              }
-            },
-            "stopReason": "pending",
-            "timestamp": 1792942568970
-          }
-        },
-        {
-          "type": "toolcall_start",
-          "contentIndex": 0,
-          "gap": 64,
-          "io": true,
-          "partial": {
-            "role": "assistant",
-            "content": [
-              {
-                "type": "toolCall",
-                "id": "call-r2|fc_r2",
-                "name": "read",
-                "arguments": {}
-              }
-            ],
-            "api": "azure-openai-responses",
-            "provider": "probe-provider",
-            "model": "probe",
-            "usage": {
-              "input": 0,
-              "output": 0,
-              "cacheRead": 0,
-              "cacheWrite": 0,
-              "totalTokens": 0,
-              "cost": {
-                "input": 0,
-                "output": 0,
-                "cacheRead": 0,
-                "cacheWrite": 0,
-                "total": 0
-              }
-            },
-            "stopReason": "pending",
-            "timestamp": 1792942568970,
-            "responseId": "response-r2"
-          }
-        },
-        {
-          "type": "toolcall_delta",
-          "contentIndex": 0,
-          "delta": "{\"path\":\"target.txt\"}",
-          "gap": 7,
-          "io": false,
-          "partial": {
-            "role": "assistant",
-            "content": [
-              {
-                "type": "toolCall",
-                "id": "call-r2|fc_r2",
-                "name": "read",
-                "arguments": {
-                  "path": "target.txt"
-                }
-              }
-            ],
-            "api": "azure-openai-responses",
-            "provider": "probe-provider",
-            "model": "probe",
-            "usage": {
-              "input": 0,
-              "output": 0,
-              "cacheRead": 0,
-              "cacheWrite": 0,
-              "totalTokens": 0,
-              "cost": {
-                "input": 0,
-                "output": 0,
-                "cacheRead": 0,
-                "cacheWrite": 0,
-                "total": 0
-              }
-            },
-            "stopReason": "pending",
-            "timestamp": 1792942568970,
-            "responseId": "response-r2"
-          }
-        },
-        {
-          "type": "toolcall_end",
-          "contentIndex": 0,
-          "gap": 7,
-          "io": false,
-          "partial": {
-            "role": "assistant",
-            "content": [
-              {
-                "type": "toolCall",
-                "id": "call-r2|fc_r2",
-                "name": "read",
-                "arguments": {
-                  "path": "target.txt"
-                }
-              }
-            ],
-            "api": "azure-openai-responses",
-            "provider": "probe-provider",
-            "model": "probe",
-            "usage": {
-              "input": 0,
-              "output": 0,
-              "cacheRead": 0,
-              "cacheWrite": 0,
-              "totalTokens": 0,
-              "cost": {
-                "input": 0,
-                "output": 0,
-                "cacheRead": 0,
-                "cacheWrite": 0,
-                "total": 0
-              }
-            },
-            "stopReason": "pending",
-            "timestamp": 1792942568970,
-            "responseId": "response-r2"
-          }
-        },
-        {
-          "type": "done",
-          "gap": 64,
-          "io": true,
-          "partial": {
-            "role": "assistant",
-            "content": [
-              {
-                "type": "toolCall",
-                "id": "call-r2|fc_r2",
-                "name": "read",
-                "arguments": {
-                  "path": "target.txt"
-                }
-              }
-            ],
-            "api": "azure-openai-responses",
-            "provider": "probe-provider",
-            "model": "probe",
-            "usage": {
-              "input": 0,
-              "output": 0,
-              "cacheRead": 0,
-              "cacheWrite": 0,
-              "totalTokens": 0,
-              "cost": {
-                "input": 0,
-                "output": 0,
-                "cacheRead": 0,
-                "cacheWrite": 0,
-                "total": 0,
-                "totalFromProvider": false
-              }
-            },
-            "stopReason": "toolUse",
-            "timestamp": 1792942568970,
-            "responseId": "response-r2",
-            "rawStopReason": "completed",
-            "durationMs": 4
-          }
-        }
-      ]
-    },
-    {
-      "api": "azure-openai-responses",
-      "layers": 0,
-      "shape": "tool",
-      "fixture": "chunked",
-      "events": [
-        {
-          "type": "start",
-          "gap": 4,
-          "io": false,
-          "partial": {
-            "role": "assistant",
-            "content": [],
-            "api": "azure-openai-responses",
-            "provider": "probe-provider",
-            "model": "probe",
-            "usage": {
-              "input": 0,
-              "output": 0,
-              "cacheRead": 0,
-              "cacheWrite": 0,
-              "totalTokens": 0,
-              "cost": {
-                "input": 0,
-                "output": 0,
-                "cacheRead": 0,
-                "cacheWrite": 0,
-                "total": 0
-              }
-            },
-            "stopReason": "pending",
-            "timestamp": 1792942568975
-          }
-        },
-        {
-          "type": "toolcall_start",
-          "contentIndex": 0,
-          "gap": 64,
-          "io": true,
-          "partial": {
-            "role": "assistant",
-            "content": [
-              {
-                "type": "toolCall",
-                "id": "call-r2|fc_r2",
-                "name": "read",
-                "arguments": {}
-              }
-            ],
-            "api": "azure-openai-responses",
-            "provider": "probe-provider",
-            "model": "probe",
-            "usage": {
-              "input": 0,
-              "output": 0,
-              "cacheRead": 0,
-              "cacheWrite": 0,
-              "totalTokens": 0,
-              "cost": {
-                "input": 0,
-                "output": 0,
-                "cacheRead": 0,
-                "cacheWrite": 0,
-                "total": 0
-              }
-            },
-            "stopReason": "pending",
-            "timestamp": 1792942568975,
-            "responseId": "response-r2"
-          }
-        },
-        {
-          "type": "toolcall_delta",
-          "contentIndex": 0,
-          "delta": "{\"path\":\"target.txt\"}",
-          "gap": 64,
-          "io": true,
-          "partial": {
-            "role": "assistant",
-            "content": [
-              {
-                "type": "toolCall",
-                "id": "call-r2|fc_r2",
-                "name": "read",
-                "arguments": {
-                  "path": "target.txt"
-                }
-              }
-            ],
-            "api": "azure-openai-responses",
-            "provider": "probe-provider",
-            "model": "probe",
-            "usage": {
-              "input": 0,
-              "output": 0,
-              "cacheRead": 0,
-              "cacheWrite": 0,
-              "totalTokens": 0,
-              "cost": {
-                "input": 0,
-                "output": 0,
-                "cacheRead": 0,
-                "cacheWrite": 0,
-                "total": 0
-              }
-            },
-            "stopReason": "pending",
-            "timestamp": 1792942568975,
-            "responseId": "response-r2"
-          }
-        },
-        {
-          "type": "toolcall_end",
-          "contentIndex": 0,
-          "gap": 64,
-          "io": true,
-          "partial": {
-            "role": "assistant",
-            "content": [
-              {
-                "type": "toolCall",
-                "id": "call-r2|fc_r2",
-                "name": "read",
-                "arguments": {
-                  "path": "target.txt"
-                }
-              }
-            ],
-            "api": "azure-openai-responses",
-            "provider": "probe-provider",
-            "model": "probe",
-            "usage": {
-              "input": 0,
-              "output": 0,
-              "cacheRead": 0,
-              "cacheWrite": 0,
-              "totalTokens": 0,
-              "cost": {
-                "input": 0,
-                "output": 0,
-                "cacheRead": 0,
-                "cacheWrite": 0,
-                "total": 0
-              }
-            },
-            "stopReason": "pending",
-            "timestamp": 1792942568975,
-            "responseId": "response-r2"
-          }
-        },
-        {
-          "type": "done",
-          "gap": 64,
-          "io": true,
-          "partial": {
-            "role": "assistant",
-            "content": [
-              {
-                "type": "toolCall",
-                "id": "call-r2|fc_r2",
-                "name": "read",
-                "arguments": {
-                  "path": "target.txt"
-                }
-              }
-            ],
-            "api": "azure-openai-responses",
-            "provider": "probe-provider",
-            "model": "probe",
-            "usage": {
-              "input": 0,
-              "output": 0,
-              "cacheRead": 0,
-              "cacheWrite": 0,
-              "totalTokens": 0,
-              "cost": {
-                "input": 0,
-                "output": 0,
-                "cacheRead": 0,
-                "cacheWrite": 0,
-                "total": 0,
-                "totalFromProvider": false
-              }
-            },
-            "stopReason": "toolUse",
-            "timestamp": 1792942568975,
-            "responseId": "response-r2",
-            "rawStopReason": "completed",
-            "durationMs": 31
-          }
-        }
-      ]
-    },
-    {
-      "api": "azure-openai-responses",
-      "layers": "runtime",
-      "shape": "text",
-      "fixture": "buffered",
-      "events": [
-        {
-          "type": "start",
-          "gap": 13,
-          "io": false,
-          "partial": {
-            "role": "assistant",
-            "content": [],
-            "api": "azure-openai-responses",
-            "provider": "probe-provider",
-            "model": "probe",
-            "usage": {
-              "input": 0,
-              "output": 0,
-              "cacheRead": 0,
-              "cacheWrite": 0,
-              "totalTokens": 0,
-              "cost": {
-                "input": 0,
-                "output": 0,
-                "cacheRead": 0,
-                "cacheWrite": 0,
-                "total": 0
-              }
-            },
-            "stopReason": "pending",
-            "timestamp": 1792942569022
-          }
-        },
-        {
-          "type": "text_start",
-          "contentIndex": 0,
-          "gap": 19,
-          "io": false,
-          "partial": {
-            "role": "assistant",
-            "content": [
-              {
-                "type": "text",
-                "text": "one"
-              }
-            ],
-            "api": "azure-openai-responses",
-            "provider": "probe-provider",
-            "model": "probe",
-            "usage": {
-              "input": 0,
-              "output": 0,
-              "cacheRead": 0,
-              "cacheWrite": 0,
-              "totalTokens": 0,
-              "cost": {
-                "input": 0,
-                "output": 0,
-                "cacheRead": 0,
-                "cacheWrite": 0,
-                "total": 0
-              }
-            },
-            "stopReason": "pending",
-            "timestamp": 1792942569022,
-            "responseId": "response-r2"
-          }
-        },
-        {
-          "type": "text_delta",
-          "contentIndex": 0,
-          "delta": "one",
-          "gap": 7,
-          "io": false,
-          "partial": {
-            "role": "assistant",
-            "content": [
-              {
-                "type": "text",
-                "text": "one two"
-              }
-            ],
-            "api": "azure-openai-responses",
-            "provider": "probe-provider",
-            "model": "probe",
-            "usage": {
-              "input": 0,
-              "output": 0,
-              "cacheRead": 0,
-              "cacheWrite": 0,
-              "totalTokens": 0,
-              "cost": {
-                "input": 0,
-                "output": 0,
-                "cacheRead": 0,
-                "cacheWrite": 0,
-                "total": 0
-              }
-            },
-            "stopReason": "pending",
-            "timestamp": 1792942569022,
-            "responseId": "response-r2"
-          }
-        },
-        {
-          "type": "text_delta",
-          "contentIndex": 0,
-          "delta": " two",
-          "gap": 7,
-          "io": false,
-          "partial": {
-            "role": "assistant",
-            "content": [
-              {
-                "type": "text",
-                "text": "one two",
-                "textSignature": "{\"v\":1,\"id\":\"msg_r2\"}"
-              }
-            ],
-            "api": "azure-openai-responses",
-            "provider": "probe-provider",
-            "model": "probe",
-            "usage": {
-              "input": 0,
-              "output": 0,
-              "cacheRead": 0,
-              "cacheWrite": 0,
-              "totalTokens": 0,
-              "cost": {
-                "input": 0,
-                "output": 0,
-                "cacheRead": 0,
-                "cacheWrite": 0,
-                "total": 0
-              }
-            },
-            "stopReason": "pending",
-            "timestamp": 1792942569022,
-            "responseId": "response-r2"
-          }
-        },
-        {
-          "type": "text_end",
-          "contentIndex": 0,
-          "gap": 7,
-          "io": false,
-          "partial": {
-            "role": "assistant",
-            "content": [
-              {
-                "type": "text",
-                "text": "one two",
-                "textSignature": "{\"v\":1,\"id\":\"msg_r2\"}"
-              }
-            ],
-            "api": "azure-openai-responses",
-            "provider": "probe-provider",
-            "model": "probe",
-            "usage": {
-              "input": 0,
-              "output": 0,
-              "cacheRead": 0,
-              "cacheWrite": 0,
-              "totalTokens": 0,
-              "cost": {
-                "input": 0,
-                "output": 0,
-                "cacheRead": 0,
-                "cacheWrite": 0,
-                "total": 0,
-                "totalFromProvider": false
-              }
-            },
-            "stopReason": "stop",
-            "timestamp": 1792942569022,
-            "responseId": "response-r2",
-            "rawStopReason": "completed"
-          }
-        },
-        {
-          "type": "done",
-          "gap": 64,
-          "io": true,
-          "partial": {
-            "role": "assistant",
-            "content": [
-              {
-                "type": "text",
-                "text": "one two",
-                "textSignature": "{\"v\":1,\"id\":\"msg_r2\"}"
-              }
-            ],
-            "api": "azure-openai-responses",
-            "provider": "probe-provider",
-            "model": "probe",
-            "usage": {
-              "input": 0,
-              "output": 0,
-              "cacheRead": 0,
-              "cacheWrite": 0,
-              "totalTokens": 0,
-              "cost": {
-                "input": 0,
-                "output": 0,
-                "cacheRead": 0,
-                "cacheWrite": 0,
-                "total": 0,
-                "totalFromProvider": false
-              }
-            },
-            "stopReason": "stop",
-            "timestamp": 1792942569022,
-            "responseId": "response-r2",
-            "rawStopReason": "completed",
-            "durationMs": 6
-          }
-        }
-      ]
-    },
-    {
-      "api": "azure-openai-responses",
-      "layers": "runtime",
-      "shape": "text",
-      "fixture": "pending",
-      "events": [
-        {
-          "type": "start",
-          "gap": 13,
-          "io": false,
-          "partial": {
-            "role": "assistant",
-            "content": [],
-            "api": "azure-openai-responses",
-            "provider": "probe-provider",
-            "model": "probe",
-            "usage": {
-              "input": 0,
-              "output": 0,
-              "cacheRead": 0,
-              "cacheWrite": 0,
-              "totalTokens": 0,
-              "cost": {
-                "input": 0,
-                "output": 0,
-                "cacheRead": 0,
-                "cacheWrite": 0,
-                "total": 0
-              }
-            },
-            "stopReason": "pending",
-            "timestamp": 1792942569035
-          }
-        },
-        {
-          "type": "text_start",
-          "contentIndex": 0,
-          "gap": 64,
-          "io": true,
-          "partial": {
-            "role": "assistant",
-            "content": [
-              {
-                "type": "text",
-                "text": "one"
-              }
-            ],
-            "api": "azure-openai-responses",
-            "provider": "probe-provider",
-            "model": "probe",
-            "usage": {
-              "input": 0,
-              "output": 0,
-              "cacheRead": 0,
-              "cacheWrite": 0,
-              "totalTokens": 0,
-              "cost": {
-                "input": 0,
-                "output": 0,
-                "cacheRead": 0,
-                "cacheWrite": 0,
-                "total": 0
-              }
-            },
-            "stopReason": "pending",
-            "timestamp": 1792942569035,
-            "responseId": "response-r2"
-          }
-        },
-        {
-          "type": "text_delta",
-          "contentIndex": 0,
-          "delta": "one",
-          "gap": 7,
-          "io": false,
-          "partial": {
-            "role": "assistant",
-            "content": [
-              {
-                "type": "text",
-                "text": "one two"
-              }
-            ],
-            "api": "azure-openai-responses",
-            "provider": "probe-provider",
-            "model": "probe",
-            "usage": {
-              "input": 0,
-              "output": 0,
-              "cacheRead": 0,
-              "cacheWrite": 0,
-              "totalTokens": 0,
-              "cost": {
-                "input": 0,
-                "output": 0,
-                "cacheRead": 0,
-                "cacheWrite": 0,
-                "total": 0
-              }
-            },
-            "stopReason": "pending",
-            "timestamp": 1792942569035,
-            "responseId": "response-r2"
-          }
-        },
-        {
-          "type": "text_delta",
-          "contentIndex": 0,
-          "delta": " two",
-          "gap": 7,
-          "io": false,
-          "partial": {
-            "role": "assistant",
-            "content": [
-              {
-                "type": "text",
-                "text": "one two",
-                "textSignature": "{\"v\":1,\"id\":\"msg_r2\"}"
-              }
-            ],
-            "api": "azure-openai-responses",
-            "provider": "probe-provider",
-            "model": "probe",
-            "usage": {
-              "input": 0,
-              "output": 0,
-              "cacheRead": 0,
-              "cacheWrite": 0,
-              "totalTokens": 0,
-              "cost": {
-                "input": 0,
-                "output": 0,
-                "cacheRead": 0,
-                "cacheWrite": 0,
-                "total": 0
-              }
-            },
-            "stopReason": "pending",
-            "timestamp": 1792942569035,
-            "responseId": "response-r2"
-          }
-        },
-        {
-          "type": "text_end",
-          "contentIndex": 0,
-          "gap": 7,
-          "io": false,
-          "partial": {
-            "role": "assistant",
-            "content": [
-              {
-                "type": "text",
-                "text": "one two",
-                "textSignature": "{\"v\":1,\"id\":\"msg_r2\"}"
-              }
-            ],
-            "api": "azure-openai-responses",
-            "provider": "probe-provider",
-            "model": "probe",
-            "usage": {
-              "input": 0,
-              "output": 0,
-              "cacheRead": 0,
-              "cacheWrite": 0,
-              "totalTokens": 0,
-              "cost": {
-                "input": 0,
-                "output": 0,
-                "cacheRead": 0,
-                "cacheWrite": 0,
-                "total": 0,
-                "totalFromProvider": false
-              }
-            },
-            "stopReason": "stop",
-            "timestamp": 1792942569035,
-            "responseId": "response-r2",
-            "rawStopReason": "completed"
-          }
-        },
-        {
-          "type": "done",
-          "gap": 64,
-          "io": true,
-          "partial": {
-            "role": "assistant",
-            "content": [
-              {
-                "type": "text",
-                "text": "one two",
-                "textSignature": "{\"v\":1,\"id\":\"msg_r2\"}"
-              }
-            ],
-            "api": "azure-openai-responses",
-            "provider": "probe-provider",
-            "model": "probe",
-            "usage": {
-              "input": 0,
-              "output": 0,
-              "cacheRead": 0,
-              "cacheWrite": 0,
-              "totalTokens": 0,
-              "cost": {
-                "input": 0,
-                "output": 0,
-                "cacheRead": 0,
-                "cacheWrite": 0,
-                "total": 0,
-                "totalFromProvider": false
-              }
-            },
-            "stopReason": "stop",
-            "timestamp": 1792942569035,
-            "responseId": "response-r2",
-            "rawStopReason": "completed",
-            "durationMs": 4
-          }
-        }
-      ]
-    },
-    {
-      "api": "azure-openai-responses",
-      "layers": "runtime",
-      "shape": "text",
-      "fixture": "chunked",
-      "events": [
-        {
-          "type": "start",
-          "gap": 13,
-          "io": false,
-          "partial": {
-            "role": "assistant",
-            "content": [],
-            "api": "azure-openai-responses",
-            "provider": "probe-provider",
-            "model": "probe",
-            "usage": {
-              "input": 0,
-              "output": 0,
-              "cacheRead": 0,
-              "cacheWrite": 0,
-              "totalTokens": 0,
-              "cost": {
-                "input": 0,
-                "output": 0,
-                "cacheRead": 0,
-                "cacheWrite": 0,
-                "total": 0
-              }
-            },
-            "stopReason": "pending",
-            "timestamp": 1792942569044
-          }
-        },
-        {
-          "type": "text_start",
-          "contentIndex": 0,
-          "gap": 64,
-          "io": true,
-          "partial": {
-            "role": "assistant",
-            "content": [
-              {
-                "type": "text",
-                "text": ""
-              }
-            ],
-            "api": "azure-openai-responses",
-            "provider": "probe-provider",
-            "model": "probe",
-            "usage": {
-              "input": 0,
-              "output": 0,
-              "cacheRead": 0,
-              "cacheWrite": 0,
-              "totalTokens": 0,
-              "cost": {
-                "input": 0,
-                "output": 0,
-                "cacheRead": 0,
-                "cacheWrite": 0,
-                "total": 0
-              }
-            },
-            "stopReason": "pending",
-            "timestamp": 1792942569044,
-            "responseId": "response-r2"
-          }
-        },
-        {
-          "type": "text_delta",
-          "contentIndex": 0,
-          "delta": "one",
-          "gap": 64,
-          "io": true,
-          "partial": {
-            "role": "assistant",
-            "content": [
-              {
-                "type": "text",
-                "text": "one"
-              }
-            ],
-            "api": "azure-openai-responses",
-            "provider": "probe-provider",
-            "model": "probe",
-            "usage": {
-              "input": 0,
-              "output": 0,
-              "cacheRead": 0,
-              "cacheWrite": 0,
-              "totalTokens": 0,
-              "cost": {
-                "input": 0,
-                "output": 0,
-                "cacheRead": 0,
-                "cacheWrite": 0,
-                "total": 0
-              }
-            },
-            "stopReason": "pending",
-            "timestamp": 1792942569044,
-            "responseId": "response-r2"
-          }
-        },
-        {
-          "type": "text_delta",
-          "contentIndex": 0,
-          "delta": " two",
-          "gap": 64,
-          "io": true,
-          "partial": {
-            "role": "assistant",
-            "content": [
-              {
-                "type": "text",
-                "text": "one two"
-              }
-            ],
-            "api": "azure-openai-responses",
-            "provider": "probe-provider",
-            "model": "probe",
-            "usage": {
-              "input": 0,
-              "output": 0,
-              "cacheRead": 0,
-              "cacheWrite": 0,
-              "totalTokens": 0,
-              "cost": {
-                "input": 0,
-                "output": 0,
-                "cacheRead": 0,
-                "cacheWrite": 0,
-                "total": 0
-              }
-            },
-            "stopReason": "pending",
-            "timestamp": 1792942569044,
-            "responseId": "response-r2"
-          }
-        },
-        {
-          "type": "text_end",
-          "contentIndex": 0,
-          "gap": 64,
-          "io": true,
-          "partial": {
-            "role": "assistant",
-            "content": [
-              {
-                "type": "text",
-                "text": "one two",
-                "textSignature": "{\"v\":1,\"id\":\"msg_r2\"}"
-              }
-            ],
-            "api": "azure-openai-responses",
-            "provider": "probe-provider",
-            "model": "probe",
-            "usage": {
-              "input": 0,
-              "output": 0,
-              "cacheRead": 0,
-              "cacheWrite": 0,
-              "totalTokens": 0,
-              "cost": {
-                "input": 0,
-                "output": 0,
-                "cacheRead": 0,
-                "cacheWrite": 0,
-                "total": 0
-              }
-            },
-            "stopReason": "pending",
-            "timestamp": 1792942569044,
-            "responseId": "response-r2"
-          }
-        },
-        {
-          "type": "done",
-          "gap": 64,
-          "io": true,
-          "partial": {
-            "role": "assistant",
-            "content": [
-              {
-                "type": "text",
-                "text": "one two",
-                "textSignature": "{\"v\":1,\"id\":\"msg_r2\"}"
-              }
-            ],
-            "api": "azure-openai-responses",
-            "provider": "probe-provider",
-            "model": "probe",
-            "usage": {
-              "input": 0,
-              "output": 0,
-              "cacheRead": 0,
-              "cacheWrite": 0,
-              "totalTokens": 0,
-              "cost": {
-                "input": 0,
-                "output": 0,
-                "cacheRead": 0,
-                "cacheWrite": 0,
-                "total": 0,
-                "totalFromProvider": false
-              }
-            },
-            "stopReason": "stop",
-            "timestamp": 1792942569044,
-            "responseId": "response-r2",
-            "rawStopReason": "completed",
-            "durationMs": 34
-          }
-        }
-      ]
-    },
-    {
-      "api": "azure-openai-responses",
-      "layers": "runtime",
       "shape": "thinking",
       "fixture": "buffered",
       "events": [
         {
           "type": "start",
-          "gap": 13,
+          "gap": 4,
           "io": false,
           "partial": {
             "role": "assistant",
@@ -2613,13 +726,49 @@
               }
             },
             "stopReason": "pending",
-            "timestamp": 1792942569084
+            "timestamp": 1793072863830
           }
         },
         {
           "type": "thinking_start",
           "contentIndex": 0,
           "gap": 19,
+          "io": false,
+          "partial": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "thinking",
+                "thinking": ""
+              }
+            ],
+            "api": "azure-openai-responses",
+            "provider": "probe-provider",
+            "model": "probe",
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "pending",
+            "timestamp": 1793072863830,
+            "responseId": "response-r2"
+          }
+        },
+        {
+          "type": "thinking_delta",
+          "contentIndex": 0,
+          "delta": "one",
+          "gap": 7,
           "io": false,
           "partial": {
             "role": "assistant",
@@ -2647,14 +796,14 @@
               }
             },
             "stopReason": "pending",
-            "timestamp": 1792942569084,
+            "timestamp": 1793072863830,
             "responseId": "response-r2"
           }
         },
         {
           "type": "thinking_delta",
           "contentIndex": 0,
-          "delta": "one",
+          "delta": " two",
           "gap": 7,
           "io": false,
           "partial": {
@@ -2683,44 +832,7 @@
               }
             },
             "stopReason": "pending",
-            "timestamp": 1792942569084,
-            "responseId": "response-r2"
-          }
-        },
-        {
-          "type": "thinking_delta",
-          "contentIndex": 0,
-          "delta": " two",
-          "gap": 7,
-          "io": false,
-          "partial": {
-            "role": "assistant",
-            "content": [
-              {
-                "type": "thinking",
-                "thinking": "one two",
-                "thinkingSignature": "{\"type\":\"reasoning\",\"id\":\"rs_r2\",\"summary\":[{\"type\":\"summary_text\",\"text\":\"one two\"}]}"
-              }
-            ],
-            "api": "azure-openai-responses",
-            "provider": "probe-provider",
-            "model": "probe",
-            "usage": {
-              "input": 0,
-              "output": 0,
-              "cacheRead": 0,
-              "cacheWrite": 0,
-              "totalTokens": 0,
-              "cost": {
-                "input": 0,
-                "output": 0,
-                "cacheRead": 0,
-                "cacheWrite": 0,
-                "total": 0
-              }
-            },
-            "stopReason": "pending",
-            "timestamp": 1792942569084,
+            "timestamp": 1793072863830,
             "responseId": "response-r2"
           }
         },
@@ -2752,14 +864,12 @@
                 "output": 0,
                 "cacheRead": 0,
                 "cacheWrite": 0,
-                "total": 0,
-                "totalFromProvider": false
+                "total": 0
               }
             },
-            "stopReason": "stop",
-            "timestamp": 1792942569084,
-            "responseId": "response-r2",
-            "rawStopReason": "completed"
+            "stopReason": "pending",
+            "timestamp": 1793072863830,
+            "responseId": "response-r2"
           }
         },
         {
@@ -2794,23 +904,23 @@
               }
             },
             "stopReason": "stop",
-            "timestamp": 1792942569084,
+            "timestamp": 1793072863830,
             "responseId": "response-r2",
             "rawStopReason": "completed",
-            "durationMs": 3
+            "durationMs": 4
           }
         }
       ]
     },
     {
       "api": "azure-openai-responses",
-      "layers": "runtime",
+      "layers": 0,
       "shape": "thinking",
       "fixture": "pending",
       "events": [
         {
           "type": "start",
-          "gap": 13,
+          "gap": 4,
           "io": false,
           "partial": {
             "role": "assistant",
@@ -2833,227 +943,7 @@
               }
             },
             "stopReason": "pending",
-            "timestamp": 1792942569095
-          }
-        },
-        {
-          "type": "thinking_start",
-          "contentIndex": 0,
-          "gap": 64,
-          "io": true,
-          "partial": {
-            "role": "assistant",
-            "content": [
-              {
-                "type": "thinking",
-                "thinking": "one"
-              }
-            ],
-            "api": "azure-openai-responses",
-            "provider": "probe-provider",
-            "model": "probe",
-            "usage": {
-              "input": 0,
-              "output": 0,
-              "cacheRead": 0,
-              "cacheWrite": 0,
-              "totalTokens": 0,
-              "cost": {
-                "input": 0,
-                "output": 0,
-                "cacheRead": 0,
-                "cacheWrite": 0,
-                "total": 0
-              }
-            },
-            "stopReason": "pending",
-            "timestamp": 1792942569095,
-            "responseId": "response-r2"
-          }
-        },
-        {
-          "type": "thinking_delta",
-          "contentIndex": 0,
-          "delta": "one",
-          "gap": 7,
-          "io": false,
-          "partial": {
-            "role": "assistant",
-            "content": [
-              {
-                "type": "thinking",
-                "thinking": "one two"
-              }
-            ],
-            "api": "azure-openai-responses",
-            "provider": "probe-provider",
-            "model": "probe",
-            "usage": {
-              "input": 0,
-              "output": 0,
-              "cacheRead": 0,
-              "cacheWrite": 0,
-              "totalTokens": 0,
-              "cost": {
-                "input": 0,
-                "output": 0,
-                "cacheRead": 0,
-                "cacheWrite": 0,
-                "total": 0
-              }
-            },
-            "stopReason": "pending",
-            "timestamp": 1792942569095,
-            "responseId": "response-r2"
-          }
-        },
-        {
-          "type": "thinking_delta",
-          "contentIndex": 0,
-          "delta": " two",
-          "gap": 7,
-          "io": false,
-          "partial": {
-            "role": "assistant",
-            "content": [
-              {
-                "type": "thinking",
-                "thinking": "one two",
-                "thinkingSignature": "{\"type\":\"reasoning\",\"id\":\"rs_r2\",\"summary\":[{\"type\":\"summary_text\",\"text\":\"one two\"}]}"
-              }
-            ],
-            "api": "azure-openai-responses",
-            "provider": "probe-provider",
-            "model": "probe",
-            "usage": {
-              "input": 0,
-              "output": 0,
-              "cacheRead": 0,
-              "cacheWrite": 0,
-              "totalTokens": 0,
-              "cost": {
-                "input": 0,
-                "output": 0,
-                "cacheRead": 0,
-                "cacheWrite": 0,
-                "total": 0
-              }
-            },
-            "stopReason": "pending",
-            "timestamp": 1792942569095,
-            "responseId": "response-r2"
-          }
-        },
-        {
-          "type": "thinking_end",
-          "contentIndex": 0,
-          "gap": 7,
-          "io": false,
-          "partial": {
-            "role": "assistant",
-            "content": [
-              {
-                "type": "thinking",
-                "thinking": "one two",
-                "thinkingSignature": "{\"type\":\"reasoning\",\"id\":\"rs_r2\",\"summary\":[{\"type\":\"summary_text\",\"text\":\"one two\"}]}"
-              }
-            ],
-            "api": "azure-openai-responses",
-            "provider": "probe-provider",
-            "model": "probe",
-            "usage": {
-              "input": 0,
-              "output": 0,
-              "cacheRead": 0,
-              "cacheWrite": 0,
-              "totalTokens": 0,
-              "cost": {
-                "input": 0,
-                "output": 0,
-                "cacheRead": 0,
-                "cacheWrite": 0,
-                "total": 0,
-                "totalFromProvider": false
-              }
-            },
-            "stopReason": "stop",
-            "timestamp": 1792942569095,
-            "responseId": "response-r2",
-            "rawStopReason": "completed"
-          }
-        },
-        {
-          "type": "done",
-          "gap": 64,
-          "io": true,
-          "partial": {
-            "role": "assistant",
-            "content": [
-              {
-                "type": "thinking",
-                "thinking": "one two",
-                "thinkingSignature": "{\"type\":\"reasoning\",\"id\":\"rs_r2\",\"summary\":[{\"type\":\"summary_text\",\"text\":\"one two\"}]}"
-              }
-            ],
-            "api": "azure-openai-responses",
-            "provider": "probe-provider",
-            "model": "probe",
-            "usage": {
-              "input": 0,
-              "output": 0,
-              "cacheRead": 0,
-              "cacheWrite": 0,
-              "totalTokens": 0,
-              "cost": {
-                "input": 0,
-                "output": 0,
-                "cacheRead": 0,
-                "cacheWrite": 0,
-                "total": 0,
-                "totalFromProvider": false
-              }
-            },
-            "stopReason": "stop",
-            "timestamp": 1792942569095,
-            "responseId": "response-r2",
-            "rawStopReason": "completed",
-            "durationMs": 3
-          }
-        }
-      ]
-    },
-    {
-      "api": "azure-openai-responses",
-      "layers": "runtime",
-      "shape": "thinking",
-      "fixture": "chunked",
-      "events": [
-        {
-          "type": "start",
-          "gap": 13,
-          "io": false,
-          "partial": {
-            "role": "assistant",
-            "content": [],
-            "api": "azure-openai-responses",
-            "provider": "probe-provider",
-            "model": "probe",
-            "usage": {
-              "input": 0,
-              "output": 0,
-              "cacheRead": 0,
-              "cacheWrite": 0,
-              "totalTokens": 0,
-              "cost": {
-                "input": 0,
-                "output": 0,
-                "cacheRead": 0,
-                "cacheWrite": 0,
-                "total": 0
-              }
-            },
-            "stopReason": "pending",
-            "timestamp": 1792942569102
+            "timestamp": 1793072863835
           }
         },
         {
@@ -3087,7 +977,7 @@
               }
             },
             "stopReason": "pending",
-            "timestamp": 1792942569102,
+            "timestamp": 1793072863835,
             "responseId": "response-r2"
           }
         },
@@ -3095,8 +985,8 @@
           "type": "thinking_delta",
           "contentIndex": 0,
           "delta": "one",
-          "gap": 64,
-          "io": true,
+          "gap": 7,
+          "io": false,
           "partial": {
             "role": "assistant",
             "content": [
@@ -3123,7 +1013,7 @@
               }
             },
             "stopReason": "pending",
-            "timestamp": 1792942569102,
+            "timestamp": 1793072863835,
             "responseId": "response-r2"
           }
         },
@@ -3131,8 +1021,8 @@
           "type": "thinking_delta",
           "contentIndex": 0,
           "delta": " two",
-          "gap": 64,
-          "io": true,
+          "gap": 7,
+          "io": false,
           "partial": {
             "role": "assistant",
             "content": [
@@ -3159,15 +1049,15 @@
               }
             },
             "stopReason": "pending",
-            "timestamp": 1792942569102,
+            "timestamp": 1793072863835,
             "responseId": "response-r2"
           }
         },
         {
           "type": "thinking_end",
           "contentIndex": 0,
-          "gap": 64,
-          "io": true,
+          "gap": 7,
+          "io": false,
           "partial": {
             "role": "assistant",
             "content": [
@@ -3195,7 +1085,7 @@
               }
             },
             "stopReason": "pending",
-            "timestamp": 1792942569102,
+            "timestamp": 1793072863835,
             "responseId": "response-r2"
           }
         },
@@ -3231,10 +1121,2120 @@
               }
             },
             "stopReason": "stop",
-            "timestamp": 1792942569102,
+            "timestamp": 1793072863835,
+            "responseId": "response-r2",
+            "rawStopReason": "completed",
+            "durationMs": 4
+          }
+        }
+      ]
+    },
+    {
+      "api": "azure-openai-responses",
+      "layers": 0,
+      "shape": "thinking",
+      "fixture": "chunked",
+      "events": [
+        {
+          "type": "start",
+          "gap": 4,
+          "io": false,
+          "partial": {
+            "role": "assistant",
+            "content": [],
+            "api": "azure-openai-responses",
+            "provider": "probe-provider",
+            "model": "probe",
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "pending",
+            "timestamp": 1793072863839
+          }
+        },
+        {
+          "type": "thinking_start",
+          "contentIndex": 0,
+          "gap": 64,
+          "io": true,
+          "partial": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "thinking",
+                "thinking": ""
+              }
+            ],
+            "api": "azure-openai-responses",
+            "provider": "probe-provider",
+            "model": "probe",
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "pending",
+            "timestamp": 1793072863839,
+            "responseId": "response-r2"
+          }
+        },
+        {
+          "type": "thinking_delta",
+          "contentIndex": 0,
+          "delta": "one",
+          "gap": 64,
+          "io": true,
+          "partial": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "thinking",
+                "thinking": "one"
+              }
+            ],
+            "api": "azure-openai-responses",
+            "provider": "probe-provider",
+            "model": "probe",
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "pending",
+            "timestamp": 1793072863839,
+            "responseId": "response-r2"
+          }
+        },
+        {
+          "type": "thinking_delta",
+          "contentIndex": 0,
+          "delta": " two",
+          "gap": 64,
+          "io": true,
+          "partial": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "thinking",
+                "thinking": "one two"
+              }
+            ],
+            "api": "azure-openai-responses",
+            "provider": "probe-provider",
+            "model": "probe",
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "pending",
+            "timestamp": 1793072863839,
+            "responseId": "response-r2"
+          }
+        },
+        {
+          "type": "thinking_end",
+          "contentIndex": 0,
+          "gap": 64,
+          "io": true,
+          "partial": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "thinking",
+                "thinking": "one two",
+                "thinkingSignature": "{\"type\":\"reasoning\",\"id\":\"rs_r2\",\"summary\":[{\"type\":\"summary_text\",\"text\":\"one two\"}]}"
+              }
+            ],
+            "api": "azure-openai-responses",
+            "provider": "probe-provider",
+            "model": "probe",
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "pending",
+            "timestamp": 1793072863839,
+            "responseId": "response-r2"
+          }
+        },
+        {
+          "type": "done",
+          "gap": 64,
+          "io": true,
+          "partial": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "thinking",
+                "thinking": "one two",
+                "thinkingSignature": "{\"type\":\"reasoning\",\"id\":\"rs_r2\",\"summary\":[{\"type\":\"summary_text\",\"text\":\"one two\"}]}"
+              }
+            ],
+            "api": "azure-openai-responses",
+            "provider": "probe-provider",
+            "model": "probe",
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0,
+                "totalFromProvider": false
+              }
+            },
+            "stopReason": "stop",
+            "timestamp": 1793072863839,
+            "responseId": "response-r2",
+            "rawStopReason": "completed",
+            "durationMs": 35
+          }
+        }
+      ]
+    },
+    {
+      "api": "azure-openai-responses",
+      "layers": 0,
+      "shape": "tool",
+      "fixture": "buffered",
+      "events": [
+        {
+          "type": "start",
+          "gap": 4,
+          "io": false,
+          "partial": {
+            "role": "assistant",
+            "content": [],
+            "api": "azure-openai-responses",
+            "provider": "probe-provider",
+            "model": "probe",
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "pending",
+            "timestamp": 1793072863875
+          }
+        },
+        {
+          "type": "toolcall_start",
+          "contentIndex": 0,
+          "gap": 19,
+          "io": false,
+          "partial": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "toolCall",
+                "id": "call-r2|fc_r2",
+                "name": "read",
+                "arguments": {}
+              }
+            ],
+            "api": "azure-openai-responses",
+            "provider": "probe-provider",
+            "model": "probe",
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "pending",
+            "timestamp": 1793072863875,
+            "responseId": "response-r2"
+          }
+        },
+        {
+          "type": "toolcall_delta",
+          "contentIndex": 0,
+          "delta": "{\"path\":\"target.txt\"}",
+          "gap": 7,
+          "io": false,
+          "partial": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "toolCall",
+                "id": "call-r2|fc_r2",
+                "name": "read",
+                "arguments": {
+                  "path": "target.txt"
+                }
+              }
+            ],
+            "api": "azure-openai-responses",
+            "provider": "probe-provider",
+            "model": "probe",
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "pending",
+            "timestamp": 1793072863875,
+            "responseId": "response-r2"
+          }
+        },
+        {
+          "type": "toolcall_end",
+          "contentIndex": 0,
+          "gap": 7,
+          "io": false,
+          "partial": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "toolCall",
+                "id": "call-r2|fc_r2",
+                "name": "read",
+                "arguments": {
+                  "path": "target.txt"
+                }
+              }
+            ],
+            "api": "azure-openai-responses",
+            "provider": "probe-provider",
+            "model": "probe",
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "pending",
+            "timestamp": 1793072863875,
+            "responseId": "response-r2"
+          }
+        },
+        {
+          "type": "done",
+          "gap": 64,
+          "io": true,
+          "partial": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "toolCall",
+                "id": "call-r2|fc_r2",
+                "name": "read",
+                "arguments": {
+                  "path": "target.txt"
+                }
+              }
+            ],
+            "api": "azure-openai-responses",
+            "provider": "probe-provider",
+            "model": "probe",
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0,
+                "totalFromProvider": false
+              }
+            },
+            "stopReason": "toolUse",
+            "timestamp": 1793072863875,
+            "responseId": "response-r2",
+            "rawStopReason": "completed",
+            "durationMs": 7
+          }
+        }
+      ]
+    },
+    {
+      "api": "azure-openai-responses",
+      "layers": 0,
+      "shape": "tool",
+      "fixture": "pending",
+      "events": [
+        {
+          "type": "start",
+          "gap": 4,
+          "io": false,
+          "partial": {
+            "role": "assistant",
+            "content": [],
+            "api": "azure-openai-responses",
+            "provider": "probe-provider",
+            "model": "probe",
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "pending",
+            "timestamp": 1793072863883
+          }
+        },
+        {
+          "type": "toolcall_start",
+          "contentIndex": 0,
+          "gap": 64,
+          "io": true,
+          "partial": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "toolCall",
+                "id": "call-r2|fc_r2",
+                "name": "read",
+                "arguments": {}
+              }
+            ],
+            "api": "azure-openai-responses",
+            "provider": "probe-provider",
+            "model": "probe",
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "pending",
+            "timestamp": 1793072863883,
+            "responseId": "response-r2"
+          }
+        },
+        {
+          "type": "toolcall_delta",
+          "contentIndex": 0,
+          "delta": "{\"path\":\"target.txt\"}",
+          "gap": 7,
+          "io": false,
+          "partial": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "toolCall",
+                "id": "call-r2|fc_r2",
+                "name": "read",
+                "arguments": {
+                  "path": "target.txt"
+                }
+              }
+            ],
+            "api": "azure-openai-responses",
+            "provider": "probe-provider",
+            "model": "probe",
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "pending",
+            "timestamp": 1793072863883,
+            "responseId": "response-r2"
+          }
+        },
+        {
+          "type": "toolcall_end",
+          "contentIndex": 0,
+          "gap": 7,
+          "io": false,
+          "partial": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "toolCall",
+                "id": "call-r2|fc_r2",
+                "name": "read",
+                "arguments": {
+                  "path": "target.txt"
+                }
+              }
+            ],
+            "api": "azure-openai-responses",
+            "provider": "probe-provider",
+            "model": "probe",
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "pending",
+            "timestamp": 1793072863883,
+            "responseId": "response-r2"
+          }
+        },
+        {
+          "type": "done",
+          "gap": 64,
+          "io": true,
+          "partial": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "toolCall",
+                "id": "call-r2|fc_r2",
+                "name": "read",
+                "arguments": {
+                  "path": "target.txt"
+                }
+              }
+            ],
+            "api": "azure-openai-responses",
+            "provider": "probe-provider",
+            "model": "probe",
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0,
+                "totalFromProvider": false
+              }
+            },
+            "stopReason": "toolUse",
+            "timestamp": 1793072863883,
+            "responseId": "response-r2",
+            "rawStopReason": "completed",
+            "durationMs": 4
+          }
+        }
+      ]
+    },
+    {
+      "api": "azure-openai-responses",
+      "layers": 0,
+      "shape": "tool",
+      "fixture": "chunked",
+      "events": [
+        {
+          "type": "start",
+          "gap": 4,
+          "io": false,
+          "partial": {
+            "role": "assistant",
+            "content": [],
+            "api": "azure-openai-responses",
+            "provider": "probe-provider",
+            "model": "probe",
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "pending",
+            "timestamp": 1793072863887
+          }
+        },
+        {
+          "type": "toolcall_start",
+          "contentIndex": 0,
+          "gap": 64,
+          "io": true,
+          "partial": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "toolCall",
+                "id": "call-r2|fc_r2",
+                "name": "read",
+                "arguments": {}
+              }
+            ],
+            "api": "azure-openai-responses",
+            "provider": "probe-provider",
+            "model": "probe",
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "pending",
+            "timestamp": 1793072863887,
+            "responseId": "response-r2"
+          }
+        },
+        {
+          "type": "toolcall_delta",
+          "contentIndex": 0,
+          "delta": "{\"path\":\"target.txt\"}",
+          "gap": 64,
+          "io": true,
+          "partial": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "toolCall",
+                "id": "call-r2|fc_r2",
+                "name": "read",
+                "arguments": {
+                  "path": "target.txt"
+                }
+              }
+            ],
+            "api": "azure-openai-responses",
+            "provider": "probe-provider",
+            "model": "probe",
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "pending",
+            "timestamp": 1793072863887,
+            "responseId": "response-r2"
+          }
+        },
+        {
+          "type": "toolcall_end",
+          "contentIndex": 0,
+          "gap": 64,
+          "io": true,
+          "partial": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "toolCall",
+                "id": "call-r2|fc_r2",
+                "name": "read",
+                "arguments": {
+                  "path": "target.txt"
+                }
+              }
+            ],
+            "api": "azure-openai-responses",
+            "provider": "probe-provider",
+            "model": "probe",
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "pending",
+            "timestamp": 1793072863887,
+            "responseId": "response-r2"
+          }
+        },
+        {
+          "type": "done",
+          "gap": 64,
+          "io": true,
+          "partial": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "toolCall",
+                "id": "call-r2|fc_r2",
+                "name": "read",
+                "arguments": {
+                  "path": "target.txt"
+                }
+              }
+            ],
+            "api": "azure-openai-responses",
+            "provider": "probe-provider",
+            "model": "probe",
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0,
+                "totalFromProvider": false
+              }
+            },
+            "stopReason": "toolUse",
+            "timestamp": 1793072863887,
+            "responseId": "response-r2",
+            "rawStopReason": "completed",
+            "durationMs": 29
+          }
+        }
+      ]
+    },
+    {
+      "api": "azure-openai-responses",
+      "layers": "runtime",
+      "shape": "text",
+      "fixture": "buffered",
+      "events": [
+        {
+          "type": "start",
+          "gap": 13,
+          "io": false,
+          "partial": {
+            "role": "assistant",
+            "content": [],
+            "api": "azure-openai-responses",
+            "provider": "probe-provider",
+            "model": "probe",
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "pending",
+            "timestamp": 1793072863931
+          }
+        },
+        {
+          "type": "text_start",
+          "contentIndex": 0,
+          "gap": 19,
+          "io": false,
+          "partial": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": "one"
+              }
+            ],
+            "api": "azure-openai-responses",
+            "provider": "probe-provider",
+            "model": "probe",
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "pending",
+            "timestamp": 1793072863931,
+            "responseId": "response-r2"
+          }
+        },
+        {
+          "type": "text_delta",
+          "contentIndex": 0,
+          "delta": "one",
+          "gap": 7,
+          "io": false,
+          "partial": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": "one two"
+              }
+            ],
+            "api": "azure-openai-responses",
+            "provider": "probe-provider",
+            "model": "probe",
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "pending",
+            "timestamp": 1793072863931,
+            "responseId": "response-r2"
+          }
+        },
+        {
+          "type": "text_delta",
+          "contentIndex": 0,
+          "delta": " two",
+          "gap": 7,
+          "io": false,
+          "partial": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": "one two",
+                "textSignature": "{\"v\":1,\"id\":\"msg_r2\"}"
+              }
+            ],
+            "api": "azure-openai-responses",
+            "provider": "probe-provider",
+            "model": "probe",
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "pending",
+            "timestamp": 1793072863931,
+            "responseId": "response-r2"
+          }
+        },
+        {
+          "type": "text_end",
+          "contentIndex": 0,
+          "gap": 7,
+          "io": false,
+          "partial": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": "one two",
+                "textSignature": "{\"v\":1,\"id\":\"msg_r2\"}"
+              }
+            ],
+            "api": "azure-openai-responses",
+            "provider": "probe-provider",
+            "model": "probe",
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0,
+                "totalFromProvider": false
+              }
+            },
+            "stopReason": "stop",
+            "timestamp": 1793072863931,
+            "responseId": "response-r2",
+            "rawStopReason": "completed"
+          }
+        },
+        {
+          "type": "done",
+          "gap": 64,
+          "io": true,
+          "partial": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": "one two",
+                "textSignature": "{\"v\":1,\"id\":\"msg_r2\"}"
+              }
+            ],
+            "api": "azure-openai-responses",
+            "provider": "probe-provider",
+            "model": "probe",
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0,
+                "totalFromProvider": false
+              }
+            },
+            "stopReason": "stop",
+            "timestamp": 1793072863931,
+            "responseId": "response-r2",
+            "rawStopReason": "completed",
+            "durationMs": 4
+          }
+        }
+      ]
+    },
+    {
+      "api": "azure-openai-responses",
+      "layers": "runtime",
+      "shape": "text",
+      "fixture": "pending",
+      "events": [
+        {
+          "type": "start",
+          "gap": 13,
+          "io": false,
+          "partial": {
+            "role": "assistant",
+            "content": [],
+            "api": "azure-openai-responses",
+            "provider": "probe-provider",
+            "model": "probe",
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "pending",
+            "timestamp": 1793072863942
+          }
+        },
+        {
+          "type": "text_start",
+          "contentIndex": 0,
+          "gap": 64,
+          "io": true,
+          "partial": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": "one"
+              }
+            ],
+            "api": "azure-openai-responses",
+            "provider": "probe-provider",
+            "model": "probe",
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "pending",
+            "timestamp": 1793072863942,
+            "responseId": "response-r2"
+          }
+        },
+        {
+          "type": "text_delta",
+          "contentIndex": 0,
+          "delta": "one",
+          "gap": 7,
+          "io": false,
+          "partial": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": "one two"
+              }
+            ],
+            "api": "azure-openai-responses",
+            "provider": "probe-provider",
+            "model": "probe",
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "pending",
+            "timestamp": 1793072863942,
+            "responseId": "response-r2"
+          }
+        },
+        {
+          "type": "text_delta",
+          "contentIndex": 0,
+          "delta": " two",
+          "gap": 7,
+          "io": false,
+          "partial": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": "one two",
+                "textSignature": "{\"v\":1,\"id\":\"msg_r2\"}"
+              }
+            ],
+            "api": "azure-openai-responses",
+            "provider": "probe-provider",
+            "model": "probe",
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "pending",
+            "timestamp": 1793072863942,
+            "responseId": "response-r2"
+          }
+        },
+        {
+          "type": "text_end",
+          "contentIndex": 0,
+          "gap": 7,
+          "io": false,
+          "partial": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": "one two",
+                "textSignature": "{\"v\":1,\"id\":\"msg_r2\"}"
+              }
+            ],
+            "api": "azure-openai-responses",
+            "provider": "probe-provider",
+            "model": "probe",
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0,
+                "totalFromProvider": false
+              }
+            },
+            "stopReason": "stop",
+            "timestamp": 1793072863942,
+            "responseId": "response-r2",
+            "rawStopReason": "completed"
+          }
+        },
+        {
+          "type": "done",
+          "gap": 64,
+          "io": true,
+          "partial": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": "one two",
+                "textSignature": "{\"v\":1,\"id\":\"msg_r2\"}"
+              }
+            ],
+            "api": "azure-openai-responses",
+            "provider": "probe-provider",
+            "model": "probe",
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0,
+                "totalFromProvider": false
+              }
+            },
+            "stopReason": "stop",
+            "timestamp": 1793072863942,
+            "responseId": "response-r2",
+            "rawStopReason": "completed",
+            "durationMs": 3
+          }
+        }
+      ]
+    },
+    {
+      "api": "azure-openai-responses",
+      "layers": "runtime",
+      "shape": "text",
+      "fixture": "chunked",
+      "events": [
+        {
+          "type": "start",
+          "gap": 13,
+          "io": false,
+          "partial": {
+            "role": "assistant",
+            "content": [],
+            "api": "azure-openai-responses",
+            "provider": "probe-provider",
+            "model": "probe",
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "pending",
+            "timestamp": 1793072863950
+          }
+        },
+        {
+          "type": "text_start",
+          "contentIndex": 0,
+          "gap": 64,
+          "io": true,
+          "partial": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": ""
+              }
+            ],
+            "api": "azure-openai-responses",
+            "provider": "probe-provider",
+            "model": "probe",
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "pending",
+            "timestamp": 1793072863950,
+            "responseId": "response-r2"
+          }
+        },
+        {
+          "type": "text_delta",
+          "contentIndex": 0,
+          "delta": "one",
+          "gap": 64,
+          "io": true,
+          "partial": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": "one"
+              }
+            ],
+            "api": "azure-openai-responses",
+            "provider": "probe-provider",
+            "model": "probe",
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "pending",
+            "timestamp": 1793072863950,
+            "responseId": "response-r2"
+          }
+        },
+        {
+          "type": "text_delta",
+          "contentIndex": 0,
+          "delta": " two",
+          "gap": 64,
+          "io": true,
+          "partial": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": "one two"
+              }
+            ],
+            "api": "azure-openai-responses",
+            "provider": "probe-provider",
+            "model": "probe",
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "pending",
+            "timestamp": 1793072863950,
+            "responseId": "response-r2"
+          }
+        },
+        {
+          "type": "text_end",
+          "contentIndex": 0,
+          "gap": 64,
+          "io": true,
+          "partial": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": "one two",
+                "textSignature": "{\"v\":1,\"id\":\"msg_r2\"}"
+              }
+            ],
+            "api": "azure-openai-responses",
+            "provider": "probe-provider",
+            "model": "probe",
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "pending",
+            "timestamp": 1793072863950,
+            "responseId": "response-r2"
+          }
+        },
+        {
+          "type": "done",
+          "gap": 64,
+          "io": true,
+          "partial": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": "one two",
+                "textSignature": "{\"v\":1,\"id\":\"msg_r2\"}"
+              }
+            ],
+            "api": "azure-openai-responses",
+            "provider": "probe-provider",
+            "model": "probe",
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0,
+                "totalFromProvider": false
+              }
+            },
+            "stopReason": "stop",
+            "timestamp": 1793072863950,
             "responseId": "response-r2",
             "rawStopReason": "completed",
             "durationMs": 34
+          }
+        }
+      ]
+    },
+    {
+      "api": "azure-openai-responses",
+      "layers": "runtime",
+      "shape": "thinking",
+      "fixture": "buffered",
+      "events": [
+        {
+          "type": "start",
+          "gap": 13,
+          "io": false,
+          "partial": {
+            "role": "assistant",
+            "content": [],
+            "api": "azure-openai-responses",
+            "provider": "probe-provider",
+            "model": "probe",
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "pending",
+            "timestamp": 1793072863992
+          }
+        },
+        {
+          "type": "thinking_start",
+          "contentIndex": 0,
+          "gap": 19,
+          "io": false,
+          "partial": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "thinking",
+                "thinking": "one"
+              }
+            ],
+            "api": "azure-openai-responses",
+            "provider": "probe-provider",
+            "model": "probe",
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "pending",
+            "timestamp": 1793072863992,
+            "responseId": "response-r2"
+          }
+        },
+        {
+          "type": "thinking_delta",
+          "contentIndex": 0,
+          "delta": "one",
+          "gap": 7,
+          "io": false,
+          "partial": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "thinking",
+                "thinking": "one two"
+              }
+            ],
+            "api": "azure-openai-responses",
+            "provider": "probe-provider",
+            "model": "probe",
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "pending",
+            "timestamp": 1793072863992,
+            "responseId": "response-r2"
+          }
+        },
+        {
+          "type": "thinking_delta",
+          "contentIndex": 0,
+          "delta": " two",
+          "gap": 7,
+          "io": false,
+          "partial": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "thinking",
+                "thinking": "one two",
+                "thinkingSignature": "{\"type\":\"reasoning\",\"id\":\"rs_r2\",\"summary\":[{\"type\":\"summary_text\",\"text\":\"one two\"}]}"
+              }
+            ],
+            "api": "azure-openai-responses",
+            "provider": "probe-provider",
+            "model": "probe",
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "pending",
+            "timestamp": 1793072863992,
+            "responseId": "response-r2"
+          }
+        },
+        {
+          "type": "thinking_end",
+          "contentIndex": 0,
+          "gap": 7,
+          "io": false,
+          "partial": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "thinking",
+                "thinking": "one two",
+                "thinkingSignature": "{\"type\":\"reasoning\",\"id\":\"rs_r2\",\"summary\":[{\"type\":\"summary_text\",\"text\":\"one two\"}]}"
+              }
+            ],
+            "api": "azure-openai-responses",
+            "provider": "probe-provider",
+            "model": "probe",
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0,
+                "totalFromProvider": false
+              }
+            },
+            "stopReason": "stop",
+            "timestamp": 1793072863992,
+            "responseId": "response-r2",
+            "rawStopReason": "completed"
+          }
+        },
+        {
+          "type": "done",
+          "gap": 64,
+          "io": true,
+          "partial": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "thinking",
+                "thinking": "one two",
+                "thinkingSignature": "{\"type\":\"reasoning\",\"id\":\"rs_r2\",\"summary\":[{\"type\":\"summary_text\",\"text\":\"one two\"}]}"
+              }
+            ],
+            "api": "azure-openai-responses",
+            "provider": "probe-provider",
+            "model": "probe",
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0,
+                "totalFromProvider": false
+              }
+            },
+            "stopReason": "stop",
+            "timestamp": 1793072863992,
+            "responseId": "response-r2",
+            "rawStopReason": "completed",
+            "durationMs": 7
+          }
+        }
+      ]
+    },
+    {
+      "api": "azure-openai-responses",
+      "layers": "runtime",
+      "shape": "thinking",
+      "fixture": "pending",
+      "events": [
+        {
+          "type": "start",
+          "gap": 13,
+          "io": false,
+          "partial": {
+            "role": "assistant",
+            "content": [],
+            "api": "azure-openai-responses",
+            "provider": "probe-provider",
+            "model": "probe",
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "pending",
+            "timestamp": 1793072864005
+          }
+        },
+        {
+          "type": "thinking_start",
+          "contentIndex": 0,
+          "gap": 64,
+          "io": true,
+          "partial": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "thinking",
+                "thinking": "one"
+              }
+            ],
+            "api": "azure-openai-responses",
+            "provider": "probe-provider",
+            "model": "probe",
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "pending",
+            "timestamp": 1793072864005,
+            "responseId": "response-r2"
+          }
+        },
+        {
+          "type": "thinking_delta",
+          "contentIndex": 0,
+          "delta": "one",
+          "gap": 7,
+          "io": false,
+          "partial": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "thinking",
+                "thinking": "one two"
+              }
+            ],
+            "api": "azure-openai-responses",
+            "provider": "probe-provider",
+            "model": "probe",
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "pending",
+            "timestamp": 1793072864005,
+            "responseId": "response-r2"
+          }
+        },
+        {
+          "type": "thinking_delta",
+          "contentIndex": 0,
+          "delta": " two",
+          "gap": 7,
+          "io": false,
+          "partial": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "thinking",
+                "thinking": "one two",
+                "thinkingSignature": "{\"type\":\"reasoning\",\"id\":\"rs_r2\",\"summary\":[{\"type\":\"summary_text\",\"text\":\"one two\"}]}"
+              }
+            ],
+            "api": "azure-openai-responses",
+            "provider": "probe-provider",
+            "model": "probe",
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "pending",
+            "timestamp": 1793072864005,
+            "responseId": "response-r2"
+          }
+        },
+        {
+          "type": "thinking_end",
+          "contentIndex": 0,
+          "gap": 7,
+          "io": false,
+          "partial": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "thinking",
+                "thinking": "one two",
+                "thinkingSignature": "{\"type\":\"reasoning\",\"id\":\"rs_r2\",\"summary\":[{\"type\":\"summary_text\",\"text\":\"one two\"}]}"
+              }
+            ],
+            "api": "azure-openai-responses",
+            "provider": "probe-provider",
+            "model": "probe",
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0,
+                "totalFromProvider": false
+              }
+            },
+            "stopReason": "stop",
+            "timestamp": 1793072864005,
+            "responseId": "response-r2",
+            "rawStopReason": "completed"
+          }
+        },
+        {
+          "type": "done",
+          "gap": 64,
+          "io": true,
+          "partial": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "thinking",
+                "thinking": "one two",
+                "thinkingSignature": "{\"type\":\"reasoning\",\"id\":\"rs_r2\",\"summary\":[{\"type\":\"summary_text\",\"text\":\"one two\"}]}"
+              }
+            ],
+            "api": "azure-openai-responses",
+            "provider": "probe-provider",
+            "model": "probe",
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0,
+                "totalFromProvider": false
+              }
+            },
+            "stopReason": "stop",
+            "timestamp": 1793072864005,
+            "responseId": "response-r2",
+            "rawStopReason": "completed",
+            "durationMs": 3
+          }
+        }
+      ]
+    },
+    {
+      "api": "azure-openai-responses",
+      "layers": "runtime",
+      "shape": "thinking",
+      "fixture": "chunked",
+      "events": [
+        {
+          "type": "start",
+          "gap": 13,
+          "io": false,
+          "partial": {
+            "role": "assistant",
+            "content": [],
+            "api": "azure-openai-responses",
+            "provider": "probe-provider",
+            "model": "probe",
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "pending",
+            "timestamp": 1793072864012
+          }
+        },
+        {
+          "type": "thinking_start",
+          "contentIndex": 0,
+          "gap": 64,
+          "io": true,
+          "partial": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "thinking",
+                "thinking": ""
+              }
+            ],
+            "api": "azure-openai-responses",
+            "provider": "probe-provider",
+            "model": "probe",
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "pending",
+            "timestamp": 1793072864012,
+            "responseId": "response-r2"
+          }
+        },
+        {
+          "type": "thinking_delta",
+          "contentIndex": 0,
+          "delta": "one",
+          "gap": 64,
+          "io": true,
+          "partial": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "thinking",
+                "thinking": "one"
+              }
+            ],
+            "api": "azure-openai-responses",
+            "provider": "probe-provider",
+            "model": "probe",
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "pending",
+            "timestamp": 1793072864012,
+            "responseId": "response-r2"
+          }
+        },
+        {
+          "type": "thinking_delta",
+          "contentIndex": 0,
+          "delta": " two",
+          "gap": 64,
+          "io": true,
+          "partial": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "thinking",
+                "thinking": "one two"
+              }
+            ],
+            "api": "azure-openai-responses",
+            "provider": "probe-provider",
+            "model": "probe",
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "pending",
+            "timestamp": 1793072864012,
+            "responseId": "response-r2"
+          }
+        },
+        {
+          "type": "thinking_end",
+          "contentIndex": 0,
+          "gap": 64,
+          "io": true,
+          "partial": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "thinking",
+                "thinking": "one two",
+                "thinkingSignature": "{\"type\":\"reasoning\",\"id\":\"rs_r2\",\"summary\":[{\"type\":\"summary_text\",\"text\":\"one two\"}]}"
+              }
+            ],
+            "api": "azure-openai-responses",
+            "provider": "probe-provider",
+            "model": "probe",
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "pending",
+            "timestamp": 1793072864012,
+            "responseId": "response-r2"
+          }
+        },
+        {
+          "type": "done",
+          "gap": 64,
+          "io": true,
+          "partial": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "thinking",
+                "thinking": "one two",
+                "thinkingSignature": "{\"type\":\"reasoning\",\"id\":\"rs_r2\",\"summary\":[{\"type\":\"summary_text\",\"text\":\"one two\"}]}"
+              }
+            ],
+            "api": "azure-openai-responses",
+            "provider": "probe-provider",
+            "model": "probe",
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0,
+                "totalFromProvider": false
+              }
+            },
+            "stopReason": "stop",
+            "timestamp": 1793072864012,
+            "responseId": "response-r2",
+            "rawStopReason": "completed",
+            "durationMs": 33
           }
         }
       ]
@@ -3270,7 +3270,7 @@
               }
             },
             "stopReason": "pending",
-            "timestamp": 1792942569142
+            "timestamp": 1793072864051
           }
         },
         {
@@ -3308,7 +3308,7 @@
               }
             },
             "stopReason": "pending",
-            "timestamp": 1792942569142,
+            "timestamp": 1793072864051,
             "responseId": "response-r2"
           }
         },
@@ -3348,7 +3348,7 @@
               }
             },
             "stopReason": "pending",
-            "timestamp": 1792942569142,
+            "timestamp": 1793072864051,
             "responseId": "response-r2"
           }
         },
@@ -3388,7 +3388,7 @@
               }
             },
             "stopReason": "toolUse",
-            "timestamp": 1792942569142,
+            "timestamp": 1793072864051,
             "responseId": "response-r2",
             "rawStopReason": "completed"
           }
@@ -3428,10 +3428,10 @@
               }
             },
             "stopReason": "toolUse",
-            "timestamp": 1792942569142,
+            "timestamp": 1793072864051,
             "responseId": "response-r2",
             "rawStopReason": "completed",
-            "durationMs": 3
+            "durationMs": 2
           }
         }
       ]
@@ -3467,7 +3467,7 @@
               }
             },
             "stopReason": "pending",
-            "timestamp": 1792942569149
+            "timestamp": 1793072864058
           }
         },
         {
@@ -3505,7 +3505,7 @@
               }
             },
             "stopReason": "pending",
-            "timestamp": 1792942569149,
+            "timestamp": 1793072864058,
             "responseId": "response-r2"
           }
         },
@@ -3545,7 +3545,7 @@
               }
             },
             "stopReason": "pending",
-            "timestamp": 1792942569149,
+            "timestamp": 1793072864058,
             "responseId": "response-r2"
           }
         },
@@ -3585,7 +3585,7 @@
               }
             },
             "stopReason": "toolUse",
-            "timestamp": 1792942569149,
+            "timestamp": 1793072864058,
             "responseId": "response-r2",
             "rawStopReason": "completed"
           }
@@ -3625,10 +3625,10 @@
               }
             },
             "stopReason": "toolUse",
-            "timestamp": 1792942569149,
+            "timestamp": 1793072864058,
             "responseId": "response-r2",
             "rawStopReason": "completed",
-            "durationMs": 3
+            "durationMs": 2
           }
         }
       ]
@@ -3664,7 +3664,7 @@
               }
             },
             "stopReason": "pending",
-            "timestamp": 1792942569156
+            "timestamp": 1793072864066
           }
         },
         {
@@ -3700,7 +3700,7 @@
               }
             },
             "stopReason": "pending",
-            "timestamp": 1792942569156,
+            "timestamp": 1793072864066,
             "responseId": "response-r2"
           }
         },
@@ -3740,7 +3740,7 @@
               }
             },
             "stopReason": "pending",
-            "timestamp": 1792942569156,
+            "timestamp": 1793072864066,
             "responseId": "response-r2"
           }
         },
@@ -3779,7 +3779,7 @@
               }
             },
             "stopReason": "pending",
-            "timestamp": 1792942569156,
+            "timestamp": 1793072864066,
             "responseId": "response-r2"
           }
         },
@@ -3818,10 +3818,10 @@
               }
             },
             "stopReason": "toolUse",
-            "timestamp": 1792942569156,
+            "timestamp": 1793072864066,
             "responseId": "response-r2",
             "rawStopReason": "completed",
-            "durationMs": 28
+            "durationMs": 29
           }
         }
       ]

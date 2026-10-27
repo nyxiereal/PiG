@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"errors"
 	"path/filepath"
+	"sync"
 	"sync/atomic"
 	"testing"
 
@@ -448,6 +449,32 @@ func TestSubmissionDraftIgnoresTheFieldsOfTheOtherType(t *testing.T) {
 		}))
 		if record := must(write.Status(testContext)); record.Status != durable.SubmissionQueued || record.Type != durable.SubmissionTypeWrite {
 			t.Fatalf("record = %+v, want a queued write", record)
+		}
+		closeHarness(t, harness)
+	})
+
+	t.Run("resumes a wait only once subscribeCommits() listeners saw the commit that settled it", func(t *testing.T) {
+		setup := chatSetup(t)
+		setup.Faux.SetResponses([]ai.FauxResponseStep{fauxAnswer("hi")})
+		harness, root := openChat(t, newLateResolvingStorage(), setup)
+		var mu sync.Mutex
+		settled := map[durable.SubmissionId]bool{}
+		harness.SubscribeCommits(func(_ context.Context, publication durable.CommitPublication) {
+			for _, change := range publication.Changes {
+				if write, ok := change.(durable.SubmissionWrite); ok && write.Value.Status == durable.SubmissionDone {
+					mu.Lock()
+					settled[write.Value.Id] = true
+					mu.Unlock()
+				}
+			}
+		})
+		submission := must(root.Submit(testContext, durable.SubmissionDraft{Type: durable.SubmissionTypeInput, Content: ai.UserText("hello")}))
+		must(submission.Wait(testContext))
+		mu.Lock()
+		saw := settled[submission.Id()]
+		mu.Unlock()
+		if !saw {
+			t.Fatal("the wait resumed before the subscribeCommits() listeners saw the settling commit")
 		}
 		closeHarness(t, harness)
 	})

@@ -9,6 +9,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/MichaelKinsy/PiG/chord"
 	"reflect"
 	"sync"
 	"sync/atomic"
@@ -143,12 +144,8 @@ func TestTaskRuntime(t *testing.T) {
 			if err != nil {
 				return err
 			}
-			watch.Start(func(_ context.Context, value durable.JsonObject, _ []durable.Op) error {
-				if value == nil {
-					delivered.add("retired")
-				} else {
-					delivered.add(value.Value("text").(string))
-				}
+			watch.Start(func(_ context.Context, change chord.WatchChange[durable.JsonObject]) error {
+				delivered.add(change.Value.Value("text").(string))
 				return nil
 			})
 			watchHandle.put(watch)

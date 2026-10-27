@@ -1032,9 +1032,10 @@ func (s *TaskScheduler) observe(publication session.ObservedCommit) {
 		}
 		if record.AbortRequested && (!hadPrevious || !previous.AbortRequested) {
 			s.cascadePending = true
-			// Signal a run invocation of the newly marked task; its next step ends it.
+			// Signal a run invocation of the newly marked task; its next step ends it. Cancellation observers are task code,
+			// which never runs inside Storage's adopt: the signal follows after the host's commit listeners.
 			if running := s.invocations[record.Id]; running != nil && running.mode == modeRun {
-				running.cancel(context.Canceled)
+				s.options.Session.DeferUntilPublished(func() { running.cancel(context.Canceled) })
 			}
 		}
 		// A request replacing a restart mark upgrades the marks of the work below.
@@ -1223,9 +1224,12 @@ func (s *TaskScheduler) scheduleReconcileLocked() {
 		s.reconcilesIdle = make(chan struct{})
 	}
 	s.reconciles++
-	// Taken now, in the turn that scheduled it, as upstream's queued reconcile microtask is.
-	ticket := s.options.Session.TakeLineTicket()
-	s.background.Go(func() { s.reconcile(ticket) })
+	// Taken in the turn that scheduled it, as upstream's queued reconcile microtask is: once the publication in progress ran
+	// the host's commit listeners, whose own commits therefore queue first.
+	s.options.Session.DeferUntilPublished(func() {
+		ticket := s.options.Session.TakeLineTicket()
+		s.background.Go(func() { s.reconcile(ticket) })
+	})
 }
 
 // awaitReconcilesLocked returns, with s.mu held, once no reconcile pass is scheduled or running. Upstream queues a
@@ -1688,10 +1692,8 @@ func (s *TaskScheduler) seal() {
 // finishSealLocked completes the seal; it is called with s.mu held and releases it.
 func (s *TaskScheduler) finishSealLocked() {
 	// Closing the Harness releases its active counts.
-	if s.metricsOn {
-		for _, kind := range s.counted {
-			s.activeMetric.Add(-1, telemetry.SpanAttributes{telemetry.Attr("task", kind)})
-		}
+	for _, kind := range s.counted {
+		s.countActive(-1, kind)
 	}
 	clear(s.counted)
 	clear(s.resumed)
@@ -1727,10 +1729,13 @@ func (s *TaskScheduler) kick() {
 		return
 	}
 	s.draining = true
-	// Never commit synchronously from a commit or registry listener. The pass takes its place on the Session line now,
-	// as upstream's queueMicrotask takes it in the publishing turn, so a commit started after this point queues behind.
-	ticket := s.options.Session.TakeLineTicket()
-	s.background.Go(func() { s.drain(ticket) })
+	// Never commit synchronously from a commit or registry listener. The pass takes its place on the Session line as
+	// upstream's queueMicrotask does in the publishing turn, after the host's commit listeners ran, so a commit started
+	// after this point queues behind.
+	s.options.Session.DeferUntilPublished(func() {
+		ticket := s.options.Session.TakeLineTicket()
+		s.background.Go(func() { s.drain(ticket) })
+	})
 }
 
 func (s *TaskScheduler) drain(ticket *session.LineTicket) {
@@ -3480,9 +3485,9 @@ func (s *TaskScheduler) wakeDueLocked() {
 	})
 }
 
-// scheduleWakeLocked recomputes the wake off the Session line: it arms the built-in timer, or tells OnWake of a change
-// (scheduler.ts #scheduleWake, a microtask after the change). Changes until the recomputation runs share it, as they share
-// upstream's one queued microtask.
+// scheduleWakeLocked recomputes the wake in a goroutine the Session line never waits for, with no order relative to host
+// commit listeners: it arms the built-in timer, or tells OnWake of a change (scheduler.ts #scheduleWake, a microtask after the
+// change). Changes until the recomputation runs share it, as they share upstream's one queued microtask.
 func (s *TaskScheduler) scheduleWakeLocked() {
 	if s.wakeScheduled || s.sealing.Load() || s.options.ReadOnly {
 		return
@@ -3609,9 +3614,10 @@ func (s *TaskScheduler) armTimerLocked(at *float64) {
 }
 
 var (
-	registryInfo = durable.ReportInfo{Type: durable.ReportHostError, Callback: durable.HostCallbackRegistry}
-	settingsInfo = durable.ReportInfo{Type: durable.ReportHostError, Callback: durable.HostCallbackSettings}
-	onWakeInfo   = durable.ReportInfo{Type: durable.ReportHostError, Callback: durable.HostCallbackOnWake}
+	registryInfo  = durable.ReportInfo{Type: durable.ReportHostError, Callback: durable.HostCallbackRegistry}
+	settingsInfo  = durable.ReportInfo{Type: durable.ReportHostError, Callback: durable.HostCallbackSettings}
+	onWakeInfo    = durable.ReportInfo{Type: durable.ReportHostError, Callback: durable.HostCallbackOnWake}
+	telemetryInfo = durable.ReportInfo{Type: durable.ReportHostError, Callback: durable.HostCallbackTelemetry}
 )
 
 // installerOf is the extension that installed task in snapshot, the last one that lists it; empty for a built-in task.

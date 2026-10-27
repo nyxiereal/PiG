@@ -3,6 +3,7 @@ package harness
 import (
 	"context"
 	"encoding/json"
+	"github.com/MichaelKinsy/PiG/chord"
 	"math"
 	"slices"
 	"sync"
@@ -127,7 +128,8 @@ func TestTheEventsAreTheSameWithDocumentsEvictedRightAfterUseAsWithDocumentsKept
 		var mu sync.Mutex
 		var events []AgentEvent
 		stream := must(WatchEvents(testContext, harness, root.Id()))
-		stream.Start(func(_ context.Context, batch []AgentEvent) error {
+		stream.Start(func(_ context.Context, change chord.NativeWatchChange[[]AgentEvent]) error {
+			batch := change.Value
 			mu.Lock()
 			defer mu.Unlock()
 			events = append(events, batch...)

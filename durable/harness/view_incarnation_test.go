@@ -2,6 +2,7 @@ package harness
 
 import (
 	"context"
+	"github.com/MichaelKinsy/PiG/chord"
 	"testing"
 
 	"github.com/MichaelKinsy/PiG/chord/delta"
@@ -82,7 +83,7 @@ func TestAdvanceViewFollowsOnlyTheMountedIncarnation(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			mount := newMount()
 			var advanced []durable.Op
-			observer := &ViewObserver{Advance: func(_ context.Context, _ ConversationView, ops []durable.Op) { advanced = ops }}
+			observer := &ViewObserver{Advance: func(_ context.Context, change chord.WatchChange[ConversationView]) { advanced = change.Ops }}
 			advanceView(t.Context(), conversation, mount, []*ViewObserver{observer}, tc.publication, func(err error) { t.Errorf("observer reported %v", err) })
 			expectSameJSON(t, advanced, tc.ops)
 			expectSameJSON(t, mount.value.Docs, tc.docs)

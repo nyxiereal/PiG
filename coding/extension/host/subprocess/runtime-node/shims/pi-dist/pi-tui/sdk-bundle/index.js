@@ -6874,13 +6874,13 @@ import { decodeKittyPrintable as decodeKittyPrintable2, isKeyRelease as isKeyRel
 import { getNativeClipboard } from "../native-platform.js";
 
 // pi-dist/pi-tui/program-status.js
+import { replaceControlCharacters } from "../utils.js";
 var PROGRAM_STATUS_QUERY = "\x1B]7501;?\x1B\\";
 function isProgramStatusReply(sequence) {
   return /^\x1b\]7501;\?[^\x07\x1b]*(?:\x07|\x1b\\)$/.test(sequence);
 }
 __name(isProgramStatusReply, "isProgramStatusReply");
 var APP_PATTERN = /^[A-Za-z0-9_.+-]{1,32}$/;
-var CONTROL_CHARACTERS = /[\u0000-\u001f\u007f-\u009f]+/g;
 var MAX_MESSAGE_BYTES = 2048;
 function truncateUtf8(text, maxBytes) {
   if (Buffer.byteLength(text, "utf8") <= maxBytes)
@@ -6903,7 +6903,7 @@ function formatProgramStatus(status) {
     pairs.push(`app=${status.app}`);
   if (status.state === "blocked" && status.kind)
     pairs.push(`kind=${status.kind}`);
-  const message = truncateUtf8((status.message ?? "").replace(CONTROL_CHARACTERS, " ").trim(), MAX_MESSAGE_BYTES);
+  const message = truncateUtf8(replaceControlCharacters(status.message ?? "").trim(), MAX_MESSAGE_BYTES);
   if (message)
     pairs.push(`msg=${Buffer.from(message, "utf8").toString("base64")}`);
   return `\x1B]7501;${pairs.join(":")}\x1B\\`;
@@ -7243,6 +7243,7 @@ __name(isNativeModifierPressed, "isNativeModifierPressed");
 
 // pi-dist/pi-tui/terminal.js
 import { getNativePlatformHelper as getNativePlatformHelper2 } from "../native-platform.js";
+import { replaceControlCharacters as replaceControlCharacters2 } from "../utils.js";
 var TERMINAL_PROGRESS_KEEPALIVE_MS = 1e3;
 var TERMINAL_PROGRESS_ACTIVE_SEQUENCE = "\x1B]9;4;3\x07";
 var TERMINAL_PROGRESS_CLEAR_SEQUENCE = "\x1B]9;4;0\x07";
@@ -7658,7 +7659,7 @@ var ProcessTerminal = class {
     process.stdout.write("\x1B[2J\x1B[H");
   }
   setTitle(title) {
-    process.stdout.write(`\x1B]0;${title}\x07`);
+    process.stdout.write(`\x1B]0;${replaceControlCharacters2(title)}\x07`);
   }
   setProgramStatus(status) {
     this.programStatus = status.state === "clear" ? void 0 : status;
@@ -10436,7 +10437,7 @@ var TuiMainScreen = class extends TuiBase2 {
 };
 
 // pi-dist/pi-tui/index.js
-import { getOsc8LinkAtColumn as getOsc8LinkAtColumn2, sliceByColumn as sliceByColumn5, stripTerminalSequences as stripTerminalSequences3, truncateToWidth as truncateToWidth9, visibleWidth as visibleWidth15, wrapTextWithAnsi as wrapTextWithAnsi4 } from "../utils.js";
+import { getOsc8LinkAtColumn as getOsc8LinkAtColumn2, replaceControlCharacters as replaceControlCharacters3, sliceByColumn as sliceByColumn5, stripTerminalSequences as stripTerminalSequences3, truncateToWidth as truncateToWidth9, visibleWidth as visibleWidth15, wrapTextWithAnsi as wrapTextWithAnsi4 } from "../utils.js";
 export {
   Box,
   CURSOR_MARKER5 as CURSOR_MARKER,
@@ -10514,6 +10515,7 @@ export {
   renderFakeCursor3 as renderFakeCursor,
   renderImage2 as renderImage,
   renderLatex,
+  replaceControlCharacters3 as replaceControlCharacters,
   resetCapabilitiesCache,
   rgbColor,
   setCapabilities2 as setCapabilities,

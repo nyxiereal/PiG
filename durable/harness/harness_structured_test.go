@@ -9,6 +9,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/MichaelKinsy/PiG/chord"
 	"math"
 	"path/filepath"
 	"slices"
@@ -1865,7 +1866,8 @@ func TestToolRounds(t *testing.T) {
 		stream := must(WatchEvents(testContext, harness, root.Id()))
 		var mu sync.Mutex
 		turns := []string{}
-		stream.Start(func(_ context.Context, batch []AgentEvent) error {
+		stream.Start(func(_ context.Context, change chord.NativeWatchChange[[]AgentEvent]) error {
+			batch := change.Value
 			mu.Lock()
 			for _, event := range batch {
 				if strings.HasPrefix(event.EventType(), "turn_") {
@@ -2461,7 +2463,8 @@ type eventListener struct {
 func listenEvents(t *testing.T, harness Harness, conversation Conversation) *eventListener {
 	t.Helper()
 	found := &eventListener{stream: must(WatchEvents(testContext, harness, conversation.Id()))}
-	found.stream.Start(func(_ context.Context, batch []AgentEvent) error {
+	found.stream.Start(func(_ context.Context, change chord.NativeWatchChange[[]AgentEvent]) error {
+		batch := change.Value
 		found.mu.Lock()
 		found.events = append(found.events, batch...)
 		found.mu.Unlock()

@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"reflect"
 	"slices"
 	"sync"
 
@@ -18,29 +17,13 @@ import (
 // maxPendingNativeValues is the maximum number of undelivered values retained behind one unavailable native watch listener.
 const maxPendingNativeValues = 100
 
-// retirementOperations is the canonical terminal update of a retired source.
-func retirementOperations() []delta.Op { return []delta.Op{{"r", nil}} }
-
-// isRetiredValue reports upstream's `value === null` for a nil map, pointer, slice, or interface.
-func isRetiredValue(value any) bool {
-	if value == nil {
-		return true
-	}
-	reflected := reflect.ValueOf(value)
-	switch reflected.Kind() {
-	case reflect.Map, reflect.Pointer, reflect.Slice, reflect.Interface:
-		return reflected.IsNil()
-	}
-	return false
-}
-
 // NativeWatchHandle is a serialized observation of an in-process value: as WatchHandle, but a change is a new value
 // without ops.
 type NativeWatchHandle[T any] interface {
 	// Value is the acquisition value before Start and the latest delivered value afterward.
 	Value() T
 	// Start installs the sole asynchronous listener. It never invokes it inline.
-	Start(listener func(ctx context.Context, value T) error)
+	Start(listener func(ctx context.Context, change NativeWatchChange[T]) error)
 	// Stop idempotently stops future callbacks and returns this watch's terminal result.
 	Stop() (WatchEnd, error)
 	// Closed returns a channel closed when the watch terminates; an already-running callback remains caller-owned.
@@ -56,6 +39,9 @@ type pending struct {
 	count      int
 	idle       *sync.Cond
 	deliveries []*delivery
+	// holds counts the open Hold calls; while any is open, deliveries watches would start wait in held.
+	holds int
+	held  []func()
 }
 
 // delivery is one scheduled delivery goroutine. started is closed once id is set; done once the goroutine ended.
@@ -102,6 +88,37 @@ func (tracker *pending) wait() {
 		tracker.idle.Wait()
 	}
 	tracker.mu.Unlock()
+}
+
+// hold makes the deliveries advanced watches would start wait until the matching release; it returns release.
+func (tracker *pending) hold() (release func()) {
+	tracker.mu.Lock()
+	tracker.holds++
+	tracker.mu.Unlock()
+	return func() {
+		tracker.mu.Lock()
+		tracker.holds--
+		var held []func()
+		if tracker.holds == 0 {
+			held, tracker.held = tracker.held, nil
+		}
+		tracker.mu.Unlock()
+		for _, start := range held {
+			start()
+		}
+	}
+}
+
+// holding queues start to run at the release of the last open hold and reports true, or reports false when no hold is
+// open.
+func (tracker *pending) holding(start func()) bool {
+	tracker.mu.Lock()
+	defer tracker.mu.Unlock()
+	if tracker.holds == 0 {
+		return false
+	}
+	tracker.held = append(tracker.held, start)
+	return true
 }
 
 // schedule runs job off the caller's goroutine, as upstream's queueMicrotask runs it outside the publishing call.
@@ -166,19 +183,25 @@ func NewDeliveryScheduler() *DeliveryScheduler { return &DeliveryScheduler{pendi
 // Wait blocks until no scheduled delivery is queued or running.
 func (s *DeliveryScheduler) Wait() { s.pending.wait() }
 
+// Hold makes the deliveries that frames advanced from now on would start wait until the returned release runs, which
+// starts them in the order the watches were first advanced. Frames a watch is advanced with meanwhile fold into one call,
+// as the frames of one publication fold into the single microtask upstream queues for it. Holds nest; release is called
+// once.
+func (s *DeliveryScheduler) Hold() (release func()) { return s.pending.hold() }
+
 // AwaitEntered blocks until every delivery scheduled before the call has entered its listener, up to the listener's
 // first wait; it returns the cause of ctx when ctx ends the wait.
 func (s *DeliveryScheduler) AwaitEntered(ctx context.Context) error {
 	return s.pending.awaitEntered(ctx)
 }
 
-// watchFrame is one listener call: the value it delivers and the context of the newest frame it covers.
+// watchFrame is one listener call: the value it delivers, the ops and retirement flag of a JSON watch, and the context of
+// the newest frame it covers. The listener gets the change and the context apart: a change is plain data.
 type watchFrame[T any] struct {
-	value T
-	ops   []delta.Op
-	ctx   context.Context
-	// retires marks the retirement: the watch ends retired once it is delivered.
-	retires bool
+	value   T
+	ops     []delta.Op
+	ctx     context.Context
+	retired bool
 }
 
 // watchLifecycle is the lifecycle both handles share: serialized delivery and termination. A source feeds it and ends
@@ -205,6 +228,10 @@ type watchLifecycle[T, L any] struct {
 	started   bool
 	scheduled bool
 	running   bool
+	// holdQueued is set while a delivery waits for the release of a Hold.
+	holdQueued bool
+	// ending is set by EndAfterDelivery: the source sends nothing more, and the watch ends ended once it delivered the rest.
+	ending    bool
 	detached  bool
 	end       *WatchEnd
 	resolved  bool
@@ -291,7 +318,8 @@ func (watch *watchLifecycle[T, L]) Cancel() {
 	watch.terminate(WatchEnd{Reason: WatchCancelled})
 }
 
-// SourceEnded is the source closing: the watch ends ended, or failed with the error when the source failed.
+// SourceEnded is the source closing: the watch ends ended, or failed with the error when the source failed, at once,
+// dropping what is pending.
 func (watch *watchLifecycle[T, L]) SourceEnded(failure error) {
 	if failure != nil {
 		watch.terminate(WatchEnd{Reason: WatchFailed, Error: failure})
@@ -299,6 +327,25 @@ func (watch *watchLifecycle[T, L]) SourceEnded(failure error) {
 	}
 	watch.terminate(WatchEnd{Reason: WatchEnded})
 }
+
+// EndAfterDelivery tells the watch that its source sends nothing more after its last frames, such as a retirement: it takes
+// no more frames, delivers what is pending, then ends ended, after the running call returns, if one runs, and at once when
+// nothing is pending and no call runs. Until then the watch stays attached, so SourceEnded, Stop, cancellation and a
+// failing listener still end it first; a watch never started keeps what is pending until one of them or Start.
+func (watch *watchLifecycle[T, L]) EndAfterDelivery() {
+	watch.mu.Lock()
+	defer watch.mu.Unlock()
+	if watch.end != nil || watch.ending {
+		return
+	}
+	watch.ending = true
+	if !watch.running && !watch.hasPending() {
+		watch.terminateLocked(WatchEnd{Reason: WatchEnded})
+	}
+}
+
+// open reports whether the watch still takes frames: it has not ended, and its source has not ended. Called under mu.
+func (watch *watchLifecycle[T, L]) open() bool { return watch.end == nil && !watch.ending }
 
 // deliverLocked starts delivery of the oldest pending frame when no callback is in flight. Upstream's commit publishes
 // before its promise resolves and the drain microtask that advance queues enters the listener before the commit's
@@ -308,8 +355,23 @@ func (watch *watchLifecycle[T, L]) deliverLocked() {
 	if watch.running || watch.end != nil || !watch.hasPending() {
 		return
 	}
+	if !watch.holdQueued && watch.scheduler.holding(watch.deliverHeld) {
+		watch.holdQueued = true
+		return
+	}
+	if watch.holdQueued {
+		return
+	}
 	frame, listener := watch.takeLocked()
 	watch.scheduler.schedule(func() { watch.drain(frame, listener) })
+}
+
+// deliverHeld starts the delivery a Hold postponed, with the frames advanced since folded.
+func (watch *watchLifecycle[T, L]) deliverHeld() {
+	watch.mu.Lock()
+	watch.holdQueued = false
+	watch.deliverLocked()
+	watch.mu.Unlock()
 }
 
 // scheduleLocked queues a drain of the frames buffered before Start, as upstream's start queues a microtask.
@@ -367,11 +429,13 @@ func (watch *watchLifecycle[T, L]) drain(frame watchFrame[T], listener *L) {
 			}
 			break
 		}
-		if frame.retires {
-			watch.terminateLocked(WatchEnd{Reason: WatchRetired})
+		if watch.end != nil {
 			break
 		}
-		if watch.end != nil || !watch.hasPending() {
+		if !watch.hasPending() {
+			if watch.ending {
+				watch.terminateLocked(WatchEnd{Reason: WatchEnded})
+			}
 			break
 		}
 		frame, listener = watch.takeLocked()
@@ -444,14 +508,15 @@ func (watch *watchLifecycle[T, L]) finishIfReadyLocked() {
 
 // Watch is the watch handle of a JSON source. Frames that arrive before Start or while the listener runs wait in one
 // delta.PendingOps queue; the next call gets the newest value, the folded ops of every frame since the previous call (or
-// [["r", newest]] after the queue overflowed) and the newest frame's context. A source creates one per watch and feeds it
-// with Advance, Retire, SourceEnded and ObserveCancellation.
+// [["r", newest]] after the queue overflowed), Retired when any of them was a retirement, and the newest frame's context.
+// A source creates one per watch and feeds it with Advance, EndAfterDelivery, SourceEnded and ObserveCancellation.
 type Watch[T any] struct {
-	watchLifecycle[T, func(ctx context.Context, value T, ops []delta.Op) error]
+	watchLifecycle[T, func(ctx context.Context, change WatchChange[T]) error]
 	ops delta.PendingOps
 	// newest is the newest frame, while a call is pending.
-	newest   *watchNewest[T]
-	retiring bool
+	newest *watchNewest[T]
+	// retired is set while a pending frame was a retirement.
+	retired bool
 }
 
 // watchNewest is the newest frame of a Watch.
@@ -466,14 +531,15 @@ type watchNewest[T any] struct {
 func NewWatch[T any](value T, detach func(), report func(error)) *Watch[T] {
 	watch := &Watch[T]{}
 	watch.setup(value, detach, report)
-	watch.invoke = func(listener func(context.Context, T, []delta.Op) error, frame watchFrame[T]) error {
-		return listener(frame.ctx, frame.value, frame.ops)
+	watch.invoke = func(listener func(context.Context, WatchChange[T]) error, frame watchFrame[T]) error {
+		return listener(frame.ctx, WatchChange[T]{Value: frame.value, Ops: frame.ops, Retired: frame.retired})
 	}
 	watch.next = watch.nextDelivery
 	watch.hasPending = func() bool { return watch.newest != nil }
 	watch.release = func() {
 		watch.ops.Take()
 		watch.newest = nil
+		watch.retired = false
 	}
 	return watch
 }
@@ -487,36 +553,23 @@ func (watch *Watch[T]) On(scheduler *DeliveryScheduler) *Watch[T] {
 
 // Start installs the sole asynchronous listener; it never invokes it inline. It panics when the watch is started or
 // stopped, as upstream throws.
-func (watch *Watch[T]) Start(listener func(ctx context.Context, value T, ops []delta.Op) error) {
+func (watch *Watch[T]) Start(listener func(ctx context.Context, change WatchChange[T]) error) {
 	watch.start(listener)
 }
 
-// Advance queues the frame ops, which turn the previous value into value.
-func (watch *Watch[T]) Advance(ctx context.Context, value T, ops []delta.Op) {
+// Advance queues the frame change: its Ops turn the previous value into its Value, and Retired says the document the
+// watch follows was retired, which the next call reports however many frames it folds. ctx is the frame's context.
+func (watch *Watch[T]) Advance(ctx context.Context, change WatchChange[T]) {
 	watch.mu.Lock()
 	defer watch.mu.Unlock()
-	if watch.end != nil || watch.retiring {
+	if !watch.open() {
 		return
 	}
-	watch.ops.Push(ops)
-	watch.newest = &watchNewest[T]{value: value, ctx: ctx}
-	if watch.started {
-		watch.deliverLocked()
+	watch.ops.Push(change.Ops)
+	watch.newest = &watchNewest[T]{value: change.Value, ctx: ctx}
+	if change.Retired {
+		watch.retired = true
 	}
-}
-
-// Retire is the source retiring: it queues the last frame, a root replacement with nil ([["r", null]]) and the zero
-// value, after which the watch ends retired.
-func (watch *Watch[T]) Retire(ctx context.Context) {
-	watch.mu.Lock()
-	defer watch.mu.Unlock()
-	if watch.end != nil || watch.retiring {
-		return
-	}
-	watch.retiring = true
-	var retired T
-	watch.ops.Push(retirementOperations())
-	watch.newest = &watchNewest[T]{value: retired, ctx: ctx}
 	if watch.started {
 		watch.deliverLocked()
 	}
@@ -528,24 +581,22 @@ func (watch *Watch[T]) nextDelivery() (watchFrame[T], bool) {
 		return watchFrame[T]{}, false
 	}
 	watch.newest = nil
+	retired := watch.retired
+	watch.retired = false
 	taken := watch.ops.Take()
 	ops := taken.Ops
 	if taken.Replace {
 		// Values of a JSON watch are JSON; T is the source's narrower or wider view of them (a typed document).
 		var payload any = newest.value
-		if isRetiredValue(newest.value) {
-			payload = nil
-		}
 		ops = []delta.Op{{"r", payload}}
 	}
-	// Nothing is queued after a retirement, so a retiring watch's pending call is its last.
-	return watchFrame[T]{value: newest.value, ops: ops, ctx: newest.ctx, retires: watch.retiring}, true
+	return watchFrame[T]{value: newest.value, ops: ops, ctx: newest.ctx, retired: retired}, true
 }
 
 // NativeWatch is the watch handle of a native source: every value in order, one call each; past 100 pending values they
 // collapse to one, replace() or by default the newest value.
 type NativeWatch[T any] struct {
-	watchLifecycle[T, func(ctx context.Context, value T) error]
+	watchLifecycle[T, func(ctx context.Context, change NativeWatchChange[T]) error]
 	values  []watchFrame[T]
 	replace func() T
 }
@@ -555,8 +606,8 @@ type NativeWatch[T any] struct {
 func NewNativeWatch[T any](value T, detach func(), report func(error), replace func() T) *NativeWatch[T] {
 	watch := &NativeWatch[T]{replace: replace}
 	watch.setup(value, detach, report)
-	watch.invoke = func(listener func(context.Context, T) error, frame watchFrame[T]) error {
-		return listener(frame.ctx, frame.value)
+	watch.invoke = func(listener func(context.Context, NativeWatchChange[T]) error, frame watchFrame[T]) error {
+		return listener(frame.ctx, NativeWatchChange[T]{Value: frame.value})
 	}
 	watch.next = func() (watchFrame[T], bool) {
 		if len(watch.values) == 0 {
@@ -582,7 +633,7 @@ func (watch *NativeWatch[T]) On(scheduler *DeliveryScheduler) *NativeWatch[T] {
 
 // Start installs the sole asynchronous listener; it never invokes it inline. It panics when the watch is started or
 // stopped, as upstream throws.
-func (watch *NativeWatch[T]) Start(listener func(ctx context.Context, value T) error) {
+func (watch *NativeWatch[T]) Start(listener func(ctx context.Context, change NativeWatchChange[T]) error) {
 	watch.start(listener)
 }
 
@@ -590,7 +641,7 @@ func (watch *NativeWatch[T]) Start(listener func(ctx context.Context, value T) e
 func (watch *NativeWatch[T]) Advance(ctx context.Context, value T) {
 	watch.mu.Lock()
 	defer watch.mu.Unlock()
-	if watch.end != nil {
+	if !watch.open() {
 		return
 	}
 	if len(watch.values) < maxPendingNativeValues {

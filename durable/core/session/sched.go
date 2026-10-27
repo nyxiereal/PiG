@@ -691,7 +691,9 @@ func (s *Scheduler) AbortConversation(conversationID ID, background bool, cancel
 		var wait func(i int)
 		wait = func(i int) {
 			if !background || i >= len(reached) {
-				s.WaitForIdle(conversationID, cancel, then)
+				// abortConversation is an async function whose last await is waitForIdle: its caller resumes a hop after the
+				// waiter does.
+				s.WaitForIdle(conversationID, cancel, func(err error) { s.loop.Defer(func() { then(err) }) })
 				return
 			}
 			s.WaitForTask(reached[i], cancel, func(_ *jv.Object, err error) {

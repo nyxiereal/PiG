@@ -158,9 +158,9 @@ test("a view frame carries ops only: the host applies them to the value it holds
   const h = await open(core)
   const seen: any[] = []
   const sink = await (h as any).watches.attach({ kind: "view", conversationId: 1, changes: true }, context, (value: unknown, release: () => void) => ({
-    advance: (after: unknown, ops: unknown[]) => seen.push(["advance", after, ops]),
+    advance: ({ value: after, ops }: { value: unknown; ops: unknown[] }) => seen.push(["advance", after, ops]),
     publication: (before: unknown, after: unknown, ops: unknown[], c: unknown) => seen.push(["publication", before, after, ops.length, c]),
-    closeSession: release,
+    end: release,
   }))
   assert.ok(sink)
   assert.deepEqual(apis(core)[0]!.body.target, { kind: "view", conversationId: 1, changes: true }, "the open request asks for the commit's records")
@@ -185,8 +185,8 @@ test("a graph frame carries ops only: the host applies them to the graph it hold
   const h = await open(core)
   const seen: any[] = []
   const sink = await (h as any).watches.attach({ kind: "graph" }, context, (_value: unknown, release: () => void) => ({
-    advance: (after: unknown, ops: unknown[]) => seen.push([after, ops.length]),
-    closeSession: release,
+    advance: ({ value: after, ops }: { value: unknown; ops: unknown[] }) => seen.push([after, ops.length]),
+    end: release,
   }))
   assert.ok(sink)
   pump(h)
@@ -206,7 +206,7 @@ test("a view state and event observers of one conversation share one core watch;
   const core = watching(first, { frames: id => [published({ watchId: id, frame: { ops: [["p", ["entries"], 0, 0, [{ id: 4, kind: "b" }]]], changes: { entries: [{ id: 4, kind: "b" }], tasks: [], submissions: [] } } })] })
   const h = await open(core)
   const order: string[] = []
-  const observer = (name: string) => (_value: unknown, release: () => void) => ({ advance: () => order.push(`${name} advance`), publication: () => order.push(`${name} publication`), closeSession: release })
+  const observer = (name: string) => (_value: unknown, release: () => void) => ({ advance: () => order.push(`${name} advance`), publication: () => order.push(`${name} publication`), end: release })
   await (h as any).attachView(1, context, observer("a"))
   const state = await (h as any).conversationState(1, context)
   await (h as any).attachView(1, context, observer("b"))
@@ -297,7 +297,7 @@ test("watchEvents' completing generations come from the core's line job: watch.o
   const core = watching({ conversation: { id: 1 }, entries: [], docs: {} }, { completing: [5], attached: [6] })
   const h = await open(core)
   const seen: (readonly number[] | undefined)[] = []
-  const make = (_value: unknown, release: () => void, completing?: readonly number[]) => { seen.push(completing); return { advance: () => {}, closeSession: release } }
+  const make = (_value: unknown, release: () => void, completing?: readonly number[]) => { seen.push(completing); return { advance: () => {}, end: release } }
   await (h as any).attachView(1, context, make)
   await (h as any).attachView(1, context, make)
   assert.deepEqual(seen, [[5], [6]])

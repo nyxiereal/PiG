@@ -2,9 +2,10 @@
 //
 // Go mappings forced by language mechanics. A TypeScript test that runs two calls "at once" with Promise.all or
 // void-calls relies on the event loop's FIFO queueing; Go goroutines have no such order, so the tests either wait for
-// the first call to reach storage before starting the second, or assert only what the order cannot change. Each
-// such site says so. Abort reasons are context causes: the scheduler's signal is context.Canceled where upstream's
-// is an AbortError.
+// the first call to reach storage before starting the second, or assert only what the order cannot change. A call
+// whose synchronous part upstream relies on (a waitForTask() that has taken its place on the Session line before the
+// test resolves a gate) runs through callAsync. Each such site says so. Abort reasons are context causes: the
+// scheduler's signal is context.Canceled where upstream's is an AbortError.
 
 package harness
 
@@ -1055,15 +1056,26 @@ func TestPublicationAtAdoption(t *testing.T) {
 		id := tkStart(t, opened.root, gated.Erased())
 		opened.harness.Resume()
 		sawIt := func() bool { return slices.Contains(seen.all(), id) }
-		results := make(chan bool, 3)
-		go func() { _, _ = opened.harness.WaitForTask(testContext, id); results <- sawIt() }()
-		go func() { _ = opened.harness.WaitForIdle(testContext); results <- sawIt() }()
-		go func() { _ = opened.root.WaitForIdle(testContext); results <- sawIt() }()
-		flush()
+		type resumed struct {
+			wait string
+			saw  bool
+		}
+		results := make(chan resumed, 3)
+		// Pi calls the three waits, each of which registers in its synchronous part, before it resolves the gate; here each
+		// goroutine has entered before the gate resolves, so the terminal commit cannot overtake a wait.
+		callAsync(func() { _, _ = opened.harness.WaitForTask(testContext, id); results <- resumed{"WaitForTask", sawIt()} })
+		callAsync(func() {
+			_ = opened.harness.WaitForIdle(testContext)
+			results <- resumed{"Harness.WaitForIdle", sawIt()}
+		})
+		callAsync(func() {
+			_ = opened.root.WaitForIdle(testContext)
+			results <- resumed{"Conversation.WaitForIdle", sawIt()}
+		})
 		gate.resolve()
 		for range 3 {
-			if !<-results {
-				t.Fatal("a wait resumed before the subscribeCommits() listeners saw the terminal commit")
+			if got := <-results; !got.saw {
+				t.Fatalf("%s resumed before the subscribeCommits() listeners saw the terminal commit", got.wait)
 			}
 		}
 		mustClose(t, opened.harness)
@@ -1084,11 +1096,11 @@ func TestPublicationAtAdoption(t *testing.T) {
 			})
 			opened.harness.Resume()
 			waited := make(chan struct{})
-			go func() {
+			callAsync(func() {
 				_, _ = opened.harness.WaitForTask(testContext, id)
 				order.add("wait")
 				close(waited)
-			}()
+			})
 			gate.resolve()
 			<-waited
 			if got := order.all(); !reflect.DeepEqual(got, []string{"host adopting=false", "wait"}) {
@@ -1097,20 +1109,29 @@ func TestPublicationAtAdoption(t *testing.T) {
 			mustClose(t, opened.harness)
 		})
 
+		// Upstream checks the order in the microtask after `await abortTask()`, when only the mark has been published, and its
+		// abort listener runs inside controller.abort(). Here context.AfterFunc runs the observer on a goroutine of its own, so
+		// it can follow AbortTask's return, and by then the aborted task's terminal commit, which carries the same mark, can be
+		// published too. The host listener therefore counts only the commit that marks the task, and the test waits for the
+		// observer, not for a count of entries.
 		t.Run("signals a newly marked run after host listeners saw the mark, outside the storage's adopt ("+c.name+")", func(t *testing.T) {
 			store := c.open()
 			reached := deferred()
+			signalled := deferred()
 			var order syncList[string]
-			signalled := tkOneStep("test.order-signalled", func(ctx context.Context, _ stepRecord, _ stepRuntime) error {
-				context.AfterFunc(ctx, func() { order.add(fmt.Sprintf("abort adopting=%v", c.adopting(store))) })
+			task := tkOneStep("test.order-signalled", func(ctx context.Context, _ stepRecord, _ stepRuntime) error {
+				context.AfterFunc(ctx, func() {
+					order.add(fmt.Sprintf("abort adopting=%v", c.adopting(store)))
+					signalled.resolve()
+				})
 				reached.resolve()
 				return abortedBy(ctx)
 			})
-			opened := tkOpenRoot(t, []durable.AnyTask{signalled.Erased()}, tkOptions{storage: store})
-			id := tkStart(t, opened.root, signalled.Erased())
+			opened := tkOpenRoot(t, []durable.AnyTask{task.Erased()}, tkOptions{storage: store})
+			id := tkStart(t, opened.root, task.Erased())
 			opened.harness.SubscribeCommits(func(_ context.Context, publication durable.CommitPublication) {
 				for _, change := range publication.Changes {
-					if write, ok := change.(durable.TaskWrite); ok && write.Value.Id == id && write.Value.AbortRequested {
+					if write, ok := change.(durable.TaskWrite); ok && write.Value.Id == id && write.Value.AbortRequested && write.Value.State.Status != durable.TaskTerminal {
 						order.add("host")
 					}
 				}
@@ -1120,7 +1141,9 @@ func TestPublicationAtAdoption(t *testing.T) {
 			if result := must(opened.harness.AbortTask(testContext, id)); result != "marked" {
 				t.Fatalf("abort result %q", result)
 			}
-			eventually(t, func() bool { return len(order.all()) == 2 })
+			if err := signalled.wait(testContext); err != nil {
+				t.Fatal(err)
+			}
 			if got := order.all(); !reflect.DeepEqual(got, []string{"host", "abort adopting=false"}) {
 				t.Fatalf("order %v", got)
 			}
@@ -1135,28 +1158,33 @@ func TestPublicationAtAdoption(t *testing.T) {
 		opened := tkOpenRoot(t, []durable.AnyTask{gated.Erased()}, tkOptions{storage: store})
 		var order syncList[string]
 		id := tkStart(t, opened.root, gated.Erased())
+		hosted := deferred()
 		opened.harness.SubscribeCommits(func(_ context.Context, publication durable.CommitPublication) {
 			if publicationTerminal(publication, id) {
 				order.add("host")
+				hosted.resolve()
 			}
 		})
-		gapped := deferred()
 		idle := make(chan struct{})
 		store.setGap(func(writes []durable.StorageWrite) bool {
 			if !writesEndTask(writes) {
 				return false
 			}
+			// Upstream runs the gap a macrotask after adoption, when the microtask that dispatched the host listeners has run,
+			// and what the gap started runs before the commit resolves. Here the Session publishes once the storage's goroutine
+			// is parked in a wait, which under load can take longer than the storage's own work, so the gap waits for the
+			// listeners' effect and for the continuation it started.
+			_ = hosted.wait(testContext)
 			go func() {
 				_ = opened.harness.WaitForIdle(testContext)
 				order.add(fmt.Sprintf("idle committing=%v", store.committing.Load()))
 				close(idle)
 			}()
-			gapped.resolve()
+			<-idle
 			return true
 		})
 		opened.harness.Resume()
 		gate.resolve()
-		_ = gapped.wait(testContext)
 		<-idle
 		if got := order.all(); !reflect.DeepEqual(got, []string{"host", "idle committing=true"}) {
 			t.Fatalf("order %v", got)
@@ -1180,10 +1208,10 @@ func TestPublicationAtAdoption(t *testing.T) {
 		store.setRejectAfterAdopt(writesEndTask)
 		opened.harness.Resume()
 		waited := make(chan durable.SettledTask[durable.JsonValue], 1)
-		go func() {
+		callAsync(func() {
 			receipt, _ := opened.harness.WaitForTask(testContext, id)
 			waited <- receipt
-		}()
+		})
 		gate.resolve()
 		receipt := <-waited
 		if receipt.State.Outcome == nil || receipt.State.Outcome.Status != durable.OutcomeCompleted {
@@ -1246,13 +1274,13 @@ func TestPublicationAtAdoption(t *testing.T) {
 		})
 		opened.harness.Resume()
 		waited := make(chan durable.SettledTask[durable.JsonValue], 1)
-		go func() {
+		callAsync(func() {
 			receipt, err := opened.harness.WaitForTask(testContext, id)
 			if err != nil {
 				t.Error(err)
 			}
 			waited <- receipt
-		}()
+		})
 		gate.resolve()
 		receipt := <-waited
 		if receipt.State.Outcome == nil || receipt.State.Outcome.Status != durable.OutcomeCompleted {
@@ -1353,7 +1381,7 @@ func TestPublicationAtAdoption(t *testing.T) {
 			if !writesEndTask(writes) {
 				return false
 			}
-			go func() { _ = opened.harness.Close(testContext); close(closing) }()
+			callAsync(func() { _ = opened.harness.Close(testContext); close(closing) })
 			gapped.resolve()
 			return true
 		})
@@ -1363,10 +1391,10 @@ func TestPublicationAtAdoption(t *testing.T) {
 			err     error
 		}
 		waited := make(chan waitResult, 1)
-		go func() {
+		callAsync(func() {
 			receipt, err := opened.harness.WaitForTask(testContext, id)
 			waited <- waitResult{receipt, err}
-		}()
+		})
 		gate.resolve()
 		_ = gapped.wait(testContext)
 		<-closing

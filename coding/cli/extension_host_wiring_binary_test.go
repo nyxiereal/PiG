@@ -130,3 +130,35 @@ func TestExtensionVirtualModelFlushFailureStopsStartup(t *testing.T) {
 		})
 	}
 }
+
+// Pi binds a mode's extensions with that mode: print-mode.ts bindExtensions passes "json" for --mode json and "print" otherwise, and rpc-mode.ts passes "rpc"; the interactive mode passes "tui" (interactive-mode.ts), which the parity scenario 90-extension-run-mode drives on a PTY. An extension reads it as ctx.mode. Pig's host sends the mode in the ready payload, and every SDK that never receives one reports "print" (issue 360), so only json and rpc tell a host that sends the mode from one that does not.
+func TestExtensionContextModeIsTheRunMode(t *testing.T) {
+	t.Parallel()
+	for _, fixture := range []string{"host-wiring-run-mode.mjs", "host-wiring-run-mode.py"} {
+		for _, mode := range []string{"print", "json", "rpc"} {
+			t.Run(fixture+"/"+mode, func(t *testing.T) {
+				got := runHostWiringMode(t, mode, nil, fixture)
+				if want := []string{`{"event":"mode","value":"` + mode + `"}`}; !slices.Equal(got, want) {
+					t.Fatalf("records:\n%s\nwant:\n%s", strings.Join(got, "\n"), strings.Join(want, "\n"))
+				}
+			})
+		}
+	}
+}
+
+// An SDK extension that computes a schema with a member of Type the host's type engine runs (Pick) loads in every mode of the stock pig binary: the Go, Rust and
+// Python SDKs send the call to the host (type.engine), and the engine is registered by coding/extension/pigsdk, which every pig program that embeds an SDK links, so no
+// host the command builds can meet the call without an engine. The subprocess package's own test binary links no pigsdk, so it registers the engine for its fixtures
+// (coding/extension/host/subprocess/type_engine_testmain_test.go); this test is the production path.
+func TestStockPigHostsTheTypeEngineForSDKExtensionsInEveryMode(t *testing.T) {
+	t.Parallel()
+	want := []string{`{"event":"type_engine","keys":["id","n"]}`}
+	for _, mode := range []string{"print", "json", "rpc"} {
+		t.Run(mode, func(t *testing.T) {
+			got := runHostWiringMode(t, mode, nil, "host-wiring-type-engine.py")
+			if !slices.Equal(got, want) {
+				t.Fatalf("records:\n%s\nwant:\n%s", strings.Join(got, "\n"), strings.Join(want, "\n"))
+			}
+		})
+	}
+}

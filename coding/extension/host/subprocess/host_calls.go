@@ -47,7 +47,7 @@ func startsAsync(method string) bool {
 	case "ui.select", "ui.confirm", "ui.input", "ui.editor", CallUICustom,
 		"setModel", "registerProvider", "exec", CallLoadingExec, "complete", "modelStream", CallProviderObject, "getModelAuth", "getProviderAuth", "getAvailableOfType", "classify", "generateImages", "refreshModelRegistry", "compact",
 		"waitForIdle", "newSession", "fork", "navigateTree", "switchSession", "reload", CallExecuteTool, CallBuiltinToolExecute, CallBuiltinToolLocalExec, CallSessionGraphAsync,
-		CallChildSessionCreate, CallChildSessionPrompt, CallChildSessionQueue, CallChildSessionAbort, CallChildSessionBindExtensions,
+		CallChildSessionCreate, CallChildSessionPrompt, CallChildSessionQueue, CallChildSessionAbort, CallChildSessionBindExtensions, CallChildSessionEmit,
 		CallOAuthOnPrompt, CallOAuthOnSelect, CallOAuthOnManualCodeInput:
 		return true
 	default:
@@ -469,12 +469,16 @@ func (h *Host) runCall(me *managedExt, conn *Conn, callID string, call *CallPayl
 		result, err = h.handleResizeImage(call)
 	case call.Method == CallBuiltinToolDefinition:
 		result, err = h.handleBuiltinToolDefinition(call)
+	case call.Method == CallBuiltinToolPrepareArguments:
+		result, err = h.handleBuiltinToolPrepareArguments(call)
 	case call.Method == CallBuiltinToolExecute:
 		result, err = h.handleBuiltinToolExecute(callCtx, conn, call)
 	case call.Method == CallBuiltinToolLocalExec:
 		result, err = h.handleBuiltinToolLocalExec(callCtx, conn, call)
 	case call.Method == CallHighlightCode:
 		result, err = h.handleHighlightCode(call)
+	case call.Method == CallTypeEngine:
+		result, err = h.handleTypeEngine(call)
 	case call.Method == CallLoadTheme:
 		result, err = h.handleLoadTheme(call)
 	case call.Method == CallFileMutationEnter:
@@ -657,7 +661,7 @@ func (h *Host) handleProviderRegistrationCall(ctx context.Context, me *managedEx
 		if request.Native.ID != request.Name {
 			return nil, errors.New("native provider id does not match registration")
 		}
-		if err := h.registerNativeProvider(ctx, me, conn, request.Native); err != nil {
+		if err := h.registerNativeProvider(ctx, me, conn, request.Native, false); err != nil {
 			return nil, err
 		}
 		h.dropProviderConfigRef(request.Name)

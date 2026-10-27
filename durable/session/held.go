@@ -138,12 +138,20 @@ func (session *SessionImpl) hold(ctx context.Context, tx *Transaction, held []he
 	for _, document := range documents {
 		changes = append(changes, document)
 	}
-	session.deliver(ctx, internal, nil, ObservedCommit{Memory: true, Changes: changes}, durable.CommitPublication{})
+	commit := ObservedCommit{Memory: true, Changes: changes}
+	session.beginPublication()
+	release := session.scheduler.Hold()
+	for _, listener := range internal {
+		// Our own observers are synchronous.
+		contained(func() { listener.listener(ctx, commit) }, func(err error) { session.failIn(ctx, err) })
+	}
+	release()
+	session.endPublication()
 	return nil
 }
 
 // storeHolds stores the held changes of holds in one storage transaction, on the line. Memory already has them, so only
-// SubscribeCommits listeners see it. A failure fails the Session, as every Storage failure does.
+// SubscribeCommits listeners see it, published as Storage adopts it. A failure fails the Session, as every Storage failure does.
 func (session *SessionImpl) storeHolds(ctx context.Context, holds []*heldDocument) error {
 	if len(holds) == 0 {
 		return nil
@@ -166,7 +174,7 @@ func (session *SessionImpl) storeHolds(ctx context.Context, holds []*heldDocumen
 		changes = append(changes, durable.DocumentChange{Record: record, ConversationId: conversationId, Version: &version, Value: value, Ops: ops})
 	}
 	adopted := false
-	adopt := func(durable.Seq) {
+	adopt := func(seq durable.Seq) {
 		adopted = true
 		for index, hold := range holds {
 			loaded := hold.loaded
@@ -178,8 +186,16 @@ func (session *SessionImpl) storeHolds(ctx context.Context, holds []*heldDocumen
 			}
 			loaded.mu.Unlock()
 		}
+		session.mu.Lock()
+		hosts := len(session.commitOrder) > 0
+		session.mu.Unlock()
+		if hosts {
+			session.beginPublication()
+			session.notifyHosts(ctx, durable.CommitPublication{Seq: seq, Changes: changes})
+			session.armPublication()
+		}
 	}
-	seq, err := session.storage.Commit(context.WithoutCancel(ctx), writes, adopt)
+	_, err := session.storage.Commit(context.WithoutCancel(ctx), writes, adopt)
 	if err != nil {
 		return err
 	}
@@ -189,12 +205,6 @@ func (session *SessionImpl) storeHolds(ctx context.Context, holds []*heldDocumen
 		return err
 	}
 	session.release(holds)
-	session.mu.Lock()
-	listeners := append([]*commitListener(nil), session.commitOrder...)
-	session.mu.Unlock()
-	if len(listeners) > 0 {
-		session.deliver(ctx, nil, listeners, ObservedCommit{}, durable.CommitPublication{Seq: seq, Changes: changes})
-	}
 	return nil
 }
 

@@ -6,6 +6,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"github.com/MichaelKinsy/PiG/chord"
 	"slices"
 	"strings"
 	"sync"
@@ -47,7 +48,8 @@ func listen(t *testing.T, harness Harness, conversation Conversation) *listening
 	t.Helper()
 	stream := must(WatchEvents(testContext, harness, conversation.Id()))
 	recorded := &listening{stream: stream}
-	stream.Start(func(_ context.Context, events []AgentEvent) error {
+	stream.Start(func(_ context.Context, change chord.NativeWatchChange[[]AgentEvent]) error {
+		events := change.Value
 		recorded.mu.Lock()
 		defer recorded.mu.Unlock()
 		recorded.batches = append(recorded.batches, slices.Clone(events))
@@ -436,7 +438,8 @@ func TestAgentEvents(t *testing.T) {
 		}
 		var mu sync.Mutex
 		var batches [][]AgentEvent
-		stream.Start(func(_ context.Context, events []AgentEvent) error {
+		stream.Start(func(_ context.Context, change chord.NativeWatchChange[[]AgentEvent]) error {
+			events := change.Value
 			mu.Lock()
 			defer mu.Unlock()
 			batches = append(batches, slices.Clone(events))
@@ -472,7 +475,8 @@ func TestAgentEvents(t *testing.T) {
 		}
 		var mu sync.Mutex
 		var batches [][]AgentEvent
-		stream.Start(func(_ context.Context, events []AgentEvent) error {
+		stream.Start(func(_ context.Context, change chord.NativeWatchChange[[]AgentEvent]) error {
+			events := change.Value
 			mu.Lock()
 			defer mu.Unlock()
 			batches = append(batches, slices.Clone(events))
@@ -795,7 +799,8 @@ func TestAgentEvents(t *testing.T) {
 		}
 		var mu sync.Mutex
 		var batches [][]AgentEvent
-		stream.Start(func(_ context.Context, events []AgentEvent) error {
+		stream.Start(func(_ context.Context, change chord.NativeWatchChange[[]AgentEvent]) error {
+			events := change.Value
 			mu.Lock()
 			defer mu.Unlock()
 			batches = append(batches, slices.Clone(events))

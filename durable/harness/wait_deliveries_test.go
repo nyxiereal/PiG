@@ -5,6 +5,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/MichaelKinsy/PiG/chord"
 	"runtime"
 	"sync"
 	"sync/atomic"
@@ -108,7 +109,7 @@ func startSpinningListener(t *testing.T) *spinningListener {
 	spinning := &spinningListener{chat: openSettledChat(t)}
 	t.Cleanup(func() { spinning.release.Store(true) })
 	spinning.stream = must(WatchEvents(testContext, spinning.chat.harness, spinning.chat.root.Id()))
-	spinning.stream.Start(func(_ context.Context, _ []AgentEvent) error {
+	spinning.stream.Start(func(_ context.Context, _ chord.NativeWatchChange[[]AgentEvent]) error {
 		for !spinning.release.Load() {
 			runtime.Gosched()
 		}
@@ -202,7 +203,7 @@ func TestAHarnessWaitDoesNotWaitForAListenerBlockedOnALockTheCallerHolds(t *test
 			var held sync.Mutex
 			var given atomic.Int32
 			stream := must(WatchEvents(testContext, chat.harness, chat.root.Id()))
-			stream.Start(func(_ context.Context, _ []AgentEvent) error {
+			stream.Start(func(_ context.Context, _ chord.NativeWatchChange[[]AgentEvent]) error {
 				held.Lock()
 				defer held.Unlock()
 				given.Add(1)
@@ -231,7 +232,7 @@ func TestAHarnessWaitDoesNotWaitForAListenerParkedInAWait(t *testing.T) {
 	release, entered := make(chan struct{}), make(chan struct{})
 	var once sync.Once
 	stream := must(WatchEvents(testContext, chat.harness, chat.root.Id()))
-	stream.Start(func(_ context.Context, _ []AgentEvent) error {
+	stream.Start(func(_ context.Context, _ chord.NativeWatchChange[[]AgentEvent]) error {
 		once.Do(func() { close(entered) })
 		<-release
 		return nil
@@ -261,7 +262,7 @@ func TestListenersThatWaitForTheHarnessDoNotWaitForEachOther(t *testing.T) {
 		stream := must(WatchEvents(testContext, chat.harness, chat.root.Id()))
 		waiting.Add(1)
 		var once sync.Once
-		stream.Start(func(_ context.Context, _ []AgentEvent) error {
+		stream.Start(func(_ context.Context, _ chord.NativeWatchChange[[]AgentEvent]) error {
 			once.Do(func() {
 				defer waiting.Done()
 				if err := chat.harness.WaitForIdle(testContext); err != nil {

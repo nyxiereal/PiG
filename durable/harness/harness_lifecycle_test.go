@@ -12,6 +12,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/MichaelKinsy/PiG/chord"
 	"path/filepath"
 	"reflect"
 	"slices"
@@ -404,9 +405,9 @@ func TestHarnessClose(t *testing.T) {
 			defer mu.Unlock()
 			frames = append(frames, name)
 		}
-		graphWatch.Start(func(context.Context, TaskGraph, []durable.Op) error { frame("graphWatch"); return nil })
-		docWatch.Start(func(context.Context, durable.JsonObject, []durable.Op) error { frame("docWatch"); return nil })
-		viewWatch.Start(func(context.Context, ConversationView, []durable.Op) error { frame("viewWatch"); return nil })
+		graphWatch.Start(func(context.Context, chord.WatchChange[TaskGraph]) error { frame("graphWatch"); return nil })
+		docWatch.Start(func(context.Context, chord.WatchChange[durable.JsonObject]) error { frame("docWatch"); return nil })
+		viewWatch.Start(func(context.Context, chord.WatchChange[ConversationView]) error { frame("viewWatch"); return nil })
 		docValue := docWatch.Value()
 		viewValue := viewWatch.Value()
 

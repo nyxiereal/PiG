@@ -6,6 +6,7 @@ package harness
 import (
 	"context"
 	"errors"
+	"github.com/MichaelKinsy/PiG/chord"
 	"slices"
 	"strings"
 	"sync"
@@ -241,7 +242,7 @@ func TestAFailedStorageCall(t *testing.T) {
 		go func() { idle <- harness.WaitForIdle(testContext) }()
 		watch := must(harness.WatchDocErased(testContext, LiveDoc, root.Id()))
 		stream := must(WatchEvents(testContext, harness, root.Id()))
-		stream.Start(func(context.Context, []AgentEvent) error { return nil })
+		stream.Start(func(context.Context, chord.NativeWatchChange[[]AgentEvent]) error { return nil })
 		flush()
 
 		failure := errors.New("disk gone")

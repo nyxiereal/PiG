@@ -25,8 +25,12 @@ func TestCommittedObservationHarnessSurface(t *testing.T) {
 		released := 0
 		watch := session.NewSessionWatch(harness.Session, []any{}, func() { released++ })
 		frames := make(chan []any, 2)
-		watch.Start(func(_ context.Context, value []any, _ []durable.Op) error { frames <- value; return nil })
-		watch.Advance(context.Background(), []any{"a"}, []durable.Op{{"p", "", 0, 0, []any{"a"}}})
+		watch.Start(func(_ context.Context, change durable.WatchChange[[]any]) error {
+			value := change.Value
+			frames <- value
+			return nil
+		})
+		watch.Advance(context.Background(), durable.WatchChange[[]any]{Value: []any{"a"}, Ops: []durable.Op{{"p", "", 0, 0, []any{"a"}}}})
 		expectEqual(t, <-frames, []any{"a"})
 		watch.Cancel()
 		<-watch.Closed()

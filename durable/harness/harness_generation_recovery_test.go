@@ -5,6 +5,7 @@ package harness
 import (
 	"context"
 	"encoding/json"
+	"github.com/MichaelKinsy/PiG/chord"
 	"path/filepath"
 	"strings"
 	"sync"
@@ -163,7 +164,8 @@ func TestGenerationRecovery(t *testing.T) {
 		var mu sync.Mutex
 		watched := ""
 		seen := false
-		watch.Start(func(_ context.Context, value durable.JsonObject, _ []durable.Op) error {
+		watch.Start(func(_ context.Context, change chord.WatchChange[durable.JsonObject]) error {
+			value := change.Value
 			generation, _ := value.Value("generation").(*delta.JsonObject)
 			message, _ := generation.Value("message").(*delta.JsonObject)
 			if got, ok := messageTextJSON(t, message); ok {

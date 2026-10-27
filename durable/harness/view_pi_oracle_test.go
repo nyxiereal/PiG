@@ -6,6 +6,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"github.com/MichaelKinsy/PiG/chord"
 	"math/rand"
 	"os/exec"
 	"path/filepath"
@@ -268,8 +269,8 @@ func TestConversationViewsMatchPi(t *testing.T) {
 				entry := &viewLog{}
 				_, detach, err := views.Attach(ctx, conversations[0], func(value ConversationView, _ func(), _ durable.Storage) (*ViewObserver, error) {
 					entry.Initial = value
-					return &ViewObserver{Advance: func(_ context.Context, next ConversationView, ops []durable.Op) {
-						entry.Events = append(entry.Events, recorded{current, next, ops})
+					return &ViewObserver{Advance: func(_ context.Context, change chord.WatchChange[ConversationView]) {
+						entry.Events = append(entry.Events, recorded{current, change.Value, change.Ops})
 					}, End: func(error) {}}, nil
 				})
 				gotErr = err

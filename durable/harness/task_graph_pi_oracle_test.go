@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/MichaelKinsy/PiG/chord"
 	"math/rand"
 	"os/exec"
 	"path/filepath"
@@ -84,7 +85,8 @@ func runPigTaskGraph(t *testing.T, program []graphStep) []graphOutcome {
 	}
 	var mu sync.Mutex
 	var deliveries []graphDelivery
-	live.Start(func(_ context.Context, _ TaskGraph, ops []durable.Op) error {
+	live.Start(func(_ context.Context, change chord.WatchChange[TaskGraph]) error {
+		ops := change.Ops
 		encoded, err := json.Marshal(ops)
 		if err != nil {
 			return err

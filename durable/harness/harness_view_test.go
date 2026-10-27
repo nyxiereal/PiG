@@ -6,6 +6,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"github.com/MichaelKinsy/PiG/chord"
 	"reflect"
 	"slices"
 	"sync"
@@ -49,7 +50,9 @@ func record(t *testing.T, conversation Conversation) *recording {
 	t.Helper()
 	watch := must(conversation.Watch(testContext))
 	recorded := &recording{initial: watch.Value(), watch: watch}
-	watch.Start(func(_ context.Context, value ConversationView, ops []durable.Op) error {
+	watch.Start(func(_ context.Context, change chord.WatchChange[ConversationView]) error {
+		value := change.Value
+		ops := change.Ops
 		recorded.mu.Lock()
 		defer recorded.mu.Unlock()
 		recorded.frames = append(recorded.frames, viewFrame{value: value, ops: ops})
@@ -425,7 +428,9 @@ func TestConversationView(t *testing.T) {
 		}
 		var mu sync.Mutex
 		var frames []viewFrame
-		watch.Start(func(_ context.Context, value ConversationView, ops []durable.Op) error {
+		watch.Start(func(_ context.Context, change chord.WatchChange[ConversationView]) error {
+			value := change.Value
+			ops := change.Ops
 			mu.Lock()
 			defer mu.Unlock()
 			frames = append(frames, viewFrame{value: value, ops: ops})
@@ -558,7 +563,7 @@ func TestConversationView(t *testing.T) {
 			t.Fatal("observers do not share one mount revision")
 		}
 		must(shared.Stop())
-		failing.Start(func(context.Context, ConversationView, []durable.Op) error { return errors.New("listener failed") })
+		failing.Start(func(context.Context, chord.WatchChange[ConversationView]) error { return errors.New("listener failed") })
 		noteEntry(t, root, "one")
 		noteEntry(t, root, "two")
 		drained(harness)

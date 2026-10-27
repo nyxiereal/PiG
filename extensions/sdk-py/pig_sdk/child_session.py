@@ -26,6 +26,7 @@ from .type_schema import count_refinements
 
 if TYPE_CHECKING:
     from . import Extension, ToolDefinition
+    from .session_manager import SessionManager
 
 
 @dataclass(kw_only=True)

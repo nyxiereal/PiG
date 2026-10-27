@@ -3,8 +3,7 @@
 ``build/type/{action,engine,extends,script}`` for every SDK (``internal/typebox/engine``). A call encodes its arguments in the engine's wire form, asks the host (the
 ``type.engine`` call, which the host answers before the extension registers, so a schema built at import time works) and decodes the schema the host returns: the enumerable
 members in the order TypeBox wrote them and the hidden ones (``~kind``, ``~optional``, ...). What TypeBox throws raises ``ValueError`` with its message."""
-import json
-from typing import Any, Callable, List, Mapping, Optional, Sequence
+from typing import Any, Callable, Mapping, Optional, Sequence
 
 _ENVELOPE = "\x00"
 _CALL_TYPE_ENGINE = "type.engine"

@@ -10,7 +10,7 @@ import re
 
 import pytest
 
-from pig_sdk import BigInt, TSchema, TSchemaArray, Type
+from pig_sdk import BigInt, Type
 from type_vectors_support import all_cases, check_case, needs_host, non_engine_cases
 
 

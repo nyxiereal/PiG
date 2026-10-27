@@ -3115,6 +3115,25 @@
       ]
     },
     {
+      "id": "BF-2022c75",
+      "title": "sdk-py: fix the ruff findings in the type engine, child session and type vector tests",
+      "symptom": "sdk-py: fix the ruff findings in the type engine, child session and type vector tests",
+      "rootCause": "SessionManager is imported for type checking where the child session's return annotation names it; unused imports are removed.",
+      "rootCauseSource": "commit",
+      "userImpact": "Behavior differed from Pi",
+      "platform": "All platforms",
+      "class": "own",
+      "fixedIn": "Unreleased",
+      "origin": "commit",
+      "commits": [
+        {
+          "hash": "2022c75e94",
+          "date": "2026-10-26"
+        }
+      ],
+      "tests": []
+    },
+    {
       "id": "BF-202b8f1",
       "title": "On arm64 and other CPUs with a fused multiply-add, the OKHSL saturation of a color (used when generating the…",
       "symptom": "It differed from Pi's in the last bit for about 9% of sRGB colors.",
@@ -3896,6 +3915,29 @@
       "tests": [
         "coding/cli/no_stdin_test.go::TestNoStdinStartsWithAnOpenInputPipe",
         "coding/cli/no_stdin_test.go::TestParseArgsNoStdin"
+      ]
+    },
+    {
+      "id": "BF-286d303",
+      "title": "A native Provider object an extension registers (`registerNativeProvider`, `pi.registerProvider(provider)`)…",
+      "symptom": "Such a provider never composed (no models, its name replaced by its id, every stream an error), and a provider-level `baseUrl` was copied onto its models, which Pi does not do (it is only the context of `refreshModels`).",
+      "rootCause": "A Provider object an extension registers (registerNativeProvider, through its carrier) was composed through the extension-configuration rules: a model without a baseUrl failed Pi's 'baseUrl is required when defining custom models' check, so the provider never reached the catalog (no models, its name lost, its streams an error), and the provider's own baseUrl was copied onto its models. Pi composes the Provider object untouched (model-runtime.ts composeProvider), so its models keep the base URL they declare, or none, and the provider's baseUrl is only the refresh context's. The carrier's models are now composed that way (composeCarrierProvider, carrierModelInput) on the Session path and the…",
+      "rootCauseSource": "commit",
+      "userImpact": "An operation failed or was rejected",
+      "platform": "All platforms",
+      "class": "own",
+      "fixedIn": "Unreleased",
+      "releaseNote": "A native Provider object an extension registers (`registerNativeProvider`, `pi.registerProvider(provider)`) whose models declare no `baseUrl` now reaches the model catalog, as in Pi: the host composes the Provider object untouched, so its models keep the base URL they declare (or none) and its name, models and streams work. Before, such a provider never composed (no models, its name replaced by its id, every stream an error), and a provider-level `baseUrl` was copied onto its models, which Pi does not do (it is only the context of `refreshModels`).",
+      "origin": "release note",
+      "commits": [
+        {
+          "hash": "286d303e8f",
+          "date": "2026-10-25"
+        }
+      ],
+      "tests": [
+        "coding/extension_native_bare_provider_test.go::TestExtensionNativeProviderWithoutBaseURLComposesAndSettlesLikePi",
+        "internal/codingagent/native_provider_without_base_url_test.go::TestNativeProviderObjectWithoutBaseURLComposesUntouched"
       ]
     },
     {
@@ -15092,6 +15134,27 @@
       ]
     },
     {
+      "id": "BF-6b97207",
+      "title": "An extension that overrides the `edit` tool with a definition built by the Go, Rust or Python SDK's…",
+      "symptom": "An extension that overrides the `edit` tool with a definition built by the Go, Rust or Python SDK's `createEditToolDefinition` now has the model's legacy edit shapes normalised, as Pi's `{ ...createEditToolDefinition(cwd), execute }` does.",
+      "rootCause": "Pi's createEditToolDefinition returns prepareArguments (edit.ts:158), so an override spread from it normalises `edits` as a JSON string, a single edit object and the legacy top-level {path, oldText, newText}. The SDK definitions (Go, Rust, Python) dropped it, and an override built from them got the legacy shape unnormalised: the edit was silently not applied. The definition reply now says whether the built-in has the hook and the SDKs' hook asks the host to run the built-in's own (builtinTool.prepareArguments; a fused Go extension calls it directly), keeping no copy of the normaliser.",
+      "rootCauseSource": "commit",
+      "userImpact": "Lost or altered data",
+      "platform": "All platforms",
+      "class": "own",
+      "fixedIn": "Unreleased",
+      "releaseNote": "An extension that overrides the `edit` tool with a definition built by the Go, Rust or Python SDK's `createEditToolDefinition` now has the model's legacy edit shapes normalised, as Pi's `{ ...createEditToolDefinition(cwd), execute }` does. The SDK definition dropped the built-in's `prepareArguments`, so `edits` sent as a JSON string, a single edit object or the legacy top-level `{path, oldText, newText}` reached the override unnormalised and the edit was silently not applied, while the model's turn still reported success. The definition's `PrepareArguments` / `prepare_arguments` now runs the built-in's own normaliser on the host (a new `builtinTool.prepareArguments` host call; a fused Go extension calls it directly), and write, read and the other built-ins have none, as in Pi.",
+      "origin": "release note",
+      "commits": [
+        {
+          "hash": "6b97207807",
+          "date": "2026-10-25",
+          "pr": "322"
+        }
+      ],
+      "tests": []
+    },
+    {
       "id": "BF-6cb29f0",
       "title": "Started from a directory reached through a symlink, `pig install`/`remove`/`list`/`update` resolve local…",
       "symptom": "Started from a directory reached through a symlink, `pig install`/`remove`/`list`/`update` resolve local sources against the physical working directory, and `--session` with an empty file records the physical directory as the session cwd, as Pi does.",
@@ -18303,6 +18366,26 @@
         "ai/provider_request_shape_test.go::TestGoogleRequestPreservesEmptyText",
         "coding/session_tree_wire_oracle_test.go::TestNavigateTreeEveryPointSendsValidToolFlow"
       ]
+    },
+    {
+      "id": "BF-8620e9e",
+      "title": "The SDK `DefaultResourceLoader` lists a tool or flag that two extensions register as an error of the…",
+      "symptom": "The SDK `DefaultResourceLoader` lists a tool or flag that two extensions register as an error of the extension load result (`Tool \"x\" conflicts with \u003cpath\u003e`), and an extension it loads from `additionalExtensionPaths` has the source `cli`, as Pi's loader reports them.",
+      "rootCause": "",
+      "rootCauseSource": "",
+      "userImpact": "An operation failed or was rejected",
+      "platform": "All platforms",
+      "class": "own",
+      "fixedIn": "Unreleased",
+      "releaseNote": "The SDK `DefaultResourceLoader` lists a tool or flag that two extensions register as an error of the extension load result (`Tool \"x\" conflicts with \u003cpath\u003e`), and an extension it loads from `additionalExtensionPaths` has the source `cli`, as Pi's loader reports them.",
+      "origin": "release note",
+      "commits": [
+        {
+          "hash": "8620e9eac5",
+          "date": "2026-10-25"
+        }
+      ],
+      "tests": []
     },
     {
       "id": "BF-86364b4",
@@ -22908,6 +22991,31 @@
         "coding/cli/no_home_directory_test.go::TestStartupFailsWhereNoHomeDirectoryExists",
         "coding/cli/no_home_directory_test.go::TestStartupFollowsNodeWhenThereIsNoHomeDirectory"
       ]
+    },
+    {
+      "id": "BF-D204",
+      "title": "The Go, Rust and Python SDKs do not yet export TuiAltScreen, Pi's alternate-screen TUI host, where the Node…",
+      "symptom": "none claimed.",
+      "rootCause": "Landing the export in all three SDKs needs that unit and its vector tests; it is not part of 0.6.0.",
+      "rootCauseSource": "divergence record",
+      "userImpact": "Behavior differed from Pi",
+      "platform": "All platforms",
+      "class": "ahead-of-pi",
+      "divergence": "D204",
+      "removeWhen": "the 0.6.1 export of `TuiAltScreen` lands in the Go, Rust and Python SDKs; then the 46 cells become `native:` cells with their conformance or vector reach, and this record goes.",
+      "fixedIn": "Unreleased",
+      "origin": "divergence",
+      "commits": [
+        {
+          "hash": "26bbbe6a80",
+          "date": "2026-10-26"
+        },
+        {
+          "hash": "f67a7da98e",
+          "date": "2026-10-26"
+        }
+      ],
+      "tests": []
     },
     {
       "id": "BF-a076a50",
@@ -37844,6 +37952,11 @@
       "id": "D200",
       "title": "With no home directory PiG still runs the commands that load no resources, where Pi crashes at import, and…",
       "entry": "BF-D200"
+    },
+    {
+      "id": "D204",
+      "title": "The Go, Rust and Python SDKs do not yet export TuiAltScreen, Pi's alternate-screen TUI host, where the Node…",
+      "entry": "BF-D204"
     }
   ],
   "exemptCommits": {

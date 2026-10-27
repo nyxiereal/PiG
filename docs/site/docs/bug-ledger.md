@@ -115,6 +115,7 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 | [BF-1f7fa2f](#bf-1f7fa2f) | In print and JSON mode, an extension in its own Node process no longer runs its callbacks with a stale ctx… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-1fbdabb](#bf-1fbdabb) | A CRLF that a proxy splits across two network chunks no longer aborts an Anthropic turn with `Could not parse… | A Pi defect that PiG fixed first | All platforms | 0.5.0 |
 | [BF-1fcf017](#bf-1fcf017) | `toUpperCase` ports use a shared JavaScript `jsstring.ToUpper` (matches Node over every code point).… | PiG's own defect | All platforms | 0.5.0 |
+| [BF-2022c75](#bf-2022c75) | sdk-py: fix the ruff findings in the type engine, child session and type vector tests | PiG's own defect | All platforms | Unreleased |
 | [BF-202b8f1](#bf-202b8f1) | On arm64 and other CPUs with a fused multiply-add, the OKHSL saturation of a color (used when generating the… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-205933e](#bf-205933e) | fix(ai): a Gemini model outside the catalog carries the provider's API, so replay's isSameModel matches Pi… | PiG's own defect | All platforms | Unreleased |
 | [BF-20718f7](#bf-20718f7) | fix(coding-agent): resolve model references through one provider selection policy (Pi) | PiG's own defect | All platforms | Unreleased |
@@ -139,6 +140,7 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 | [BF-27a1650](#bf-27a1650) | The keybindings manager's key text and key matching now cover every keybinding the merged table defines… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-27ddc30](#bf-27ddc30) | A tool card shows the arguments of a tool call while they stream, as Pi does: a streamed write card shows its… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-27f3324](#bf-27f3324) | The npm release packer reads `npm pack --json` output from npm 12, which keys the result by package name, as… | PiG's own defect | All platforms | 0.5.0 |
+| [BF-286d303](#bf-286d303) | A native Provider object an extension registers (`registerNativeProvider`, `pi.registerProvider(provider)`)… | PiG's own defect | All platforms | Unreleased |
 | [BF-28b8425](#bf-28b8425) | Blank-key detection for compat API keys, the Vertex API key and the Vertex custom base URL trim whitespace… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-28f8b3b](#bf-28f8b3b) | fix(tui): editor wrap of a one-grapheme segment wider than the width no longer overflows the stack (D158) | PiG's own defect | All platforms | Unreleased |
 | [BF-2a055a7](#bf-2a055a7) | An extension dialog (`select`, `confirm`, `input`, `editor`) opened while a focused `ctx.ui.custom` component… | PiG's own defect | All platforms | 0.5.0 |
@@ -522,6 +524,7 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 | [BF-6a6fffa-8](#bf-6a6fffa-8) | In `--mode json`, SIGTERM or SIGHUP during a tool call now stops the output and the session file where Pi… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-6a6fffa-9](#bf-6a6fffa-9) | `TestSettingsSelectorMatchesPi` opens each row under the Kitty keyboard protocol with CSI-u keys; no… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-6ac4c8c](#bf-6ac4c8c) | Ctrl+V pastes clipboard text in Termux | A fix Pi shipped that PiG ported | Linux, Android and Termux | 0.5.0 |
+| [BF-6b97207](#bf-6b97207) | An extension that overrides the `edit` tool with a definition built by the Go, Rust or Python SDK's… | PiG's own defect | All platforms | Unreleased |
 | [BF-6cb29f0](#bf-6cb29f0) | Started from a directory reached through a symlink, `pig install`/`remove`/`list`/`update` resolve local… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-6cb29f0-2](#bf-6cb29f0-2) | Started from a directory reached through a symlink, `/export <file>.jsonl` and `/bug` now write and name… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-6cb29f0-3](#bf-6cb29f0-3) | Switching to or importing an empty session file from a directory reached through a symlink starts the session… | PiG's own defect | All platforms | 0.5.0 |
@@ -627,6 +630,7 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 | [BF-85c98be](#bf-85c98be) | `durable/interop/bench.mjs` and `sqlhost-bench seed\|sample` report the process's own peak RSS on Linux… | PiG's own defect | Linux | 0.5.0 |
 | [BF-85ca0f5](#bf-85ca0f5) | Rebuilding the transcript (resume, `/tree`, display settings) now places cache-miss notices as Pi does in a… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-860776a](#bf-860776a) | A Google provider built from a model id without catalog metadata now sends its own earlier thinking blocks as… | PiG's own defect | All platforms | 0.5.0 |
+| [BF-8620e9e](#bf-8620e9e) | The SDK `DefaultResourceLoader` lists a tool or flag that two extensions register as an error of the… | PiG's own defect | All platforms | Unreleased |
 | [BF-86364b4](#bf-86364b4) | fix(minimatch): case-insensitive patterns compare as a JavaScript RegExp does | PiG's own defect | All platforms | Unreleased |
 | [BF-866c7f9](#bf-866c7f9) | fix(rpc): two prompts of one batch answer in request order | PiG's own defect | All platforms | Unreleased |
 | [BF-869cef8](#bf-869cef8) | A pi-messages stream event that is a number, string, boolean or array is skipped, as Pi skips an event of… | PiG's own defect | All platforms | 0.5.0 |
@@ -793,6 +797,7 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 | [BF-D197](#bf-d197) | The env daemon's limit of open files is the hard limit, where Pi's daemon keeps the soft limit it inherited | A Pi defect that PiG fixed first | All platforms | Unreleased |
 | [BF-D198](#bf-d198) | The Go, Rust and Python `Type` has no Codec family (`Codec`, `Decode`, `Encode`, `DecodeBuilder`… | A Pi defect that PiG fixed first | All platforms | Unreleased |
 | [BF-D200](#bf-d200) | With no home directory PiG still runs the commands that load no resources, where Pi crashes at import, and… | A Pi defect that PiG fixed first | All platforms | Unreleased |
+| [BF-D204](#bf-d204) | The Go, Rust and Python SDKs do not yet export TuiAltScreen, Pi's alternate-screen TUI host, where the Node… | A Pi defect that PiG fixed first | All platforms | Unreleased |
 | [BF-a076a50](#bf-a076a50) | A model request on a reused connection gets the full HTTP idle timeout to receive its first response bytes… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-a09da26](#bf-a09da26) | `pi.getSettings()` in a subprocess extension lists the settings in Pi's order: the global settings file's… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-a09da26-2](#bf-a09da26-2) | A bash or PowerShell tool card reads the result's `truncation` details by their exact keys, as Pi does: a… | PiG's own defect | Windows | 0.5.0 |
@@ -2551,6 +2556,19 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 - **Tests:** `durable/core/history/js_space_agreement_test.go::TestIsJSSpaceAgreesWithJsstringIsSpace`, `internal/chord/chordjson/own_keys_index_bound_test.go::TestOwnKeysArrayIndexStopsBelowTwoToTheThirtyTwoMinusOne`, `internal/jsstring/upper_oracle_test.go::TestToUpperMatchesNode`, `internal/minimatch/canonicalize_upper_test.go::TestCanonicalizeUsesJavaScriptUpperCase`, `tui/select_page_keys_test.go::TestSelectListFilterLowercasesAsJavaScriptDoes`, `tui/widthx/js_space_agreement_test.go::TestIsJSSpaceAgreesWithJsstringIsSpace`
 - **Release note:** `toUpperCase` ports use a shared JavaScript `jsstring.ToUpper` (matches Node over every code point). minimatch `nocase` folds `ᾀ` and `ß` as JavaScript does.
 
+### BF-2022c75
+
+**sdk-py: fix the ruff findings in the type engine, child session and type vector tests**
+
+- **Source:** PiG's own defect
+- **Symptom:** sdk-py: fix the ruff findings in the type engine, child session and type vector tests
+- **Root cause:** SessionManager is imported for type checking where the child session's return annotation names it; unused imports are removed.
+- **User impact:** Behavior differed from Pi
+- **Platform:** All platforms
+- **Fixed in:** Unreleased
+- **Fix commits:** `2022c75e94` (2026-10-26)
+- **Tests:** None recorded.
+
 ### BF-202b8f1
 
 **On arm64 and other CPUs with a fused multiply-add, the OKHSL saturation of a color (used when generating the…**
@@ -2885,6 +2903,20 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 - **Commit that wrote the release note (the fix commit is not identified):** `27f33240ee` (2026-10-09)
 - **Tests:** `coding/cli/no_stdin_test.go::TestNoStdinStartsWithAnOpenInputPipe`, `coding/cli/no_stdin_test.go::TestParseArgsNoStdin`
 - **Release note:** The npm release packer reads `npm pack --json` output from npm 12, which keys the result by package name, as well as npm 11's array (Pi 6fb2e781).
+
+### BF-286d303
+
+**A native Provider object an extension registers (`registerNativeProvider`, `pi.registerProvider(provider)`)…**
+
+- **Source:** PiG's own defect
+- **Symptom:** Such a provider never composed (no models, its name replaced by its id, every stream an error), and a provider-level `baseUrl` was copied onto its models, which Pi does not do (it is only the context of `refreshModels`).
+- **Root cause:** A Provider object an extension registers (registerNativeProvider, through its carrier) was composed through the extension-configuration rules: a model without a baseUrl failed Pi's 'baseUrl is required when defining custom models' check, so the provider never reached the catalog (no models, its name lost, its streams an error), and the provider's own baseUrl was copied onto its models. Pi composes the Provider object untouched (model-runtime.ts composeProvider), so its models keep the base URL they declare, or none, and the provider's baseUrl is only the refresh context's. The carrier's models are now composed that way (composeCarrierProvider, carrierModelInput) on the Session path and the…
+- **User impact:** An operation failed or was rejected
+- **Platform:** All platforms
+- **Fixed in:** Unreleased
+- **Fix commits:** `286d303e8f` (2026-10-25)
+- **Tests:** `coding/extension_native_bare_provider_test.go::TestExtensionNativeProviderWithoutBaseURLComposesAndSettlesLikePi`, `internal/codingagent/native_provider_without_base_url_test.go::TestNativeProviderObjectWithoutBaseURLComposesUntouched`
+- **Release note:** A native Provider object an extension registers (`registerNativeProvider`, `pi.registerProvider(provider)`) whose models declare no `baseUrl` now reaches the model catalog, as in Pi: the host composes the Provider object untouched, so its models keep the base URL they declare (or none) and its name, models and streams work. Before, such a provider never composed (no models, its name replaced by its id, every stream an error), and a provider-level `baseUrl` was copied onto its models, which Pi does not do (it is only the context of `refreshModels`).
 
 ### BF-28b8425
 
@@ -8197,6 +8229,20 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 - **Tests:** `coding/cli/dotenv_autoload_test.go::TestLaunchDirectoryDotenvFilesDoNotReachPigEnvironment`, `internal/codingagent/clipboard_copy_test.go::TestCopyToClipboardReportsTheTermuxAPIRequirementOnAndroid`, `internal/codingagent/clipboard_copy_test.go::TestCopyToClipboardTermuxOnAndroidWritesThroughTermuxClipboardSet`, `internal/codingagent/clipboard_paste_test.go::TestClipboardPasteInsertsTermuxTextOnAndroid`, `internal/codingagent/clipboard_read_text_test.go::TestReadClipboardTextAndroidSkipsLinuxCommands`, `internal/codingagent/clipboard_read_text_test.go::TestReadClipboardTextTermuxReadsOnAndroid`, `internal/codingagent/selfupdate_test.go::TestSelfReplaceAtWithCommitKeepsOnlyTheNewExecutable`
 - **Release note:** Ctrl+V pastes clipboard text in Termux. PiG read `termux-clipboard-get` only where the platform is `linux`, and Termux reports `android`. A failed copy in Termux now also shows the Termux:API install hint on Android.
 
+### BF-6b97207
+
+**An extension that overrides the `edit` tool with a definition built by the Go, Rust or Python SDK's…**
+
+- **Source:** PiG's own defect
+- **Symptom:** An extension that overrides the `edit` tool with a definition built by the Go, Rust or Python SDK's `createEditToolDefinition` now has the model's legacy edit shapes normalised, as Pi's `{ ...createEditToolDefinition(cwd), execute }` does.
+- **Root cause:** Pi's createEditToolDefinition returns prepareArguments (edit.ts:158), so an override spread from it normalises `edits` as a JSON string, a single edit object and the legacy top-level {path, oldText, newText}. The SDK definitions (Go, Rust, Python) dropped it, and an override built from them got the legacy shape unnormalised: the edit was silently not applied. The definition reply now says whether the built-in has the hook and the SDKs' hook asks the host to run the built-in's own (builtinTool.prepareArguments; a fused Go extension calls it directly), keeping no copy of the normaliser.
+- **User impact:** Lost or altered data
+- **Platform:** All platforms
+- **Fixed in:** Unreleased
+- **Fix commits:** `6b97207807` (2026-10-25, #322)
+- **Tests:** None recorded.
+- **Release note:** An extension that overrides the `edit` tool with a definition built by the Go, Rust or Python SDK's `createEditToolDefinition` now has the model's legacy edit shapes normalised, as Pi's `{ ...createEditToolDefinition(cwd), execute }` does. The SDK definition dropped the built-in's `prepareArguments`, so `edits` sent as a JSON string, a single edit object or the legacy top-level `{path, oldText, newText}` reached the override unnormalised and the edit was silently not applied, while the model's turn still reported success. The definition's `PrepareArguments` / `prepare_arguments` now runs the built-in's own normaliser on the host (a new `builtinTool.prepareArguments` host call; a fused Go extension calls it directly), and write, read and the other built-ins have none, as in Pi.
+
 ### BF-6cb29f0
 
 **Started from a directory reached through a symlink, `pig install`/`remove`/`list`/`update` resolve local…**
@@ -9652,6 +9698,20 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 - **Fix commits:** `433d232815` (2026-10-09), `860776a9f5` (2026-10-10)
 - **Tests:** `agent/convert_custom_upstream_test.go::TestConvertToLLMCustomMessagesMatchUpstreamConvertToLlm`, `agent/convert_custom_upstream_test.go::TestConvertToLLMToolFlowMatchesUpstreamTransformOrder`, `agent/convert_custom_upstream_test.go::TestCustomMessagesReachProvidersAsUpstreamContentBlocks`, `agent/transform_custom_user_boundary_test.go::TestAnthropicRequestAfterBranchSummaryHasNoOrphanToolResult`, `agent/transform_custom_user_boundary_test.go::TestConvertToLLMCustomMessageWithoutWireOutputKeepsToolFlow`, `agent/transform_custom_user_boundary_test.go::TestConvertToLLMCustomUserMessageInterruptsToolFlow`, `agent/transform_custom_user_boundary_test.go::TestConvertToLLMHoldsSystemMessageUntilToolFlowCloses`, `ai/google_same_model_signature_test.go::TestGoogleProviderKeepsItsOwnThinkingSignaturesWithoutCatalogMetadata` and 2 more in docs/bug-ledger.json
 - **Release note:** A Google provider built from a model id without catalog metadata now sends its own earlier thinking blocks as thoughts with their signatures, as Pi does for the same provider, API and model. Before, the missing API made every earlier turn look like another model and the signature was dropped (found by the provider-wire parity scenario against the pinned Pi).
+
+### BF-8620e9e
+
+**The SDK `DefaultResourceLoader` lists a tool or flag that two extensions register as an error of the…**
+
+- **Source:** PiG's own defect
+- **Symptom:** The SDK `DefaultResourceLoader` lists a tool or flag that two extensions register as an error of the extension load result (`Tool "x" conflicts with <path>`), and an extension it loads from `additionalExtensionPaths` has the source `cli`, as Pi's loader reports them.
+- **Root cause:** Not recorded.
+- **User impact:** An operation failed or was rejected
+- **Platform:** All platforms
+- **Fixed in:** Unreleased
+- **Fix commits:** `8620e9eac5` (2026-10-25)
+- **Tests:** None recorded.
+- **Release note:** The SDK `DefaultResourceLoader` lists a tool or flag that two extensions register as an error of the extension load result (`Tool "x" conflicts with <path>`), and an extension it loads from `additionalExtensionPaths` has the source `cli`, as Pi's loader reports them.
 
 ### BF-86364b4
 
@@ -11971,6 +12031,21 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 - **Removed when Pi fixes it:** Pi stops resolving the home directory at import (so `--version` and `list` run there without one), or an owner decision reverses this one; then PiG's startup fails at the same point as Pi's, the markers, the allowance test and this record go.
 - **Fix commits:** `09c5680c80` (2026-10-24), `99f0027ef1` (2026-10-24)
 - **Tests:** `coding/cli/no_home_directory_test.go::TestNoHomeDirectoryPiCrashesAtImportWherePiGRunsResourceFreeCommands`, `coding/cli/no_home_directory_test.go::TestStartupFailsWhereNoHomeDirectoryExists`, `coding/cli/no_home_directory_test.go::TestStartupFollowsNodeWhenThereIsNoHomeDirectory`
+
+### BF-D204
+
+**The Go, Rust and Python SDKs do not yet export TuiAltScreen, Pi's alternate-screen TUI host, where the Node…**
+
+- **Source:** A Pi defect that PiG fixed first (divergence D204)
+- **Symptom:** none claimed.
+- **Root cause:** Landing the export in all three SDKs needs that unit and its vector tests; it is not part of 0.6.0.
+- **User impact:** Behavior differed from Pi
+- **Platform:** All platforms
+- **Fixed in:** Unreleased
+- **Pi issue:** none recorded
+- **Removed when Pi fixes it:** the 0.6.1 export of `TuiAltScreen` lands in the Go, Rust and Python SDKs; then the 46 cells become `native:` cells with their conformance or vector reach, and this record goes.
+- **Fix commits:** `26bbbe6a80` (2026-10-26), `f67a7da98e` (2026-10-26)
+- **Tests:** None recorded.
 
 ### BF-a076a50
 
@@ -17987,6 +18062,7 @@ Each divergence record is accounted for here. A divergence that fixes a Pi defec
 | D198 | The Go, Rust and Python `Type` has no Codec family (`Codec`, `Decode`, `Encode`, `DecodeBuilder`… | [BF-D198](#bf-d198) |
 | D199 | PiG lists OpenRouter's :nitro and :floor routing variants beside every OpenRouter model, where Pi lists only… | deliberate difference |
 | D200 | With no home directory PiG still runs the commands that load no resources, where Pi crashes at import, and… | [BF-D200](#bf-d200) |
+| D204 | The Go, Rust and Python SDKs do not yet export TuiAltScreen, Pi's alternate-screen TUI host, where the Node… | [BF-D204](#bf-d204) |
 
 ## Fix-titled commits that are not bugs in a release
 

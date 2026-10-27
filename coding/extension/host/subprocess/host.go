@@ -3807,6 +3807,13 @@ func (h *Host) buildExtension(me *managedExt, reg *RegisterPayload) *extension.E
 		if tool.PreparesArguments {
 			definition.PrepareArguments = h.makeToolPrepareArguments(me, tool.Name)
 		}
+		if len(tool.Refinements) > 0 {
+			definition.RefinementSites = make([]ai.RefinementSite, len(tool.Refinements))
+			for i, site := range tool.Refinements {
+				definition.RefinementSites[i] = ai.RefinementSite{Path: site.Path, Count: site.Count}
+			}
+			definition.RefineArguments = h.makeToolRefineArguments(me, tool.Name)
+		}
 		definition.ReserveCallOrder = toolCallOrder(me)
 		definition.MayTakeFileMutationQueue = true
 		if tool.RendersCall {
@@ -4143,6 +4150,38 @@ func (h *Host) makeToolPrepareArguments(me *managedExt, toolName string) extensi
 			return nil, resp.Response.Error.ToError()
 		}
 		return resp.Response.Result, nil
+	}
+}
+
+// makeToolRefineArguments returns the call that runs a tool's refinements in the extension (Type.Refine). The host's validator makes one call per predicate call TypeBox makes, with the
+// tool call's context: ending the call ends a pending request. A connection that is gone fails the validation, and so the tool call, with that reason; a refinement that throws is
+// an error response, whose message is the tool call's error as Pi's thrown error is (agent-loop.ts prepareToolCall's catch).
+func (h *Host) makeToolRefineArguments(me *managedExt, toolName string) extension.ToolRefineFunc {
+	return func(ctx context.Context, path string, index int, value any, withMessage bool) (ai.RefineOutcome, error) {
+		me := me.current()
+		conn := me.connection()
+		if conn == nil {
+			return ai.RefineOutcome{}, fmt.Errorf("Tool \"%s\" cannot run its argument refinements: the extension is not connected", toolName)
+		}
+		raw, err := json.MarshalStringify(value)
+		if err != nil {
+			return ai.RefineOutcome{}, err
+		}
+		resp, err := conn.Request(ctx, &Envelope{Type: MsgRequest, Request: &RequestPayload{Method: RequestRefineArguments, Tool: toolName, Refine: &RefineRequest{Path: path, Index: index, Value: raw, WithMessage: withMessage}}})
+		if err != nil {
+			return ai.RefineOutcome{}, fmt.Errorf("Tool \"%s\" cannot run its argument refinements: %w", toolName, err)
+		}
+		if resp.Response == nil {
+			return ai.RefineOutcome{}, fmt.Errorf("Tool \"%s\" cannot run its argument refinements: the extension sent no answer", toolName)
+		}
+		if resp.Response.Error != nil {
+			return ai.RefineOutcome{}, resp.Response.Error.ToError()
+		}
+		var result RefineResult
+		if err := json.Unmarshal(resp.Response.Result, &result); err != nil {
+			return ai.RefineOutcome{}, fmt.Errorf("Tool \"%s\": malformed refinement answer: %w", toolName, err)
+		}
+		return ai.RefineOutcome{OK: result.OK, Message: result.Message}, nil
 	}
 }
 

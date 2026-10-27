@@ -1329,6 +1329,7 @@ closing = "Pure helpers ported per SDK with vector tests from Pi at the pin (tes
 "pi-tui: renderFakeCursor" = { go = "gap:SdkExportsLedger", rust = "gap:SdkExportsLedger", python = "gap:SdkExportsLedger" }
 "pi-tui: renderImage" = { go = "gap:SdkExportsLedger", rust = "gap:SdkExportsLedger", python = "gap:SdkExportsLedger" }
 "pi-tui: renderLatex" = { go = "gap:SdkExportsLedger", rust = "gap:SdkExportsLedger", python = "gap:SdkExportsLedger" }
+"pi-tui: replaceControlCharacters" = { go = "gap:SdkExportsLedger", rust = "gap:SdkExportsLedger", python = "gap:SdkExportsLedger" }
 "pi-tui: resetCapabilitiesCache" = { go = "native:tui.ResetCapabilitiesCache", rust = "native:tui::reset_capabilities_cache", python = "native:tui.reset_capabilities_cache" }
 "pi-tui: rgbColor" = { go = "native:tui.NewRgbColor", rust = "native:tui::rgb_color", python = "native:tui.rgb_color" }
 "pi-tui: setCapabilities" = { go = "native:tui.SetCapabilities", rust = "native:tui::set_capabilities", python = "native:tui.set_capabilities" }
@@ -1337,7 +1338,6 @@ closing = "Pure helpers ported per SDK with vector tests from Pi at the pin (tes
 "pi-tui: setImageTranscoder" = { go = "gap:SdkExportsLedger", rust = "gap:SdkExportsLedger", python = "gap:SdkExportsLedger" }
 "pi-tui: setKeybindings" = { go = "native:tui.SetKeybindings", rust = "native:tui::set_keybindings", python = "native:tui.set_keybindings" }
 "pi-tui: setKittyProtocolActive" = { go = "native:tui.SetKittyProtocolActive", rust = "native:tui::set_kitty_protocol_active", python = "native:tui.set_kitty_protocol_active" }
-"pi-tui: replaceControlCharacters" = { go = "gap:SdkExportsLedger", rust = "gap:SdkExportsLedger", python = "gap:SdkExportsLedger" }
 "pi-tui: sliceByColumn" = { go = "native:tui.SliceByColumn", rust = "native:tui::slice_by_column", python = "native:tui.slice_by_column" }
 "pi-tui: stripTerminalSequences" = { go = "native:tui.StripTerminalSequences", rust = "native:tui::strip_terminal_sequences", python = "native:tui.strip_terminal_sequences" }
 "pi-tui: styleText" = { go = "native:tui.StyleText", rust = "native:tui::style_text", python = "native:tui.style_text" }

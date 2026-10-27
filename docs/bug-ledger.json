@@ -1596,7 +1596,6 @@
         "durable/interop/interop_test.go::TestScriptedSessionStoresMatchPiDurable",
         "durable/interop/interop_test.go::TestScriptedSessionsViewIdentically",
         "durable/interop/interop_test.go::TestSecondScriptedSessionStoresMatchPiDurable",
-        "durable/session/watch_doc_typed_test.go::TestWatchDocTypedDecodesRevisionsAndReportsRetirementAsNil",
         "internal/codingagent/prompts/hidden_tools_upstream_test.go::TestUpstreamSystemPromptHiddenTools"
       ]
     },
@@ -6891,6 +6890,32 @@
         "internal/chord/chordjson/own_key_order_test.go::TestCopyFollowsPisKeyOrderAndMessages",
         "internal/codingagent/thinking_selector_oracle_test.go::TestThinkingSelectorInputMatchesPi",
         "internal/codingagent/tools/find_operations_port_test.go::TestFindGlobFailureIsReportedWithItsOwnMessage"
+      ]
+    },
+    {
+      "id": "BF-439c708",
+      "title": "fix(ai): open only http(s) URLs a login server supplies, and reject pi-messages content indexes that are not…",
+      "symptom": "fix(ai): open only http(s) URLs a login server supplies, and reject pi-messages content indexes that are not the next or an existing block (Pi)",
+      "rootCause": "",
+      "rootCauseSource": "",
+      "userImpact": "Behavior differed from Pi",
+      "platform": "All platforms",
+      "class": "own",
+      "fixedIn": "Unreleased",
+      "origin": "commit",
+      "commits": [
+        {
+          "hash": "439c708ebc",
+          "date": "2026-10-26"
+        }
+      ],
+      "tests": [
+        "ai/oauth_kimi_test.go::TestTrustedHTTPURL",
+        "ai/oauth_radius_test.go::TestRadiusOAuthBrowserDiscoveryRejectsNonHTTPAuthorizationEndpoint",
+        "ai/oauth_radius_test.go::TestRadiusOAuthDeviceLoginRejectsNonHTTPVerificationURI",
+        "ai/oauth_radius_test.go::TestRadiusOAuthThrowsFetchErrorsForCredentialedGatewayAndInvalidEndpoint",
+        "ai/pi_messages_test.go::TestPiMessagesRejectsContentIndexesThatAreNotTheNextOrAnExistingBlock",
+        "ai/trusted_url_oracle_test.go::TestTrustedVerificationURLsMatchPi"
       ]
     },
     {
@@ -24201,6 +24226,32 @@
       ]
     },
     {
+      "id": "BF-ae1ee6d",
+      "title": "fix(tui): replace control characters in terminal titles, and open and print only web URLs in the login dialog…",
+      "symptom": "fix(tui): replace control characters in terminal titles, and open and print only web URLs in the login dialog (Pi)",
+      "rootCause": "",
+      "rootCauseSource": "",
+      "userImpact": "Behavior differed from Pi",
+      "platform": "All platforms",
+      "class": "own",
+      "fixedIn": "Unreleased",
+      "origin": "commit",
+      "commits": [
+        {
+          "hash": "ae1ee6d132",
+          "date": "2026-10-26"
+        }
+      ],
+      "tests": [
+        "tui/login_dialog_device_code_test.go::TestLoginURLsKeepControlCharactersFromEndingTerminalHyperlinks",
+        "tui/login_dialog_device_code_test.go::TestLoginURLsOpenOnlyHTTPSignInURLs",
+        "tui/login_dialog_device_code_test.go::TestLoginURLsReplaceControlCharactersInURLsThatAreNotWebURLs",
+        "tui/login_dialog_gaps_test.go::TestLoginDialogComponentShowsAuthDeviceCodeDetailsAndInfo",
+        "tui/terminal_test.go::TestProcessTerminalSetTitleReplacesControlCharacters",
+        "tui/widthx/grapheme_range_test.go::TestReplaceControlCharacters"
+      ]
+    },
+    {
       "id": "BF-ae498eb",
       "title": "A line of many `\u003e` characters no longer makes the Markdown renderer's output grow exponentially with the…",
       "symptom": "A line of many `\u003e` characters no longer makes the Markdown renderer's output grow exponentially with the nesting depth.",
@@ -31958,6 +32009,28 @@
         "ai/mistral_chunk_member_type_oracle_test.go::TestMistralChunkMistypedMembersMatchPi",
         "ai/openai_completions_member_type_oracle_test.go::TestOpenAICompletionsMistypedMembersMatchPi",
         "ai/openai_responses_member_type_oracle_test.go::TestOpenAIResponsesMistypedMembersMatchPi"
+      ]
+    },
+    {
+      "id": "BF-e16cbba",
+      "title": "fix(coding): rank a tool first when the search query is its name (Pi)",
+      "symptom": "fix(coding): rank a tool first when the search query is its name (Pi)",
+      "rootCause": "",
+      "rootCauseSource": "",
+      "userImpact": "Behavior differed from Pi",
+      "platform": "All platforms",
+      "class": "own",
+      "fixedIn": "Unreleased",
+      "origin": "commit",
+      "commits": [
+        {
+          "hash": "e16cbbaf76",
+          "date": "2026-10-26"
+        }
+      ],
+      "tests": [
+        "coding/extension/builtin/toolsearch/toolsearch_oracle_test.go::TestToolSearchNameQueriesMatchPi",
+        "coding/extension/builtin/toolsearch/toolsearch_upstream_test.go::TestBm25RankerRanksAToolFirstWhenTheQueryIsItsName"
       ]
     },
     {

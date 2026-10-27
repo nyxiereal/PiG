@@ -106867,8 +106867,26 @@
     },
     {
       "id": "pkg:chord/.#NativeWatch",
-      "disposition": "pending",
-      "upstreamShapeHash": "sha256:5f0b5b921686b8a2c43d7f3be9914ee68a02809379dd0570f731901e1c55dd93"
+      "disposition": "ported",
+      "upstreamShapeHash": "sha256:5f0b5b921686b8a2c43d7f3be9914ee68a02809379dd0570f731901e1c55dd93",
+      "rationale": "Derived by the interface gap detector: NativeWatch is Go chord/watch_impl.go#NativeWatch (name rule N1), every shape rule holds, and it is exercised by an asserting Go test. The row is re-derived on every run of make interface-gaps-update.",
+      "pigTargets": [
+        "chord/watch_impl.go#NativeWatch"
+      ],
+      "layers": {
+        "behavior": "complete",
+        "production": "complete",
+        "shape": "complete"
+      },
+      "production": [
+        "call:chord/watch_impl.go#NewNativeWatch"
+      ],
+      "evidence": [
+        "test:chord/watch_upstream_test.go#TestDeliverySchedulerHoldFoldsTheFramesAdvancedWhileItIsOpenIntoOneCallPerWatch",
+        "test:chord/watch_upstream_test.go#TestNativeWatchCollapses101PendingValuesToTheNewest",
+        "test:chord/watch_upstream_test.go#TestNativeWatchCollapses101PendingValuesToTheValueOfReplace"
+      ],
+      "asyncContract": "An awaited Promise is a blocking Go call that returns the value or error; AbortSignal is the context.Context argument; no detached goroutine."
     },
     {
       "id": "pkg:chord/.#NativeWatch::construct:0",
@@ -106889,7 +106907,7 @@
       "evidence": [
         "test:chord/watch_upstream_test.go#TestNativeWatchCollapses101PendingValuesToTheNewest",
         "test:chord/watch_upstream_test.go#TestNativeWatchCollapses101PendingValuesToTheValueOfReplace",
-        "test:chord/watch_upstream_test.go#TestNativeWatchDeliversValuesByIdentityInOrderWithAContextNeverInline"
+        "test:chord/watch_upstream_test.go#TestNativeWatchDeliversABacklogThatNeverDrainsInOrder"
       ]
     },
     {
@@ -106911,7 +106929,7 @@
       "evidence": [
         "test:chord/watch_upstream_test.go#TestNativeWatchCollapses101PendingValuesToTheNewest",
         "test:chord/watch_upstream_test.go#TestNativeWatchCollapses101PendingValuesToTheValueOfReplace",
-        "test:chord/watch_upstream_test.go#TestNativeWatchDeliversValuesByIdentityInOrderWithAContextNeverInline"
+        "test:chord/watch_upstream_test.go#TestNativeWatchDeliversABacklogThatNeverDrainsInOrder"
       ]
     },
     {
@@ -106933,7 +106951,7 @@
       "evidence": [
         "test:chord/watch_upstream_test.go#TestNativeWatchCollapses101PendingValuesToTheNewest",
         "test:chord/watch_upstream_test.go#TestNativeWatchCollapses101PendingValuesToTheValueOfReplace",
-        "test:chord/watch_upstream_test.go#TestNativeWatchDeliversValuesByIdentityInOrderWithAContextNeverInline"
+        "test:chord/watch_upstream_test.go#TestNativeWatchDeliversABacklogThatNeverDrainsInOrder"
       ]
     },
     {
@@ -106997,9 +107015,9 @@
         "call:chord/watch_impl.go#watchLifecycle.Closed"
       ],
       "evidence": [
-        "test:chord/watch_upstream_test.go#TestWatchEndsRetiredOnlyOnItsSourcesRetirementNeverOnANullValue",
-        "test:chord/watch_upstream_test.go#TestWatchRetainsNeitherItsSourceNorItsListenerOnceEnded",
-        "test:durable/session/observation_api_test.go#TestCommittedObservationHarnessSurface"
+        "test:chord/watch_upstream_test.go#TestWatchEndAfterDeliveryTakesNoMoreFramesDeliversWhatIsPendingThenEndsEndedAndOnlyThenDetaches",
+        "test:chord/watch_upstream_test.go#TestWatchEndAfterDeliveryWaitsForStartToDeliverAndEndsAtOnceWithNothingPending",
+        "test:chord/watch_upstream_test.go#TestWatchReportsARetirementInTheNextCallWithTheValueTheSourceGivesAndGoesOn"
       ],
       "asyncContract": "An awaited Promise is a blocking Go call that returns the value or error; AbortSignal is the context.Context argument; no detached goroutine."
     },
@@ -107022,7 +107040,7 @@
       "evidence": [
         "test:chord/watch_upstream_test.go#TestNativeWatchEndsWithEveryReasonOfItsLifecycle",
         "test:chord/watch_upstream_test.go#TestWatchDiscardsARetirementStillPendingWhenTheSourceEnds",
-        "test:chord/watch_upstream_test.go#TestWatchEndsEndedOrFailedFromItsSourceDroppingPendingFrames"
+        "test:chord/watch_upstream_test.go#TestWatchEndAfterDeliveryEndsANeverStartedWatchAtItsSourcesEndDroppingWhatIsPending"
       ]
     },
     {
@@ -107044,18 +107062,52 @@
       "evidence": [
         "test:chord/watch_upstream_test.go#TestNativeWatchEndsWithEveryReasonOfItsLifecycle",
         "test:chord/watch_upstream_test.go#TestWatchDiscardsARetirementStillPendingWhenTheSourceEnds",
-        "test:chord/watch_upstream_test.go#TestWatchEndsEndedOrFailedFromItsSourceDroppingPendingFrames"
+        "test:chord/watch_upstream_test.go#TestWatchEndAfterDeliveryEndsANeverStartedWatchAtItsSourcesEndDroppingWhatIsPending"
       ]
     },
     {
       "id": "pkg:chord/.#NativeWatch::property:endAfterDelivery",
-      "disposition": "pending",
-      "upstreamShapeHash": "sha256:65d5897e7f5648ed168526af02ee27d7b4555cc652f531e7460d95a17af817a0"
+      "disposition": "ported",
+      "upstreamShapeHash": "sha256:65d5897e7f5648ed168526af02ee27d7b4555cc652f531e7460d95a17af817a0",
+      "rationale": "Derived by the interface gap detector: NativeWatch::property:endAfterDelivery is Go chord/watch_impl.go#watchLifecycle.EndAfterDelivery (name rule N1), every shape rule holds, and it is exercised by an asserting Go test. The row is re-derived on every run of make interface-gaps-update.",
+      "pigTargets": [
+        "chord/watch_impl.go#watchLifecycle.EndAfterDelivery"
+      ],
+      "layers": {
+        "behavior": "complete",
+        "production": "complete",
+        "shape": "complete"
+      },
+      "production": [
+        "call:chord/watch_impl.go#watchLifecycle.EndAfterDelivery"
+      ],
+      "evidence": [
+        "test:chord/watch_upstream_test.go#TestNativeWatchEndAfterDeliveryDeliversWhatIsPendingThenEndsEnded",
+        "test:chord/watch_upstream_test.go#TestWatchEndAfterDeliveryEndsANeverStartedWatchAtItsSourcesEndDroppingWhatIsPending",
+        "test:chord/watch_upstream_test.go#TestWatchEndAfterDeliveryTakesNoMoreFramesDeliversWhatIsPendingThenEndsEndedAndOnlyThenDetaches"
+      ]
     },
     {
       "id": "pkg:chord/.#NativeWatch::property:endAfterDelivery::call:0",
-      "disposition": "pending",
-      "upstreamShapeHash": "sha256:9ca6a314a982a3e688c5c5ffde6bd32f25f07554352674c9e2234fc7f4b40b92"
+      "disposition": "ported",
+      "upstreamShapeHash": "sha256:9ca6a314a982a3e688c5c5ffde6bd32f25f07554352674c9e2234fc7f4b40b92",
+      "rationale": "Derived by the interface gap detector: NativeWatch::property:endAfterDelivery::call:0 is Go chord/watch_impl.go#watchLifecycle.EndAfterDelivery (name rule N1), every shape rule holds, and it is exercised by an asserting Go test. The row is re-derived on every run of make interface-gaps-update.",
+      "pigTargets": [
+        "chord/watch_impl.go#watchLifecycle.EndAfterDelivery"
+      ],
+      "layers": {
+        "behavior": "complete",
+        "production": "complete",
+        "shape": "complete"
+      },
+      "production": [
+        "call:chord/watch_impl.go#watchLifecycle.EndAfterDelivery"
+      ],
+      "evidence": [
+        "test:chord/watch_upstream_test.go#TestNativeWatchEndAfterDeliveryDeliversWhatIsPendingThenEndsEnded",
+        "test:chord/watch_upstream_test.go#TestWatchEndAfterDeliveryEndsANeverStartedWatchAtItsSourcesEndDroppingWhatIsPending",
+        "test:chord/watch_upstream_test.go#TestWatchEndAfterDeliveryTakesNoMoreFramesDeliversWhatIsPendingThenEndsEndedAndOnlyThenDetaches"
+      ]
     },
     {
       "id": "pkg:chord/.#NativeWatch::property:observeCancellation",
@@ -107122,7 +107174,7 @@
       "evidence": [
         "test:chord/watch_upstream_test.go#TestNativeWatchCollapses101PendingValuesToTheNewest",
         "test:chord/watch_upstream_test.go#TestNativeWatchCollapses101PendingValuesToTheValueOfReplace",
-        "test:chord/watch_upstream_test.go#TestNativeWatchRetainsNeitherItsSourceNorItsListenerOnceStopped"
+        "test:chord/watch_upstream_test.go#TestNativeWatchDeliversABacklogThatNeverDrainsInOrder"
       ]
     },
     {
@@ -107144,7 +107196,7 @@
       "evidence": [
         "test:chord/watch_upstream_test.go#TestNativeWatchCollapses101PendingValuesToTheNewest",
         "test:chord/watch_upstream_test.go#TestNativeWatchCollapses101PendingValuesToTheValueOfReplace",
-        "test:chord/watch_upstream_test.go#TestNativeWatchRetainsNeitherItsSourceNorItsListenerOnceStopped"
+        "test:chord/watch_upstream_test.go#TestNativeWatchDeliversABacklogThatNeverDrainsInOrder"
       ]
     },
     {
@@ -107164,9 +107216,9 @@
         "call:chord/watch_impl.go#watchLifecycle.Stop"
       ],
       "evidence": [
+        "test:chord/watch_upstream_test.go#TestNativeWatchDeliversABacklogThatNeverDrainsInOrder",
         "test:chord/watch_upstream_test.go#TestNativeWatchRetainsNeitherItsSourceNorItsListenerOnceStopped",
-        "test:chord/watch_upstream_test.go#TestWatchEndsRetiredOnlyOnItsSourcesRetirementNeverOnANullValue",
-        "test:chord/watch_upstream_test.go#TestWatchRetainsNeitherItsSourceNorItsListenerOnceEnded"
+        "test:chord/watch_upstream_test.go#TestWatchChangeObjectsCarryPlainDataOnlyTheFoldedChangeBuiltByTheWatch"
       ],
       "asyncContract": "An awaited Promise is a blocking Go call that returns the value or error; AbortSignal is the context.Context argument; no detached goroutine."
     },
@@ -107187,9 +107239,9 @@
         "call:chord/watch_impl.go#watchLifecycle.Stop"
       ],
       "evidence": [
+        "test:chord/watch_upstream_test.go#TestNativeWatchDeliversABacklogThatNeverDrainsInOrder",
         "test:chord/watch_upstream_test.go#TestNativeWatchRetainsNeitherItsSourceNorItsListenerOnceStopped",
-        "test:chord/watch_upstream_test.go#TestWatchEndsRetiredOnlyOnItsSourcesRetirementNeverOnANullValue",
-        "test:chord/watch_upstream_test.go#TestWatchRetainsNeitherItsSourceNorItsListenerOnceEnded"
+        "test:chord/watch_upstream_test.go#TestWatchChangeObjectsCarryPlainDataOnlyTheFoldedChangeBuiltByTheWatch"
       ],
       "asyncContract": "An awaited Promise is a blocking Go call that returns the value or error; AbortSignal is the context.Context argument; no detached goroutine."
     },
@@ -107210,9 +107262,9 @@
         "call:chord/watch_impl.go#watchLifecycle.Value"
       ],
       "evidence": [
+        "test:chord/watch_upstream_test.go#TestDeliverySchedulerHoldFoldsTheFramesAdvancedWhileItIsOpenIntoOneCallPerWatch",
         "test:chord/watch_upstream_test.go#TestWatchDiscardsARetirementStillPendingWhenTheSourceEnds",
-        "test:chord/watch_upstream_test.go#TestWatchKeepsTheAcquisitionValueUntilStartThenDeliversTheFramesSinceInOneCall",
-        "test:chord/watch_upstream_test.go#TestWatchRetirementDeliversTheLastCallThenEndsRetired"
+        "test:chord/watch_upstream_test.go#TestWatchKeepsTheAcquisitionValueUntilStartThenDeliversTheFramesSinceInOneCall"
       ]
     },
     {
@@ -107300,8 +107352,25 @@
     },
     {
       "id": "pkg:chord/.#NativeWatchChange",
-      "disposition": "pending",
-      "upstreamShapeHash": "sha256:820966f5fc2f2a8250e9e952783285fd18013c2890c7e018e0085234a17ce504"
+      "disposition": "ported",
+      "upstreamShapeHash": "sha256:820966f5fc2f2a8250e9e952783285fd18013c2890c7e018e0085234a17ce504",
+      "rationale": "Derived by the interface gap detector: NativeWatchChange is Go chord/watch.go#NativeWatchChange (name rule N1), every shape rule holds, and it is exercised by an asserting Go test. The row is re-derived on every run of make interface-gaps-update.",
+      "pigTargets": [
+        "chord/watch.go#NativeWatchChange"
+      ],
+      "layers": {
+        "behavior": "complete",
+        "production": "complete",
+        "shape": "complete"
+      },
+      "production": [
+        "call:chord/watch_impl.go#NativeWatch.Start"
+      ],
+      "evidence": [
+        "test:chord/watch_upstream_test.go#TestNativeWatchCollapses101PendingValuesToTheNewest",
+        "test:chord/watch_upstream_test.go#TestNativeWatchCollapses101PendingValuesToTheValueOfReplace",
+        "test:chord/watch_upstream_test.go#TestNativeWatchDeliversABacklogThatNeverDrainsInOrder"
+      ]
     },
     {
       "id": "pkg:chord/.#NativeWatchHandle",
@@ -110419,8 +110488,26 @@
     },
     {
       "id": "pkg:chord/.#Watch",
-      "disposition": "pending",
-      "upstreamShapeHash": "sha256:185eaf591c737cb600a0bd5788273e1927daf21f6383c962eb8699d76b57fade"
+      "disposition": "ported",
+      "upstreamShapeHash": "sha256:185eaf591c737cb600a0bd5788273e1927daf21f6383c962eb8699d76b57fade",
+      "rationale": "Derived by the interface gap detector: Watch is Go chord/watch_impl.go#Watch (name rule N1), every shape rule holds, and it is exercised by an asserting Go test. The row is re-derived on every run of make interface-gaps-update.",
+      "pigTargets": [
+        "chord/watch_impl.go#Watch"
+      ],
+      "layers": {
+        "behavior": "complete",
+        "production": "complete",
+        "shape": "complete"
+      },
+      "production": [
+        "call:chord/watch_impl.go#NativeWatch.Advance"
+      ],
+      "evidence": [
+        "test:chord/watch_upstream_test.go#TestDeliverySchedulerHoldFoldsTheFramesAdvancedWhileItIsOpenIntoOneCallPerWatch",
+        "test:chord/watch_upstream_test.go#TestNativeWatchDeliversABacklogThatNeverDrainsInOrder",
+        "test:chord/watch_upstream_test.go#TestNativeWatchEndsWithEveryReasonOfItsLifecycle"
+      ],
+      "asyncContract": "An awaited Promise is a blocking Go call that returns the value or error; AbortSignal is the context.Context argument; no detached goroutine."
     },
     {
       "id": "pkg:chord/.#Watch::construct:0",
@@ -110439,20 +110526,54 @@
         "call:chord/watch_impl.go#NewWatch"
       ],
       "evidence": [
+        "test:chord/watch_upstream_test.go#TestDeliverySchedulerHoldFoldsTheFramesAdvancedWhileItIsOpenIntoOneCallPerWatch",
         "test:chord/watch_upstream_test.go#TestWatchAwaitsEachCallbackAndFoldsFramesAdvancedWhileOneIsInFlightIntoTheNextCall",
-        "test:chord/watch_upstream_test.go#TestWatchDeliversTheNewestFramesContextWithoutItsCancellation",
-        "test:chord/watch_upstream_test.go#TestWatchDiscardsARetirementStillPendingWhenTheSourceEnds"
+        "test:chord/watch_upstream_test.go#TestWatchChangeObjectsCarryPlainDataOnlyTheFoldedChangeBuiltByTheWatch"
       ]
     },
     {
       "id": "pkg:chord/.#Watch::property:advance",
-      "disposition": "pending",
-      "upstreamShapeHash": "sha256:4545e774305bcbd918ac3cbab4658e0b997d2fe1b48d939d54640896ee42090e"
+      "disposition": "ported",
+      "upstreamShapeHash": "sha256:4545e774305bcbd918ac3cbab4658e0b997d2fe1b48d939d54640896ee42090e",
+      "rationale": "Derived by the interface gap detector: Watch::property:advance is Go chord/watch_impl.go#Watch.Advance (name rule N1), every shape rule holds, and it is exercised by an asserting Go test. The row is re-derived on every run of make interface-gaps-update.",
+      "pigTargets": [
+        "chord/watch_impl.go#Watch.Advance"
+      ],
+      "layers": {
+        "behavior": "complete",
+        "production": "complete",
+        "shape": "complete"
+      },
+      "production": [
+        "call:chord/watch_impl.go#Watch.Advance"
+      ],
+      "evidence": [
+        "test:chord/watch_upstream_test.go#TestDeliverySchedulerHoldFoldsTheFramesAdvancedWhileItIsOpenIntoOneCallPerWatch",
+        "test:chord/watch_upstream_test.go#TestWatchAwaitsEachCallbackAndFoldsFramesAdvancedWhileOneIsInFlightIntoTheNextCall",
+        "test:chord/watch_upstream_test.go#TestWatchChangeObjectsCarryPlainDataOnlyTheFoldedChangeBuiltByTheWatch"
+      ]
     },
     {
       "id": "pkg:chord/.#Watch::property:advance::call:0",
-      "disposition": "pending",
-      "upstreamShapeHash": "sha256:fea7c744b4b0b43d4341508a6c9aa917f114fc8e01c4dfabb90204bb783cf53f"
+      "disposition": "ported",
+      "upstreamShapeHash": "sha256:fea7c744b4b0b43d4341508a6c9aa917f114fc8e01c4dfabb90204bb783cf53f",
+      "rationale": "Derived by the interface gap detector: Watch::property:advance::call:0 is Go chord/watch_impl.go#Watch.Advance (name rule N1), every shape rule holds, and it is exercised by an asserting Go test. The row is re-derived on every run of make interface-gaps-update.",
+      "pigTargets": [
+        "chord/watch_impl.go#Watch.Advance"
+      ],
+      "layers": {
+        "behavior": "complete",
+        "production": "complete",
+        "shape": "complete"
+      },
+      "production": [
+        "call:chord/watch_impl.go#Watch.Advance"
+      ],
+      "evidence": [
+        "test:chord/watch_upstream_test.go#TestDeliverySchedulerHoldFoldsTheFramesAdvancedWhileItIsOpenIntoOneCallPerWatch",
+        "test:chord/watch_upstream_test.go#TestWatchAwaitsEachCallbackAndFoldsFramesAdvancedWhileOneIsInFlightIntoTheNextCall",
+        "test:chord/watch_upstream_test.go#TestWatchChangeObjectsCarryPlainDataOnlyTheFoldedChangeBuiltByTheWatch"
+      ]
     },
     {
       "id": "pkg:chord/.#Watch::property:cancel",
@@ -110515,9 +110636,9 @@
         "call:chord/watch_impl.go#watchLifecycle.Closed"
       ],
       "evidence": [
-        "test:chord/watch_upstream_test.go#TestWatchEndsRetiredOnlyOnItsSourcesRetirementNeverOnANullValue",
-        "test:chord/watch_upstream_test.go#TestWatchRetainsNeitherItsSourceNorItsListenerOnceEnded",
-        "test:durable/session/observation_api_test.go#TestCommittedObservationHarnessSurface"
+        "test:chord/watch_upstream_test.go#TestWatchEndAfterDeliveryTakesNoMoreFramesDeliversWhatIsPendingThenEndsEndedAndOnlyThenDetaches",
+        "test:chord/watch_upstream_test.go#TestWatchEndAfterDeliveryWaitsForStartToDeliverAndEndsAtOnceWithNothingPending",
+        "test:chord/watch_upstream_test.go#TestWatchReportsARetirementInTheNextCallWithTheValueTheSourceGivesAndGoesOn"
       ],
       "asyncContract": "An awaited Promise is a blocking Go call that returns the value or error; AbortSignal is the context.Context argument; no detached goroutine."
     },
@@ -110540,7 +110661,7 @@
       "evidence": [
         "test:chord/watch_upstream_test.go#TestNativeWatchEndsWithEveryReasonOfItsLifecycle",
         "test:chord/watch_upstream_test.go#TestWatchDiscardsARetirementStillPendingWhenTheSourceEnds",
-        "test:chord/watch_upstream_test.go#TestWatchEndsEndedOrFailedFromItsSourceDroppingPendingFrames"
+        "test:chord/watch_upstream_test.go#TestWatchEndAfterDeliveryEndsANeverStartedWatchAtItsSourcesEndDroppingWhatIsPending"
       ]
     },
     {
@@ -110562,18 +110683,52 @@
       "evidence": [
         "test:chord/watch_upstream_test.go#TestNativeWatchEndsWithEveryReasonOfItsLifecycle",
         "test:chord/watch_upstream_test.go#TestWatchDiscardsARetirementStillPendingWhenTheSourceEnds",
-        "test:chord/watch_upstream_test.go#TestWatchEndsEndedOrFailedFromItsSourceDroppingPendingFrames"
+        "test:chord/watch_upstream_test.go#TestWatchEndAfterDeliveryEndsANeverStartedWatchAtItsSourcesEndDroppingWhatIsPending"
       ]
     },
     {
       "id": "pkg:chord/.#Watch::property:endAfterDelivery",
-      "disposition": "pending",
-      "upstreamShapeHash": "sha256:65d5897e7f5648ed168526af02ee27d7b4555cc652f531e7460d95a17af817a0"
+      "disposition": "ported",
+      "upstreamShapeHash": "sha256:65d5897e7f5648ed168526af02ee27d7b4555cc652f531e7460d95a17af817a0",
+      "rationale": "Derived by the interface gap detector: Watch::property:endAfterDelivery is Go chord/watch_impl.go#watchLifecycle.EndAfterDelivery (name rule N1), every shape rule holds, and it is exercised by an asserting Go test. The row is re-derived on every run of make interface-gaps-update.",
+      "pigTargets": [
+        "chord/watch_impl.go#watchLifecycle.EndAfterDelivery"
+      ],
+      "layers": {
+        "behavior": "complete",
+        "production": "complete",
+        "shape": "complete"
+      },
+      "production": [
+        "call:chord/watch_impl.go#watchLifecycle.EndAfterDelivery"
+      ],
+      "evidence": [
+        "test:chord/watch_upstream_test.go#TestNativeWatchEndAfterDeliveryDeliversWhatIsPendingThenEndsEnded",
+        "test:chord/watch_upstream_test.go#TestWatchEndAfterDeliveryEndsANeverStartedWatchAtItsSourcesEndDroppingWhatIsPending",
+        "test:chord/watch_upstream_test.go#TestWatchEndAfterDeliveryTakesNoMoreFramesDeliversWhatIsPendingThenEndsEndedAndOnlyThenDetaches"
+      ]
     },
     {
       "id": "pkg:chord/.#Watch::property:endAfterDelivery::call:0",
-      "disposition": "pending",
-      "upstreamShapeHash": "sha256:9ca6a314a982a3e688c5c5ffde6bd32f25f07554352674c9e2234fc7f4b40b92"
+      "disposition": "ported",
+      "upstreamShapeHash": "sha256:9ca6a314a982a3e688c5c5ffde6bd32f25f07554352674c9e2234fc7f4b40b92",
+      "rationale": "Derived by the interface gap detector: Watch::property:endAfterDelivery::call:0 is Go chord/watch_impl.go#watchLifecycle.EndAfterDelivery (name rule N1), every shape rule holds, and it is exercised by an asserting Go test. The row is re-derived on every run of make interface-gaps-update.",
+      "pigTargets": [
+        "chord/watch_impl.go#watchLifecycle.EndAfterDelivery"
+      ],
+      "layers": {
+        "behavior": "complete",
+        "production": "complete",
+        "shape": "complete"
+      },
+      "production": [
+        "call:chord/watch_impl.go#watchLifecycle.EndAfterDelivery"
+      ],
+      "evidence": [
+        "test:chord/watch_upstream_test.go#TestNativeWatchEndAfterDeliveryDeliversWhatIsPendingThenEndsEnded",
+        "test:chord/watch_upstream_test.go#TestWatchEndAfterDeliveryEndsANeverStartedWatchAtItsSourcesEndDroppingWhatIsPending",
+        "test:chord/watch_upstream_test.go#TestWatchEndAfterDeliveryTakesNoMoreFramesDeliversWhatIsPendingThenEndsEndedAndOnlyThenDetaches"
+      ]
     },
     {
       "id": "pkg:chord/.#Watch::property:observeCancellation",
@@ -110623,13 +110778,47 @@
     },
     {
       "id": "pkg:chord/.#Watch::property:start",
-      "disposition": "pending",
-      "upstreamShapeHash": "sha256:cbac58c325a502b80bc38ae15fca6b5ce8d15c5bf903374a5549d5be7dbe96c8"
+      "disposition": "ported",
+      "upstreamShapeHash": "sha256:cbac58c325a502b80bc38ae15fca6b5ce8d15c5bf903374a5549d5be7dbe96c8",
+      "rationale": "Derived by the interface gap detector: Watch::property:start is Go chord/watch_impl.go#Watch.Start (name rule N1), every shape rule holds, and it is exercised by an asserting Go test. The row is re-derived on every run of make interface-gaps-update.",
+      "pigTargets": [
+        "chord/watch_impl.go#Watch.Start"
+      ],
+      "layers": {
+        "behavior": "complete",
+        "production": "complete",
+        "shape": "complete"
+      },
+      "production": [
+        "call:chord/watch_impl.go#Watch.Start"
+      ],
+      "evidence": [
+        "test:chord/watch_upstream_test.go#TestDeliverySchedulerHoldFoldsTheFramesAdvancedWhileItIsOpenIntoOneCallPerWatch",
+        "test:chord/watch_upstream_test.go#TestWatchAwaitsEachCallbackAndFoldsFramesAdvancedWhileOneIsInFlightIntoTheNextCall",
+        "test:chord/watch_upstream_test.go#TestWatchChangeObjectsCarryPlainDataOnlyTheFoldedChangeBuiltByTheWatch"
+      ]
     },
     {
       "id": "pkg:chord/.#Watch::property:start::call:0",
-      "disposition": "pending",
-      "upstreamShapeHash": "sha256:1221d10b12e690fd9cdadd9591a9ca5f5d6398eff4d807008c89bea1f054f930"
+      "disposition": "ported",
+      "upstreamShapeHash": "sha256:1221d10b12e690fd9cdadd9591a9ca5f5d6398eff4d807008c89bea1f054f930",
+      "rationale": "Derived by the interface gap detector: Watch::property:start::call:0 is Go chord/watch_impl.go#Watch.Start (name rule N1), every shape rule holds, and it is exercised by an asserting Go test. The row is re-derived on every run of make interface-gaps-update.",
+      "pigTargets": [
+        "chord/watch_impl.go#Watch.Start"
+      ],
+      "layers": {
+        "behavior": "complete",
+        "production": "complete",
+        "shape": "complete"
+      },
+      "production": [
+        "call:chord/watch_impl.go#Watch.Start"
+      ],
+      "evidence": [
+        "test:chord/watch_upstream_test.go#TestDeliverySchedulerHoldFoldsTheFramesAdvancedWhileItIsOpenIntoOneCallPerWatch",
+        "test:chord/watch_upstream_test.go#TestWatchAwaitsEachCallbackAndFoldsFramesAdvancedWhileOneIsInFlightIntoTheNextCall",
+        "test:chord/watch_upstream_test.go#TestWatchChangeObjectsCarryPlainDataOnlyTheFoldedChangeBuiltByTheWatch"
+      ]
     },
     {
       "id": "pkg:chord/.#Watch::property:stop",
@@ -110648,9 +110837,9 @@
         "call:chord/watch_impl.go#watchLifecycle.Stop"
       ],
       "evidence": [
+        "test:chord/watch_upstream_test.go#TestNativeWatchDeliversABacklogThatNeverDrainsInOrder",
         "test:chord/watch_upstream_test.go#TestNativeWatchRetainsNeitherItsSourceNorItsListenerOnceStopped",
-        "test:chord/watch_upstream_test.go#TestWatchEndsRetiredOnlyOnItsSourcesRetirementNeverOnANullValue",
-        "test:chord/watch_upstream_test.go#TestWatchRetainsNeitherItsSourceNorItsListenerOnceEnded"
+        "test:chord/watch_upstream_test.go#TestWatchChangeObjectsCarryPlainDataOnlyTheFoldedChangeBuiltByTheWatch"
       ],
       "asyncContract": "An awaited Promise is a blocking Go call that returns the value or error; AbortSignal is the context.Context argument; no detached goroutine."
     },
@@ -110671,9 +110860,9 @@
         "call:chord/watch_impl.go#watchLifecycle.Stop"
       ],
       "evidence": [
+        "test:chord/watch_upstream_test.go#TestNativeWatchDeliversABacklogThatNeverDrainsInOrder",
         "test:chord/watch_upstream_test.go#TestNativeWatchRetainsNeitherItsSourceNorItsListenerOnceStopped",
-        "test:chord/watch_upstream_test.go#TestWatchEndsRetiredOnlyOnItsSourcesRetirementNeverOnANullValue",
-        "test:chord/watch_upstream_test.go#TestWatchRetainsNeitherItsSourceNorItsListenerOnceEnded"
+        "test:chord/watch_upstream_test.go#TestWatchChangeObjectsCarryPlainDataOnlyTheFoldedChangeBuiltByTheWatch"
       ],
       "asyncContract": "An awaited Promise is a blocking Go call that returns the value or error; AbortSignal is the context.Context argument; no detached goroutine."
     },
@@ -110694,9 +110883,9 @@
         "call:chord/watch_impl.go#watchLifecycle.Value"
       ],
       "evidence": [
+        "test:chord/watch_upstream_test.go#TestDeliverySchedulerHoldFoldsTheFramesAdvancedWhileItIsOpenIntoOneCallPerWatch",
         "test:chord/watch_upstream_test.go#TestWatchDiscardsARetirementStillPendingWhenTheSourceEnds",
-        "test:chord/watch_upstream_test.go#TestWatchKeepsTheAcquisitionValueUntilStartThenDeliversTheFramesSinceInOneCall",
-        "test:chord/watch_upstream_test.go#TestWatchRetirementDeliversTheLastCallThenEndsRetired"
+        "test:chord/watch_upstream_test.go#TestWatchKeepsTheAcquisitionValueUntilStartThenDeliversTheFramesSinceInOneCall"
       ]
     },
     {
@@ -110784,8 +110973,25 @@
     },
     {
       "id": "pkg:chord/.#WatchChange",
-      "disposition": "pending",
-      "upstreamShapeHash": "sha256:43ff7a0f4dc4c0db2b995dd3c926eed502fa7cd46d61e2fd7dd812accc67486b"
+      "disposition": "ported",
+      "upstreamShapeHash": "sha256:43ff7a0f4dc4c0db2b995dd3c926eed502fa7cd46d61e2fd7dd812accc67486b",
+      "rationale": "Derived by the interface gap detector: WatchChange is Go chord/watch.go#WatchChange (name rule N1), every shape rule holds, and it is exercised by an asserting Go test. The row is re-derived on every run of make interface-gaps-update.",
+      "pigTargets": [
+        "chord/watch.go#WatchChange"
+      ],
+      "layers": {
+        "behavior": "complete",
+        "production": "complete",
+        "shape": "complete"
+      },
+      "production": [
+        "call:chord/watch_impl.go#NewWatch"
+      ],
+      "evidence": [
+        "test:chord/watch_upstream_test.go#TestDeliverySchedulerHoldFoldsTheFramesAdvancedWhileItIsOpenIntoOneCallPerWatch",
+        "test:chord/watch_upstream_test.go#TestWatchAwaitsEachCallbackAndFoldsFramesAdvancedWhileOneIsInFlightIntoTheNextCall",
+        "test:chord/watch_upstream_test.go#TestWatchChangeObjectsCarryPlainDataOnlyTheFoldedChangeBuiltByTheWatch"
+      ]
     },
     {
       "id": "pkg:chord/.#WatchEnd",
@@ -110811,8 +111017,26 @@
     },
     {
       "id": "pkg:chord/.#WatchHandle",
-      "disposition": "pending",
-      "upstreamShapeHash": "sha256:e711357fdfa27f18f14ca759ca2d1c9c705a8b3ed6d253e5ea29eb9b972a8846"
+      "disposition": "ported",
+      "upstreamShapeHash": "sha256:e711357fdfa27f18f14ca759ca2d1c9c705a8b3ed6d253e5ea29eb9b972a8846",
+      "rationale": "Derived by the interface gap detector: WatchHandle is Go chord/watch.go#WatchHandle (name rule N1), every shape rule holds, and it is exercised by an asserting Go test. The row is re-derived on every run of make interface-gaps-update.",
+      "pigTargets": [
+        "chord/watch.go#WatchHandle"
+      ],
+      "layers": {
+        "behavior": "complete",
+        "production": "complete",
+        "shape": "complete"
+      },
+      "production": [
+        "call:durable/harness/scheduler.go#TaskScheduler.endLocked"
+      ],
+      "evidence": [
+        "test:chord/watch_upstream_test.go#TestWatchableWatchHoldsTheCurrentValueThenOneFramePerChangeAndEndsWithItsContext",
+        "test:durable/session/session_deferred_commits_upstream_test.go#TestPublicationsOfDeferredCommits",
+        "test:durable/core/driver/docs_core_test.go#TestCoreObserversOfAnOlderShapeGetARootReplacementAfterANewerTokenWrites"
+      ],
+      "asyncContract": "An awaited Promise is a blocking Go call that returns the value or error; AbortSignal is the context.Context argument; no detached goroutine."
     },
     {
       "id": "pkg:chord/.#WatchHandle::property:closed",
@@ -110832,20 +111056,52 @@
       ],
       "evidence": [
         "test:chord/watch_upstream_test.go#TestWatchableWatchHoldsTheCurrentValueThenOneFramePerChangeAndEndsWithItsContext",
-        "test:durable/core/driver/docs_core_watches_test.go#TestCoreWatchDeliversRetirementAndDoesNotFollowRecreation",
-        "test:durable/core/driver/docs_core_watches_test.go#TestCoreWatchFoldsRetirementOverPendingCommitsThenCloses"
+        "test:durable/core/driver/docs_core_watches_test.go#TestCoreWatchFollowsItsAddressAcrossARetirementAndARecreationInOneCommitInOneCall",
+        "test:durable/core/driver/docs_core_watches_test.go#TestCoreWatchListenerFailureSettlesOnlyTheAffectedWatch"
       ],
       "asyncContract": "An awaited Promise is a blocking Go call that returns the value or error; AbortSignal is the context.Context argument; no detached goroutine."
     },
     {
       "id": "pkg:chord/.#WatchHandle::property:start",
-      "disposition": "pending",
-      "upstreamShapeHash": "sha256:d9bc0d5d494d821d46f42a5fbc6780a1981e00631bfe365cda0f3a13e7655035"
+      "disposition": "ported",
+      "upstreamShapeHash": "sha256:d9bc0d5d494d821d46f42a5fbc6780a1981e00631bfe365cda0f3a13e7655035",
+      "rationale": "Derived by the interface gap detector: WatchHandle::property:start is Go chord/watch.go#WatchHandle.Start (name rule N1), every shape rule holds, and it is exercised by an asserting Go test. The row is re-derived on every run of make interface-gaps-update.",
+      "pigTargets": [
+        "chord/watch.go#WatchHandle.Start"
+      ],
+      "layers": {
+        "behavior": "complete",
+        "production": "public-api-tested",
+        "shape": "complete"
+      },
+      "production": [
+        "public-api:chord/watch.go#WatchHandle.Start"
+      ],
+      "evidence": [
+        "test:chord/watch_upstream_test.go#TestWatchableWatchHoldsTheCurrentValueThenOneFramePerChangeAndEndsWithItsContext"
+      ],
+      "asyncContract": "An awaited Promise is a blocking Go call that returns the value or error; AbortSignal is the context.Context argument; no detached goroutine."
     },
     {
       "id": "pkg:chord/.#WatchHandle::property:start::call:0",
-      "disposition": "pending",
-      "upstreamShapeHash": "sha256:50a22952b3368cb5e861c7feb64cf19d20d5ab23fc231fd986a27dc74a43e54d"
+      "disposition": "ported",
+      "upstreamShapeHash": "sha256:50a22952b3368cb5e861c7feb64cf19d20d5ab23fc231fd986a27dc74a43e54d",
+      "rationale": "Derived by the interface gap detector: WatchHandle::property:start::call:0 is Go chord/watch.go#WatchHandle.Start (name rule N1), every shape rule holds, and it is exercised by an asserting Go test. The row is re-derived on every run of make interface-gaps-update.",
+      "pigTargets": [
+        "chord/watch.go#WatchHandle.Start"
+      ],
+      "layers": {
+        "behavior": "complete",
+        "production": "public-api-tested",
+        "shape": "complete"
+      },
+      "production": [
+        "public-api:chord/watch.go#WatchHandle.Start"
+      ],
+      "evidence": [
+        "test:chord/watch_upstream_test.go#TestWatchableWatchHoldsTheCurrentValueThenOneFramePerChangeAndEndsWithItsContext"
+      ],
+      "asyncContract": "An awaited Promise is a blocking Go call that returns the value or error; AbortSignal is the context.Context argument; no detached goroutine."
     },
     {
       "id": "pkg:chord/.#WatchHandle::property:stop",
@@ -168883,26 +169139,8 @@
     },
     {
       "id": "pkg:coding-agent/.#LoginDialogComponent",
-      "disposition": "ported",
-      "upstreamShapeHash": "sha256:9e7ee4f3ae17d22b661521d07aac441b87f02ed11b42de7ca266772cfe37f009",
-      "rationale": "Derived by the interface gap detector: LoginDialogComponent is Go tui/login_dialog.go#LoginDialogComponent (name rule N1), every shape rule holds, and it is exercised by an asserting Go test. The row is re-derived on every run of make interface-gaps-update.",
-      "pigTargets": [
-        "tui/login_dialog.go#LoginDialogComponent"
-      ],
-      "layers": {
-        "behavior": "complete",
-        "production": "complete",
-        "shape": "complete"
-      },
-      "production": [
-        "call:tui/alt_screen_search.go#AltScreenSearchComponent.Invalidate"
-      ],
-      "evidence": [
-        "test:internal/codingagent/interactive_mode_status_upstream_test.go#TestInteractiveManagedToolStatusContiguousGroupUpstream",
-        "test:internal/codingagent/interactive_mode_status_upstream_test.go#TestInteractiveStatusCoalescingUpstream",
-        "test:internal/codingagent/interactive_tui_custom_status_upstream_test.go#TestCustomEditorDoesNotInheritDefaultStatusOptIn"
-      ],
-      "asyncContract": "An awaited Promise is a blocking Go call that returns the value or error; AbortSignal is the context.Context argument; no detached goroutine."
+      "disposition": "pending",
+      "upstreamShapeHash": "sha256:9e7ee4f3ae17d22b661521d07aac441b87f02ed11b42de7ca266772cfe37f009"
     },
     {
       "id": "pkg:coding-agent/.#LoginDialogComponent::construct:0",
@@ -169256,8 +169494,8 @@
       ],
       "evidence": [
         "test:tui/login_dialog_oracle_test.go#TestLoginDialogInputMatchesPi",
-        "test:tui/login_dialog_gaps_test.go#TestLoginDialogComponentSecretMaskingAndRedaction",
-        "test:tui/login_dialog_gaps_test.go#TestLoginDialogComponentShowsAuthDeviceCodeDetailsAndInfo"
+        "test:tui/login_dialog_device_code_test.go#TestLoginURLsKeepControlCharactersFromEndingTerminalHyperlinks",
+        "test:tui/login_dialog_device_code_test.go#TestLoginURLsReplaceControlCharactersInURLsThatAreNotWebURLs"
       ]
     },
     {
@@ -169278,53 +169516,19 @@
       ],
       "evidence": [
         "test:tui/login_dialog_oracle_test.go#TestLoginDialogInputMatchesPi",
-        "test:tui/login_dialog_gaps_test.go#TestLoginDialogComponentSecretMaskingAndRedaction",
-        "test:tui/login_dialog_gaps_test.go#TestLoginDialogComponentShowsAuthDeviceCodeDetailsAndInfo"
+        "test:tui/login_dialog_device_code_test.go#TestLoginURLsKeepControlCharactersFromEndingTerminalHyperlinks",
+        "test:tui/login_dialog_device_code_test.go#TestLoginURLsReplaceControlCharactersInURLsThatAreNotWebURLs"
       ]
     },
     {
       "id": "pkg:coding-agent/.#LoginDialogComponent::property:showAuth",
-      "disposition": "ported",
-      "upstreamShapeHash": "sha256:47afcde6f70ccda1abdf16c8e0a475a7ee0d12e489d7db150645421492cf50bf",
-      "rationale": "Derived by the interface gap detector: LoginDialogComponent::property:showAuth is Go tui/login_dialog.go#LoginDialogComponent.ShowAuth (name rule N1), every shape rule holds, and it is exercised by an asserting Go test. The row is re-derived on every run of make interface-gaps-update.",
-      "pigTargets": [
-        "tui/login_dialog.go#LoginDialogComponent.ShowAuth"
-      ],
-      "layers": {
-        "behavior": "complete",
-        "production": "complete",
-        "shape": "complete"
-      },
-      "production": [
-        "call:tui/login_dialog.go#LoginDialogComponent.ShowAuth"
-      ],
-      "evidence": [
-        "test:tui/auth_url_copy_upstream_test.go#TestAuthURLCopyLoginDialogCopiesTheAuthURLInsteadOfTypingIntoTheCodeInput",
-        "test:tui/login_dialog_oauth_prompt_upstream_test.go#TestLoginDialogPreservesAuthInstructionsWithPromptUpstream",
-        "test:tui/login_dialog_device_code_test.go#TestDeviceCodeLoginClearsBothActionTypesWhenShowingDetails"
-      ]
+      "disposition": "pending",
+      "upstreamShapeHash": "sha256:47afcde6f70ccda1abdf16c8e0a475a7ee0d12e489d7db150645421492cf50bf"
     },
     {
       "id": "pkg:coding-agent/.#LoginDialogComponent::property:showAuth::call:0",
-      "disposition": "ported",
-      "upstreamShapeHash": "sha256:05a32ed2afe95b5ac01f1774c5897fc7259501878d53cd46d2a0df1cd856edbc",
-      "rationale": "Derived by the interface gap detector: LoginDialogComponent::property:showAuth::call:0 is Go tui/login_dialog.go#LoginDialogComponent.ShowAuth (name rule N1), every shape rule holds, and it is exercised by an asserting Go test. The row is re-derived on every run of make interface-gaps-update.",
-      "pigTargets": [
-        "tui/login_dialog.go#LoginDialogComponent.ShowAuth"
-      ],
-      "layers": {
-        "behavior": "complete",
-        "production": "complete",
-        "shape": "complete"
-      },
-      "production": [
-        "call:tui/login_dialog.go#LoginDialogComponent.ShowAuth"
-      ],
-      "evidence": [
-        "test:tui/auth_url_copy_upstream_test.go#TestAuthURLCopyLoginDialogCopiesTheAuthURLInsteadOfTypingIntoTheCodeInput",
-        "test:tui/login_dialog_oauth_prompt_upstream_test.go#TestLoginDialogPreservesAuthInstructionsWithPromptUpstream",
-        "test:tui/login_dialog_device_code_test.go#TestDeviceCodeLoginClearsBothActionTypesWhenShowingDetails"
-      ]
+      "disposition": "pending",
+      "upstreamShapeHash": "sha256:05a32ed2afe95b5ac01f1774c5897fc7259501878d53cd46d2a0df1cd856edbc"
     },
     {
       "id": "pkg:coding-agent/.#LoginDialogComponent::property:showDetails",
@@ -169432,8 +169636,8 @@
       ],
       "evidence": [
         "test:tui/login_dialog_oauth_prompt_upstream_test.go#TestLoginDialogPreservesNeutralInformationAndLinksUpstream",
-        "test:tui/login_dialog_gaps_test.go#TestLoginDialogComponentShowsAuthDeviceCodeDetailsAndInfo",
-        "test:tui/login_dialog_test.go#TestLoginDialogOAuthPromptsUpstream"
+        "test:tui/login_dialog_device_code_test.go#TestLoginURLsKeepControlCharactersFromEndingTerminalHyperlinks",
+        "test:tui/login_dialog_device_code_test.go#TestLoginURLsReplaceControlCharactersInURLsThatAreNotWebURLs"
       ]
     },
     {
@@ -169454,8 +169658,8 @@
       ],
       "evidence": [
         "test:tui/login_dialog_oauth_prompt_upstream_test.go#TestLoginDialogPreservesNeutralInformationAndLinksUpstream",
-        "test:tui/login_dialog_gaps_test.go#TestLoginDialogComponentShowsAuthDeviceCodeDetailsAndInfo",
-        "test:tui/login_dialog_test.go#TestLoginDialogOAuthPromptsUpstream"
+        "test:tui/login_dialog_device_code_test.go#TestLoginURLsKeepControlCharactersFromEndingTerminalHyperlinks",
+        "test:tui/login_dialog_device_code_test.go#TestLoginURLsReplaceControlCharactersInURLsThatAreNotWebURLs"
       ]
     },
     {
@@ -203831,8 +204035,8 @@
       ],
       "evidence": [
         "test:coding/extension/builtin/toolsearch/toolsearch_oracle_test.go#TestToolSearchMatchesPi",
-        "test:coding/mcp_session_upstream_test.go#TestAgentSessionMCPDeclaresDirectlyExposedMCPToolsToTheModel",
-        "test:coding/mcp_session_upstream_test.go#TestAgentSessionMCPListsAndReadsResourcesWithCodexResourceTools"
+        "test:coding/extension/builtin/toolsearch/toolsearch_oracle_test.go#TestToolSearchNameQueriesMatchPi",
+        "test:coding/mcp_session_upstream_test.go#TestAgentSessionMCPDeclaresDirectlyExposedMCPToolsToTheModel"
       ]
     },
     {
@@ -208146,8 +208350,26 @@
     },
     {
       "id": "pkg:durable/.#AgentEventStream",
-      "disposition": "pending",
-      "upstreamShapeHash": "sha256:84f941759b232e95b4fb01960ddfe9450692d0ccb4ea3a8a05fd069fb2d5e996"
+      "disposition": "ported",
+      "upstreamShapeHash": "sha256:84f941759b232e95b4fb01960ddfe9450692d0ccb4ea3a8a05fd069fb2d5e996",
+      "rationale": "Derived by the interface gap detector: AgentEventStream is Go durable/harness/events.go#AgentEventStream (name rule N1), every shape rule holds, and it is exercised by an asserting Go test. The row is re-derived on every run of make interface-gaps-update.",
+      "pigTargets": [
+        "durable/harness/events.go#AgentEventStream"
+      ],
+      "layers": {
+        "behavior": "complete",
+        "production": "complete",
+        "shape": "complete"
+      },
+      "production": [
+        "call:durable/harness/events.go#NewAgentEventStream"
+      ],
+      "evidence": [
+        "test:durable/core/driver/compaction_failure_core_test.go#TestCoreACompactionFailureIsVisibleUntilASummaryIsProduced",
+        "test:durable/core/driver/generation_abort_core_test.go#TestCoreAStreamedMessageStartsAtItsFirstPartialAndEndsOnceWithTheConvertedEntryOnAbort",
+        "test:durable/core/driver/harness_nested_core_test.go#TestCoreNestedCallsAreToolEventsWithTheirParent"
+      ],
+      "asyncContract": "An awaited Promise is a blocking Go call that returns the value or error; AbortSignal is the context.Context argument; no detached goroutine."
     },
     {
       "id": "pkg:durable/.#AgentEventStream::property:closed",
@@ -208196,13 +208418,49 @@
     },
     {
       "id": "pkg:durable/.#AgentEventStream::property:start",
-      "disposition": "pending",
-      "upstreamShapeHash": "sha256:ab9da6837983ddb9ee30b43e34517006e248cda2d02ffc16ccc2b9561ac77c1e"
+      "disposition": "ported",
+      "upstreamShapeHash": "sha256:ab9da6837983ddb9ee30b43e34517006e248cda2d02ffc16ccc2b9561ac77c1e",
+      "rationale": "Derived by the interface gap detector: AgentEventStream::property:start is Go durable/harness/events.go#AgentEventStream.Start (name rule N1), every shape rule holds, and it is exercised by an asserting Go test. The row is re-derived on every run of make interface-gaps-update.",
+      "pigTargets": [
+        "durable/harness/events.go#AgentEventStream.Start"
+      ],
+      "layers": {
+        "behavior": "complete",
+        "production": "complete",
+        "shape": "complete"
+      },
+      "production": [
+        "call:durable/harness/events.go#AgentEventStream.Start"
+      ],
+      "evidence": [
+        "test:durable/core/driver/compaction_failure_core_test.go#TestCoreACompactionFailureIsVisibleUntilASummaryIsProduced",
+        "test:durable/core/driver/generation_abort_core_test.go#TestCoreAStreamedMessageStartsAtItsFirstPartialAndEndsOnceWithTheConvertedEntryOnAbort",
+        "test:durable/core/driver/harness_nested_core_test.go#TestCoreNestedCallsAreToolEventsWithTheirParent"
+      ],
+      "asyncContract": "An awaited Promise is a blocking Go call that returns the value or error; AbortSignal is the context.Context argument; no detached goroutine."
     },
     {
       "id": "pkg:durable/.#AgentEventStream::property:start::call:0",
-      "disposition": "pending",
-      "upstreamShapeHash": "sha256:5f4e80f5d18cd365d9d1ae91a9d1ae02b9ecb7eb7181dc69ae6e2ca5a6584710"
+      "disposition": "ported",
+      "upstreamShapeHash": "sha256:5f4e80f5d18cd365d9d1ae91a9d1ae02b9ecb7eb7181dc69ae6e2ca5a6584710",
+      "rationale": "Derived by the interface gap detector: AgentEventStream::property:start::call:0 is Go durable/harness/events.go#AgentEventStream.Start (name rule N1), every shape rule holds, and it is exercised by an asserting Go test. The row is re-derived on every run of make interface-gaps-update.",
+      "pigTargets": [
+        "durable/harness/events.go#AgentEventStream.Start"
+      ],
+      "layers": {
+        "behavior": "complete",
+        "production": "complete",
+        "shape": "complete"
+      },
+      "production": [
+        "call:durable/harness/events.go#AgentEventStream.Start"
+      ],
+      "evidence": [
+        "test:durable/core/driver/compaction_failure_core_test.go#TestCoreACompactionFailureIsVisibleUntilASummaryIsProduced",
+        "test:durable/core/driver/generation_abort_core_test.go#TestCoreAStreamedMessageStartsAtItsFirstPartialAndEndsOnceWithTheConvertedEntryOnAbort",
+        "test:durable/core/driver/harness_nested_core_test.go#TestCoreNestedCallsAreToolEventsWithTheirParent"
+      ],
+      "asyncContract": "An awaited Promise is a blocking Go call that returns the value or error; AbortSignal is the context.Context argument; no detached goroutine."
     },
     {
       "id": "pkg:durable/.#AgentEventStream::property:stop",
@@ -208333,6 +208591,7 @@
         "call:durable/harness/scheduler.go#TaskScheduler.BlockedReason"
       ],
       "evidence": [
+        "test:durable/harness/harness_observers_test.go#TestObserveConversationAndObserveTaskGraph",
         "test:durable/harness/task_graph_pi_oracle_test.go#TestTaskGraphViewMatchesPiOnSeededPrograms"
       ]
     },
@@ -208420,7 +208679,8 @@
       ],
       "evidence": [
         "test:durable/session/session_deferred_commits_upstream_test.go#TestHoldingADeferredCommit",
-        "test:durable/session/session_deferred_commits_upstream_test.go#TestStoringHeldChanges"
+        "test:durable/session/session_deferred_commits_upstream_test.go#TestStoringHeldChanges",
+        "test:durable/session/session_adoption_test.go#TestPublicationAtAdoption"
       ]
     },
     {
@@ -208437,7 +208697,7 @@
         "shape": "complete"
       },
       "production": [
-        "call:durable/session/held.go#SessionImpl.hold"
+        "call:durable/session/held.go#SessionImpl.storeHolds"
       ],
       "evidence": [
         "test:durable/harness/events_pi_oracle_test.go#TestTranslateEventsMatchPi",
@@ -212477,8 +212737,25 @@
     },
     {
       "id": "pkg:durable/.#HostCallback",
-      "disposition": "pending",
-      "upstreamShapeHash": "sha256:3c5aa4eb2480a889106a465c205dbd254c079fb4f07c9e8e1511dc47ce472544"
+      "disposition": "ported",
+      "upstreamShapeHash": "sha256:3c5aa4eb2480a889106a465c205dbd254c079fb4f07c9e8e1511dc47ce472544",
+      "rationale": "Derived by the interface gap detector: HostCallback is Go durable/types.go#HostCallback (name rule N1), every shape rule holds, and it is exercised by an asserting Go test. The row is re-derived on every run of make interface-gaps-update.",
+      "pigTargets": [
+        "durable/types.go#HostCallback"
+      ],
+      "layers": {
+        "behavior": "complete",
+        "production": "complete",
+        "shape": "complete"
+      },
+      "production": [
+        "call:durable/harness/generation.go#generationAbortHandler"
+      ],
+      "evidence": [
+        "test:durable/core/driver/harness_reports_core_test.go#TestReports",
+        "test:durable/harness/harness_telemetry_events_test.go#TestDurableTelemetryMirrorsRuntimeReportsAsFixedFieldPhaseEventsAndTypeOnlyCounters",
+        "test:durable/harness/harness_telemetry_test.go#TestDurableTelemetryReportsTelemetryAdaptersThatThrowWhileACommitIsPublishedAndTheCommitStands"
+      ]
     },
     {
       "id": "pkg:durable/.#Id",
@@ -213612,8 +213889,25 @@
     },
     {
       "id": "pkg:durable/.#NativeWatchChange",
-      "disposition": "pending",
-      "upstreamShapeHash": "sha256:820966f5fc2f2a8250e9e952783285fd18013c2890c7e018e0085234a17ce504"
+      "disposition": "ported",
+      "upstreamShapeHash": "sha256:820966f5fc2f2a8250e9e952783285fd18013c2890c7e018e0085234a17ce504",
+      "rationale": "Derived by the interface gap detector: NativeWatchChange is Go durable/types.go#NativeWatchChange (name rule N1), every shape rule holds, and it is exercised by an asserting Go test. The row is re-derived on every run of make interface-gaps-update.",
+      "pigTargets": [
+        "durable/types.go#NativeWatchChange"
+      ],
+      "layers": {
+        "behavior": "complete",
+        "production": "complete",
+        "shape": "complete"
+      },
+      "production": [
+        "call:chord/watch_impl.go#NewNativeWatch"
+      ],
+      "evidence": [
+        "test:chord/watch_upstream_test.go#TestNativeWatchCollapses101PendingValuesToTheNewest",
+        "test:chord/watch_upstream_test.go#TestNativeWatchCollapses101PendingValuesToTheValueOfReplace",
+        "test:chord/watch_upstream_test.go#TestNativeWatchDeliversABacklogThatNeverDrainsInOrder"
+      ]
     },
     {
       "id": "pkg:durable/.#NestedCallDoc",
@@ -213748,13 +214042,46 @@
     },
     {
       "id": "pkg:durable/.#Observation",
-      "disposition": "pending",
-      "upstreamShapeHash": "sha256:1580ef62fa7d4f69a1b564741d337ed5d45a6572d506c58fecfdb153d740f361"
+      "disposition": "ported",
+      "upstreamShapeHash": "sha256:1580ef62fa7d4f69a1b564741d337ed5d45a6572d506c58fecfdb153d740f361",
+      "rationale": "Derived by the interface gap detector: Observation is Go durable/types.go#Observation (name rule N1), every shape rule holds, and it is exercised by an asserting Go test. The row is re-derived on every run of make interface-gaps-update.",
+      "pigTargets": [
+        "durable/types.go#Observation"
+      ],
+      "layers": {
+        "behavior": "complete",
+        "production": "complete",
+        "shape": "complete"
+      },
+      "production": [
+        "call:durable/harness/harness.go#harnessImpl.ObserveConversation"
+      ],
+      "evidence": [
+        "test:durable/harness/harness_observers_test.go#TestObserveConversationAndObserveTaskGraph",
+        "test:durable/session/session_observers_test.go#TestObserveDoc",
+        "test:durable/session/session_observers_test.go#TestObserveDocDetachedDuringACommit"
+      ]
     },
     {
       "id": "pkg:durable/.#Observer",
-      "disposition": "pending",
-      "upstreamShapeHash": "sha256:26ee864b9db430593feeb171c8b3046475cdf7b0ba78be7a02d76923a85b6d6b"
+      "disposition": "ported",
+      "upstreamShapeHash": "sha256:26ee864b9db430593feeb171c8b3046475cdf7b0ba78be7a02d76923a85b6d6b",
+      "rationale": "Derived by the interface gap detector: Observer is Go durable/types.go#Observer (name rule N1), every shape rule holds, and it is exercised by an asserting Go test. The row is re-derived on every run of make interface-gaps-update.",
+      "pigTargets": [
+        "durable/types.go#Observer"
+      ],
+      "layers": {
+        "behavior": "complete",
+        "production": "complete",
+        "shape": "complete"
+      },
+      "production": [
+        "call:durable/harness/harness.go#harnessImpl.ObserveConversation"
+      ],
+      "evidence": [
+        "test:durable/session/session_observers_test.go#TestObserveDoc",
+        "test:durable/session/session_observers_test.go#TestObserveDocDetachedDuringACommit"
+      ]
     },
     {
       "id": "pkg:durable/.#Page",
@@ -215020,8 +215347,26 @@
     },
     {
       "id": "pkg:durable/.#Session",
-      "disposition": "pending",
-      "upstreamShapeHash": "sha256:9f0f509a34cf348e0adb1bbcb948caf1f79e9663b25fe50669c75ec9a4f5bc44"
+      "disposition": "ported",
+      "upstreamShapeHash": "sha256:9f0f509a34cf348e0adb1bbcb948caf1f79e9663b25fe50669c75ec9a4f5bc44",
+      "rationale": "Derived by the interface gap detector: Session is Go durable/types.go#Session (name rule N1), every shape rule holds, and it is exercised by an asserting Go test. The row is re-derived on every run of make interface-gaps-update.",
+      "pigTargets": [
+        "durable/types.go#Session"
+      ],
+      "layers": {
+        "behavior": "complete",
+        "production": "complete",
+        "shape": "complete"
+      },
+      "production": [
+        "call:durable/documents.go#Snapshot"
+      ],
+      "evidence": [
+        "test:durable/examples/spec_usage_upstream_test.go#TestSpecUsageHostSequenceRuns",
+        "test:durable/examples/spec_usage_upstream_test.go#TestSpecUsageRevokedLiveDraftPanics",
+        "test:durable/harness/harness_deferred_progress_upstream_test.go#TestACompactionCutOffByACrashRerunsFromItsCheckpoint"
+      ],
+      "asyncContract": "An awaited Promise is a blocking Go call that returns the value or error; AbortSignal is the context.Context argument; no detached goroutine."
     },
     {
       "id": "pkg:durable/.#Session::property:close",
@@ -215130,38 +215475,150 @@
     },
     {
       "id": "pkg:durable/.#Session::property:observeDoc",
-      "disposition": "pending",
-      "upstreamShapeHash": "sha256:1212e28b04a02f2303fd43400a9eed3425b10baf12f10291515d82bbd455c9b6"
+      "disposition": "ported",
+      "upstreamShapeHash": "sha256:1212e28b04a02f2303fd43400a9eed3425b10baf12f10291515d82bbd455c9b6",
+      "rationale": "Derived by the interface gap detector: Session::property:observeDoc is Go durable/documents.go#ObserveDoc (name rule N1), every shape rule holds, and it is exercised by an asserting Go test. The row is re-derived on every run of make interface-gaps-update.",
+      "pigTargets": [
+        "durable/documents.go#ObserveDoc"
+      ],
+      "layers": {
+        "behavior": "complete",
+        "production": "public-api-tested",
+        "shape": "complete"
+      },
+      "production": [
+        "public-api:durable/documents.go#ObserveDoc"
+      ],
+      "evidence": [
+        "test:durable/harness/harness_observers_test.go#TestTaskDocuments"
+      ],
+      "asyncContract": "An awaited Promise is a blocking Go call that returns the value or error; AbortSignal is the context.Context argument; no detached goroutine."
     },
     {
       "id": "pkg:durable/.#Session::property:observeDoc::call:0",
-      "disposition": "pending",
-      "upstreamShapeHash": "sha256:776fdf6055052685f0a2708f11bb6d741157f275256412c609d87e8eb6a9b56a"
+      "disposition": "ported",
+      "upstreamShapeHash": "sha256:776fdf6055052685f0a2708f11bb6d741157f275256412c609d87e8eb6a9b56a",
+      "rationale": "Derived by the interface gap detector: Session::property:observeDoc::call:0 is Go durable/documents.go#ObserveDoc (name rule N1), every shape rule holds, and it is exercised by an asserting Go test. The row is re-derived on every run of make interface-gaps-update.",
+      "pigTargets": [
+        "durable/documents.go#ObserveDoc"
+      ],
+      "layers": {
+        "behavior": "complete",
+        "production": "public-api-tested",
+        "shape": "complete"
+      },
+      "production": [
+        "public-api:durable/documents.go#ObserveDoc"
+      ],
+      "evidence": [
+        "test:durable/harness/harness_observers_test.go#TestTaskDocuments"
+      ],
+      "asyncContract": "An awaited Promise is a blocking Go call that returns the value or error; AbortSignal is the context.Context argument; no detached goroutine."
     },
     {
       "id": "pkg:durable/.#Session::property:observeDoc::call:1",
-      "disposition": "pending",
-      "upstreamShapeHash": "sha256:38eaced49c0a9cf9609eae40d66e5c0088cff120c95e6a49b5baad888811affa"
+      "disposition": "ported",
+      "upstreamShapeHash": "sha256:38eaced49c0a9cf9609eae40d66e5c0088cff120c95e6a49b5baad888811affa",
+      "rationale": "Derived by the interface gap detector: Session::property:observeDoc::call:1 is Go durable/documents.go#ObserveDoc (name rule N1), every shape rule holds, and it is exercised by an asserting Go test. The row is re-derived on every run of make interface-gaps-update.",
+      "pigTargets": [
+        "durable/documents.go#ObserveDoc"
+      ],
+      "layers": {
+        "behavior": "complete",
+        "production": "public-api-tested",
+        "shape": "complete"
+      },
+      "production": [
+        "public-api:durable/documents.go#ObserveDoc"
+      ],
+      "evidence": [
+        "test:durable/harness/harness_observers_test.go#TestTaskDocuments"
+      ],
+      "asyncContract": "An awaited Promise is a blocking Go call that returns the value or error; AbortSignal is the context.Context argument; no detached goroutine."
     },
     {
       "id": "pkg:durable/.#Session::property:observeDoc::call:2",
-      "disposition": "pending",
-      "upstreamShapeHash": "sha256:b7d7d80f571faa9002d218d8f7d92c6c993da48dc6313ed6e14bc1819ea0e124"
+      "disposition": "ported",
+      "upstreamShapeHash": "sha256:b7d7d80f571faa9002d218d8f7d92c6c993da48dc6313ed6e14bc1819ea0e124",
+      "rationale": "Derived by the interface gap detector: Session::property:observeDoc::call:2 is Go durable/documents.go#ObserveDoc (name rule N1), every shape rule holds, and it is exercised by an asserting Go test. The row is re-derived on every run of make interface-gaps-update.",
+      "pigTargets": [
+        "durable/documents.go#ObserveDoc"
+      ],
+      "layers": {
+        "behavior": "complete",
+        "production": "public-api-tested",
+        "shape": "complete"
+      },
+      "production": [
+        "public-api:durable/documents.go#ObserveDoc"
+      ],
+      "evidence": [
+        "test:durable/harness/harness_observers_test.go#TestTaskDocuments"
+      ],
+      "asyncContract": "An awaited Promise is a blocking Go call that returns the value or error; AbortSignal is the context.Context argument; no detached goroutine."
     },
     {
       "id": "pkg:durable/.#Session::property:observeDoc::call:3",
-      "disposition": "pending",
-      "upstreamShapeHash": "sha256:bf63f82b959424622a7a216d8e1693b8de581f13055190dd3fe6919e8ebe5eed"
+      "disposition": "ported",
+      "upstreamShapeHash": "sha256:bf63f82b959424622a7a216d8e1693b8de581f13055190dd3fe6919e8ebe5eed",
+      "rationale": "Derived by the interface gap detector: Session::property:observeDoc::call:3 is Go durable/documents.go#ObserveDoc (name rule N1), every shape rule holds, and it is exercised by an asserting Go test. The row is re-derived on every run of make interface-gaps-update.",
+      "pigTargets": [
+        "durable/documents.go#ObserveDoc"
+      ],
+      "layers": {
+        "behavior": "complete",
+        "production": "public-api-tested",
+        "shape": "complete"
+      },
+      "production": [
+        "public-api:durable/documents.go#ObserveDoc"
+      ],
+      "evidence": [
+        "test:durable/harness/harness_observers_test.go#TestTaskDocuments"
+      ],
+      "asyncContract": "An awaited Promise is a blocking Go call that returns the value or error; AbortSignal is the context.Context argument; no detached goroutine."
     },
     {
       "id": "pkg:durable/.#Session::property:observeDoc::call:4",
-      "disposition": "pending",
-      "upstreamShapeHash": "sha256:38cf3742d4150f10c7a6eecd0547c166abf7ce1ee64a72dfc2118e644f3301f9"
+      "disposition": "ported",
+      "upstreamShapeHash": "sha256:38cf3742d4150f10c7a6eecd0547c166abf7ce1ee64a72dfc2118e644f3301f9",
+      "rationale": "Derived by the interface gap detector: Session::property:observeDoc::call:4 is Go durable/documents.go#ObserveDoc (name rule N1), every shape rule holds, and it is exercised by an asserting Go test. The row is re-derived on every run of make interface-gaps-update.",
+      "pigTargets": [
+        "durable/documents.go#ObserveDoc"
+      ],
+      "layers": {
+        "behavior": "complete",
+        "production": "public-api-tested",
+        "shape": "complete"
+      },
+      "production": [
+        "public-api:durable/documents.go#ObserveDoc"
+      ],
+      "evidence": [
+        "test:durable/harness/harness_observers_test.go#TestTaskDocuments"
+      ],
+      "asyncContract": "An awaited Promise is a blocking Go call that returns the value or error; AbortSignal is the context.Context argument; no detached goroutine."
     },
     {
       "id": "pkg:durable/.#Session::property:observeDoc::call:5",
-      "disposition": "pending",
-      "upstreamShapeHash": "sha256:e7e1b457de33f15504d5e9a7e3a05ed350db07756d90c687125469781e8e5f57"
+      "disposition": "ported",
+      "upstreamShapeHash": "sha256:e7e1b457de33f15504d5e9a7e3a05ed350db07756d90c687125469781e8e5f57",
+      "rationale": "Derived by the interface gap detector: Session::property:observeDoc::call:5 is Go durable/documents.go#ObserveDoc (name rule N1), every shape rule holds, and it is exercised by an asserting Go test. The row is re-derived on every run of make interface-gaps-update.",
+      "pigTargets": [
+        "durable/documents.go#ObserveDoc"
+      ],
+      "layers": {
+        "behavior": "complete",
+        "production": "public-api-tested",
+        "shape": "complete"
+      },
+      "production": [
+        "public-api:durable/documents.go#ObserveDoc"
+      ],
+      "evidence": [
+        "test:durable/harness/harness_observers_test.go#TestTaskDocuments"
+      ],
+      "asyncContract": "An awaited Promise is a blocking Go call that returns the value or error; AbortSignal is the context.Context argument; no detached goroutine."
     },
     {
       "id": "pkg:durable/.#Session::property:snapshot",
@@ -217384,12 +217841,12 @@
         "shape": "complete"
       },
       "production": [
-        "call:durable/harness/task_graph.go#TaskGraphView.Watch"
+        "call:durable/harness/harness.go#harnessImpl.ObserveTaskGraph"
       ],
       "evidence": [
         "test:durable/core/driver/watch_reduce_test.go#TestGraphFrameCostsOneMapCopy",
         "test:durable/core/driver/watch_reduce_test.go#TestTaskGraphReducerMatchesFullConversion",
-        "test:durable/core/driver/harness_sleep_core_test.go#TestSleepingTasks"
+        "test:durable/harness/harness_observers_test.go#TestObserveConversationAndObserveTaskGraph"
       ]
     },
     {
@@ -221718,8 +222175,25 @@
     },
     {
       "id": "pkg:durable/.#WatchChange",
-      "disposition": "pending",
-      "upstreamShapeHash": "sha256:43ff7a0f4dc4c0db2b995dd3c926eed502fa7cd46d61e2fd7dd812accc67486b"
+      "disposition": "ported",
+      "upstreamShapeHash": "sha256:43ff7a0f4dc4c0db2b995dd3c926eed502fa7cd46d61e2fd7dd812accc67486b",
+      "rationale": "Derived by the interface gap detector: WatchChange is Go durable/types.go#WatchChange (name rule N1), every shape rule holds, and it is exercised by an asserting Go test. The row is re-derived on every run of make interface-gaps-update.",
+      "pigTargets": [
+        "durable/types.go#WatchChange"
+      ],
+      "layers": {
+        "behavior": "complete",
+        "production": "complete",
+        "shape": "complete"
+      },
+      "production": [
+        "call:durable/harness/task_graph.go#publishChanged"
+      ],
+      "evidence": [
+        "test:chord/watch_upstream_test.go#TestDeliverySchedulerHoldFoldsTheFramesAdvancedWhileItIsOpenIntoOneCallPerWatch",
+        "test:chord/watch_upstream_test.go#TestWatchAwaitsEachCallbackAndFoldsFramesAdvancedWhileOneIsInFlightIntoTheNextCall",
+        "test:chord/watch_upstream_test.go#TestWatchChangeObjectsCarryPlainDataOnlyTheFoldedChangeBuiltByTheWatch"
+      ]
     },
     {
       "id": "pkg:durable/.#WatchEnd",
@@ -221791,8 +222265,26 @@
     },
     {
       "id": "pkg:durable/.#WatchHandle",
-      "disposition": "pending",
-      "upstreamShapeHash": "sha256:e711357fdfa27f18f14ca759ca2d1c9c705a8b3ed6d253e5ea29eb9b972a8846"
+      "disposition": "ported",
+      "upstreamShapeHash": "sha256:e711357fdfa27f18f14ca759ca2d1c9c705a8b3ed6d253e5ea29eb9b972a8846",
+      "rationale": "Derived by the interface gap detector: WatchHandle is Go durable/types.go#WatchHandle (name rule N1), every shape rule holds, and it is exercised by an asserting Go test. The row is re-derived on every run of make interface-gaps-update.",
+      "pigTargets": [
+        "durable/types.go#WatchHandle"
+      ],
+      "layers": {
+        "behavior": "complete",
+        "production": "complete",
+        "shape": "complete"
+      },
+      "production": [
+        "call:durable/harness/scheduler.go#TaskScheduler.createInvocationLocked"
+      ],
+      "evidence": [
+        "test:chord/watch_upstream_test.go#TestWatchableWatchHoldsTheCurrentValueThenOneFramePerChangeAndEndsWithItsContext",
+        "test:durable/session/session_deferred_commits_upstream_test.go#TestPublicationsOfDeferredCommits",
+        "test:durable/core/driver/docs_core_test.go#TestCoreObserversOfAnOlderShapeGetARootReplacementAfterANewerTokenWrites"
+      ],
+      "asyncContract": "An awaited Promise is a blocking Go call that returns the value or error; AbortSignal is the context.Context argument; no detached goroutine."
     },
     {
       "id": "pkg:durable/.#WatchHandle::property:closed",
@@ -221812,20 +222304,52 @@
       ],
       "evidence": [
         "test:chord/watch_upstream_test.go#TestWatchableWatchHoldsTheCurrentValueThenOneFramePerChangeAndEndsWithItsContext",
-        "test:durable/core/driver/docs_core_watches_test.go#TestCoreWatchDeliversRetirementAndDoesNotFollowRecreation",
-        "test:durable/core/driver/docs_core_watches_test.go#TestCoreWatchFoldsRetirementOverPendingCommitsThenCloses"
+        "test:durable/core/driver/docs_core_watches_test.go#TestCoreWatchFollowsItsAddressAcrossARetirementAndARecreationInOneCommitInOneCall",
+        "test:durable/core/driver/docs_core_watches_test.go#TestCoreWatchListenerFailureSettlesOnlyTheAffectedWatch"
       ],
       "asyncContract": "An awaited Promise is a blocking Go call that returns the value or error; AbortSignal is the context.Context argument; no detached goroutine."
     },
     {
       "id": "pkg:durable/.#WatchHandle::property:start",
-      "disposition": "pending",
-      "upstreamShapeHash": "sha256:d9bc0d5d494d821d46f42a5fbc6780a1981e00631bfe365cda0f3a13e7655035"
+      "disposition": "ported",
+      "upstreamShapeHash": "sha256:d9bc0d5d494d821d46f42a5fbc6780a1981e00631bfe365cda0f3a13e7655035",
+      "rationale": "Derived by the interface gap detector: WatchHandle::property:start is Go chord/watch.go#WatchHandle.Start (name rule N1), every shape rule holds, and it is exercised by an asserting Go test. The row is re-derived on every run of make interface-gaps-update.",
+      "pigTargets": [
+        "chord/watch.go#WatchHandle.Start"
+      ],
+      "layers": {
+        "behavior": "complete",
+        "production": "public-api-tested",
+        "shape": "complete"
+      },
+      "production": [
+        "public-api:chord/watch.go#WatchHandle.Start"
+      ],
+      "evidence": [
+        "test:chord/watch_upstream_test.go#TestWatchableWatchHoldsTheCurrentValueThenOneFramePerChangeAndEndsWithItsContext"
+      ],
+      "asyncContract": "An awaited Promise is a blocking Go call that returns the value or error; AbortSignal is the context.Context argument; no detached goroutine."
     },
     {
       "id": "pkg:durable/.#WatchHandle::property:start::call:0",
-      "disposition": "pending",
-      "upstreamShapeHash": "sha256:50a22952b3368cb5e861c7feb64cf19d20d5ab23fc231fd986a27dc74a43e54d"
+      "disposition": "ported",
+      "upstreamShapeHash": "sha256:50a22952b3368cb5e861c7feb64cf19d20d5ab23fc231fd986a27dc74a43e54d",
+      "rationale": "Derived by the interface gap detector: WatchHandle::property:start::call:0 is Go chord/watch.go#WatchHandle.Start (name rule N1), every shape rule holds, and it is exercised by an asserting Go test. The row is re-derived on every run of make interface-gaps-update.",
+      "pigTargets": [
+        "chord/watch.go#WatchHandle.Start"
+      ],
+      "layers": {
+        "behavior": "complete",
+        "production": "public-api-tested",
+        "shape": "complete"
+      },
+      "production": [
+        "public-api:chord/watch.go#WatchHandle.Start"
+      ],
+      "evidence": [
+        "test:chord/watch_upstream_test.go#TestWatchableWatchHoldsTheCurrentValueThenOneFramePerChangeAndEndsWithItsContext"
+      ],
+      "asyncContract": "An awaited Promise is a blocking Go call that returns the value or error; AbortSignal is the context.Context argument; no detached goroutine."
     },
     {
       "id": "pkg:durable/.#WatchHandle::property:stop",
@@ -225241,8 +225765,25 @@
     },
     {
       "id": "pkg:durable/env#FileChange",
-      "disposition": "pending",
-      "upstreamShapeHash": "sha256:0515ac47d2f5d8666052867b865175d85d3817f597d62e8f275376803bd123c2"
+      "disposition": "ported",
+      "upstreamShapeHash": "sha256:0515ac47d2f5d8666052867b865175d85d3817f597d62e8f275376803bd123c2",
+      "rationale": "Derived by the interface gap detector: FileChange is Go durable/env/env.go#FileChange (name rule N1), every shape rule holds, and it is exercised by an asserting Go test. The row is re-derived on every run of make interface-gaps-update.",
+      "pigTargets": [
+        "durable/env/env.go#FileChange"
+      ],
+      "layers": {
+        "behavior": "complete",
+        "production": "complete",
+        "shape": "complete"
+      },
+      "production": [
+        "call:durable/env/node/watch.go#NodeExecutionEnv.Watch"
+      ],
+      "evidence": [
+        "test:durable/env/node/conformance_test.go#TestNodeExecutionEnvWatchLimits",
+        "test:durable/env/node/conformance_test.go#TestNodeExecutionEnvWatchPermissionDenied",
+        "test:durable/env/node/env_members_test.go#TestNodeWatchOptionsModeForcesTheWatcherMode"
+      ]
     },
     {
       "id": "pkg:durable/env#FileError",
@@ -256479,7 +257020,8 @@
       ],
       "evidence": [
         "test:telemetry/metrics_upstream_test.go#TestMetricsUpstream",
-        "test:durable/harness/harness_telemetry_options_test.go#TestHarnessOptionsTelemetryAcceptsOneAdapterWithOptionalPropagationAndMetricsCapabilities"
+        "test:durable/harness/harness_telemetry_options_test.go#TestHarnessOptionsTelemetryAcceptsOneAdapterWithOptionalPropagationAndMetricsCapabilities",
+        "test:durable/harness/harness_telemetry_test.go#TestDurableTelemetryDropsAReportsOwnMetricThatThrowsAfterOnReportGotTheReport"
       ]
     },
     {
@@ -272940,9 +273482,9 @@
       "id": "pkg:tui/.#replaceControlCharacters",
       "disposition": "ported",
       "upstreamShapeHash": "sha256:fef8fbb059b373338ae4784e5ea2ceb531c73093a754d2e5c194546041747af6",
-      "rationale": "Derived by the interface gap detector: replaceControlCharacters is Go tui/program_status.go#replaceControlCharacters (name rule N1), every shape rule holds, and it is exercised by a function reachable from cmd/pig. The row is re-derived on every run of make interface-gaps-update.",
+      "rationale": "Derived by the interface gap detector: replaceControlCharacters is Go tui/widthx/grapheme_range.go#ReplaceControlCharacters (name rule N1), every shape rule holds, and it is exercised by an asserting Go test. The row is re-derived on every run of make interface-gaps-update.",
       "pigTargets": [
-        "tui/program_status.go#replaceControlCharacters"
+        "tui/widthx/grapheme_range.go#ReplaceControlCharacters"
       ],
       "layers": {
         "behavior": "complete",
@@ -272950,19 +273492,19 @@
         "shape": "complete"
       },
       "production": [
-        "call:tui/program_status.go#replaceControlCharacters"
+        "call:tui/widthx/grapheme_range.go#ReplaceControlCharacters"
       ],
       "evidence": [
-        "reach:tui/program_status.go#replaceControlCharacters"
+        "test:tui/widthx/grapheme_range_test.go#TestReplaceControlCharacters"
       ]
     },
     {
       "id": "pkg:tui/.#replaceControlCharacters::call:0",
       "disposition": "ported",
       "upstreamShapeHash": "sha256:ce6fb48ce9ec4a8e35a7336f238e4664f04a3c6ae5d6183b060a811487067d5c",
-      "rationale": "Derived by the interface gap detector: replaceControlCharacters::call:0 is Go tui/program_status.go#replaceControlCharacters (name rule N1), every shape rule holds, and it is exercised by a function reachable from cmd/pig. The row is re-derived on every run of make interface-gaps-update.",
+      "rationale": "Derived by the interface gap detector: replaceControlCharacters::call:0 is Go tui/widthx/grapheme_range.go#ReplaceControlCharacters (name rule N1), every shape rule holds, and it is exercised by an asserting Go test. The row is re-derived on every run of make interface-gaps-update.",
       "pigTargets": [
-        "tui/program_status.go#replaceControlCharacters"
+        "tui/widthx/grapheme_range.go#ReplaceControlCharacters"
       ],
       "layers": {
         "behavior": "complete",
@@ -272970,10 +273512,10 @@
         "shape": "complete"
       },
       "production": [
-        "call:tui/program_status.go#replaceControlCharacters"
+        "call:tui/widthx/grapheme_range.go#ReplaceControlCharacters"
       ],
       "evidence": [
-        "reach:tui/program_status.go#replaceControlCharacters"
+        "test:tui/widthx/grapheme_range_test.go#TestReplaceControlCharacters"
       ]
     },
     {

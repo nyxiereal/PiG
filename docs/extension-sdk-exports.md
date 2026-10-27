@@ -10,8 +10,8 @@ Use counts (`uses`) are the number of the 255 scanned npm packages that import t
 
 | Module | Rows | type-only (identity by kind) | Node served | Go gaps | Rust gaps | Python gaps |
 |---|---|---|---|---|---|---|
-| `pi-coding-agent` | 920 | 306 | 910 | 392 | 392 | 392 |
-| `pi-tui` | 365 | 85 | 364 | 147 | 147 | 147 |
+| `pi-coding-agent` | 920 | 306 | 910 | 391 | 391 | 391 |
+| `pi-tui` | 366 | 85 | 365 | 148 | 148 | 148 |
 | `pi-ai` | 105 | 199 | 105 | 75 | 75 | 75 |
 | `pi-ai/compat` | 164 | 206 | 164 | 131 | 131 | 131 |
 | `pi-agent-core` | 45 | 34 | 45 | 45 | 45 | 45 |
@@ -21,18 +21,17 @@ Use counts (`uses`) are the number of the 255 scanned npm packages that import t
 | Lane | Owner | Opened | Gap cells | Closing row |
 |---|---|---|---|---|
 | C2Sessions | C2Sessions lane (createAgentSession family, E1/E6) | 0.5.2 | 405 | Conformance rows for createAgentSession, createAgentSessionRuntime and the pi-agent-core Agent loop in all four SDKs (branch feat/sdk-child-agent-sessions) |
-| SdkExportsLedger | SdkExportsLedger lane (Pi application internals no extension scan imports) | 0.5.2 | 1158 | Owner decision per export, listed with usage counts in handoffs/0.5.2/sdk-exports-internals.md: a numbered divergence in docs/parity/DIVERGENCES.md (cells become divergence:D<n>), or a real lane with a port and a conformance row |
+| SdkExportsLedger | SdkExportsLedger lane (Pi application internals no extension scan imports) | 0.5.2 | 1161 | Owner decision per export, listed with usage counts in handoffs/0.5.2/sdk-exports-internals.md: a numbered divergence in docs/parity/DIVERGENCES.md (cells become divergence:D<n>), or a real lane with a port and a conformance row |
 | SdkPiAiHelpers | SdkPiAiHelpers lane (pi-ai pure helpers, StringEnum, host getters, E17-E22) | 0.5.2 | 198 | Pure helpers with vector tests from Pi at the pin; host getters and the pi-ai compat calls with a conformance row per SDK |
-| SdkSessionGraph | SdkSessionGraph lane (SessionManager/SettingsManager/ModelRuntime/resource loader, E2-E5) | 0.5.2 | 360 | Host calls for session open/list/inMemory, scoped settings, standalone model runtime, resource loader and package manager, with a conformance row per SDK |
+| SdkSessionGraph | SdkSessionGraph lane (SessionManager/SettingsManager/ModelRuntime/resource loader, E2-E5) | 0.5.2 | 357 | Host calls for session open/list/inMemory, scoped settings, standalone model runtime, resource loader and package manager, with a conformance row per SDK |
 | SdkTuiHelpers | SdkTuiHelpers lane (pi-tui helpers, keys, keybindings, theme and rendering helpers, E8-E16) | 0.5.2 | 249 | Pure helpers ported per SDK with vector tests from Pi at the pin (test/parity/sdk-vectors), keybinding and theme helpers with a conformance row per SDK |
 
 ## High-use gaps (block the release gate)
 
-15 exports imported by 5 or more scanned packages have a gap.
+14 exports imported by 5 or more scanned packages have a gap.
 
 | Export | uses | Gaps |
 |---|---|---|
-| `pi-coding-agent: buildSessionContext` | 19 | Go SdkSessionGraph; Rust SdkSessionGraph; Python SdkSessionGraph |
 | `pi-ai: Type` | 14 | Go SdkPiAiHelpers; Rust SdkPiAiHelpers; Python SdkPiAiHelpers |
 | `pi-ai/compat: Type` | 14 | Go SdkPiAiHelpers; Rust SdkPiAiHelpers; Python SdkPiAiHelpers |
 | `pi-coding-agent: createAgentSessionServices` | 9 | Go SdkSessionGraph; Rust SdkSessionGraph; Python SdkSessionGraph |
@@ -867,7 +866,7 @@ None.
 | `VERSION` | 13 | served | native:Version | native:get_version | native:get_version |
 | `VIRTUAL_MODEL_STATE_ENTRY` | 0 | served | native:VirtualModelStateEntry | native:VIRTUAL_MODEL_STATE_ENTRY | native:VIRTUAL_MODEL_STATE_ENTRY |
 | `buildContextEntries` | 1 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
-| `buildSessionContext` | 19 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
+| `buildSessionContext` | 19 | served | native:BuildSessionContext | native:build_session_context | native:build_session_context |
 | `buildSessionProjection` | 2 | served | gap:SdkSessionGraph | gap:SdkSessionGraph | gap:SdkSessionGraph |
 | `calculateContextTokens` | 2 | served | native:CalculateContextTokens | native:calculate_context_tokens | native:calculate_context_tokens |
 | `collectEntriesForBranchSummary` | 0 | served | native:CollectEntriesForBranchSummary | native:collect_entries_for_branch_summary | native:collect_entries_for_branch_summary |
@@ -1331,6 +1330,7 @@ None.
 | `renderFakeCursor` | 1 | served | gap:SdkExportsLedger | gap:SdkExportsLedger | gap:SdkExportsLedger |
 | `renderImage` | 0 | served | gap:SdkExportsLedger | gap:SdkExportsLedger | gap:SdkExportsLedger |
 | `renderLatex` | 0 | served | gap:SdkExportsLedger | gap:SdkExportsLedger | gap:SdkExportsLedger |
+| `replaceControlCharacters` | 0 | served | gap:SdkExportsLedger | gap:SdkExportsLedger | gap:SdkExportsLedger |
 | `resetCapabilitiesCache` | 1 | served | native:tui.ResetCapabilitiesCache | native:tui::reset_capabilities_cache | native:tui.reset_capabilities_cache |
 | `rgbColor` | 3 | served | native:tui.NewRgbColor | native:tui::rgb_color | native:tui.rgb_color |
 | `setCapabilities` | 1 | served | native:tui.SetCapabilities | native:tui::set_capabilities | native:tui.set_capabilities |

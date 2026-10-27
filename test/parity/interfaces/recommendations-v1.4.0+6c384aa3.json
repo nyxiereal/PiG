@@ -379337,22 +379337,24 @@
     {
       "id": "pkg:tui/.#replaceControlCharacters",
       "upstreamShapeHash": "sha256:fef8fbb059b373338ae4784e5ea2ceb531c73093a754d2e5c194546041747af6",
-      "recommendedDisposition": "partial",
+      "recommendedDisposition": "pending",
       "confidence": "low",
       "basis": [
-        "Exactly one normalized declared Go symbol name matches; package context, semantic shape, and production closure remain unverified."
+        "2 normalized-name Pig candidates are ambiguous."
       ],
       "alternatives": [
         "ported",
-        "pending",
+        "partial",
         "deferred",
         "designed-out",
         "divergence"
       ],
       "pigCandidates": [
-        "go:github.com/MichaelKinsy/PiG/tui#replaceControlCharacters"
+        "go:github.com/MichaelKinsy/PiG/extensions/sdk/tui/internal/widthx#ReplaceControlCharacters",
+        "go:github.com/MichaelKinsy/PiG/tui/widthx#ReplaceControlCharacters"
       ],
       "missingClosure": [
+        "candidate-disambiguation",
         "shape-translation-review",
         "production-reachability",
         "required-layers",

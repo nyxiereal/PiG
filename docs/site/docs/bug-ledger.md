@@ -78,6 +78,7 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 | [BF-0e8761b](#bf-0e8761b) | A system message with an empty sections object is stored as `"sections": {}`, as Pi stores it after a reset | A fix Pi shipped that PiG ported | All platforms | 0.5.0 |
 | [BF-0ffb06a](#bf-0ffb06a) | fix(tui): diff rows with a CR are wrapped like Pi's Text | PiG's own defect | All platforms | Unreleased |
 | [BF-116b36c](#bf-116b36c) | fix(extensions): answer the start-window report of a tool call that holds no window, where the report is read | PiG's own defect | All platforms | Unreleased |
+| [BF-11866f8](#bf-11866f8) | `WaitForIdle` on the Harness or a Conversation no longer fails with "Harness is closed" when a close begins… | PiG's own defect | All platforms | Unreleased |
 | [BF-11a6fcb](#bf-11a6fcb) | fix(extension): a restart adopts the new renderers; the late-registration row runs what it registered | PiG's own defect | All platforms | Unreleased |
 | [BF-11b199d](#bf-11b199d) | Session lines (and every other JSON.stringify-mode encode) now write ill-formed UTF-8 the way Pi does: one… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-1268115](#bf-1268115) | fix(model runtime): a cancelled request to a caller-owned provider the runtime does not know is aborted, not… | PiG's own defect | All platforms | Unreleased |
@@ -520,6 +521,7 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 | [BF-6a6fffa-9](#bf-6a6fffa-9) | `TestSettingsSelectorMatchesPi` opens each row under the Kitty keyboard protocol with CSI-u keys; no… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-6ac4c8c](#bf-6ac4c8c) | Ctrl+V pastes clipboard text in Termux | A fix Pi shipped that PiG ported | Linux, Android and Termux | 0.5.0 |
 | [BF-6b97207](#bf-6b97207) | An extension that overrides the `edit` tool with a definition built by the Go, Rust or Python SDK's… | PiG's own defect | All platforms | Unreleased |
+| [BF-6c26be3](#bf-6c26be3) | A submission's `Wait` no longer fails with "Harness is closed" when a close begins before the wait wakes: a… | PiG's own defect | All platforms | Unreleased |
 | [BF-6cb29f0](#bf-6cb29f0) | Started from a directory reached through a symlink, `pig install`/`remove`/`list`/`update` resolve local… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-6cb29f0-2](#bf-6cb29f0-2) | Started from a directory reached through a symlink, `/export <file>.jsonl` and `/bug` now write and name… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-6cb29f0-3](#bf-6cb29f0-3) | Switching to or importing an empty session file from a directory reached through a symlink starts the session… | PiG's own defect | All platforms | 0.5.0 |
@@ -748,6 +750,7 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 | [BF-928e15c-9](#bf-928e15c-9) | An OpenAI Codex login or refresh whose success response is not JSON reports JavaScript's own message, as Pi… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-92da987](#bf-92da987) | Codemode no longer reserves its whole 256 MiB script-memory limit when a session starts: the QuickJS linear… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-930c88e](#bf-930c88e) | Claude models with per-message effort no longer fail with `Invalid effort level` on accounts whose… | PiG's own defect | All platforms | Unreleased |
+| [BF-9327bc7](#bf-9327bc7) | A closed Harness or Session no longer stays reachable from Go's timer heap | PiG's own defect | All platforms | Unreleased |
 | [BF-93319f4](#bf-93319f4) | The terminal UI worked example now describes the typed `/model` prefix in words | PiG's own defect | All platforms | 0.5.0 |
 | [BF-93c09d6](#bf-93c09d6) | A local package source that is a file Node cannot import, such as a packed `.tgz`, fails to load as in Pi… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-93c09d6-2](#bf-93c09d6-2) | `pig install --validate-only` on a Package root validates every extension the Package names in… | PiG's own defect | All platforms | 0.5.0 |
@@ -772,6 +775,7 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 | [BF-985b5f9](#bf-985b5f9) | fix(coding): a resumed session takes its active tools from the transcript (pi-mono #10785) [SIGNOFF-PENDING] | PiG's own defect | All platforms | Unreleased |
 | [BF-992f3cb](#bf-992f3cb) | A `before_provider_request` replacement that is not an object leaves Anthropic Messages as Pi's `{ ...value… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-99a06cf](#bf-99a06cf) | Interactive startup paints the editor and footer first and adds the startup header once the terminal reports… | PiG's own defect | All platforms | 0.5.0 |
+| [BF-9a9dc99](#bf-9a9dc99) | `WaitForTask` on a task whose terminal commit was adopted no longer fails with "Harness is closed" when a… | PiG's own defect | All platforms | Unreleased |
 | [BF-9abc6ac](#bf-9abc6ac) | Markdown bold and italic next to CJK punctuation render in HTML exports and in Markdown that Node extensions… | PiG's own defect | All platforms | 0.5.2 |
 | [BF-9af407c](#bf-9af407c) | fix(ai): race builds read provider sockets through syscall.Read | PiG's own defect | All platforms | Unreleased |
 | [BF-9b2165f](#bf-9b2165f) | fix(tui): quotes narrower than a border keep their whitespace tokens like Pi (Pi) | PiG's own defect | All platforms | Unreleased |
@@ -1106,6 +1110,7 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 | [BF-e5f9fdd](#bf-e5f9fdd) | The provider retry transport no longer replaces `Body` on the caller's request when it retries | PiG's own defect | All platforms | 0.5.0 |
 | [BF-e63c61c](#bf-e63c61c) | fix(interactive): pump the owner loop while model selection awaits extensions (#208) (#209) | PiG's own defect | All platforms | Unreleased |
 | [BF-e64d2cf](#bf-e64d2cf) | fix(tui): a tool error result collapses like any other (Pi updateResult) | PiG's own defect | All platforms | Unreleased |
+| [BF-e65ade9](#bf-e65ade9) | `WaitForIdle` on the Harness or a Conversation no longer resumes before the `SubscribeCommits` listeners saw… | PiG's own defect | All platforms | Unreleased |
 | [BF-e69d018](#bf-e69d018) | Closing an `env` connection, or losing it, now ends its daemon process with SIGTERM, as in Pi, instead of… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-e73e536](#bf-e73e536) | Codemode scripts no longer fail immediately when both codemode workers are busy, for example with parallel… | A fix Pi shipped that PiG ported | All platforms | 0.5.2 |
 | [BF-e75a8b9](#bf-e75a8b9) | The external editor (`ctrl+g`) now edits `prompt.md` inside a private `pi-editor-*` directory under the… | PiG's own defect | All platforms | 0.5.0 |
@@ -1114,6 +1119,7 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 | [BF-e90ac19](#bf-e90ac19) | Very long streamed answers no longer slow down with their length: each streamed frame renders only the last… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-e9332c8](#bf-e9332c8) | fix(codingagent): session search re: reads patterns as V8 does | PiG's own defect | All platforms | Unreleased |
 | [BF-e9392fd](#bf-e9392fd) | A Google Generative AI or Vertex request with no `contents` (a history of system messages only, or one user… | PiG's own defect | All platforms | 0.5.0 |
+| [BF-e9ca222](#bf-e9ca222) | fix(durable/host/cf): adopt Pi's address-following watches and observers (Pi) | PiG's own defect | All platforms | Unreleased |
 | [BF-e9e9cf8](#bf-e9e9cf8) | An extension that calls a pi-ai function such as `completeSimple` at top level or in its factory no longer… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-ea6db99](#bf-ea6db99) | A provider request that fails in transport now records its cause: the failed message carries a… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-ea90fb3](#bf-ea90fb3) | A running `!cmd` block keeps only the last 2000 lines or 50 KB it shows instead of every byte the command… | PiG's own defect | All platforms | 0.5.0 |
@@ -2060,6 +2066,20 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 - **Fixed in:** Unreleased
 - **Fix commits:** `116b36c0cc` (2026-10-21)
 - **Tests:** None recorded.
+
+### BF-11866f8
+
+**`WaitForIdle` on the Harness or a Conversation no longer fails with "Harness is closed" when a close begins…**
+
+- **Source:** PiG's own defect
+- **Symptom:** `WaitForIdle` on the Harness or a Conversation no longer fails with "Harness is closed" when a close begins after the commit that made the work idle and before the wait wakes.
+- **Root cause:** This replaces the pending count added: a settle outside the publication can no longer see a wait the commit made idle, because that wait left the pending set at the commit, so the count has nothing left to guard.
+- **User impact:** An operation failed or was rejected
+- **Platform:** All platforms
+- **Fixed in:** Unreleased
+- **Fix commits:** `11866f8f17` (2026-10-27)
+- **Tests:** `durable/harness/harness_tasks_test.go::TestPublicationAtAdoption`
+- **Release note:** `WaitForIdle` on the Harness or a Conversation no longer fails with "Harness is closed" when a close begins after the commit that made the work idle and before the wait wakes. Pi settles the idle waits at the commit, so a later close cannot reach them; PiG decided and settled them only after the host listeners, and the close's seal rejected them. They are now settled at the commit and only wake after the listeners.
 
 ### BF-11a6fcb
 
@@ -8185,6 +8205,20 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 - **Tests:** None recorded.
 - **Release note:** An extension that overrides the `edit` tool with a definition built by the Go, Rust or Python SDK's `createEditToolDefinition` now has the model's legacy edit shapes normalised, as Pi's `{ ...createEditToolDefinition(cwd), execute }` does. The SDK definition dropped the built-in's `prepareArguments`, so `edits` sent as a JSON string, a single edit object or the legacy top-level `{path, oldText, newText}` reached the override unnormalised and the edit was silently not applied, while the model's turn still reported success. The definition's `PrepareArguments` / `prepare_arguments` now runs the built-in's own normaliser on the host (a new `builtinTool.prepareArguments` host call; a fused Go extension calls it directly), and write, read and the other built-ins have none, as in Pi.
 
+### BF-6c26be3
+
+**A submission's `Wait` no longer fails with "Harness is closed" when a close begins before the wait wakes: a…**
+
+- **Source:** PiG's own defect
+- **Symptom:** A submission's `Wait` no longer fails with "Harness is closed" when a close begins before the wait wakes: a host `SubscribeCommits` listener that closes the Harness on the commit that settled the submission, or a close that comes between that commit's adoption and its publication.
+- **Root cause:** Pi's Submissions#observe resolves the wait of a settled submission inside the observer, at the commit (submissions.ts #observe), so the promise is settled for good: the close listener's rejectAll (submissions.ts subscribeClose) no longer reaches it, and only the code awaiting it resumes after the host's commit listeners. The port deferred the settling itself behind the listeners, so a wait for a submission whose settling commit was adopted was still pending while the listeners ran, and the seal of a close that began in a listener, or between the adoption and the publication, rejected it with "Harness is closed": a settled submission turned into an error for its waiter. This is the defect…
+- **User impact:** Lost or altered data
+- **Platform:** All platforms
+- **Fixed in:** Unreleased
+- **Fix commits:** `6c26be37c2` (2026-10-27)
+- **Tests:** `durable/harness/harness_submissions_test.go::TestSubmissions`
+- **Release note:** A submission's `Wait` no longer fails with "Harness is closed" when a close begins before the wait wakes: a host `SubscribeCommits` listener that closes the Harness on the commit that settled the submission, or a close that comes between that commit's adoption and its publication. Pi resolves the wait at the commit, so a later close cannot reach it; PiG settled it only after the host listeners, and the close's seal rejected it, turning a settled submission into an error for its waiter. The record is now fixed at the commit and the wait only wakes after the listeners.
+
 ### BF-6cb29f0
 
 **Started from a directory reached through a symlink, `pig install`/`remove`/`list`/`update` resolve local…**
@@ -11353,6 +11387,20 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 - **Tests:** `ai/anthropic_beta_override_test.go::TestAnthropicManagedEffortBodyFollowsTheBetasSent`, `ai/anthropic_mid_effort_upstream_test.go::TestAnthropicUpstreamMidConversationEffort`
 - **Release note:** Claude models with per-message effort no longer fail with `Invalid effort level` on accounts whose organization caps effort below `high`: the fixed top-level effort is `low`.
 
+### BF-9327bc7
+
+**A closed Harness or Session no longer stays reachable from Go's timer heap**
+
+- **Source:** PiG's own defect
+- **Symptom:** A closed Harness or Session no longer stays reachable from Go's timer heap.
+- **Root cause:** time.Timer.Stop only marks a heap-resident timer as a zombie; the runtime keeps the timer and the function it was armed with until it next removes it from that P's timer heap, which is not at Stop. NativeTimer's function reached its callback, and the callback of the document sweep reaches the Session, so a closed Harness stayed reachable from the runtime's timer heap for as long as the heap was not cleaned: the next timer armed on that P, or the P's next scheduling round under force-cleaning. Pi's clearTimeout leaves nothing of the callback; the Go port left the whole Session.
+- **User impact:** Behavior differed from Pi
+- **Platform:** All platforms
+- **Fixed in:** Unreleased
+- **Fix commits:** `9327bc7628` (2026-10-27)
+- **Tests:** `durable/harness/harness_observers_test.go::TestTaskDocuments`, `durable/timers_test.go::TestNativeTimerDisarmReleasesItsCallback`
+- **Release note:** A closed Harness or Session no longer stays reachable from Go's timer heap. `durable.NativeTimer`, the default `SetTimer`, stopped a timer without dropping its callback, and Go keeps a stopped timer and the function it was armed with until the runtime next removes it from the timer heap, which is not at `Stop` and can be as late as the timer's delay (ten minutes for the document sweep); the sweep's callback reaches the Session, so a closed Harness stayed alive that long, where Pi's `clearTimeout` leaves nothing of the callback. A disarmed timer now keeps nothing of its callback.
+
 ### BF-93319f4
 
 **The terminal UI worked example now describes the typed `/model` prefix in words**
@@ -11683,6 +11731,20 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 - **Fix commits:** `99a06cfc16` (2026-10-09)
 - **Tests:** `coding/cli/interactive_startup_pty_test.go::TestInteractiveStartupPaintsTheEditorBeforeTheHeaderWhenTheTerminalIsSilent`, `internal/codingagent/extension_header_spacing_test.go::TestStartupHeaderStaysOutOfTheFirstPaintUntilTheColorsArrive`
 - **Release note:** Interactive startup paints the editor and footer first and adds the startup header once the terminal reports its colors or 100 ms pass, as Pi does. On a terminal that never answers the color query, the first frame no longer waits for that timeout.
+
+### BF-9a9dc99
+
+**`WaitForTask` on a task whose terminal commit was adopted no longer fails with "Harness is closed" when a…**
+
+- **Source:** PiG's own defect
+- **Symptom:** `WaitForTask` on a task whose terminal commit was adopted no longer fails with "Harness is closed" when a close begins before the wait wakes: a host `SubscribeCommits` listener that closes the Harness on that commit, or a close that comes between the commit's adoption and its publication.
+- **Root cause:** Pi resolves a task wait inside the scheduler's observer, at the commit, so a promise that is settled can no longer be rejected: only the code awaiting it resumes later, after the host's commit listeners. The port deferred the settling itself behind the listeners, so a wait for a task whose terminal commit was adopted was still pending while the listeners ran, and the close listener's seal rejected it with "Harness is closed". A host listener that closes the Harness on the terminal commit (as Pi's "keeps a task wait resolved when a host listener closes the Harness on the terminal commit" does) or a close that begins between the adoption and the publication turned a completed task into an…
+- **User impact:** Lost or altered data
+- **Platform:** All platforms
+- **Fixed in:** Unreleased
+- **Fix commits:** `9a9dc9900a` (2026-10-27)
+- **Tests:** `durable/harness/harness_tasks_test.go::TestPublicationAtAdoption`
+- **Release note:** `WaitForTask` on a task whose terminal commit was adopted no longer fails with "Harness is closed" when a close begins before the wait wakes: a host `SubscribeCommits` listener that closes the Harness on that commit, or a close that comes between the commit's adoption and its publication. Pi settles the wait at the commit, so a later close cannot reach it; PiG settled it only after the host listeners, and the close's seal rejected it, turning a completed task into an error for its waiter. The receipt is now fixed at the commit and the wait only wakes after the listeners.
 
 ### BF-9abc6ac
 
@@ -16335,6 +16397,20 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 - **Fix commits:** `e64d2cfe13` (2026-10-11)
 - **Tests:** `internal/codingagent/model_registry_availability_refresh_gaps_test.go::TestRefreshModelRuntimeHonoursNetworkForceErrorsAndRegistrationCover`, `tui/tool_execution_test.go::TestErrorResultStaysCollapsedUntilExpanded`
 
+### BF-e65ade9
+
+**`WaitForIdle` on the Harness or a Conversation no longer resumes before the `SubscribeCommits` listeners saw…**
+
+- **Source:** PiG's own defect
+- **Symptom:** `WaitForIdle` on the Harness or a Conversation no longer resumes before the `SubscribeCommits` listeners saw the commit that made the work idle.
+- **Root cause:** A reconcile pass ends with an idle settle (scheduler.ts #settleIdle) after it left the Session line, and the context expiry timer runs the same settle. Upstream's continuation there runs before the next job on the line, so it never sees a commit that was adopted and whose host listeners have not run yet. The port runs it on the pass's own goroutine, which can run right after another goroutine's commit adopted and changed what the scheduler considers idle: it then resolved the idle waits before the host's commit listeners saw that commit, where Pi resumes them only after (the guarantee of its "resumes task and idle waits only once subscribeCommits() listeners saw the terminal commit").
+- **User impact:** An operation failed or was rejected
+- **Platform:** All platforms
+- **Fixed in:** Unreleased
+- **Fix commits:** `e65ade9b1b` (2026-10-27)
+- **Tests:** `durable/harness/harness_tasks_test.go::TestPublicationAtAdoption`
+- **Release note:** `WaitForIdle` on the Harness or a Conversation no longer resumes before the `SubscribeCommits` listeners saw the commit that made the work idle. The idle settle that ends a reconcile pass, and the one the context expiry timer runs, could decide on a commit another goroutine had just adopted and resolve the waits ahead of its host listeners; Pi's continuation there cannot run between an adoption and its publication, and PiG's now leaves the decision to the settle queued behind the listeners.
+
 ### BF-e69d018
 
 **Closing an `env` connection, or losing it, now ends its daemon process with SIGTERM, as in Pi, instead of…**
@@ -16444,6 +16520,19 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 - **Fix commits:** `532f5728bb` (2026-10-10), `942ecc33e7` (2026-10-10), `e9392fd158` (2026-10-10)
 - **Tests:** `ai/google_empty_contents_test.go::TestGoogleEmptyContentsChecksThePayloadOnPayloadReturned`, `ai/google_empty_contents_test.go::TestGoogleEmptyContentsFailsBeforeSending`, `ai/tool_flow_result_reset_test.go::TestTransformMessagesResultBeforeCallDoesNotAnswerIt`, `ai/transform_messages_allocs_test.go::TestTransformMessagesDoesNotReboxUnchangedMessages`, `test/pipeline-diff/system_only_test.go::TestSystemOnlyHistoryFailsBeforeSendingLikePi`
 - **Release note:** A Google Generative AI or Vertex request with no `contents` (a history of system messages only, or one user message without content) now fails with `contents are required` before it is sent, as Pi's `@google/genai` SDK does, instead of reaching the API and failing with HTTP 400. An `onPayload` hook that adds or removes `contents` is checked as sent.
+
+### BF-e9ca222
+
+**fix(durable/host/cf): adopt Pi's address-following watches and observers (Pi)**
+
+- **Source:** PiG's own defect
+- **Symptom:** fix(durable/host/cf): adopt Pi's address-following watches and observers (Pi)
+- **Root cause:** The host's watches are Chord's Watch and NativeWatch; a retirement is a retired change that leaves the watch open, a later incarnation arrives as a root replacement, and the owner task's end ends it after delivery. The facade gains observeConversation, observeTaskGraph and observeDoc.
+- **User impact:** Behavior differed from Pi
+- **Platform:** All platforms
+- **Fixed in:** Unreleased
+- **Fix commits:** `e9ca222766` (2026-10-27)
+- **Tests:** None recorded.
 
 ### BF-e9e9cf8
 

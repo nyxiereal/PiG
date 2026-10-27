@@ -338,9 +338,7 @@ type TaskScheduler struct {
 	reconciles     int
 	reconcilesIdle chan struct{}
 	cascadePending bool
-	// idlePending counts the commits observe adopted whose idle settle, queued behind their host listeners, has not run.
-	idlePending int
-	enabled     bool
+	enabled        bool
 	// sealing is the closing flag: set by the close listener before anything else, without the mutex (see seal).
 	sealing  atomic.Bool
 	sealed   chan struct{}
@@ -1099,10 +1097,11 @@ func (s *TaskScheduler) observe(publication session.ObservedCommit) {
 		s.scheduleReconcileLocked()
 	}
 	s.sweepLocked()
+	// Upstream settles the idle waits the commit's state decides here too, inside the observer (#settleIdle), where they are
+	// settled for good; only the code awaiting them resumes after the host listeners.
+	var idleWakes []func()
 	if changed {
-		// In the same critical section as the state this commit changed: from here until its idle settle runs, after the host
-		// listeners, no other idle settle may decide on that state.
-		s.idlePending++
+		idleWakes = s.settleIdleWaitsLocked()
 	}
 	s.mu.Unlock()
 	// Upstream resolves a wait here, inside the observer, so it is settled for good and only the code awaiting it resumes
@@ -1111,43 +1110,42 @@ func (s *TaskScheduler) observe(publication session.ObservedCommit) {
 	for _, record := range terminal {
 		s.options.Session.DeferUntilPublished(s.taskWaiters.Settle(record.Id, record))
 	}
+	for _, wake := range idleWakes {
+		s.options.Session.DeferUntilPublished(wake)
+	}
 	if !changed {
 		return
 	}
-	s.options.Session.DeferUntilPublished(s.resolveIdleWaitersPublished)
+	s.options.Session.DeferUntilPublished(s.resolveIdleWaiters)
 	s.kick()
 }
 
-// resolveIdleWaitersPublished is the idle settle observe queues behind the host listeners of the commit it observed.
-func (s *TaskScheduler) resolveIdleWaitersPublished() { s.settleIdle(true) }
+// settleIdleWaitsLocked takes the idle waits the state decides out of the pending set and fixes their result, as resolving
+// a promise does, and returns the functions that wake them (Waiters.Settle): a seal that comes before the wake can no
+// longer reject them.
+func (s *TaskScheduler) settleIdleWaitsLocked() []func() {
+	var wakes []func()
+	for _, conversationId := range s.idleWaiters.Keys() {
+		if s.idleLocked(&conversationId) {
+			wakes = append(wakes, s.idleWaiters.Settle(conversationId, struct{}{}))
+		}
+	}
+	if len(s.idleHarness.Keys()) > 0 && s.idleLocked(nil) {
+		wakes = append(wakes, s.idleHarness.Settle(true, struct{}{}))
+	}
+	return wakes
+}
 
-// resolveIdleWaiters is the idle settle that runs outside a publication: at the end of a reconcile pass and on the context
-// expiry timer. Upstream's continuation there runs before the next job on the Session line, so it never sees a commit
-// adopted and not yet published to the host listeners; a goroutine here can. While such a commit is pending it leaves the
-// settle to the one queued behind that commit's listeners, which decides on the same state, after them.
-func (s *TaskScheduler) resolveIdleWaiters() { s.settleIdle(false) }
-
-// settleIdle resolves idle waiters, and drops each kept context whose conversation has been idle for the retention period
-// (scheduler.ts #settleIdle). published marks the settle observe queued, which ends the commit's pending count.
-func (s *TaskScheduler) settleIdle(published bool) {
+// resolveIdleWaiters resolves idle waiters, and drops each kept context whose conversation has been idle for the
+// retention period (scheduler.ts #settleIdle). It runs behind the host listeners of the commit that queued it, at the end
+// of a reconcile pass, and on the context expiry timer.
+func (s *TaskScheduler) resolveIdleWaiters() {
 	now := s.options.Now()
 	// #settleIdle and the #scheduleExpiry it calls each read the setting, so a failing source is reported twice.
 	retention := s.contextRetentionMs()
 	expiryRetention := s.contextRetentionMs()
 	s.mu.Lock()
-	if published {
-		s.idlePending--
-	} else if s.idlePending > 0 {
-		s.mu.Unlock()
-		return
-	}
-	var idle []durable.ConversationId
-	for _, conversationId := range s.idleWaiters.Keys() {
-		if s.idleLocked(&conversationId) {
-			idle = append(idle, conversationId)
-		}
-	}
-	harness := len(s.idleHarness.Keys()) > 0 && s.idleLocked(nil)
+	wakes := s.settleIdleWaitsLocked()
 	for conversationId, kept := range s.contexts {
 		switch {
 		case kept.idleSince != nil && now-*kept.idleSince >= retention:
@@ -1164,11 +1162,8 @@ func (s *TaskScheduler) settleIdle(published bool) {
 	}
 	s.scheduleExpiryLocked(now, expiryRetention)
 	s.mu.Unlock()
-	for _, conversationId := range idle {
-		s.idleWaiters.Resolve(conversationId, struct{}{})
-	}
-	if harness {
-		s.idleHarness.Resolve(true, struct{}{})
+	for _, wake := range wakes {
+		wake()
 	}
 }
 

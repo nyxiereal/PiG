@@ -1,6 +1,6 @@
 {
-  "piVersion": "1.4.0+d5b3de22",
-  "node": "v24.19.0",
+  "piVersion": "1.4.0+6c384aa3",
+  "node": "v24.22.1",
   "cases": [
     {
       "fixture": "tool",

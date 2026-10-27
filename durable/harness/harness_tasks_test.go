@@ -1261,6 +1261,46 @@ func TestPublicationAtAdoption(t *testing.T) {
 		<-closing
 	})
 
+	// Upstream's listener calls close(), whose seal runs inside the listener, before the publication wakes the waits: the wait
+	// the terminal commit settled keeps its receipt. A Go listener closes on a goroutine of its own, so this one waits until the
+	// seal has rejected what it rejects, which it learns from the pending idle wait the seal rejects after the task waits, and
+	// only then returns for the publication to wake them.
+	t.Run("keeps a task wait resolved when a host listener's close has sealed the Harness before the publication wakes the waits", func(t *testing.T) {
+		gate := deferred()
+		gated := tkGated("test.seal-in-listener", gate)
+		opened := tkOpenRoot(t, []durable.AnyTask{gated.Erased()})
+		id := tkStart(t, opened.root, gated.Erased())
+		idled := make(chan error, 1)
+		closing := make(chan struct{})
+		var once sync.Once
+		opened.harness.SubscribeCommits(func(_ context.Context, publication durable.CommitPublication) {
+			if publicationTerminal(publication, id) {
+				once.Do(func() {
+					go func() { _ = opened.harness.Close(testContext); close(closing) }()
+					if err := <-idled; err == nil || !strings.Contains(err.Error(), "closed") {
+						t.Errorf("the seal did not reject the idle wait: %v", err)
+					}
+				})
+			}
+		})
+		opened.harness.Resume()
+		callAsync(func() { idled <- opened.harness.WaitForIdle(testContext) })
+		waited := make(chan durable.SettledTask[durable.JsonValue], 1)
+		callAsync(func() {
+			receipt, err := opened.harness.WaitForTask(testContext, id)
+			if err != nil {
+				t.Error(err)
+			}
+			waited <- receipt
+		})
+		gate.resolve()
+		receipt := <-waited
+		if receipt.State.Outcome == nil || receipt.State.Outcome.Status != durable.OutcomeCompleted {
+			t.Fatalf("receipt %+v", receipt.State)
+		}
+		<-closing
+	})
+
 	t.Run("keeps a task wait resolved when the Harness closes after adoption, before the storage resolved", func(t *testing.T) {
 		store := newLateResolvingStorage()
 		gate := deferred()

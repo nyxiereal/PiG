@@ -1098,8 +1098,11 @@ func (s *TaskScheduler) observe(publication session.ObservedCommit) {
 	}
 	s.sweepLocked()
 	s.mu.Unlock()
+	// Upstream resolves a wait here, inside the observer, so it is settled for good and only the code awaiting it resumes
+	// after the host listeners. The wait is settled now and woken after them, so a close that begins in the meantime, inside a
+	// listener or between the adoption and the publication, does not reject a wait whose task ended.
 	for _, record := range terminal {
-		s.options.Session.DeferUntilPublished(func() { s.taskWaiters.Resolve(record.Id, record) })
+		s.options.Session.DeferUntilPublished(s.taskWaiters.Settle(record.Id, record))
 	}
 	if !changed {
 		return

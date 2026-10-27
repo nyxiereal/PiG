@@ -372,11 +372,7 @@ func (m *Markdown) renderDocument(content string, width, contentWidth int) []str
 	for i := range padding {
 		padding[i] = background(strings.Repeat(" ", width))
 	}
-	out := make([]string, 0, len(padding)*2+len(body)+len(tail))
-	out = append(out, padding...)
-	out = append(out, body...)
-	out = append(out, tail...)
-	out = append(out, padding...)
+	out := slices.Concat(padding, body, tail, padding)
 	// markdown.ts render returns [""] when text that is not blank renders no lines (only link definitions).
 	if len(out) == 0 {
 		out = []string{""}

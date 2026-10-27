@@ -187,7 +187,7 @@ type piMessagesContentIndex struct {
 
 func (field *piMessagesContentIndex) UnmarshalJSON(data []byte) error {
 	field.present = true
-	if index, err := strconv.ParseInt(string(data), 10, 64); err == nil && int64(int(index)) == index {
+	if index, err := strconv.ParseInt(string(data), 10, strconv.IntSize); err == nil {
 		field.index, field.valid = int(index), true
 	}
 	return nil

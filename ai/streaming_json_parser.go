@@ -416,7 +416,7 @@ func (p *StreamingJSONParser) continueEscape(open *streamingOpenString, char byt
 		if len(open.escape) < 6 {
 			return true
 		}
-		code, _ := strconv.ParseUint(open.escape[2:], 16, 32)
+		code, _ := strconv.ParseUint(open.escape[2:], 16, 16)
 		open.escape = ""
 		p.appendUnit(open, rune(code))
 		return true

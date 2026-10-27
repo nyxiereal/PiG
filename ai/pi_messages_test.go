@@ -271,6 +271,7 @@ func TestPiMessagesRejectsContentIndexesThatAreNotTheNextOrAnExistingBlock(t *te
 		want   string
 	}{
 		{"huge start", []any{map[string]any{"type": "text_start", "contentIndex": 4294967000}}, "Invalid contentIndex 4294967000 in pi-messages text_start event"},
+		{"past int64", []any{map[string]any{"type": "text_start", "contentIndex": uint64(1) << 63}}, "Invalid contentIndex 9223372036854776000 in pi-messages text_start event"},
 		{"string start", []any{map[string]any{"type": "text_start", "contentIndex": "__proto__"}}, `Invalid contentIndex "__proto__" in pi-messages text_start event`},
 		{"string end", []any{
 			map[string]any{"type": "text_start", "contentIndex": 0},

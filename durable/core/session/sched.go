@@ -610,20 +610,35 @@ func (s *Scheduler) resolveTaskWaiters(id ID, rec *jv.Object) {
 // WaitForIdle calls then when the conversation (0: every root) has no live
 // non-background task or queued input below it.
 func (s *Scheduler) WaitForIdle(conversationID ID, cancel *Cancel, then func(error)) {
+	s.waitForIdle(conversationID, cancel, false, then)
+}
+
+// deliverIdle calls then with err in a job of its own, a hop later when late.
+func (s *Scheduler) deliverIdle(then func(error), late bool, err error) {
+	s.loop.Defer(func() {
+		if late {
+			s.loop.Defer(func() { then(err) })
+			return
+		}
+		then(err)
+	})
+}
+
+func (s *Scheduler) waitForIdle(conversationID ID, cancel *Cancel, late bool, then func(error)) {
 	if s.closing {
-		s.loop.Defer(func() { then(s.closedErr()) })
+		s.deliverIdle(then, late, s.closedErr())
 		return
 	}
 	if s.idle(conversationID) {
-		s.loop.Defer(func() { then(nil) })
+		s.deliverIdle(then, late, nil)
 		return
 	}
 	s.scheduleReconcile()
 	if cancel.Aborted() {
-		s.loop.Defer(func() { then(ErrAborted) })
+		s.deliverIdle(then, late, ErrAborted)
 		return
 	}
-	w := &idleWaiter{done: then}
+	w := &idleWaiter{done: then, late: late}
 	if _, ok := s.idleWaiters[conversationID]; !ok {
 		s.idleWaitKeys = append(s.idleWaitKeys, conversationID)
 	}
@@ -640,7 +655,7 @@ func (s *Scheduler) WaitForIdle(conversationID ID, cancel *Cancel, then func(err
 			if len(s.idleWaiters[conversationID]) == 0 {
 				s.dropIdleKey(conversationID)
 			}
-			s.loop.Defer(func() { then(ErrAborted) })
+			s.deliverIdle(then, late, ErrAborted)
 		})
 	}
 }
@@ -693,7 +708,7 @@ func (s *Scheduler) AbortConversation(conversationID ID, background bool, cancel
 			if !background || i >= len(reached) {
 				// abortConversation is an async function whose last await is waitForIdle: its caller resumes a hop after the
 				// waiter does.
-				s.WaitForIdle(conversationID, cancel, func(err error) { s.loop.Defer(func() { then(err) }) })
+				s.waitForIdle(conversationID, cancel, true, then)
 				return
 			}
 			s.WaitForTask(reached[i], cancel, func(_ *jv.Object, err error) {
@@ -744,8 +759,7 @@ func (s *Scheduler) Seal() {
 			if w.remove != nil {
 				w.remove()
 			}
-			err := s.closedErr()
-			s.loop.Defer(func() { w.done(err) })
+			s.deliverIdle(w.done, w.late, s.closedErr())
 		}
 	}
 	s.idleWaiters, s.idleWaitKeys = map[ID][]*idleWaiter{}, nil
@@ -832,7 +846,7 @@ func (s *Scheduler) settleIdle() {
 			if w.remove != nil {
 				w.remove()
 			}
-			s.loop.Defer(func() { w.done(nil) })
+			s.deliverIdle(w.done, w.late, nil)
 		}
 	}
 }

@@ -7180,6 +7180,25 @@
       "tests": []
     },
     {
+      "id": "BF-4534a2b",
+      "title": "fix(durable): put the lifetime note of the publication goroutine on its line",
+      "symptom": "fix(durable): put the lifetime note of the publication goroutine on its line",
+      "rootCause": "",
+      "rootCauseSource": "",
+      "userImpact": "Behavior differed from Pi",
+      "platform": "All platforms",
+      "class": "own",
+      "fixedIn": "Unreleased",
+      "origin": "commit",
+      "commits": [
+        {
+          "hash": "4534a2b904",
+          "date": "2026-10-26"
+        }
+      ],
+      "tests": []
+    },
+    {
       "id": "BF-4599fab",
       "title": "fix(ai): an iteration's shared cancellation does not compare contexts",
       "symptom": "fix(ai): an iteration's shared cancellation does not compare contexts",
@@ -16853,6 +16872,25 @@
         }
       ],
       "commitsFrom": "release note",
+      "tests": []
+    },
+    {
+      "id": "BF-7bcd404",
+      "title": "fix(durable): state the lifetime of the goroutine that publishes an adopted commit",
+      "symptom": "fix(durable): state the lifetime of the goroutine that publishes an adopted commit",
+      "rootCause": "",
+      "rootCauseSource": "",
+      "userImpact": "Behavior differed from Pi",
+      "platform": "All platforms",
+      "class": "own",
+      "fixedIn": "Unreleased",
+      "origin": "commit",
+      "commits": [
+        {
+          "hash": "7bcd404f4b",
+          "date": "2026-10-26"
+        }
+      ],
       "tests": []
     },
     {

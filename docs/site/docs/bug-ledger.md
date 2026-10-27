@@ -245,6 +245,7 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 | [BF-448ff71](#bf-448ff71) | A panic in an extension error listener is now named on stderr instead of vanishing, and extension SDK… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-448ff71-2](#bf-448ff71-2) | MCP notifications no longer swallow every panic from the notify callback; only the "MCP failed to load"… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-44f8d86](#bf-44f8d86) | Fix in shipped code | PiG's own defect | All platforms | Unreleased |
+| [BF-4534a2b](#bf-4534a2b) | fix(durable): put the lifetime note of the publication goroutine on its line | PiG's own defect | All platforms | Unreleased |
 | [BF-4599fab](#bf-4599fab) | fix(ai): an iteration's shared cancellation does not compare contexts | PiG's own defect | All platforms | Unreleased |
 | [BF-45ec149](#bf-45ec149) | Read-only credential storage reports an unreadable or malformed `auth.json` as Pi does: `Failed to read… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-4610c9f](#bf-4610c9f) | A `!` or `!!` command's block draws the bytes Pi's `BashExecutionComponent` draws: its rows are padded to the… | PiG's own defect | All platforms | 0.5.0 |
@@ -579,6 +580,7 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 | [BF-7b59fe2](#bf-7b59fe2) | `pig piglet build --format binary` from a Pig source directory that is not a Git checkout (for example… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-7b92429](#bf-7b92429) | `find` and `grep` trim like JavaScript: `FindTool` trimmed each fd output line with `strings.TrimSpace` where… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-7ba3211](#bf-7ba3211) | A resumed session no longer holds its whole file in memory | PiG's own defect | macOS | 0.5.0 |
+| [BF-7bcd404](#bf-7bcd404) | fix(durable): state the lifetime of the goroutine that publishes an adopted commit | PiG's own defect | All platforms | Unreleased |
 | [BF-7c59949](#bf-7c59949) | fix(codingagent): session selector keeps Pi's out-of-range selected index | PiG's own defect | All platforms | Unreleased |
 | [BF-7cca5ee](#bf-7cca5ee) | A Node extension can default-import TypeBox (`import Type from "typebox"`, and likewise `typebox/value`… | PiG's own defect | All platforms | 0.5.0 |
 | [BF-7d0621f](#bf-7d0621f) | fix(extension): keep Pi's three-parameter EmitBeforeAgentStart (prompt, images, options); a custom run's… | PiG's own defect | All platforms | Unreleased |
@@ -4329,6 +4331,19 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 - **Platform:** All platforms
 - **Fixed in:** Unreleased
 - **Fix commits:** `44f8d86c29` (2026-10-20)
+- **Tests:** None recorded.
+
+### BF-4534a2b
+
+**fix(durable): put the lifetime note of the publication goroutine on its line**
+
+- **Source:** PiG's own defect
+- **Symptom:** fix(durable): put the lifetime note of the publication goroutine on its line
+- **Root cause:** Not recorded.
+- **User impact:** Behavior differed from Pi
+- **Platform:** All platforms
+- **Fixed in:** Unreleased
+- **Fix commits:** `4534a2b904` (2026-10-26)
 - **Tests:** None recorded.
 
 ### BF-4599fab
@@ -8969,6 +8984,19 @@ Entries are listed by ID. The page carries no totals, so a pull request that add
 - **Commit that wrote the release note (the fix commit is not identified):** `7ba3211bdc` (2026-10-11)
 - **Tests:** None recorded.
 - **Release note:** A resumed session no longer holds its whole file in memory. PiG keeps a small index of every entry and decodes only what the active context needs (the latest compaction's kept messages and everything after them); older entries are read back from the session file when a command such as `/tree`, `/fork` or export needs them. On a real 314 MB session, an interactive resume measured 150-190 MB after loading and 225-285 MB after opening `/tree` (two profiling runs on macOS), where PiG 0.4.1 took 1.2-1.3 GB and Pi 1.1.0 about 700 MB. History outside the active context is not kept decoded, so a long-open session file does not accumulate it in memory.
+
+### BF-7bcd404
+
+**fix(durable): state the lifetime of the goroutine that publishes an adopted commit**
+
+- **Source:** PiG's own defect
+- **Symptom:** fix(durable): state the lifetime of the goroutine that publishes an adopted commit
+- **Root cause:** Not recorded.
+- **User impact:** Behavior differed from Pi
+- **Platform:** All platforms
+- **Fixed in:** Unreleased
+- **Fix commits:** `7bcd404f4b` (2026-10-26)
+- **Tests:** None recorded.
 
 ### BF-7c59949
 

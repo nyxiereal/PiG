@@ -230,6 +230,8 @@ Create a fresh Session with `Runtime.New`. Open an existing Session with the Run
 
 When an `agent_settled` extension handler appends custom messages, their message events precede the final settlement event on both Session listeners and mode output.
 
+When an extension that a Session's resource loader loaded calls `pi.appendEntry`, the Session reports an `entry_appended` event to its listeners, before the event the extension was handling. `ctx.sessionManager.appendCustomEntry` writes the log only and reports no event.
+
 Subscribe to Session events before sending when your application needs streaming updates.
 
 ### Supply a SessionManager

@@ -5,6 +5,13 @@
 // long a genuine hang takes to fail. Fixed 5-10 s deadlines turned into
 // failures when many test binaries shared a machine (load average 80 on 14
 // cores), so waits use [Wait] instead. Only test code imports this package.
+//
+// The go test -timeout deadline caps every bound, so a test that starts when
+// the package run is about to expire reports a timeout of its own, naming a
+// wait, a few seconds before the test binary's timeout panic. That test is not
+// at fault: the run is out of time. A package whose tests need longer than
+// -timeout in one process (coding/cli needs about 25 minutes on 4 CPUs) runs
+// as several go test processes in CI (automation/ci/test-grouped.sh).
 package testbudget
 
 import (

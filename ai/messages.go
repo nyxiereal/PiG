@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+
+	"github.com/MichaelKinsy/PiG/internal/jsstring"
 )
 
 // Message is the closed provider-facing transcript union.
@@ -341,7 +343,9 @@ func cloneNestedToolCalls(calls *NestedToolCalls) *NestedToolCalls {
 }
 
 func marshalMessage(role string, value any) ([]byte, error) {
-	body, err := json.Marshal(value)
+	// A lone surrogate in a string (Details, an id, a name) is written as its escape, as the content blocks write it. Marshal, not
+	// MarshalStringify: a value that is not JSON (NaN in Details) stays an error, as it was with encoding/json.
+	body, err := jsstring.MarshalKeepingSurrogates(value)
 	if err != nil {
 		return nil, err
 	}
@@ -434,7 +438,7 @@ func (message *ToolResultMessage) UnmarshalJSON(data []byte) error {
 		Content []json.RawMessage `json:"content"`
 		Details json.RawMessage   `json:"details"`
 	}
-	if err := json.Unmarshal(data, &wire); err != nil {
+	if err := jsstring.UnmarshalKeepingSurrogates(data, &wire); err != nil {
 		return err
 	}
 	decoded := ToolResultMessage(wire.plain)
@@ -453,7 +457,7 @@ func (message *ToolResultMessage) UnmarshalJSON(data []byte) error {
 		}
 	}
 	if wire.Details != nil {
-		if err := json.Unmarshal(wire.Details, &decoded.Details); err != nil {
+		if err := jsstring.UnmarshalKeepingSurrogates(wire.Details, &decoded.Details); err != nil {
 			return fmt.Errorf("tool result details: %w", err)
 		}
 		decoded.DetailsNull = decoded.Details == nil

@@ -530,7 +530,7 @@ func (c *call) resumeResult(stopped bool) {
 
 // resultWithDetails is a decided result with the call's details.
 func (c *call) resultWithDetails(decided storedResult) (storedResult, error) {
-	details, err := json.Marshal(c.details())
+	details, err := jsstring.MarshalKeepingSurrogates(c.details())
 	if err != nil {
 		return decided, err
 	}
@@ -653,7 +653,8 @@ func (c *call) formatAndStore(result cm.Result, details ToolDetails, options for
 		return storedResult{}, err
 	}
 	details.FullOutputPath = fullOutputPath
-	encodedDetails, err := json.Marshal(details)
+	// JSON.stringify: a preview cut inside a surrogate pair keeps its lone surrogate as the escape, and `<`, `>` and `&` stay as they are.
+	encodedDetails, err := jsstring.MarshalKeepingSurrogates(details)
 	if err != nil {
 		return storedResult{}, err
 	}

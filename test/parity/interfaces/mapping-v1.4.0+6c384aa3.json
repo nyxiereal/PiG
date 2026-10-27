@@ -12198,8 +12198,8 @@
       ],
       "evidence": [
         "test:agent/agent_upstream_test.go#TestAgent_AttributesRequestsByDefaultAndMergesAConfiguredIdentityOverIt",
-        "test:ai/identity_bedrock_test.go#TestBedrockUserAgentCarriesTheClientIdentity",
-        "test:ai/identity_pi_messages_test.go#TestPiMessagesSendsTheIdentityUserAgentBelowRequestHeaders"
+        "test:ai/user_agent_version_oracle_test.go#TestUserAgentVersionFieldFollowsPi",
+        "test:ai/identity_bedrock_test.go#TestBedrockUserAgentCarriesTheClientIdentity"
       ]
     },
     {
@@ -12219,9 +12219,9 @@
         "call:ai/identity.go#GetClientVersion"
       ],
       "evidence": [
+        "test:ai/user_agent_version_oracle_test.go#TestUserAgentVersionFieldFollowsPi",
         "test:ai/identity_bedrock_test.go#TestBedrockUserAgentCarriesTheClientIdentity",
-        "test:ai/identity_test.go#TestClientIdentityJSON",
-        "test:ai/identity_test.go#TestClientIdentityVersionDefaultsToTheProductVersion"
+        "test:ai/identity_test.go#TestClientIdentityJSON"
       ]
     },
     {
@@ -20712,8 +20712,8 @@
       ],
       "evidence": [
         "test:ai/models_runtime_basic_upstream_test.go#TestModelsRuntimeBasicUpstream",
-        "test:ai/supports_xhigh_upstream_test.go#TestSupportsXHighUpstream",
-        "test:ai/xai_responses_upstream_test.go#TestXAIResponsesGrok47CapabilitiesAndLongContextPricing"
+        "test:ai/openrouter_cost_oracle_test.go#TestOpenRouterCostMatchesPi",
+        "test:ai/supports_xhigh_upstream_test.go#TestSupportsXHighUpstream"
       ]
     },
     {
@@ -28862,8 +28862,8 @@
       ],
       "evidence": [
         "test:ai/identity_bedrock_oracle_test.go#TestBedrockUserAgentMatchesPi",
-        "test:internal/codingagent/remote_catalog_provider_upstream_test.go#TestRemoteCatalogProviderUpstream",
-        "test:ai/identity_bedrock_test.go#TestBedrockUserAgentCarriesTheClientIdentity"
+        "test:ai/user_agent_version_oracle_test.go#TestUserAgentVersionFieldFollowsPi",
+        "test:internal/codingagent/remote_catalog_provider_upstream_test.go#TestRemoteCatalogProviderUpstream"
       ]
     },
     {
@@ -55570,8 +55570,8 @@
       ],
       "evidence": [
         "test:agent/agent_upstream_test.go#TestAgent_AttributesRequestsByDefaultAndMergesAConfiguredIdentityOverIt",
-        "test:ai/identity_bedrock_test.go#TestBedrockUserAgentCarriesTheClientIdentity",
-        "test:ai/identity_pi_messages_test.go#TestPiMessagesSendsTheIdentityUserAgentBelowRequestHeaders"
+        "test:ai/user_agent_version_oracle_test.go#TestUserAgentVersionFieldFollowsPi",
+        "test:ai/identity_bedrock_test.go#TestBedrockUserAgentCarriesTheClientIdentity"
       ]
     },
     {
@@ -55591,9 +55591,9 @@
         "call:ai/identity.go#GetClientVersion"
       ],
       "evidence": [
+        "test:ai/user_agent_version_oracle_test.go#TestUserAgentVersionFieldFollowsPi",
         "test:ai/identity_bedrock_test.go#TestBedrockUserAgentCarriesTheClientIdentity",
-        "test:ai/identity_test.go#TestClientIdentityJSON",
-        "test:ai/identity_test.go#TestClientIdentityVersionDefaultsToTheProductVersion"
+        "test:ai/identity_test.go#TestClientIdentityJSON"
       ]
     },
     {
@@ -65047,8 +65047,8 @@
       ],
       "evidence": [
         "test:ai/models_runtime_basic_upstream_test.go#TestModelsRuntimeBasicUpstream",
-        "test:ai/supports_xhigh_upstream_test.go#TestSupportsXHighUpstream",
-        "test:ai/xai_responses_upstream_test.go#TestXAIResponsesGrok47CapabilitiesAndLongContextPricing"
+        "test:ai/openrouter_cost_oracle_test.go#TestOpenRouterCostMatchesPi",
+        "test:ai/supports_xhigh_upstream_test.go#TestSupportsXHighUpstream"
       ]
     },
     {
@@ -73365,8 +73365,8 @@
       ],
       "evidence": [
         "test:ai/identity_bedrock_oracle_test.go#TestBedrockUserAgentMatchesPi",
-        "test:internal/codingagent/remote_catalog_provider_upstream_test.go#TestRemoteCatalogProviderUpstream",
-        "test:ai/identity_bedrock_test.go#TestBedrockUserAgentCarriesTheClientIdentity"
+        "test:ai/user_agent_version_oracle_test.go#TestUserAgentVersionFieldFollowsPi",
+        "test:internal/codingagent/remote_catalog_provider_upstream_test.go#TestRemoteCatalogProviderUpstream"
       ]
     },
     {
@@ -92405,8 +92405,8 @@
       ],
       "evidence": [
         "test:ai/models_runtime_basic_upstream_test.go#TestModelsRuntimeBasicUpstream",
-        "test:ai/supports_xhigh_upstream_test.go#TestSupportsXHighUpstream",
-        "test:ai/xai_responses_upstream_test.go#TestXAIResponsesGrok47CapabilitiesAndLongContextPricing"
+        "test:ai/openrouter_cost_oracle_test.go#TestOpenRouterCostMatchesPi",
+        "test:ai/supports_xhigh_upstream_test.go#TestSupportsXHighUpstream"
       ]
     },
     {
@@ -93586,6 +93586,7 @@
         "call:ai/openrouter_api.go#OpenRouterCost"
       ],
       "evidence": [
+        "test:ai/openrouter_cost_oracle_test.go#TestOpenRouterCostMatchesPi",
         "test:ai/openrouter_api_test.go#TestOpenRouterCostConvertsPricesAndFallsBackOnMissingInvalidAndNegativeRates"
       ]
     },
@@ -93606,6 +93607,7 @@
         "call:ai/openrouter_api.go#OpenRouterCost"
       ],
       "evidence": [
+        "test:ai/openrouter_cost_oracle_test.go#TestOpenRouterCostMatchesPi",
         "test:ai/openrouter_api_test.go#TestOpenRouterCostConvertsPricesAndFallsBackOnMissingInvalidAndNegativeRates"
       ]
     },
@@ -93726,9 +93728,9 @@
         "call:ai/openrouter_api.go#OpenRouterCost"
       ],
       "evidence": [
+        "test:ai/openrouter_cost_oracle_test.go#TestOpenRouterCostMatchesPi",
         "test:ai/openrouter_api_test.go#TestOpenRouterCostConvertsPricesAndFallsBackOnMissingInvalidAndNegativeRates",
-        "test:cmd/gen-models/openrouter_catalog_test.go#TestOpenRouterCostSerializesNegativeZeroAsZero",
-        "test:cmd/gen-models/openrouter_catalog_test.go#TestOpenRouterCatalogParsingUpstream"
+        "test:cmd/gen-models/openrouter_catalog_test.go#TestOpenRouterCostSerializesNegativeZeroAsZero"
       ]
     },
     {
@@ -98002,8 +98004,8 @@
       ],
       "evidence": [
         "test:agent/agent_upstream_test.go#TestAgent_AttributesRequestsByDefaultAndMergesAConfiguredIdentityOverIt",
-        "test:ai/identity_bedrock_test.go#TestBedrockUserAgentCarriesTheClientIdentity",
-        "test:ai/identity_pi_messages_test.go#TestPiMessagesSendsTheIdentityUserAgentBelowRequestHeaders"
+        "test:ai/user_agent_version_oracle_test.go#TestUserAgentVersionFieldFollowsPi",
+        "test:ai/identity_bedrock_test.go#TestBedrockUserAgentCarriesTheClientIdentity"
       ]
     },
     {
@@ -98023,9 +98025,9 @@
         "call:ai/identity.go#GetClientVersion"
       ],
       "evidence": [
+        "test:ai/user_agent_version_oracle_test.go#TestUserAgentVersionFieldFollowsPi",
         "test:ai/identity_bedrock_test.go#TestBedrockUserAgentCarriesTheClientIdentity",
-        "test:ai/identity_test.go#TestClientIdentityJSON",
-        "test:ai/identity_test.go#TestClientIdentityVersionDefaultsToTheProductVersion"
+        "test:ai/identity_test.go#TestClientIdentityJSON"
       ]
     },
     {
@@ -99271,6 +99273,7 @@
         "call:ai/openrouter_cost.go#applyOpenRouterReportedCost"
       ],
       "evidence": [
+        "test:ai/openrouter_cost_oracle_test.go#TestApplyOpenRouterReportedCostMatchesPi",
         "test:ai/openrouter_cost_test.go#TestApplyOpenRouterReportedCost"
       ]
     },
@@ -99291,6 +99294,7 @@
         "call:ai/openrouter_cost.go#applyOpenRouterReportedCost"
       ],
       "evidence": [
+        "test:ai/openrouter_cost_oracle_test.go#TestApplyOpenRouterReportedCostMatchesPi",
         "test:ai/openrouter_cost_test.go#TestApplyOpenRouterReportedCost"
       ]
     },
@@ -99311,6 +99315,7 @@
         "call:ai/openrouter_cost.go#isOpenRouterModel"
       ],
       "evidence": [
+        "test:ai/openrouter_cost_oracle_test.go#TestIsOpenRouterModelMatchesPi",
         "test:ai/openrouter_cost_test.go#TestIsOpenRouterModel"
       ]
     },
@@ -99331,6 +99336,7 @@
         "call:ai/openrouter_cost.go#isOpenRouterModel"
       ],
       "evidence": [
+        "test:ai/openrouter_cost_oracle_test.go#TestIsOpenRouterModelMatchesPi",
         "test:ai/openrouter_cost_test.go#TestIsOpenRouterModel"
       ]
     },
@@ -99351,6 +99357,7 @@
         "call:ai/openrouter_cost.go#applyOpenRouterReportedCost"
       ],
       "evidence": [
+        "test:ai/openrouter_cost_oracle_test.go#TestApplyOpenRouterReportedCostMatchesPi",
         "test:ai/openrouter_cost_test.go#TestApplyOpenRouterReportedCost"
       ]
     },
@@ -101612,8 +101619,8 @@
       ],
       "evidence": [
         "test:ai/identity_bedrock_oracle_test.go#TestBedrockUserAgentMatchesPi",
-        "test:internal/codingagent/remote_catalog_provider_upstream_test.go#TestRemoteCatalogProviderUpstream",
-        "test:ai/identity_bedrock_test.go#TestBedrockUserAgentCarriesTheClientIdentity"
+        "test:ai/user_agent_version_oracle_test.go#TestUserAgentVersionFieldFollowsPi",
+        "test:internal/codingagent/remote_catalog_provider_upstream_test.go#TestRemoteCatalogProviderUpstream"
       ]
     },
     {
@@ -101891,9 +101898,9 @@
         "public-api:chord/host/websocket.go#AcceptWebSockets"
       ],
       "evidence": [
+        "test:chord/host/websocket_pi_oracle_test.go#TestAcceptWebSocketsMatchesPiOnEveryAuthenticatorOutcome",
         "test:chord/host/websocket_upstream_test.go#TestWebSocketLinksAHoldTakenAfterTheServerRefusedTheSocketHasNoRoute",
-        "test:chord/host/websocket_upstream_test.go#TestWebSocketLinksPackedPayloadsLargeSnapshotsAndResultsReachTheClientAsBinaryMessagesClientsMayNotSendThem",
-        "test:chord/host/websocket_upstream_test.go#TestWebSocketLinksServesABrowserStyleClientOverARealSocketStampedByTheAuthenticator"
+        "test:chord/host/websocket_upstream_test.go#TestWebSocketLinksPackedPayloadsLargeSnapshotsAndResultsReachTheClientAsBinaryMessagesClientsMayNotSendThem"
       ]
     },
     {
@@ -101913,9 +101920,9 @@
         "public-api:chord/host/websocket.go#AcceptWebSockets"
       ],
       "evidence": [
+        "test:chord/host/websocket_pi_oracle_test.go#TestAcceptWebSocketsMatchesPiOnEveryAuthenticatorOutcome",
         "test:chord/host/websocket_upstream_test.go#TestWebSocketLinksAHoldTakenAfterTheServerRefusedTheSocketHasNoRoute",
-        "test:chord/host/websocket_upstream_test.go#TestWebSocketLinksPackedPayloadsLargeSnapshotsAndResultsReachTheClientAsBinaryMessagesClientsMayNotSendThem",
-        "test:chord/host/websocket_upstream_test.go#TestWebSocketLinksServesABrowserStyleClientOverARealSocketStampedByTheAuthenticator"
+        "test:chord/host/websocket_upstream_test.go#TestWebSocketLinksPackedPayloadsLargeSnapshotsAndResultsReachTheClientAsBinaryMessagesClientsMayNotSendThem"
       ]
     },
     {
@@ -102670,9 +102677,9 @@
         "call:chord/host/cell.go#NotReady"
       ],
       "evidence": [
-        "test:chord/host/manager_upstream_test.go#TestChildControlOverNodeChannel",
-        "test:chord/host/awaiting_upstream_test.go#TestAwaitingAGetTimesOutAfterReadyTimeoutWithReadyTimeoutAndReleasesItsHold",
-        "test:chord/host/bindings_upstream_test.go#TestHydrationOverALinkNullEmptyAndUndefinedValuesHydrateAStateFreeVariantIsReadyAFailedSnapshotRejects"
+        "test:chord/host/errors_pi_oracle_test.go#TestAsChordErrorMatchesPi",
+        "test:chord/host/errors_pi_oracle_test.go#TestChordErrorMatchesPi",
+        "test:chord/host/errors_pi_oracle_test.go#TestIsChordErrorMatchesPi"
       ]
     },
     {
@@ -102692,9 +102699,9 @@
         "call:chord/host/errors.go#NewChordError"
       ],
       "evidence": [
-        "test:chord/host/manager_upstream_test.go#TestChildControlOverNodeChannel",
-        "test:chord/host/errors_test.go#TestAsChordErrorKeepsChordErrorsAndWrapsOthers",
-        "test:chord/host/errors_test.go#TestChordErrorCarriesPiFields"
+        "test:chord/host/errors_pi_oracle_test.go#TestAsChordErrorMatchesPi",
+        "test:chord/host/errors_pi_oracle_test.go#TestChordErrorMatchesPi",
+        "test:chord/host/errors_pi_oracle_test.go#TestIsChordErrorMatchesPi"
       ]
     },
     {
@@ -102714,9 +102721,9 @@
         "call:chord/host/errors.go#ChordError.Unwrap"
       ],
       "evidence": [
+        "test:chord/host/errors_pi_oracle_test.go#TestAsChordErrorMatchesPi",
         "test:chord/host/errors_test.go#TestAsChordErrorKeepsChordErrorsAndWrapsOthers",
-        "test:chord/host/errors_test.go#TestChordErrorCarriesPiFields",
-        "test:chord/host/reload_error_test.go#TestReloadErrorKeepsTheCauseCodeAndSaysTheReloadAborted"
+        "test:chord/host/errors_test.go#TestChordErrorCarriesPiFields"
       ]
     },
     {
@@ -102758,8 +102765,9 @@
         "call:chord/host/errors.go#NewChordError"
       ],
       "evidence": [
-        "test:chord/host/errors_test.go#TestChordErrorCarriesPiFields",
-        "test:chord/host/reload_error_test.go#TestReloadErrorKeepsTheCauseCodeAndSaysTheReloadAborted"
+        "test:chord/host/schema_pi_oracle_test.go#TestAssertValidMatchesPi",
+        "test:chord/host/schema_pi_oracle_test.go#TestAssertValidOverADecodedDescriptionKeepsTheDeclaredOrderLikePi",
+        "test:chord/host/schema_pi_oracle_test.go#TestCanonicalIdentityAndNormalizeMatchPi"
       ]
     },
     {
@@ -102801,7 +102809,9 @@
         "call:chord/host/errors.go#NewChordError"
       ],
       "evidence": [
-        "test:chord/host/errors_test.go#TestChordErrorCarriesPiFields"
+        "test:chord/host/wire_pi_oracle_test.go#TestWireErrorsMatchPi",
+        "test:chord/host/errors_test.go#TestChordErrorCarriesPiFields",
+        "test:chord/host/errors_pi_oracle_test.go#TestAsChordErrorMatchesPi"
       ]
     },
     {
@@ -102845,7 +102855,7 @@
       "evidence": [
         "test:chord/host/errors_test.go#TestChordErrorCarriesPiFields",
         "test:chord/host/errors_test.go#TestForbiddenDefaultsOnlyAnOmittedMessage",
-        "test:chord/host/reload_upstream_test.go#TestReloadStateBumpGateMigrateOldFromVersionIntoTheNewSchemaResetToWatchersOldRootsUpgradeConflict"
+        "test:chord/host/errors_pi_oracle_test.go#TestAsChordErrorMatchesPi"
       ]
     },
     {
@@ -102874,9 +102884,9 @@
         "call:chord/host/cell.go#NotReady"
       ],
       "evidence": [
-        "test:chord/host/awaiting_upstream_test.go#TestAwaitingACtxGetStillWaitingWhenItsCallSettlesRejectsAbortedAndReleasesItsReference",
-        "test:chord/host/awaiting_upstream_test.go#TestAwaitingAGetTimesOutAfterReadyTimeoutWithReadyTimeoutAndReleasesItsHold",
-        "test:chord/host/awaiting_upstream_test.go#TestAwaitingAnAbortedGetRejectsAndReleasesOnlyItsReferenceTheBindingStaysForTheOthers"
+        "test:chord/host/errors_pi_oracle_test.go#TestChordErrorMatchesPi",
+        "test:chord/host/errors_pi_oracle_test.go#TestIsChordErrorMatchesPi",
+        "test:chord/host/wire_pi_oracle_test.go#TestWireErrorsMatchPi"
       ]
     },
     {
@@ -103522,7 +103532,7 @@
       "evidence": [
         "test:chord/host/variants_upstream_test.go#TestVariantsANewVariantsMembersArriveWithItsShapeAMemberOutsideTheVariantThrowsNotInVariant",
         "test:chord/host/contract_upstream_test.go#TestContractsMethodsWithoutArgumentsOrResultAreDescribedWithoutThemTheirPresenceMustMatchAVoidConsumerAcceptsAResult",
-        "test:chord/host/contract_fields_test.go#TestContractTokensCarryPiFields"
+        "test:chord/host/schema_pi_oracle_test.go#TestADecodedDescriptionIsWrittenBackInDeclaredOrderLikePi"
       ]
     },
     {
@@ -104065,9 +104075,9 @@
         "call:chord/host/errors.go#Forbidden"
       ],
       "evidence": [
+        "test:chord/host/errors_pi_oracle_test.go#TestChordErrorMatchesPi",
         "test:chord/host/host_upstream_test.go#TestHostAChordErrorFromAFactoryKeepsItsCodeThroughDependents",
-        "test:chord/host/readiness_upstream_test.go#TestReadinessReadyIncludesDirectHostServesButNotLaterServes",
-        "test:chord/host/readiness_upstream_test.go#TestReadinessRejectsEagerFailureWithTheActivationError"
+        "test:chord/host/readiness_upstream_test.go#TestReadinessReadyIncludesDirectHostServesButNotLaterServes"
       ]
     },
     {
@@ -104087,9 +104097,9 @@
         "call:chord/host/errors.go#Forbidden"
       ],
       "evidence": [
+        "test:chord/host/errors_pi_oracle_test.go#TestChordErrorMatchesPi",
         "test:chord/host/host_upstream_test.go#TestHostAChordErrorFromAFactoryKeepsItsCodeThroughDependents",
-        "test:chord/host/readiness_upstream_test.go#TestReadinessReadyIncludesDirectHostServesButNotLaterServes",
-        "test:chord/host/readiness_upstream_test.go#TestReadinessRejectsEagerFailureWithTheActivationError"
+        "test:chord/host/readiness_upstream_test.go#TestReadinessReadyIncludesDirectHostServesButNotLaterServes"
       ]
     },
     {
@@ -105541,8 +105551,8 @@
       ],
       "evidence": [
         "test:chord/host/cell_upstream_test.go#TestCellWriteGuardRefusesWrites",
-        "test:chord/host/errors_test.go#TestChordErrorCarriesPiFields",
-        "test:chord/host/wire_test.go#TestWireErrorsKeepCodeReasonAndMessage"
+        "test:chord/host/errors_pi_oracle_test.go#TestChordErrorMatchesPi",
+        "test:chord/host/errors_test.go#TestChordErrorCarriesPiFields"
       ]
     },
     {
@@ -105563,8 +105573,8 @@
       ],
       "evidence": [
         "test:chord/host/cell_upstream_test.go#TestCellWriteGuardRefusesWrites",
-        "test:chord/host/errors_test.go#TestChordErrorCarriesPiFields",
-        "test:chord/host/wire_test.go#TestWireErrorsKeepCodeReasonAndMessage"
+        "test:chord/host/errors_pi_oracle_test.go#TestChordErrorMatchesPi",
+        "test:chord/host/errors_test.go#TestChordErrorCarriesPiFields"
       ]
     },
     {
@@ -111186,9 +111196,9 @@
         "public-api:chord/host/websocket.go#WebSocketAcceptOptions"
       ],
       "evidence": [
+        "test:chord/host/websocket_pi_oracle_test.go#TestAcceptWebSocketsMatchesPiOnEveryAuthenticatorOutcome",
         "test:chord/host/websocket_upstream_test.go#TestWebSocketLinksAHoldTakenAfterTheServerRefusedTheSocketHasNoRoute",
-        "test:chord/host/websocket_upstream_test.go#TestWebSocketLinksPackedPayloadsLargeSnapshotsAndResultsReachTheClientAsBinaryMessagesClientsMayNotSendThem",
-        "test:chord/host/websocket_upstream_test.go#TestWebSocketLinksServesABrowserStyleClientOverARealSocketStampedByTheAuthenticator"
+        "test:chord/host/websocket_upstream_test.go#TestWebSocketLinksPackedPayloadsLargeSnapshotsAndResultsReachTheClientAsBinaryMessagesClientsMayNotSendThem"
       ],
       "asyncContract": "An awaited Promise is a blocking Go call that returns the value or error; AbortSignal is the context.Context argument; no detached goroutine."
     },
@@ -111313,7 +111323,7 @@
         "public-api:chord/host/websocket.go#WebSocketAcceptOptions.Principal"
       ],
       "evidence": [
-        "test:chord/host/websocket_upstream_test.go#TestWebSocketLinksPackedPayloadsLargeSnapshotsAndResultsReachTheClientAsBinaryMessagesClientsMayNotSendThem"
+        "test:chord/host/websocket_pi_oracle_test.go#TestAcceptWebSocketsMatchesPiOnEveryAuthenticatorOutcome"
       ],
       "asyncContract": "An awaited Promise is a blocking Go call that returns the value or error; AbortSignal is the context.Context argument; no detached goroutine."
     },
@@ -111334,7 +111344,7 @@
         "public-api:chord/host/websocket.go#WebSocketAcceptOptions.Principal"
       ],
       "evidence": [
-        "test:chord/host/websocket_upstream_test.go#TestWebSocketLinksPackedPayloadsLargeSnapshotsAndResultsReachTheClientAsBinaryMessagesClientsMayNotSendThem"
+        "test:chord/host/websocket_pi_oracle_test.go#TestAcceptWebSocketsMatchesPiOnEveryAuthenticatorOutcome"
       ],
       "asyncContract": "An awaited Promise is a blocking Go call that returns the value or error; AbortSignal is the context.Context argument; no detached goroutine."
     },
@@ -118496,9 +118506,9 @@
         "call:codemode/execution.go#execution.forwardCall"
       ],
       "evidence": [
+        "test:durable/codemode/codemode_helpers_pi_oracle_test.go#TestCodemodeHelpersMatchPi",
         "test:codemode/deterministic_test.go#TestDeterministicRunsApplyResultsInSeqOrderWhateverOrderTheyAreDeliveredIn",
-        "test:codemode/deterministic_test.go#TestDeterministicRunsApplyResultsInSeqOrderWhenTheTransportReordersRepliesSentInOrder",
-        "test:codemode/deterministic_test.go#TestDeterministicRunsMakeTheSameCallsAndOutputForTheSameStartSeedAndResults"
+        "test:codemode/deterministic_test.go#TestDeterministicRunsApplyResultsInSeqOrderWhenTheTransportReordersRepliesSentInOrder"
       ]
     },
     {
@@ -118518,9 +118528,9 @@
         "call:codemode/execution.go#execution.forwardCall"
       ],
       "evidence": [
+        "test:durable/codemode/codemode_helpers_pi_oracle_test.go#TestCodemodeHelpersMatchPi",
         "test:codemode/deterministic_test.go#TestDeterministicRunsMakeTheSameCallsAndOutputForTheSameStartSeedAndResults",
-        "test:codemode/deterministic_test.go#TestDeterministicRunsNumberCallsToGlobalsWithToolsAndAnswerErrorsAsRejections",
-        "test:codemode/deterministic_test.go#TestDeterministicRunsReportTheFingerprintBeforeAnyCallAndTheCallsIssuedAfterEachResult"
+        "test:codemode/deterministic_test.go#TestDeterministicRunsNumberCallsToGlobalsWithToolsAndAnswerErrorsAsRejections"
       ]
     },
     {
@@ -118540,9 +118550,9 @@
         "call:codemode/execution.go#execution.forwardCall"
       ],
       "evidence": [
+        "test:durable/codemode/codemode_helpers_pi_oracle_test.go#TestCodemodeHelpersMatchPi",
         "test:codemode/deterministic_test.go#TestDeterministicRunsApplyResultsInSeqOrderWhateverOrderTheyAreDeliveredIn",
-        "test:codemode/deterministic_test.go#TestDeterministicRunsApplyResultsInSeqOrderWhenTheTransportReordersRepliesSentInOrder",
-        "test:codemode/deterministic_test.go#TestDeterministicRunsNumberCallsToGlobalsWithToolsAndAnswerErrorsAsRejections"
+        "test:codemode/deterministic_test.go#TestDeterministicRunsApplyResultsInSeqOrderWhenTheTransportReordersRepliesSentInOrder"
       ]
     },
     {
@@ -118562,9 +118572,9 @@
         "call:codemode/execution.go#execution.forwardCall"
       ],
       "evidence": [
+        "test:durable/codemode/codemode_helpers_pi_oracle_test.go#TestCodemodeHelpersMatchPi",
         "test:codemode/deterministic_test.go#TestDeterministicRunsNumberCallsToGlobalsWithToolsAndAnswerErrorsAsRejections",
-        "test:codemode/deterministic_test.go#TestDeterministicRunsReportTheFingerprintBeforeAnyCallAndTheCallsIssuedAfterEachResult",
-        "test:codemode/run_members_pi_test.go#TestRunOptionsMembersAndRunDeliverFinishedMatchPi"
+        "test:codemode/deterministic_test.go#TestDeterministicRunsReportTheFingerprintBeforeAnyCallAndTheCallsIssuedAfterEachResult"
       ]
     },
     {
@@ -118584,9 +118594,9 @@
         "call:codemode/execution.go#execution.forwardCall"
       ],
       "evidence": [
+        "test:durable/codemode/codemode_helpers_pi_oracle_test.go#TestCodemodeHelpersMatchPi",
         "test:codemode/deterministic_test.go#TestDeterministicRunsNumberCallsToGlobalsWithToolsAndAnswerErrorsAsRejections",
-        "test:codemode/deterministic_test.go#TestDeterministicRunsReportTheFingerprintBeforeAnyCallAndTheCallsIssuedAfterEachResult",
-        "test:codemode/start_test.go#TestStartForwardsTheStartDataAndTheCallsOfTheScript"
+        "test:codemode/deterministic_test.go#TestDeterministicRunsReportTheFingerprintBeforeAnyCallAndTheCallsIssuedAfterEachResult"
       ]
     },
     {
@@ -118626,9 +118636,9 @@
         "call:codemode/execution.go#execution.deliver"
       ],
       "evidence": [
+        "test:durable/codemode/codemode_helpers_pi_oracle_test.go#TestCodemodeHelpersMatchPi",
         "test:codemode/deterministic_test.go#TestDeterministicRunsEndWithAnErrorTheScriptCannotCatchWhenTheCallerAborts",
-        "test:codemode/deterministic_test.go#TestDeterministicRunsKeepTheClockMonotonicAndRejectAClockValueThatIsNotFinite",
-        "test:codemode/deterministic_test.go#TestDeterministicRunsLeaveACallWaitingWhenItsAnswerCannotBeSerialized"
+        "test:codemode/deterministic_test.go#TestDeterministicRunsKeepTheClockMonotonicAndRejectAClockValueThatIsNotFinite"
       ]
     },
     {
@@ -118768,8 +118778,8 @@
       ],
       "evidence": [
         "test:codemode/cloudflare/cloudflare_test.go#TestTheObjectExecutesTheRequestAndReportsThroughTheExchange",
-        "test:codemode/deterministic_internal_test.go#TestDeterministicMessagesHaveUpstreamsJSONShape",
-        "test:codemode/deterministic_test.go#TestAVMThatIsToldTheSameResultNumberTwiceCrashes"
+        "test:codemode/cloudflare/golden_test.go#TestTheObjectsExecuteSendsThePiFrames",
+        "test:codemode/deterministic_internal_test.go#TestDeterministicMessagesHaveUpstreamsJSONShape"
       ]
     },
     {
@@ -118790,8 +118800,8 @@
       ],
       "evidence": [
         "test:codemode/cloudflare/cloudflare_test.go#TestTheObjectExecutesTheRequestAndReportsThroughTheExchange",
-        "test:codemode/deterministic_test.go#TestAVMThatIsToldTheSameResultNumberTwiceCrashes",
-        "test:codemode/remote_protocol_test.go#TestWireRepliesAndRequestsHaveUpstreamsJSONShape"
+        "test:codemode/cloudflare/golden_test.go#TestTheObjectsExecuteSendsThePiFrames",
+        "test:codemode/deterministic_test.go#TestAVMThatIsToldTheSameResultNumberTwiceCrashes"
       ]
     },
     {
@@ -118892,7 +118902,7 @@
         "shape": "complete"
       },
       "production": [
-        "call:durable/codemode/call.go#call.commitQueued"
+        "call:durable/codemode/call.go#call.commit"
       ],
       "evidence": [
         "test:codemode/deterministic_test.go#TestDeterministicRunsApplyResultsInSeqOrderWhateverOrderTheyAreDeliveredIn",
@@ -119096,9 +119106,9 @@
         "call:codemode/execution.go#execution.receive"
       ],
       "evidence": [
+        "test:codemode/wire_oracle_test.go#TestWireBehaviorMatchesPi",
         "test:codemode/deterministic_test.go#TestDeterministicRunsApplyResultsInSeqOrderWhateverOrderTheyAreDeliveredIn",
-        "test:codemode/deterministic_test.go#TestDeterministicRunsApplyResultsInSeqOrderWhenTheTransportReordersRepliesSentInOrder",
-        "test:codemode/deterministic_test.go#TestDeterministicRunsAreFinishedOnceTheyHaveTheirOutcome"
+        "test:codemode/deterministic_test.go#TestDeterministicRunsApplyResultsInSeqOrderWhenTheTransportReordersRepliesSentInOrder"
       ]
     },
     {
@@ -119119,8 +119129,8 @@
       ],
       "evidence": [
         "test:codemode/run_members_pi_test.go#TestRunOptionsMembersAndRunDeliverFinishedMatchPi",
-        "test:codemode/deterministic_test.go#TestDeterministicRunsApplyResultsInSeqOrderWhateverOrderTheyAreDeliveredIn",
-        "test:codemode/deterministic_test.go#TestDeterministicRunsApplyResultsInSeqOrderWhenTheTransportReordersRepliesSentInOrder"
+        "test:codemode/wire_oracle_test.go#TestWireBehaviorMatchesPi",
+        "test:codemode/deterministic_test.go#TestDeterministicRunsApplyResultsInSeqOrderWhateverOrderTheyAreDeliveredIn"
       ]
     },
     {
@@ -119207,7 +119217,8 @@
         "call:durable/codemode/call.go#call.execute"
       ],
       "evidence": [
-        "test:codemode/run_members_pi_test.go#TestRunOptionsMembersAndRunDeliverFinishedMatchPi"
+        "test:codemode/run_members_pi_test.go#TestRunOptionsMembersAndRunDeliverFinishedMatchPi",
+        "test:codemode/wire_oracle_test.go#TestWireBehaviorMatchesPi"
       ]
     },
     {
@@ -119909,8 +119920,8 @@
       ],
       "evidence": [
         "test:codemode/baseline_memory_test.go#TestIdleBaselineMemoryStaysSmall",
-        "test:codemode/custom_module_engine_test.go#TestSandboxesLoadingOneModuleShareOneCompilation",
-        "test:codemode/deterministic_test.go#TestDeterministicRunsReportTheFingerprintBeforeAnyCallAndTheCallsIssuedAfterEachResult"
+        "test:codemode/cloudflare/golden_test.go#TestCreateInlineSandboxResultsAreThoseOfPisCreateInlineCodemodeSandbox",
+        "test:codemode/custom_module_engine_test.go#TestSandboxesLoadingOneModuleShareOneCompilation"
       ]
     },
     {
@@ -119953,8 +119964,8 @@
       ],
       "evidence": [
         "test:codemode/bridge_test.go#TestReportsADuplicateCallIDAsASandboxError",
-        "test:codemode/inline_test.go#TestInlineSandboxChecksTheDeadlineBetweenTurnsLikePi",
-        "test:codemode/inline_test.go#TestInlineSandboxCountsTheBudgetAcrossWaitsOnTools"
+        "test:codemode/cloudflare/golden_test.go#TestCreateInlineSandboxResultsAreThoseOfPisCreateInlineCodemodeSandbox",
+        "test:codemode/inline_test.go#TestInlineSandboxChecksTheDeadlineBetweenTurnsLikePi"
       ]
     },
     {
@@ -120042,8 +120053,8 @@
       ],
       "evidence": [
         "test:codemode/baseline_memory_test.go#TestIdleBaselineMemoryStaysSmall",
-        "test:codemode/custom_module_engine_test.go#TestSandboxesLoadingOneModuleShareOneCompilation",
-        "test:codemode/deterministic_test.go#TestDeterministicRunsReportTheFingerprintBeforeAnyCallAndTheCallsIssuedAfterEachResult"
+        "test:codemode/cloudflare/golden_test.go#TestCreateInlineSandboxResultsAreThoseOfPisCreateInlineCodemodeSandbox",
+        "test:codemode/custom_module_engine_test.go#TestSandboxesLoadingOneModuleShareOneCompilation"
       ]
     },
     {
@@ -120109,8 +120120,8 @@
       ],
       "evidence": [
         "test:codemode/bridge_test.go#TestReportsADuplicateCallIDAsASandboxError",
-        "test:codemode/inline_test.go#TestInlineSandboxChecksTheDeadlineBetweenTurnsLikePi",
-        "test:codemode/inline_test.go#TestInlineSandboxCountsTheBudgetAcrossWaitsOnTools"
+        "test:codemode/cloudflare/golden_test.go#TestCreateInlineSandboxResultsAreThoseOfPisCreateInlineCodemodeSandbox",
+        "test:codemode/inline_test.go#TestInlineSandboxChecksTheDeadlineBetweenTurnsLikePi"
       ]
     },
     {
@@ -120131,8 +120142,8 @@
       ],
       "evidence": [
         "test:codemode/cloudflare/cloudflare_test.go#TestCreateInlineSandboxRunsWithTheEntrysModule",
-        "test:codemode/custom_module_engine_test.go#TestAFailedCompileIsNotKept",
-        "test:codemode/custom_module_engine_test.go#TestSandboxesLoadingOneModuleShareOneCompilation"
+        "test:codemode/cloudflare/golden_test.go#TestCreateInlineSandboxResultsAreThoseOfPisCreateInlineCodemodeSandbox",
+        "test:codemode/custom_module_engine_test.go#TestAFailedCompileIsNotKept"
       ],
       "asyncContract": "An awaited Promise is a blocking Go call that returns the value or error; AbortSignal is the context.Context argument; no detached goroutine."
     },
@@ -120579,8 +120590,8 @@
       ],
       "evidence": [
         "test:codemode/bridge_test.go#TestReportsADuplicateCallIDAsASandboxError",
-        "test:codemode/declarations_test.go#TestDeclarationOptionsDistinguishAbsentFromZero",
-        "test:codemode/declarations_test.go#TestMalformedRefPercentEncodingIsAnError"
+        "test:codemode/cloudflare/golden_test.go#TestCreateInlineSandboxResultsAreThoseOfPisCreateInlineCodemodeSandbox",
+        "test:codemode/declarations_test.go#TestDeclarationOptionsDistinguishAbsentFromZero"
       ]
     },
     {
@@ -120734,9 +120745,9 @@
         "public-api:codemode/inline_consts.go#DefaultInterruptBudget"
       ],
       "evidence": [
+        "test:codemode/wire_oracle_test.go#TestWireBehaviorMatchesPi",
         "test:codemode/cloudflare/cloudflare_test.go#TestNewSandboxDurableObjectHasPisDefaults",
-        "test:codemode/cloudflare/cloudflare_test.go#TestTheWorkerObjectHasTheSameDefaults",
-        "test:codemode/inline_consts_test.go#TestInlineConstantsArePis"
+        "test:codemode/cloudflare/cloudflare_test.go#TestTheWorkerObjectHasTheSameDefaults"
       ]
     },
     {
@@ -120780,8 +120791,8 @@
       ],
       "evidence": [
         "test:codemode/inlinechannel_test.go#TestAnInlineFirstSegmentDeliversItsResultBeforeAnExpiredDeadline",
-        "test:codemode/resources_linux_test.go#TestConcurrentInlineExecutionsReturnMemoryAndDescriptors",
-        "test:codemode/inline_test.go#TestInlineSandboxChecksTheDeadlineBetweenTurnsLikePi"
+        "test:codemode/inlinechannel_test.go#TestAnInlineLaterSegmentDeliversItsResultBeforeAnExpiredDeadline",
+        "test:codemode/resources_linux_test.go#TestConcurrentInlineExecutionsReturnMemoryAndDescriptors"
       ]
     },
     {
@@ -121062,8 +121073,8 @@
       ],
       "evidence": [
         "test:codemode/cloudflare/cloudflare_test.go#TestCreateInlineSandboxRunsWithTheEntrysModule",
-        "test:codemode/inline_test.go#TestInlineSandboxChecksTheDeadlineBetweenTurnsLikePi",
-        "test:codemode/inline_test.go#TestInlineSandboxCountsTheBudgetAcrossWaitsOnTools"
+        "test:codemode/cloudflare/golden_test.go#TestCreateInlineSandboxResultsAreThoseOfPisCreateInlineCodemodeSandbox",
+        "test:codemode/inline_test.go#TestInlineSandboxChecksTheDeadlineBetweenTurnsLikePi"
       ],
       "asyncContract": "An awaited Promise is a blocking Go call that returns the value or error; AbortSignal is the context.Context argument; no detached goroutine."
     },
@@ -121127,8 +121138,8 @@
       ],
       "evidence": [
         "test:codemode/baseline_memory_test.go#TestIdleBaselineMemoryStaysSmall",
-        "test:codemode/custom_module_engine_test.go#TestSandboxesLoadingOneModuleShareOneCompilation",
-        "test:codemode/deterministic_test.go#TestDeterministicRunsReportTheFingerprintBeforeAnyCallAndTheCallsIssuedAfterEachResult"
+        "test:codemode/cloudflare/golden_test.go#TestCreateInlineSandboxResultsAreThoseOfPisCreateInlineCodemodeSandbox",
+        "test:codemode/custom_module_engine_test.go#TestSandboxesLoadingOneModuleShareOneCompilation"
       ]
     },
     {
@@ -121171,8 +121182,8 @@
       ],
       "evidence": [
         "test:codemode/bridge_test.go#TestReportsADuplicateCallIDAsASandboxError",
-        "test:codemode/inline_test.go#TestInlineSandboxChecksTheDeadlineBetweenTurnsLikePi",
-        "test:codemode/inline_test.go#TestInlineSandboxCountsTheBudgetAcrossWaitsOnTools"
+        "test:codemode/cloudflare/golden_test.go#TestCreateInlineSandboxResultsAreThoseOfPisCreateInlineCodemodeSandbox",
+        "test:codemode/inline_test.go#TestInlineSandboxChecksTheDeadlineBetweenTurnsLikePi"
       ]
     },
     {
@@ -121193,8 +121204,8 @@
       ],
       "evidence": [
         "test:codemode/cloudflare/cloudflare_test.go#TestCreateInlineSandboxRunsWithTheEntrysModule",
-        "test:codemode/custom_module_engine_test.go#TestAFailedCompileIsNotKept",
-        "test:codemode/custom_module_engine_test.go#TestSandboxesLoadingOneModuleShareOneCompilation"
+        "test:codemode/cloudflare/golden_test.go#TestCreateInlineSandboxResultsAreThoseOfPisCreateInlineCodemodeSandbox",
+        "test:codemode/custom_module_engine_test.go#TestAFailedCompileIsNotKept"
       ],
       "asyncContract": "An awaited Promise is a blocking Go call that returns the value or error; AbortSignal is the context.Context argument; no detached goroutine."
     },
@@ -121468,7 +121479,7 @@
       "evidence": [
         "test:codemode/remote_test.go#TestCloseWaitsForTheRemoteToReturn",
         "test:codemode/remote_test.go#TestTheRequestCarriesTheStartDataAndTheRequestedBudget",
-        "test:codemode/cloudflare/cloudflare_test.go#TestNewSandboxDurableObjectHasPisDefaults"
+        "test:codemode/wire_oracle_test.go#TestWireBehaviorMatchesPi"
       ]
     },
     {
@@ -122193,7 +122204,8 @@
       ],
       "evidence": [
         "test:codemode/deterministic_test.go#TestAVMThatIsToldTheSameResultNumberTwiceCrashes",
-        "test:codemode/remote_vm_test.go#TestServeRemoteStopsAComputingScriptWhenItsContextEnds"
+        "test:codemode/remote_vm_test.go#TestServeRemoteStopsAComputingScriptWhenItsContextEnds",
+        "test:codemode/wire_oracle_test.go#TestWireBehaviorMatchesPi"
       ],
       "asyncContract": "An awaited Promise is a blocking Go call that returns the value or error; AbortSignal is the context.Context argument; no detached goroutine."
     },
@@ -122215,7 +122227,8 @@
       ],
       "evidence": [
         "test:codemode/deterministic_test.go#TestAVMThatIsToldTheSameResultNumberTwiceCrashes",
-        "test:codemode/remote_vm_test.go#TestServeRemoteStopsAComputingScriptWhenItsContextEnds"
+        "test:codemode/remote_vm_test.go#TestServeRemoteStopsAComputingScriptWhenItsContextEnds",
+        "test:codemode/wire_oracle_test.go#TestWireBehaviorMatchesPi"
       ],
       "asyncContract": "An awaited Promise is a blocking Go call that returns the value or error; AbortSignal is the context.Context argument; no detached goroutine."
     },
@@ -122276,7 +122289,8 @@
         "public-api:codemode/cloudflare/cloudflare.go#QuickJSWasm"
       ],
       "evidence": [
-        "test:codemode/cloudflare/cloudflare_test.go#TestCreateInlineSandboxRunsWithTheEntrysModule"
+        "test:codemode/cloudflare/cloudflare_test.go#TestCreateInlineSandboxRunsWithTheEntrysModule",
+        "test:codemode/cloudflare/golden_test.go#TestTheObjectsLimitsAreThoseOfPisCloudflareEntry"
       ]
     },
     {
@@ -122296,9 +122310,9 @@
         "call:codemode/execution.go#execution.deliver"
       ],
       "evidence": [
+        "test:codemode/cloudflare/golden_test.go#TestCreateInlineSandboxResultsAreThoseOfPisCreateInlineCodemodeSandbox",
         "test:codemode/deterministic_test.go#TestDeterministicRunsMakeTheSameCallsAndOutputForTheSameStartSeedAndResults",
-        "test:codemode/deterministic_test.go#TestDeterministicRunsNumberCallsToGlobalsWithToolsAndAnswerErrorsAsRejections",
-        "test:codemode/host_finish_deadline_test.go#TestACallCancelledByTheEndOfTheExecutionRecordsHowLongItRan"
+        "test:codemode/deterministic_test.go#TestDeterministicRunsNumberCallsToGlobalsWithToolsAndAnswerErrorsAsRejections"
       ]
     },
     {
@@ -122339,9 +122353,9 @@
         "call:codemode/execution.go#execution.forwardCall"
       ],
       "evidence": [
+        "test:codemode/cloudflare/golden_test.go#TestCreateInlineSandboxResultsAreThoseOfPisCreateInlineCodemodeSandbox",
         "test:codemode/deterministic_test.go#TestDeterministicRunsMakeTheSameCallsAndOutputForTheSameStartSeedAndResults",
-        "test:codemode/deterministic_test.go#TestDeterministicRunsNumberCallsToGlobalsWithToolsAndAnswerErrorsAsRejections",
-        "test:codemode/host_finish_deadline_test.go#TestACallCancelledByTheEndOfTheExecutionRecordsHowLongItRan"
+        "test:codemode/deterministic_test.go#TestDeterministicRunsNumberCallsToGlobalsWithToolsAndAnswerErrorsAsRejections"
       ]
     },
     {
@@ -122361,9 +122375,9 @@
         "call:codemode/execution.go#execution.deliver"
       ],
       "evidence": [
+        "test:codemode/cloudflare/golden_test.go#TestCreateInlineSandboxResultsAreThoseOfPisCreateInlineCodemodeSandbox",
         "test:codemode/deterministic_test.go#TestDeterministicRunsMakeTheSameCallsAndOutputForTheSameStartSeedAndResults",
-        "test:codemode/deterministic_test.go#TestDeterministicRunsNumberCallsToGlobalsWithToolsAndAnswerErrorsAsRejections",
-        "test:codemode/host_finish_deadline_test.go#TestACallCancelledByTheEndOfTheExecutionRecordsHowLongItRan"
+        "test:codemode/deterministic_test.go#TestDeterministicRunsNumberCallsToGlobalsWithToolsAndAnswerErrorsAsRejections"
       ]
     },
     {
@@ -122845,9 +122859,9 @@
         "call:codemode/execution.go#execution.forwardCall"
       ],
       "evidence": [
+        "test:durable/codemode/codemode_helpers_pi_oracle_test.go#TestCodemodeHelpersMatchPi",
         "test:codemode/deterministic_test.go#TestDeterministicRunsApplyResultsInSeqOrderWhateverOrderTheyAreDeliveredIn",
-        "test:codemode/deterministic_test.go#TestDeterministicRunsApplyResultsInSeqOrderWhenTheTransportReordersRepliesSentInOrder",
-        "test:codemode/deterministic_test.go#TestDeterministicRunsMakeTheSameCallsAndOutputForTheSameStartSeedAndResults"
+        "test:codemode/deterministic_test.go#TestDeterministicRunsApplyResultsInSeqOrderWhenTheTransportReordersRepliesSentInOrder"
       ]
     },
     {
@@ -122867,9 +122881,9 @@
         "call:codemode/execution.go#execution.forwardCall"
       ],
       "evidence": [
+        "test:durable/codemode/codemode_helpers_pi_oracle_test.go#TestCodemodeHelpersMatchPi",
         "test:codemode/deterministic_test.go#TestDeterministicRunsMakeTheSameCallsAndOutputForTheSameStartSeedAndResults",
-        "test:codemode/deterministic_test.go#TestDeterministicRunsNumberCallsToGlobalsWithToolsAndAnswerErrorsAsRejections",
-        "test:codemode/deterministic_test.go#TestDeterministicRunsReportTheFingerprintBeforeAnyCallAndTheCallsIssuedAfterEachResult"
+        "test:codemode/deterministic_test.go#TestDeterministicRunsNumberCallsToGlobalsWithToolsAndAnswerErrorsAsRejections"
       ]
     },
     {
@@ -122889,9 +122903,9 @@
         "call:codemode/execution.go#execution.forwardCall"
       ],
       "evidence": [
+        "test:durable/codemode/codemode_helpers_pi_oracle_test.go#TestCodemodeHelpersMatchPi",
         "test:codemode/deterministic_test.go#TestDeterministicRunsApplyResultsInSeqOrderWhateverOrderTheyAreDeliveredIn",
-        "test:codemode/deterministic_test.go#TestDeterministicRunsApplyResultsInSeqOrderWhenTheTransportReordersRepliesSentInOrder",
-        "test:codemode/deterministic_test.go#TestDeterministicRunsNumberCallsToGlobalsWithToolsAndAnswerErrorsAsRejections"
+        "test:codemode/deterministic_test.go#TestDeterministicRunsApplyResultsInSeqOrderWhenTheTransportReordersRepliesSentInOrder"
       ]
     },
     {
@@ -122911,9 +122925,9 @@
         "call:codemode/execution.go#execution.forwardCall"
       ],
       "evidence": [
+        "test:durable/codemode/codemode_helpers_pi_oracle_test.go#TestCodemodeHelpersMatchPi",
         "test:codemode/deterministic_test.go#TestDeterministicRunsNumberCallsToGlobalsWithToolsAndAnswerErrorsAsRejections",
-        "test:codemode/deterministic_test.go#TestDeterministicRunsReportTheFingerprintBeforeAnyCallAndTheCallsIssuedAfterEachResult",
-        "test:codemode/run_members_pi_test.go#TestRunOptionsMembersAndRunDeliverFinishedMatchPi"
+        "test:codemode/deterministic_test.go#TestDeterministicRunsReportTheFingerprintBeforeAnyCallAndTheCallsIssuedAfterEachResult"
       ]
     },
     {
@@ -122933,9 +122947,9 @@
         "call:codemode/execution.go#execution.forwardCall"
       ],
       "evidence": [
+        "test:durable/codemode/codemode_helpers_pi_oracle_test.go#TestCodemodeHelpersMatchPi",
         "test:codemode/deterministic_test.go#TestDeterministicRunsNumberCallsToGlobalsWithToolsAndAnswerErrorsAsRejections",
-        "test:codemode/deterministic_test.go#TestDeterministicRunsReportTheFingerprintBeforeAnyCallAndTheCallsIssuedAfterEachResult",
-        "test:codemode/start_test.go#TestStartForwardsTheStartDataAndTheCallsOfTheScript"
+        "test:codemode/deterministic_test.go#TestDeterministicRunsReportTheFingerprintBeforeAnyCallAndTheCallsIssuedAfterEachResult"
       ]
     },
     {
@@ -122975,9 +122989,9 @@
         "call:codemode/execution.go#execution.deliver"
       ],
       "evidence": [
+        "test:durable/codemode/codemode_helpers_pi_oracle_test.go#TestCodemodeHelpersMatchPi",
         "test:codemode/deterministic_test.go#TestDeterministicRunsEndWithAnErrorTheScriptCannotCatchWhenTheCallerAborts",
-        "test:codemode/deterministic_test.go#TestDeterministicRunsKeepTheClockMonotonicAndRejectAClockValueThatIsNotFinite",
-        "test:codemode/deterministic_test.go#TestDeterministicRunsLeaveACallWaitingWhenItsAnswerCannotBeSerialized"
+        "test:codemode/deterministic_test.go#TestDeterministicRunsKeepTheClockMonotonicAndRejectAClockValueThatIsNotFinite"
       ]
     },
     {
@@ -123117,8 +123131,8 @@
       ],
       "evidence": [
         "test:codemode/cloudflare/cloudflare_test.go#TestTheObjectExecutesTheRequestAndReportsThroughTheExchange",
-        "test:codemode/deterministic_internal_test.go#TestDeterministicMessagesHaveUpstreamsJSONShape",
-        "test:codemode/deterministic_test.go#TestAVMThatIsToldTheSameResultNumberTwiceCrashes"
+        "test:codemode/cloudflare/golden_test.go#TestTheObjectsExecuteSendsThePiFrames",
+        "test:codemode/deterministic_internal_test.go#TestDeterministicMessagesHaveUpstreamsJSONShape"
       ]
     },
     {
@@ -123139,8 +123153,8 @@
       ],
       "evidence": [
         "test:codemode/cloudflare/cloudflare_test.go#TestTheObjectExecutesTheRequestAndReportsThroughTheExchange",
-        "test:codemode/deterministic_test.go#TestAVMThatIsToldTheSameResultNumberTwiceCrashes",
-        "test:codemode/remote_protocol_test.go#TestWireRepliesAndRequestsHaveUpstreamsJSONShape"
+        "test:codemode/cloudflare/golden_test.go#TestTheObjectsExecuteSendsThePiFrames",
+        "test:codemode/deterministic_test.go#TestAVMThatIsToldTheSameResultNumberTwiceCrashes"
       ]
     },
     {
@@ -123241,7 +123255,7 @@
         "shape": "complete"
       },
       "production": [
-        "call:durable/codemode/call.go#call.commitQueued"
+        "call:durable/codemode/call.go#call.commit"
       ],
       "evidence": [
         "test:codemode/deterministic_test.go#TestDeterministicRunsApplyResultsInSeqOrderWhateverOrderTheyAreDeliveredIn",
@@ -123445,9 +123459,9 @@
         "call:codemode/execution.go#execution.receive"
       ],
       "evidence": [
+        "test:codemode/wire_oracle_test.go#TestWireBehaviorMatchesPi",
         "test:codemode/deterministic_test.go#TestDeterministicRunsApplyResultsInSeqOrderWhateverOrderTheyAreDeliveredIn",
-        "test:codemode/deterministic_test.go#TestDeterministicRunsApplyResultsInSeqOrderWhenTheTransportReordersRepliesSentInOrder",
-        "test:codemode/deterministic_test.go#TestDeterministicRunsAreFinishedOnceTheyHaveTheirOutcome"
+        "test:codemode/deterministic_test.go#TestDeterministicRunsApplyResultsInSeqOrderWhenTheTransportReordersRepliesSentInOrder"
       ]
     },
     {
@@ -123468,8 +123482,8 @@
       ],
       "evidence": [
         "test:codemode/run_members_pi_test.go#TestRunOptionsMembersAndRunDeliverFinishedMatchPi",
-        "test:codemode/deterministic_test.go#TestDeterministicRunsApplyResultsInSeqOrderWhateverOrderTheyAreDeliveredIn",
-        "test:codemode/deterministic_test.go#TestDeterministicRunsApplyResultsInSeqOrderWhenTheTransportReordersRepliesSentInOrder"
+        "test:codemode/wire_oracle_test.go#TestWireBehaviorMatchesPi",
+        "test:codemode/deterministic_test.go#TestDeterministicRunsApplyResultsInSeqOrderWhateverOrderTheyAreDeliveredIn"
       ]
     },
     {
@@ -123556,7 +123570,8 @@
         "call:durable/codemode/call.go#call.execute"
       ],
       "evidence": [
-        "test:codemode/run_members_pi_test.go#TestRunOptionsMembersAndRunDeliverFinishedMatchPi"
+        "test:codemode/run_members_pi_test.go#TestRunOptionsMembersAndRunDeliverFinishedMatchPi",
+        "test:codemode/wire_oracle_test.go#TestWireBehaviorMatchesPi"
       ]
     },
     {
@@ -123959,8 +123974,8 @@
       ],
       "evidence": [
         "test:codemode/baseline_memory_test.go#TestIdleBaselineMemoryStaysSmall",
-        "test:codemode/custom_module_engine_test.go#TestSandboxesLoadingOneModuleShareOneCompilation",
-        "test:codemode/deterministic_test.go#TestDeterministicRunsReportTheFingerprintBeforeAnyCallAndTheCallsIssuedAfterEachResult"
+        "test:codemode/cloudflare/golden_test.go#TestCreateInlineSandboxResultsAreThoseOfPisCreateInlineCodemodeSandbox",
+        "test:codemode/custom_module_engine_test.go#TestSandboxesLoadingOneModuleShareOneCompilation"
       ]
     },
     {
@@ -124003,8 +124018,8 @@
       ],
       "evidence": [
         "test:codemode/bridge_test.go#TestReportsADuplicateCallIDAsASandboxError",
-        "test:codemode/inline_test.go#TestInlineSandboxChecksTheDeadlineBetweenTurnsLikePi",
-        "test:codemode/inline_test.go#TestInlineSandboxCountsTheBudgetAcrossWaitsOnTools"
+        "test:codemode/cloudflare/golden_test.go#TestCreateInlineSandboxResultsAreThoseOfPisCreateInlineCodemodeSandbox",
+        "test:codemode/inline_test.go#TestInlineSandboxChecksTheDeadlineBetweenTurnsLikePi"
       ]
     },
     {
@@ -124026,7 +124041,7 @@
       "evidence": [
         "test:codemode/cloudflare/cloudflare_test.go#TestNewSandboxDurableObjectHasPisDefaults",
         "test:codemode/cloudflare/cloudflare_test.go#TestTheObjectExecutesTheRequestAndReportsThroughTheExchange",
-        "test:codemode/cloudflare/cloudflare_test.go#TestTheObjectsLimitsCapEveryRequest"
+        "test:codemode/cloudflare/golden_test.go#TestTheObjectsExecuteSendsThePiFrames"
       ],
       "asyncContract": "An awaited Promise is a blocking Go call that returns the value or error; AbortSignal is the context.Context argument; no detached goroutine."
     },
@@ -124048,7 +124063,8 @@
       ],
       "evidence": [
         "test:codemode/cloudflare/cloudflare_test.go#TestNewSandboxDurableObjectHasPisDefaults",
-        "test:codemode/cloudflare/cloudflare_test.go#TestTheObjectExecutesTheRequestAndReportsThroughTheExchange"
+        "test:codemode/cloudflare/cloudflare_test.go#TestTheObjectExecutesTheRequestAndReportsThroughTheExchange",
+        "test:codemode/cloudflare/golden_test.go#TestTheObjectsExecuteSendsThePiFrames"
       ]
     },
     {
@@ -124373,8 +124389,8 @@
       ],
       "evidence": [
         "test:codemode/bridge_test.go#TestReportsADuplicateCallIDAsASandboxError",
-        "test:codemode/declarations_test.go#TestDeclarationOptionsDistinguishAbsentFromZero",
-        "test:codemode/declarations_test.go#TestMalformedRefPercentEncodingIsAnError"
+        "test:codemode/cloudflare/golden_test.go#TestCreateInlineSandboxResultsAreThoseOfPisCreateInlineCodemodeSandbox",
+        "test:codemode/declarations_test.go#TestDeclarationOptionsDistinguishAbsentFromZero"
       ]
     },
     {
@@ -124481,8 +124497,8 @@
       ],
       "evidence": [
         "test:codemode/bridge_test.go#TestReportsADuplicateCallIDAsASandboxError",
-        "test:codemode/declarations_test.go#TestDeclarationOptionsDistinguishAbsentFromZero",
-        "test:codemode/declarations_test.go#TestMalformedRefPercentEncodingIsAnError"
+        "test:codemode/cloudflare/golden_test.go#TestCreateInlineSandboxResultsAreThoseOfPisCreateInlineCodemodeSandbox",
+        "test:codemode/declarations_test.go#TestDeclarationOptionsDistinguishAbsentFromZero"
       ],
       "asyncContract": "An awaited Promise is a blocking Go call that returns the value or error; AbortSignal is the context.Context argument; no detached goroutine."
     },
@@ -124513,7 +124529,8 @@
         "public-api:codemode/cloudflare/cloudflare.go#CreateInlineSandbox"
       ],
       "evidence": [
-        "test:codemode/cloudflare/cloudflare_test.go#TestCreateInlineSandboxRunsWithTheEntrysModule"
+        "test:codemode/cloudflare/cloudflare_test.go#TestCreateInlineSandboxRunsWithTheEntrysModule",
+        "test:codemode/cloudflare/golden_test.go#TestCreateInlineSandboxResultsAreThoseOfPisCreateInlineCodemodeSandbox"
       ]
     },
     {
@@ -124533,7 +124550,8 @@
         "public-api:codemode/cloudflare/cloudflare.go#CreateInlineSandbox"
       ],
       "evidence": [
-        "test:codemode/cloudflare/cloudflare_test.go#TestCreateInlineSandboxRunsWithTheEntrysModule"
+        "test:codemode/cloudflare/cloudflare_test.go#TestCreateInlineSandboxRunsWithTheEntrysModule",
+        "test:codemode/cloudflare/golden_test.go#TestCreateInlineSandboxResultsAreThoseOfPisCreateInlineCodemodeSandbox"
       ]
     },
     {
@@ -124553,9 +124571,9 @@
         "public-api:codemode/inline_consts.go#DefaultInterruptBudget"
       ],
       "evidence": [
+        "test:codemode/wire_oracle_test.go#TestWireBehaviorMatchesPi",
         "test:codemode/cloudflare/cloudflare_test.go#TestNewSandboxDurableObjectHasPisDefaults",
-        "test:codemode/cloudflare/cloudflare_test.go#TestTheWorkerObjectHasTheSameDefaults",
-        "test:codemode/inline_consts_test.go#TestInlineConstantsArePis"
+        "test:codemode/cloudflare/cloudflare_test.go#TestTheWorkerObjectHasTheSameDefaults"
       ]
     },
     {
@@ -124576,7 +124594,8 @@
       ],
       "evidence": [
         "test:codemode/cloudflare/cloudflare_test.go#TestNewSandboxDurableObjectHasPisDefaults",
-        "test:codemode/cloudflare/cloudflare_test.go#TestTheWorkerObjectHasTheSameDefaults"
+        "test:codemode/cloudflare/cloudflare_test.go#TestTheWorkerObjectHasTheSameDefaults",
+        "test:codemode/cloudflare/golden_test.go#TestTheObjectsLimitsAreThoseOfPisCloudflareEntry"
       ]
     },
     {
@@ -124642,8 +124661,8 @@
       ],
       "evidence": [
         "test:codemode/inlinechannel_test.go#TestAnInlineFirstSegmentDeliversItsResultBeforeAnExpiredDeadline",
-        "test:codemode/resources_linux_test.go#TestConcurrentInlineExecutionsReturnMemoryAndDescriptors",
-        "test:codemode/inline_test.go#TestInlineSandboxChecksTheDeadlineBetweenTurnsLikePi"
+        "test:codemode/inlinechannel_test.go#TestAnInlineLaterSegmentDeliversItsResultBeforeAnExpiredDeadline",
+        "test:codemode/resources_linux_test.go#TestConcurrentInlineExecutionsReturnMemoryAndDescriptors"
       ]
     },
     {
@@ -124924,8 +124943,8 @@
       ],
       "evidence": [
         "test:codemode/cloudflare/cloudflare_test.go#TestCreateInlineSandboxRunsWithTheEntrysModule",
-        "test:codemode/inline_test.go#TestInlineSandboxChecksTheDeadlineBetweenTurnsLikePi",
-        "test:codemode/inline_test.go#TestInlineSandboxCountsTheBudgetAcrossWaitsOnTools"
+        "test:codemode/cloudflare/golden_test.go#TestCreateInlineSandboxResultsAreThoseOfPisCreateInlineCodemodeSandbox",
+        "test:codemode/inline_test.go#TestInlineSandboxChecksTheDeadlineBetweenTurnsLikePi"
       ],
       "asyncContract": "An awaited Promise is a blocking Go call that returns the value or error; AbortSignal is the context.Context argument; no detached goroutine."
     },
@@ -124989,8 +125008,8 @@
       ],
       "evidence": [
         "test:codemode/baseline_memory_test.go#TestIdleBaselineMemoryStaysSmall",
-        "test:codemode/custom_module_engine_test.go#TestSandboxesLoadingOneModuleShareOneCompilation",
-        "test:codemode/deterministic_test.go#TestDeterministicRunsReportTheFingerprintBeforeAnyCallAndTheCallsIssuedAfterEachResult"
+        "test:codemode/cloudflare/golden_test.go#TestCreateInlineSandboxResultsAreThoseOfPisCreateInlineCodemodeSandbox",
+        "test:codemode/custom_module_engine_test.go#TestSandboxesLoadingOneModuleShareOneCompilation"
       ]
     },
     {
@@ -125033,8 +125052,8 @@
       ],
       "evidence": [
         "test:codemode/bridge_test.go#TestReportsADuplicateCallIDAsASandboxError",
-        "test:codemode/inline_test.go#TestInlineSandboxChecksTheDeadlineBetweenTurnsLikePi",
-        "test:codemode/inline_test.go#TestInlineSandboxCountsTheBudgetAcrossWaitsOnTools"
+        "test:codemode/cloudflare/golden_test.go#TestCreateInlineSandboxResultsAreThoseOfPisCreateInlineCodemodeSandbox",
+        "test:codemode/inline_test.go#TestInlineSandboxChecksTheDeadlineBetweenTurnsLikePi"
       ]
     },
     {
@@ -125055,8 +125074,8 @@
       ],
       "evidence": [
         "test:codemode/cloudflare/cloudflare_test.go#TestCreateInlineSandboxRunsWithTheEntrysModule",
-        "test:codemode/custom_module_engine_test.go#TestAFailedCompileIsNotKept",
-        "test:codemode/custom_module_engine_test.go#TestSandboxesLoadingOneModuleShareOneCompilation"
+        "test:codemode/cloudflare/golden_test.go#TestCreateInlineSandboxResultsAreThoseOfPisCreateInlineCodemodeSandbox",
+        "test:codemode/custom_module_engine_test.go#TestAFailedCompileIsNotKept"
       ],
       "asyncContract": "An awaited Promise is a blocking Go call that returns the value or error; AbortSignal is the context.Context argument; no detached goroutine."
     },
@@ -125190,7 +125209,7 @@
       "evidence": [
         "test:codemode/remote_test.go#TestCloseWaitsForTheRemoteToReturn",
         "test:codemode/remote_test.go#TestTheRequestCarriesTheStartDataAndTheRequestedBudget",
-        "test:codemode/cloudflare/cloudflare_test.go#TestNewSandboxDurableObjectHasPisDefaults"
+        "test:codemode/wire_oracle_test.go#TestWireBehaviorMatchesPi"
       ]
     },
     {
@@ -125633,7 +125652,8 @@
       ],
       "evidence": [
         "test:codemode/deterministic_test.go#TestAVMThatIsToldTheSameResultNumberTwiceCrashes",
-        "test:codemode/remote_vm_test.go#TestServeRemoteStopsAComputingScriptWhenItsContextEnds"
+        "test:codemode/remote_vm_test.go#TestServeRemoteStopsAComputingScriptWhenItsContextEnds",
+        "test:codemode/wire_oracle_test.go#TestWireBehaviorMatchesPi"
       ],
       "asyncContract": "An awaited Promise is a blocking Go call that returns the value or error; AbortSignal is the context.Context argument; no detached goroutine."
     },
@@ -125655,7 +125675,8 @@
       ],
       "evidence": [
         "test:codemode/deterministic_test.go#TestAVMThatIsToldTheSameResultNumberTwiceCrashes",
-        "test:codemode/remote_vm_test.go#TestServeRemoteStopsAComputingScriptWhenItsContextEnds"
+        "test:codemode/remote_vm_test.go#TestServeRemoteStopsAComputingScriptWhenItsContextEnds",
+        "test:codemode/wire_oracle_test.go#TestWireBehaviorMatchesPi"
       ],
       "asyncContract": "An awaited Promise is a blocking Go call that returns the value or error; AbortSignal is the context.Context argument; no detached goroutine."
     },
@@ -126234,9 +126255,9 @@
         "call:codemode/execution.go#execution.deliver"
       ],
       "evidence": [
+        "test:codemode/cloudflare/golden_test.go#TestCreateInlineSandboxResultsAreThoseOfPisCreateInlineCodemodeSandbox",
         "test:codemode/deterministic_test.go#TestDeterministicRunsMakeTheSameCallsAndOutputForTheSameStartSeedAndResults",
-        "test:codemode/deterministic_test.go#TestDeterministicRunsNumberCallsToGlobalsWithToolsAndAnswerErrorsAsRejections",
-        "test:codemode/host_finish_deadline_test.go#TestACallCancelledByTheEndOfTheExecutionRecordsHowLongItRan"
+        "test:codemode/deterministic_test.go#TestDeterministicRunsNumberCallsToGlobalsWithToolsAndAnswerErrorsAsRejections"
       ]
     },
     {
@@ -126277,9 +126298,9 @@
         "call:codemode/execution.go#execution.forwardCall"
       ],
       "evidence": [
+        "test:codemode/cloudflare/golden_test.go#TestCreateInlineSandboxResultsAreThoseOfPisCreateInlineCodemodeSandbox",
         "test:codemode/deterministic_test.go#TestDeterministicRunsMakeTheSameCallsAndOutputForTheSameStartSeedAndResults",
-        "test:codemode/deterministic_test.go#TestDeterministicRunsNumberCallsToGlobalsWithToolsAndAnswerErrorsAsRejections",
-        "test:codemode/host_finish_deadline_test.go#TestACallCancelledByTheEndOfTheExecutionRecordsHowLongItRan"
+        "test:codemode/deterministic_test.go#TestDeterministicRunsNumberCallsToGlobalsWithToolsAndAnswerErrorsAsRejections"
       ]
     },
     {
@@ -126299,9 +126320,9 @@
         "call:codemode/execution.go#execution.deliver"
       ],
       "evidence": [
+        "test:codemode/cloudflare/golden_test.go#TestCreateInlineSandboxResultsAreThoseOfPisCreateInlineCodemodeSandbox",
         "test:codemode/deterministic_test.go#TestDeterministicRunsMakeTheSameCallsAndOutputForTheSameStartSeedAndResults",
-        "test:codemode/deterministic_test.go#TestDeterministicRunsNumberCallsToGlobalsWithToolsAndAnswerErrorsAsRejections",
-        "test:codemode/host_finish_deadline_test.go#TestACallCancelledByTheEndOfTheExecutionRecordsHowLongItRan"
+        "test:codemode/deterministic_test.go#TestDeterministicRunsNumberCallsToGlobalsWithToolsAndAnswerErrorsAsRejections"
       ]
     },
     {
@@ -126783,9 +126804,9 @@
         "call:codemode/execution.go#execution.forwardCall"
       ],
       "evidence": [
+        "test:durable/codemode/codemode_helpers_pi_oracle_test.go#TestCodemodeHelpersMatchPi",
         "test:codemode/deterministic_test.go#TestDeterministicRunsApplyResultsInSeqOrderWhateverOrderTheyAreDeliveredIn",
-        "test:codemode/deterministic_test.go#TestDeterministicRunsApplyResultsInSeqOrderWhenTheTransportReordersRepliesSentInOrder",
-        "test:codemode/deterministic_test.go#TestDeterministicRunsMakeTheSameCallsAndOutputForTheSameStartSeedAndResults"
+        "test:codemode/deterministic_test.go#TestDeterministicRunsApplyResultsInSeqOrderWhenTheTransportReordersRepliesSentInOrder"
       ]
     },
     {
@@ -126805,9 +126826,9 @@
         "call:codemode/execution.go#execution.forwardCall"
       ],
       "evidence": [
+        "test:durable/codemode/codemode_helpers_pi_oracle_test.go#TestCodemodeHelpersMatchPi",
         "test:codemode/deterministic_test.go#TestDeterministicRunsMakeTheSameCallsAndOutputForTheSameStartSeedAndResults",
-        "test:codemode/deterministic_test.go#TestDeterministicRunsNumberCallsToGlobalsWithToolsAndAnswerErrorsAsRejections",
-        "test:codemode/deterministic_test.go#TestDeterministicRunsReportTheFingerprintBeforeAnyCallAndTheCallsIssuedAfterEachResult"
+        "test:codemode/deterministic_test.go#TestDeterministicRunsNumberCallsToGlobalsWithToolsAndAnswerErrorsAsRejections"
       ]
     },
     {
@@ -126827,9 +126848,9 @@
         "call:codemode/execution.go#execution.forwardCall"
       ],
       "evidence": [
+        "test:durable/codemode/codemode_helpers_pi_oracle_test.go#TestCodemodeHelpersMatchPi",
         "test:codemode/deterministic_test.go#TestDeterministicRunsApplyResultsInSeqOrderWhateverOrderTheyAreDeliveredIn",
-        "test:codemode/deterministic_test.go#TestDeterministicRunsApplyResultsInSeqOrderWhenTheTransportReordersRepliesSentInOrder",
-        "test:codemode/deterministic_test.go#TestDeterministicRunsNumberCallsToGlobalsWithToolsAndAnswerErrorsAsRejections"
+        "test:codemode/deterministic_test.go#TestDeterministicRunsApplyResultsInSeqOrderWhenTheTransportReordersRepliesSentInOrder"
       ]
     },
     {
@@ -126849,9 +126870,9 @@
         "call:codemode/execution.go#execution.forwardCall"
       ],
       "evidence": [
+        "test:durable/codemode/codemode_helpers_pi_oracle_test.go#TestCodemodeHelpersMatchPi",
         "test:codemode/deterministic_test.go#TestDeterministicRunsNumberCallsToGlobalsWithToolsAndAnswerErrorsAsRejections",
-        "test:codemode/deterministic_test.go#TestDeterministicRunsReportTheFingerprintBeforeAnyCallAndTheCallsIssuedAfterEachResult",
-        "test:codemode/run_members_pi_test.go#TestRunOptionsMembersAndRunDeliverFinishedMatchPi"
+        "test:codemode/deterministic_test.go#TestDeterministicRunsReportTheFingerprintBeforeAnyCallAndTheCallsIssuedAfterEachResult"
       ]
     },
     {
@@ -126871,9 +126892,9 @@
         "call:codemode/execution.go#execution.forwardCall"
       ],
       "evidence": [
+        "test:durable/codemode/codemode_helpers_pi_oracle_test.go#TestCodemodeHelpersMatchPi",
         "test:codemode/deterministic_test.go#TestDeterministicRunsNumberCallsToGlobalsWithToolsAndAnswerErrorsAsRejections",
-        "test:codemode/deterministic_test.go#TestDeterministicRunsReportTheFingerprintBeforeAnyCallAndTheCallsIssuedAfterEachResult",
-        "test:codemode/start_test.go#TestStartForwardsTheStartDataAndTheCallsOfTheScript"
+        "test:codemode/deterministic_test.go#TestDeterministicRunsReportTheFingerprintBeforeAnyCallAndTheCallsIssuedAfterEachResult"
       ]
     },
     {
@@ -126913,9 +126934,9 @@
         "call:codemode/execution.go#execution.deliver"
       ],
       "evidence": [
+        "test:durable/codemode/codemode_helpers_pi_oracle_test.go#TestCodemodeHelpersMatchPi",
         "test:codemode/deterministic_test.go#TestDeterministicRunsEndWithAnErrorTheScriptCannotCatchWhenTheCallerAborts",
-        "test:codemode/deterministic_test.go#TestDeterministicRunsKeepTheClockMonotonicAndRejectAClockValueThatIsNotFinite",
-        "test:codemode/deterministic_test.go#TestDeterministicRunsLeaveACallWaitingWhenItsAnswerCannotBeSerialized"
+        "test:codemode/deterministic_test.go#TestDeterministicRunsKeepTheClockMonotonicAndRejectAClockValueThatIsNotFinite"
       ]
     },
     {
@@ -127055,8 +127076,8 @@
       ],
       "evidence": [
         "test:codemode/cloudflare/cloudflare_test.go#TestTheObjectExecutesTheRequestAndReportsThroughTheExchange",
-        "test:codemode/deterministic_internal_test.go#TestDeterministicMessagesHaveUpstreamsJSONShape",
-        "test:codemode/deterministic_test.go#TestAVMThatIsToldTheSameResultNumberTwiceCrashes"
+        "test:codemode/cloudflare/golden_test.go#TestTheObjectsExecuteSendsThePiFrames",
+        "test:codemode/deterministic_internal_test.go#TestDeterministicMessagesHaveUpstreamsJSONShape"
       ]
     },
     {
@@ -127077,8 +127098,8 @@
       ],
       "evidence": [
         "test:codemode/cloudflare/cloudflare_test.go#TestTheObjectExecutesTheRequestAndReportsThroughTheExchange",
-        "test:codemode/deterministic_test.go#TestAVMThatIsToldTheSameResultNumberTwiceCrashes",
-        "test:codemode/remote_protocol_test.go#TestWireRepliesAndRequestsHaveUpstreamsJSONShape"
+        "test:codemode/cloudflare/golden_test.go#TestTheObjectsExecuteSendsThePiFrames",
+        "test:codemode/deterministic_test.go#TestAVMThatIsToldTheSameResultNumberTwiceCrashes"
       ]
     },
     {
@@ -127179,7 +127200,7 @@
         "shape": "complete"
       },
       "production": [
-        "call:durable/codemode/call.go#call.commitQueued"
+        "call:durable/codemode/call.go#call.commit"
       ],
       "evidence": [
         "test:codemode/deterministic_test.go#TestDeterministicRunsApplyResultsInSeqOrderWhateverOrderTheyAreDeliveredIn",
@@ -127383,9 +127404,9 @@
         "call:codemode/execution.go#execution.receive"
       ],
       "evidence": [
+        "test:codemode/wire_oracle_test.go#TestWireBehaviorMatchesPi",
         "test:codemode/deterministic_test.go#TestDeterministicRunsApplyResultsInSeqOrderWhateverOrderTheyAreDeliveredIn",
-        "test:codemode/deterministic_test.go#TestDeterministicRunsApplyResultsInSeqOrderWhenTheTransportReordersRepliesSentInOrder",
-        "test:codemode/deterministic_test.go#TestDeterministicRunsAreFinishedOnceTheyHaveTheirOutcome"
+        "test:codemode/deterministic_test.go#TestDeterministicRunsApplyResultsInSeqOrderWhenTheTransportReordersRepliesSentInOrder"
       ]
     },
     {
@@ -127406,8 +127427,8 @@
       ],
       "evidence": [
         "test:codemode/run_members_pi_test.go#TestRunOptionsMembersAndRunDeliverFinishedMatchPi",
-        "test:codemode/deterministic_test.go#TestDeterministicRunsApplyResultsInSeqOrderWhateverOrderTheyAreDeliveredIn",
-        "test:codemode/deterministic_test.go#TestDeterministicRunsApplyResultsInSeqOrderWhenTheTransportReordersRepliesSentInOrder"
+        "test:codemode/wire_oracle_test.go#TestWireBehaviorMatchesPi",
+        "test:codemode/deterministic_test.go#TestDeterministicRunsApplyResultsInSeqOrderWhateverOrderTheyAreDeliveredIn"
       ]
     },
     {
@@ -127494,7 +127515,8 @@
         "call:durable/codemode/call.go#call.execute"
       ],
       "evidence": [
-        "test:codemode/run_members_pi_test.go#TestRunOptionsMembersAndRunDeliverFinishedMatchPi"
+        "test:codemode/run_members_pi_test.go#TestRunOptionsMembersAndRunDeliverFinishedMatchPi",
+        "test:codemode/wire_oracle_test.go#TestWireBehaviorMatchesPi"
       ]
     },
     {
@@ -127897,8 +127919,8 @@
       ],
       "evidence": [
         "test:codemode/baseline_memory_test.go#TestIdleBaselineMemoryStaysSmall",
-        "test:codemode/custom_module_engine_test.go#TestSandboxesLoadingOneModuleShareOneCompilation",
-        "test:codemode/deterministic_test.go#TestDeterministicRunsReportTheFingerprintBeforeAnyCallAndTheCallsIssuedAfterEachResult"
+        "test:codemode/cloudflare/golden_test.go#TestCreateInlineSandboxResultsAreThoseOfPisCreateInlineCodemodeSandbox",
+        "test:codemode/custom_module_engine_test.go#TestSandboxesLoadingOneModuleShareOneCompilation"
       ]
     },
     {
@@ -127941,8 +127963,8 @@
       ],
       "evidence": [
         "test:codemode/bridge_test.go#TestReportsADuplicateCallIDAsASandboxError",
-        "test:codemode/inline_test.go#TestInlineSandboxChecksTheDeadlineBetweenTurnsLikePi",
-        "test:codemode/inline_test.go#TestInlineSandboxCountsTheBudgetAcrossWaitsOnTools"
+        "test:codemode/cloudflare/golden_test.go#TestCreateInlineSandboxResultsAreThoseOfPisCreateInlineCodemodeSandbox",
+        "test:codemode/inline_test.go#TestInlineSandboxChecksTheDeadlineBetweenTurnsLikePi"
       ]
     },
     {
@@ -128225,8 +128247,8 @@
       ],
       "evidence": [
         "test:codemode/bridge_test.go#TestReportsADuplicateCallIDAsASandboxError",
-        "test:codemode/declarations_test.go#TestDeclarationOptionsDistinguishAbsentFromZero",
-        "test:codemode/declarations_test.go#TestMalformedRefPercentEncodingIsAnError"
+        "test:codemode/cloudflare/golden_test.go#TestCreateInlineSandboxResultsAreThoseOfPisCreateInlineCodemodeSandbox",
+        "test:codemode/declarations_test.go#TestDeclarationOptionsDistinguishAbsentFromZero"
       ]
     },
     {
@@ -128333,8 +128355,8 @@
       ],
       "evidence": [
         "test:codemode/bridge_test.go#TestReportsADuplicateCallIDAsASandboxError",
-        "test:codemode/declarations_test.go#TestDeclarationOptionsDistinguishAbsentFromZero",
-        "test:codemode/declarations_test.go#TestMalformedRefPercentEncodingIsAnError"
+        "test:codemode/cloudflare/golden_test.go#TestCreateInlineSandboxResultsAreThoseOfPisCreateInlineCodemodeSandbox",
+        "test:codemode/declarations_test.go#TestDeclarationOptionsDistinguishAbsentFromZero"
       ],
       "asyncContract": "An awaited Promise is a blocking Go call that returns the value or error; AbortSignal is the context.Context argument; no detached goroutine."
     },
@@ -128365,9 +128387,9 @@
         "public-api:codemode/inline_consts.go#DefaultInterruptBudget"
       ],
       "evidence": [
+        "test:codemode/wire_oracle_test.go#TestWireBehaviorMatchesPi",
         "test:codemode/cloudflare/cloudflare_test.go#TestNewSandboxDurableObjectHasPisDefaults",
-        "test:codemode/cloudflare/cloudflare_test.go#TestTheWorkerObjectHasTheSameDefaults",
-        "test:codemode/inline_consts_test.go#TestInlineConstantsArePis"
+        "test:codemode/cloudflare/cloudflare_test.go#TestTheWorkerObjectHasTheSameDefaults"
       ]
     },
     {
@@ -128433,8 +128455,8 @@
       ],
       "evidence": [
         "test:codemode/inlinechannel_test.go#TestAnInlineFirstSegmentDeliversItsResultBeforeAnExpiredDeadline",
-        "test:codemode/resources_linux_test.go#TestConcurrentInlineExecutionsReturnMemoryAndDescriptors",
-        "test:codemode/inline_test.go#TestInlineSandboxChecksTheDeadlineBetweenTurnsLikePi"
+        "test:codemode/inlinechannel_test.go#TestAnInlineLaterSegmentDeliversItsResultBeforeAnExpiredDeadline",
+        "test:codemode/resources_linux_test.go#TestConcurrentInlineExecutionsReturnMemoryAndDescriptors"
       ]
     },
     {
@@ -128715,8 +128737,8 @@
       ],
       "evidence": [
         "test:codemode/cloudflare/cloudflare_test.go#TestCreateInlineSandboxRunsWithTheEntrysModule",
-        "test:codemode/inline_test.go#TestInlineSandboxChecksTheDeadlineBetweenTurnsLikePi",
-        "test:codemode/inline_test.go#TestInlineSandboxCountsTheBudgetAcrossWaitsOnTools"
+        "test:codemode/cloudflare/golden_test.go#TestCreateInlineSandboxResultsAreThoseOfPisCreateInlineCodemodeSandbox",
+        "test:codemode/inline_test.go#TestInlineSandboxChecksTheDeadlineBetweenTurnsLikePi"
       ],
       "asyncContract": "An awaited Promise is a blocking Go call that returns the value or error; AbortSignal is the context.Context argument; no detached goroutine."
     },
@@ -128780,8 +128802,8 @@
       ],
       "evidence": [
         "test:codemode/baseline_memory_test.go#TestIdleBaselineMemoryStaysSmall",
-        "test:codemode/custom_module_engine_test.go#TestSandboxesLoadingOneModuleShareOneCompilation",
-        "test:codemode/deterministic_test.go#TestDeterministicRunsReportTheFingerprintBeforeAnyCallAndTheCallsIssuedAfterEachResult"
+        "test:codemode/cloudflare/golden_test.go#TestCreateInlineSandboxResultsAreThoseOfPisCreateInlineCodemodeSandbox",
+        "test:codemode/custom_module_engine_test.go#TestSandboxesLoadingOneModuleShareOneCompilation"
       ]
     },
     {
@@ -128824,8 +128846,8 @@
       ],
       "evidence": [
         "test:codemode/bridge_test.go#TestReportsADuplicateCallIDAsASandboxError",
-        "test:codemode/inline_test.go#TestInlineSandboxChecksTheDeadlineBetweenTurnsLikePi",
-        "test:codemode/inline_test.go#TestInlineSandboxCountsTheBudgetAcrossWaitsOnTools"
+        "test:codemode/cloudflare/golden_test.go#TestCreateInlineSandboxResultsAreThoseOfPisCreateInlineCodemodeSandbox",
+        "test:codemode/inline_test.go#TestInlineSandboxChecksTheDeadlineBetweenTurnsLikePi"
       ]
     },
     {
@@ -128846,8 +128868,8 @@
       ],
       "evidence": [
         "test:codemode/cloudflare/cloudflare_test.go#TestCreateInlineSandboxRunsWithTheEntrysModule",
-        "test:codemode/custom_module_engine_test.go#TestAFailedCompileIsNotKept",
-        "test:codemode/custom_module_engine_test.go#TestSandboxesLoadingOneModuleShareOneCompilation"
+        "test:codemode/cloudflare/golden_test.go#TestCreateInlineSandboxResultsAreThoseOfPisCreateInlineCodemodeSandbox",
+        "test:codemode/custom_module_engine_test.go#TestAFailedCompileIsNotKept"
       ],
       "asyncContract": "An awaited Promise is a blocking Go call that returns the value or error; AbortSignal is the context.Context argument; no detached goroutine."
     },
@@ -128981,7 +129003,7 @@
       "evidence": [
         "test:codemode/remote_test.go#TestCloseWaitsForTheRemoteToReturn",
         "test:codemode/remote_test.go#TestTheRequestCarriesTheStartDataAndTheRequestedBudget",
-        "test:codemode/cloudflare/cloudflare_test.go#TestNewSandboxDurableObjectHasPisDefaults"
+        "test:codemode/wire_oracle_test.go#TestWireBehaviorMatchesPi"
       ]
     },
     {
@@ -129424,7 +129446,8 @@
       ],
       "evidence": [
         "test:codemode/deterministic_test.go#TestAVMThatIsToldTheSameResultNumberTwiceCrashes",
-        "test:codemode/remote_vm_test.go#TestServeRemoteStopsAComputingScriptWhenItsContextEnds"
+        "test:codemode/remote_vm_test.go#TestServeRemoteStopsAComputingScriptWhenItsContextEnds",
+        "test:codemode/wire_oracle_test.go#TestWireBehaviorMatchesPi"
       ],
       "asyncContract": "An awaited Promise is a blocking Go call that returns the value or error; AbortSignal is the context.Context argument; no detached goroutine."
     },
@@ -129446,7 +129469,8 @@
       ],
       "evidence": [
         "test:codemode/deterministic_test.go#TestAVMThatIsToldTheSameResultNumberTwiceCrashes",
-        "test:codemode/remote_vm_test.go#TestServeRemoteStopsAComputingScriptWhenItsContextEnds"
+        "test:codemode/remote_vm_test.go#TestServeRemoteStopsAComputingScriptWhenItsContextEnds",
+        "test:codemode/wire_oracle_test.go#TestWireBehaviorMatchesPi"
       ],
       "asyncContract": "An awaited Promise is a blocking Go call that returns the value or error; AbortSignal is the context.Context argument; no detached goroutine."
     },
@@ -140682,9 +140706,9 @@
         "call:coding/extension/builtin/codemode/execute.go#Execute"
       ],
       "evidence": [
+        "test:coding/extension/builtin/codemode/settings_defaults_oracle_test.go#TestCodemodeDefaultsAreThePinnedPiSettingsDefaults",
         "test:coding/codemode_session_upstream_test.go#TestUpstreamCodemodeModels",
-        "test:coding/extension/builtin/codemode/execute_oracle_test.go#TestExecuteOutputMatchesPi",
-        "test:coding/extension/builtin/codemode/session_free_upstream_test.go#TestDeclaresModelsOnlyForAToolCreatedWithModelAccess"
+        "test:coding/extension/builtin/codemode/execute_oracle_test.go#TestExecuteOutputMatchesPi"
       ]
     },
     {
@@ -140704,6 +140728,7 @@
         "call:coding/extension/builtin/codemode/tool.go#Options.inlineBudget"
       ],
       "evidence": [
+        "test:coding/extension/builtin/codemode/settings_defaults_oracle_test.go#TestCodemodeDefaultsAreThePinnedPiSettingsDefaults",
         "test:coding/extension/builtin/codemode/options_override_test.go#TestInlineBudgetSettingAboveTheIntRangeStaysLarge"
       ]
     },
@@ -140711,7 +140736,7 @@
       "id": "pkg:coding-agent/.#CodemodeExtensionOptions::property:mode",
       "disposition": "ported",
       "upstreamShapeHash": "sha256:2d03863e0517b71da617d7cae5bc89b5c69c7fb3ed1707de3e701d56b6d0feaa",
-      "rationale": "Derived by the interface gap detector: CodemodeExtensionOptions::property:mode is Go coding/extension/builtin/codemode/tool.go#Options.mode (name rule N1), every shape rule holds, and it is exercised by a function reachable from cmd/pig. The row is re-derived on every run of make interface-gaps-update.",
+      "rationale": "Derived by the interface gap detector: CodemodeExtensionOptions::property:mode is Go coding/extension/builtin/codemode/tool.go#Options.mode (name rule N1), every shape rule holds, and it is exercised by an asserting Go test. The row is re-derived on every run of make interface-gaps-update.",
       "pigTargets": [
         "coding/extension/builtin/codemode/tool.go#Options.mode"
       ],
@@ -140724,7 +140749,7 @@
         "call:coding/extension/builtin/codemode/tool.go#Options.mode"
       ],
       "evidence": [
-        "reach:coding/extension/builtin/codemode/tool.go#Options.mode"
+        "test:coding/extension/builtin/codemode/settings_defaults_oracle_test.go#TestCodemodeDefaultsAreThePinnedPiSettingsDefaults"
       ]
     },
     {
@@ -143281,7 +143306,7 @@
         "shape": "complete"
       },
       "production": [
-        "call:coding/create_agent_session.go#createAgentSessionOver"
+        "call:coding/cli/child_sessions.go#createChildSession"
       ],
       "evidence": [
         "test:coding/create_agent_session_test.go#TestCreateAgentSessionFromServicesForwardsTheSessionInputs"
@@ -160615,8 +160640,8 @@
       ],
       "evidence": [
         "test:coding/cli/builtin_extension_order_test.go#TestBuiltinLlamaRegistersItsNativeProviderAndCommandThroughTheLoader",
-        "test:coding/extension/runtime_state_test.go#TestBindProviderActionsDrainsTheNativeQueue",
-        "test:coding/extension/runtime_state_test.go#TestPendingNativeProviderRegistrationsExposeTheProviderObject"
+        "test:coding/extension/host/subprocess/provider_object_load_queue_test.go#TestProviderObjectRegisteredWhileLoadingIsQueuedForABoundRegistry",
+        "test:coding/extension/runtime_state_test.go#TestBindProviderActionsDrainsTheNativeQueue"
       ]
     },
     {
@@ -160638,7 +160663,7 @@
       "evidence": [
         "test:coding/extension/host/inproc/upstream_provider_queue_test.go#TestUpstreamRunnerProviderRegistration",
         "test:test/extension-conformance/node_extension_api_test.go#TestNodeProviderConfigWithImageAndClassifierModels",
-        "test:test/extension-conformance/python_extension_api_test.go#TestPythonSDKProviderConfigWithImageAndClassifierModels"
+        "test:test/extension-conformance/provider_registration_diagnostic_test.go#TestProviderRegistrationFailureIsADiagnosticAcrossSDKs"
       ]
     },
     {
@@ -161196,7 +161221,7 @@
       "evidence": [
         "test:coding/extension/host/inproc/upstream_provider_queue_test.go#TestRunnerProviderActionsOverrideRegistry",
         "test:coding/extension/host/inproc/upstream_provider_queue_test.go#TestUpstreamRunnerProviderRegistration",
-        "test:coding/extension/host/inproc/runtime_shared_state_test.go#TestBindCoreKeepsTheActionsAHostBoundToTheSharedRuntime"
+        "test:coding/cli/extension_host_wiring_guard_test.go#TestBuildFlushesTheExtensionHostProviderRegistrations"
       ]
     },
     {
@@ -161218,7 +161243,7 @@
       "evidence": [
         "test:coding/extension/host/inproc/upstream_provider_queue_test.go#TestRunnerProviderActionsOverrideRegistry",
         "test:coding/extension/host/inproc/upstream_provider_queue_test.go#TestUpstreamRunnerProviderRegistration",
-        "test:coding/extension/host/inproc/runtime_shared_state_test.go#TestBindCoreKeepsTheActionsAHostBoundToTheSharedRuntime"
+        "test:coding/cli/extension_host_wiring_guard_test.go#TestBuildFlushesTheExtensionHostProviderRegistrations"
       ]
     },
     {
@@ -163481,11 +163506,11 @@
       ],
       "layers": {
         "behavior": "complete",
-        "production": "public-api-tested",
+        "production": "complete",
         "shape": "complete"
       },
       "production": [
-        "public-api:coding/extension/ui.go#UIContext.SetWidget"
+        "call:coding/session_graph_extension_runner_ui.go#GraphExtensionRunner.callUI"
       ],
       "evidence": [
         "test:coding/extension/ui_test.go#TestNoopUIContext_AllMethodsReturnUpstreamDefaults"
@@ -163501,11 +163526,11 @@
       ],
       "layers": {
         "behavior": "complete",
-        "production": "public-api-tested",
+        "production": "complete",
         "shape": "complete"
       },
       "production": [
-        "public-api:coding/extension/ui.go#UIContext.SetWidget"
+        "call:coding/session_graph_extension_runner_ui.go#GraphExtensionRunner.callUI"
       ],
       "evidence": [
         "test:coding/extension/ui_test.go#TestNoopUIContext_AllMethodsReturnUpstreamDefaults"
@@ -166647,7 +166672,7 @@
         "shape": "complete"
       },
       "production": [
-        "call:coding/cli/builtin_extensions.go#nativeBuiltInExtensions"
+        "call:coding/extension/builtin/codemode_on.go#createCodemodeReference"
       ],
       "evidence": [
         "test:coding/cli/extension_set_upstream_test.go#TestBuiltInExtensionNamesListsOnlyBuiltinEntries",
@@ -170588,9 +170613,9 @@
         "call:coding/mcpext/command.go#Extension.openURL"
       ],
       "evidence": [
+        "test:coding/session_graph_mcp_test.go#TestGraphMcpUpdateConfigAndOpenURLWire",
         "test:coding/mcpext/command_test.go#TestMcpFactoryRegistersTheCommand",
-        "test:coding/mcpext/command_test.go#TestMcpLoadConfigReceivesTheHandlersExtensionContext",
-        "test:coding/mcpext/command_test.go#TestMcpToolCallPassesTheInputInItsMemberOrderToReachesTools"
+        "test:coding/mcpext/command_test.go#TestMcpLoadConfigReceivesTheHandlersExtensionContext"
       ]
     },
     {
@@ -170700,7 +170725,7 @@
       "evidence": [
         "test:coding/mcpext/oauth_signin_internal_test.go#TestSignInNoticeShowsThePlainAuthorizationURL",
         "test:coding/mcpext/sign_in_link_internal_test.go#TestMcpLoginNoticeShowsThePlainSignInURL",
-        "test:coding/mcp_oauth_session_upstream_test.go#TestAgentSessionMCPOAuthAcceptsAPastedRedirectURLWhenTheBrowserCannotReachTheCallback"
+        "test:coding/session_graph_mcp_test.go#TestGraphMcpUpdateConfigAndOpenURLWire"
       ]
     },
     {
@@ -170742,9 +170767,9 @@
         "call:coding/mcpext/extension.go#Extension.saveConfig"
       ],
       "evidence": [
+        "test:coding/session_graph_mcp_test.go#TestGraphMcpUpdateConfigAndOpenURLWire",
         "test:coding/mcpext/command_test.go#TestMcpCommandAsksWhichServerWhenSeveralQualify",
-        "test:coding/mcpext/command_test.go#TestMcpCommandCompletions",
-        "test:coding/mcpext/command_test.go#TestMcpCommandCompletionsSplitOnJavaScriptWhitespace"
+        "test:coding/mcpext/command_test.go#TestMcpCommandCompletions"
       ]
     },
     {
@@ -170965,11 +170990,11 @@
       ],
       "layers": {
         "behavior": "complete",
-        "production": "public-api-tested",
+        "production": "complete",
         "shape": "complete"
       },
       "production": [
-        "public-api:coding/mcpext/runtime.go#TransportFactory"
+        "call:coding/session_graph_mcp.go#graphMcpTransportFactory"
       ],
       "evidence": [
         "test:coding/mcpext/connection_test.go#TestMCPConnectionsCallTheTransportFactoryWithEntryCwdAndAuthProvider"
@@ -170985,11 +171010,11 @@
       ],
       "layers": {
         "behavior": "complete",
-        "production": "public-api-tested",
+        "production": "complete",
         "shape": "complete"
       },
       "production": [
-        "public-api:coding/mcpext/runtime.go#TransportFactory"
+        "call:coding/session_graph_mcp.go#graphMcpTransportFactory"
       ],
       "evidence": [
         "test:coding/mcpext/connection_test.go#TestMCPConnectionsCallTheTransportFactoryWithEntryCwdAndAuthProvider"
@@ -172842,40 +172867,44 @@
       "id": "pkg:coding-agent/.#ModelRegistry::property:registerVirtualModel",
       "disposition": "ported",
       "upstreamShapeHash": "sha256:e73fe86aff3d544584f5ae37e9a3227540a34eecc130a15bb93ca12d72c1239e",
-      "rationale": "ModelRegistry.registerVirtualModel is the Go method coding.ModelRegistry.RegisterVirtualModel; signature reviewed against the upstream declaration (a persistence or validation failure is the returned error; undefined is nil or the empty value); callers and tests attributed by go/types (methodrefs).",
+      "rationale": "Derived by the interface gap detector: ModelRegistry::property:registerVirtualModel is Go coding/virtual_models.go#ModelRegistry.RegisterVirtualModel (name rule N1), every shape rule holds, and it is exercised by an asserting Go test. The row is re-derived on every run of make interface-gaps-update.",
       "pigTargets": [
         "coding/virtual_models.go#ModelRegistry.RegisterVirtualModel"
       ],
       "layers": {
-        "shape": "complete",
+        "behavior": "complete",
         "production": "complete",
-        "behavior": "complete"
+        "shape": "complete"
       },
       "production": [
-        "call:coding/cli/extensions.go#flushExtensionHostVirtualModels"
+        "call:coding/virtual_models.go#ModelRegistry.RegisterVirtualModel"
       ],
       "evidence": [
-        "test:coding/cli/startup_virtual_model_test.go#TestSelectStartupModelLeavesTheVirtualCatalogEntryUnchanged"
+        "test:coding/cli/startup_virtual_model_test.go#TestSelectStartupModelLeavesTheVirtualCatalogEntryUnchanged",
+        "test:test/extension-conformance/node_sync_visibility_test.go#TestNodeContextAbortAbortsTheRunSignalInTheSameTick",
+        "test:test/extension-conformance/node_sync_visibility_test.go#TestNodeGetCommandsListsACommandRegisteredAfterLoad"
       ]
     },
     {
       "id": "pkg:coding-agent/.#ModelRegistry::property:registerVirtualModel::call:0",
       "disposition": "ported",
       "upstreamShapeHash": "sha256:000d10b1661ebcf4d7c7b704ca1b5d7d5498076b58a31a4e2f4ae22ad147bc15",
-      "rationale": "ModelRegistry.registerVirtualModel is the Go method coding.ModelRegistry.RegisterVirtualModel; signature reviewed against the upstream declaration (a persistence or validation failure is the returned error; undefined is nil or the empty value); callers and tests attributed by go/types (methodrefs).",
+      "rationale": "Derived by the interface gap detector: ModelRegistry::property:registerVirtualModel::call:0 is Go coding/virtual_models.go#ModelRegistry.RegisterVirtualModel (name rule N1), every shape rule holds, and it is exercised by an asserting Go test. The row is re-derived on every run of make interface-gaps-update.",
       "pigTargets": [
         "coding/virtual_models.go#ModelRegistry.RegisterVirtualModel"
       ],
       "layers": {
-        "shape": "complete",
+        "behavior": "complete",
         "production": "complete",
-        "behavior": "complete"
+        "shape": "complete"
       },
       "production": [
-        "call:coding/cli/extensions.go#flushExtensionHostVirtualModels"
+        "call:coding/virtual_models.go#ModelRegistry.RegisterVirtualModel"
       ],
       "evidence": [
-        "test:coding/cli/startup_virtual_model_test.go#TestSelectStartupModelLeavesTheVirtualCatalogEntryUnchanged"
+        "test:coding/cli/startup_virtual_model_test.go#TestSelectStartupModelLeavesTheVirtualCatalogEntryUnchanged",
+        "test:test/extension-conformance/node_sync_visibility_test.go#TestNodeContextAbortAbortsTheRunSignalInTheSameTick",
+        "test:test/extension-conformance/node_sync_visibility_test.go#TestNodeGetCommandsListsACommandRegisteredAfterLoad"
       ]
     },
     {
@@ -173939,40 +173968,44 @@
       "id": "pkg:coding-agent/.#ModelRuntime::property:getAvailableSnapshot",
       "disposition": "ported",
       "upstreamShapeHash": "sha256:2c111ffd530486ca4e30beb89c4694b027ecea96d0ac7b1ed1178b7130665c57",
-      "rationale": "ModelRuntime.getAvailableSnapshot is the Go method ModelRuntime.GetAvailableSnapshot; types reviewed against the upstream declaration; tests are upstream-ported files and attributed by go/types (methodrefs).",
+      "rationale": "Derived by the interface gap detector: ModelRuntime::property:getAvailableSnapshot is Go coding/model_availability.go#ModelRuntime.GetAvailableSnapshot (name rule N1), every shape rule holds, and it is exercised by an asserting Go test. The row is re-derived on every run of make interface-gaps-update.",
       "pigTargets": [
         "coding/model_availability.go#ModelRuntime.GetAvailableSnapshot"
       ],
       "layers": {
-        "shape": "complete",
+        "behavior": "complete",
         "production": "complete",
-        "behavior": "complete"
+        "shape": "complete"
       },
       "production": [
-        "call:coding/cli/rpc_mode.go#rpcAvailableModels"
+        "call:coding/model_availability.go#ModelRuntime.GetAvailableSnapshot"
       ],
       "evidence": [
-        "test:coding/credential_refresh_7027_upstream_test.go#TestCredentialRefreshHang7027StalledLogin"
+        "test:coding/credential_refresh_7027_upstream_test.go#TestCredentialRefreshHang7027StalledLogin",
+        "test:test/extension-conformance/provider_stream_test.go#TestProviderProducersAcrossSDKs",
+        "test:coding/create_agent_session_test.go#TestCreateAgentSessionFromServicesSelectsTheInitialModelOrReportsNone"
       ]
     },
     {
       "id": "pkg:coding-agent/.#ModelRuntime::property:getAvailableSnapshot::call:0",
       "disposition": "ported",
       "upstreamShapeHash": "sha256:eda778942dc1e664e85130af1626407040a09ba01b0e9dfb975508ef3fc29f92",
-      "rationale": "ModelRuntime.getAvailableSnapshot is the Go method ModelRuntime.GetAvailableSnapshot; types reviewed against the upstream declaration; tests are upstream-ported files and attributed by go/types (methodrefs).",
+      "rationale": "Derived by the interface gap detector: ModelRuntime::property:getAvailableSnapshot::call:0 is Go coding/model_availability.go#ModelRuntime.GetAvailableSnapshot (name rule N1), every shape rule holds, and it is exercised by an asserting Go test. The row is re-derived on every run of make interface-gaps-update.",
       "pigTargets": [
         "coding/model_availability.go#ModelRuntime.GetAvailableSnapshot"
       ],
       "layers": {
-        "shape": "complete",
+        "behavior": "complete",
         "production": "complete",
-        "behavior": "complete"
+        "shape": "complete"
       },
       "production": [
-        "call:coding/cli/rpc_mode.go#rpcAvailableModels"
+        "call:coding/model_availability.go#ModelRuntime.GetAvailableSnapshot"
       ],
       "evidence": [
-        "test:coding/credential_refresh_7027_upstream_test.go#TestCredentialRefreshHang7027StalledLogin"
+        "test:coding/credential_refresh_7027_upstream_test.go#TestCredentialRefreshHang7027StalledLogin",
+        "test:test/extension-conformance/provider_stream_test.go#TestProviderProducersAcrossSDKs",
+        "test:coding/create_agent_session_test.go#TestCreateAgentSessionFromServicesSelectsTheInitialModelOrReportsNone"
       ]
     },
     {
@@ -179384,7 +179417,7 @@
         "shape": "complete"
       },
       "production": [
-        "call:internal/codingagent/provider_registration_validation.go#ModelRegistry.validateExtensionRegistration"
+        "call:coding/services.go#registerHarnessTestFaux"
       ],
       "evidence": [
         "test:coding/custom_provider_stream_upstream_test.go#TestRegisteredProviderCallbackPanicIsRequestError",
@@ -179402,14 +179435,16 @@
       ],
       "layers": {
         "behavior": "complete",
-        "production": "public-api-tested",
+        "production": "complete",
         "shape": "complete"
       },
       "production": [
-        "public-api:coding/extension/provider.go#ProviderConfig.APIKey"
+        "call:coding/services.go#registerHarnessTestFaux"
       ],
       "evidence": [
-        "test:coding/custom_provider_stream_upstream_test.go#TestRegisteredProviderCallbackServesOnlyItsAPI"
+        "test:coding/custom_provider_stream_upstream_test.go#TestRegisteredProviderCallbackPanicIsRequestError",
+        "test:coding/custom_provider_stream_upstream_test.go#TestRegisteredProviderCallbackServesOnlyItsAPI",
+        "test:coding/custom_provider_stream_upstream_test.go#TestRegisteredProviderCustomStreamUpstream"
       ]
     },
     {
@@ -179446,7 +179481,7 @@
         "shape": "complete"
       },
       "production": [
-        "call:internal/codingagent/native_provider.go#ModelRegistry.RegisterNativeProvider"
+        "call:coding/services.go#registerHarnessTestFaux"
       ],
       "evidence": [
         "test:coding/custom_provider_stream_upstream_test.go#TestRegisteredProviderCallbackPanicIsRequestError",
@@ -179534,7 +179569,7 @@
         "shape": "complete"
       },
       "production": [
-        "call:internal/codingagent/model_registry.go#providerConfigFromRegistration"
+        "call:coding/services.go#registerHarnessTestFaux"
       ],
       "evidence": [
         "test:coding/custom_provider_stream_upstream_test.go#TestRegisteredProviderCallbackPanicIsRequestError",
@@ -179646,7 +179681,7 @@
         "shape": "complete"
       },
       "production": [
-        "call:internal/codingagent/model_registry.go#providerConfigFromRegistration"
+        "call:coding/services.go#registerHarnessTestFaux"
       ],
       "evidence": [
         "test:coding/custom_provider_stream_upstream_test.go#TestRegisteredProviderCallbackPanicIsRequestError",
@@ -189400,7 +189435,7 @@
         "shape": "complete"
       },
       "production": [
-        "call:coding/cli/extension_login_preview_command.go#runExtensionLoginPreview"
+        "call:coding/cli/child_sessions.go#createChildSession"
       ],
       "evidence": [
         "test:coding/runner_model_registry_upstream_test.go#TestNewExtensionRunnerBindsItsConstructorArguments",
@@ -192746,9 +192781,9 @@
         "call:internal/codingagent/settings.go#SettingsManager.GetCacheWarmingMode"
       ],
       "evidence": [
+        "test:internal/codingagent/settings_defaults_oracle_test.go#TestSettingsDefaultsMatchPiOnAnEmptySettingsManager",
         "test:internal/codingagent/settings_manager_upstream_test.go#TestUpstreamSettingsManager",
-        "test:internal/codingagent/settings_structured_getters_oracle_test.go#TestSettingsManagerStructuredGettersMatchPi",
-        "test:internal/codingagent/settings_upstream_test.go#TestSettingsManagerOriginalValues"
+        "test:internal/codingagent/settings_structured_getters_oracle_test.go#TestSettingsManagerStructuredGettersMatchPi"
       ]
     },
     {
@@ -192768,9 +192803,9 @@
         "call:internal/codingagent/settings.go#SettingsManager.GetCacheWarmingMode"
       ],
       "evidence": [
+        "test:internal/codingagent/settings_defaults_oracle_test.go#TestSettingsDefaultsMatchPiOnAnEmptySettingsManager",
         "test:internal/codingagent/settings_manager_upstream_test.go#TestUpstreamSettingsManager",
-        "test:internal/codingagent/settings_structured_getters_oracle_test.go#TestSettingsManagerStructuredGettersMatchPi",
-        "test:internal/codingagent/settings_upstream_test.go#TestSettingsManagerOriginalValues"
+        "test:internal/codingagent/settings_structured_getters_oracle_test.go#TestSettingsManagerStructuredGettersMatchPi"
       ]
     },
     {
@@ -192832,9 +192867,9 @@
         "call:internal/codingagent/settings.go#SettingsManager.GetCodeBlockIndent"
       ],
       "evidence": [
+        "test:internal/codingagent/settings_defaults_oracle_test.go#TestSettingsDefaultsMatchPiOnAnEmptySettingsManager",
         "test:internal/codingagent/settings_getters_oracle_test.go#TestSettingsManagerGettersMatchPi",
-        "test:internal/codingagent/settings_accessors_roundtrip_test.go#TestSettingsManagerGettersReadTheirKeysAndDefaultWhenAbsent",
-        "test:internal/codingagent/settings_code_block_indent_test.go#TestSettingsKeepAnAuthoredEmptyOrNullCodeBlockIndent"
+        "test:internal/codingagent/settings_accessors_roundtrip_test.go#TestSettingsManagerGettersReadTheirKeysAndDefaultWhenAbsent"
       ]
     },
     {
@@ -192854,9 +192889,9 @@
         "call:internal/codingagent/settings.go#SettingsManager.GetCodeBlockIndent"
       ],
       "evidence": [
+        "test:internal/codingagent/settings_defaults_oracle_test.go#TestSettingsDefaultsMatchPiOnAnEmptySettingsManager",
         "test:internal/codingagent/settings_getters_oracle_test.go#TestSettingsManagerGettersMatchPi",
-        "test:internal/codingagent/settings_accessors_roundtrip_test.go#TestSettingsManagerGettersReadTheirKeysAndDefaultWhenAbsent",
-        "test:internal/codingagent/settings_code_block_indent_test.go#TestSettingsKeepAnAuthoredEmptyOrNullCodeBlockIndent"
+        "test:internal/codingagent/settings_accessors_roundtrip_test.go#TestSettingsManagerGettersReadTheirKeysAndDefaultWhenAbsent"
       ]
     },
     {
@@ -192876,9 +192911,9 @@
         "call:internal/codingagent/settings.go#SettingsManager.GetCollapseChangelog"
       ],
       "evidence": [
+        "test:internal/codingagent/settings_defaults_oracle_test.go#TestSettingsDefaultsMatchPiOnAnEmptySettingsManager",
         "test:internal/codingagent/settings_structured_getters_oracle_test.go#TestSettingsManagerStructuredGettersMatchPi",
-        "test:internal/codingagent/settings_accessors_roundtrip_test.go#TestSettingsManagerGettersReadTheirKeysAndDefaultWhenAbsent",
-        "test:internal/codingagent/settings_getters_alloc_test.go#TestSettingsScalarGettersDoNotCopySettings"
+        "test:internal/codingagent/settings_accessors_roundtrip_test.go#TestSettingsManagerGettersReadTheirKeysAndDefaultWhenAbsent"
       ]
     },
     {
@@ -192898,9 +192933,9 @@
         "call:internal/codingagent/settings.go#SettingsManager.GetCollapseChangelog"
       ],
       "evidence": [
+        "test:internal/codingagent/settings_defaults_oracle_test.go#TestSettingsDefaultsMatchPiOnAnEmptySettingsManager",
         "test:internal/codingagent/settings_structured_getters_oracle_test.go#TestSettingsManagerStructuredGettersMatchPi",
-        "test:internal/codingagent/settings_accessors_roundtrip_test.go#TestSettingsManagerGettersReadTheirKeysAndDefaultWhenAbsent",
-        "test:internal/codingagent/settings_getters_alloc_test.go#TestSettingsScalarGettersDoNotCopySettings"
+        "test:internal/codingagent/settings_accessors_roundtrip_test.go#TestSettingsManagerGettersReadTheirKeysAndDefaultWhenAbsent"
       ]
     },
     {
@@ -192920,9 +192955,9 @@
         "call:internal/codingagent/settings.go#SettingsManager.GetCompactionEnabled"
       ],
       "evidence": [
+        "test:internal/codingagent/settings_defaults_oracle_test.go#TestSettingsDefaultsMatchPiOnAnEmptySettingsManager",
         "test:internal/codingagent/settings_getters_oracle_test.go#TestSettingsManagerGettersMatchPi",
-        "test:internal/codingagent/settings_memory_upstream_test.go#TestInMemorySettingsReloadUpstream",
-        "test:coding/session_settings_accessors_test.go#TestSessionReportsQueueModesAndTheAutoSettings"
+        "test:internal/codingagent/settings_memory_upstream_test.go#TestInMemorySettingsReloadUpstream"
       ]
     },
     {
@@ -192942,9 +192977,9 @@
         "call:internal/codingagent/settings.go#SettingsManager.GetCompactionEnabled"
       ],
       "evidence": [
+        "test:internal/codingagent/settings_defaults_oracle_test.go#TestSettingsDefaultsMatchPiOnAnEmptySettingsManager",
         "test:internal/codingagent/settings_getters_oracle_test.go#TestSettingsManagerGettersMatchPi",
-        "test:internal/codingagent/settings_memory_upstream_test.go#TestInMemorySettingsReloadUpstream",
-        "test:coding/session_settings_accessors_test.go#TestSessionReportsQueueModesAndTheAutoSettings"
+        "test:internal/codingagent/settings_memory_upstream_test.go#TestInMemorySettingsReloadUpstream"
       ]
     },
     {
@@ -193052,9 +193087,9 @@
         "call:internal/codingagent/settings.go#SettingsManager.GetCompactionSettings"
       ],
       "evidence": [
+        "test:internal/codingagent/settings_defaults_oracle_test.go#TestSettingsDefaultsMatchPiOnAnEmptySettingsManager",
         "test:internal/codingagent/settings_resolved_getters_oracle_test.go#TestSettingsManagerResolvedGettersMatchPi",
-        "test:coding/compaction_api_test.go#TestCompactionHelpersArePublicAndAgreeWithSettingsDefaults",
-        "test:coding/settings_manager_pi_test.go#TestInMemorySettingsManagerResolvesCompactionOverridesLikePi"
+        "test:coding/compaction_api_test.go#TestCompactionHelpersArePublicAndAgreeWithSettingsDefaults"
       ]
     },
     {
@@ -193074,9 +193109,9 @@
         "call:internal/codingagent/settings.go#SettingsManager.GetCompactionSettings"
       ],
       "evidence": [
+        "test:internal/codingagent/settings_defaults_oracle_test.go#TestSettingsDefaultsMatchPiOnAnEmptySettingsManager",
         "test:internal/codingagent/settings_resolved_getters_oracle_test.go#TestSettingsManagerResolvedGettersMatchPi",
-        "test:coding/compaction_api_test.go#TestCompactionHelpersArePublicAndAgreeWithSettingsDefaults",
-        "test:coding/settings_manager_pi_test.go#TestInMemorySettingsManagerResolvesCompactionOverridesLikePi"
+        "test:coding/compaction_api_test.go#TestCompactionHelpersArePublicAndAgreeWithSettingsDefaults"
       ]
     },
     {
@@ -193306,9 +193341,9 @@
         "call:internal/codingagent/settings.go#SettingsManager.GetDoubleEscapeAction"
       ],
       "evidence": [
+        "test:internal/codingagent/settings_defaults_oracle_test.go#TestSettingsDefaultsMatchPiOnAnEmptySettingsManager",
         "test:internal/codingagent/settings_structured_getters_oracle_test.go#TestSettingsManagerStructuredGettersMatchPi",
-        "test:internal/codingagent/settings_accessors_roundtrip_test.go#TestSettingsManagerGettersReadTheirKeysAndDefaultWhenAbsent",
-        "test:internal/codingagent/settings_accessors_roundtrip_test.go#TestSettingsManagerSettersPersistTheirKeyAndTheGetterReadsItBack"
+        "test:internal/codingagent/settings_accessors_roundtrip_test.go#TestSettingsManagerGettersReadTheirKeysAndDefaultWhenAbsent"
       ]
     },
     {
@@ -193328,9 +193363,9 @@
         "call:internal/codingagent/settings.go#SettingsManager.GetDoubleEscapeAction"
       ],
       "evidence": [
+        "test:internal/codingagent/settings_defaults_oracle_test.go#TestSettingsDefaultsMatchPiOnAnEmptySettingsManager",
         "test:internal/codingagent/settings_structured_getters_oracle_test.go#TestSettingsManagerStructuredGettersMatchPi",
-        "test:internal/codingagent/settings_accessors_roundtrip_test.go#TestSettingsManagerGettersReadTheirKeysAndDefaultWhenAbsent",
-        "test:internal/codingagent/settings_accessors_roundtrip_test.go#TestSettingsManagerSettersPersistTheirKeyAndTheGetterReadsItBack"
+        "test:internal/codingagent/settings_accessors_roundtrip_test.go#TestSettingsManagerGettersReadTheirKeysAndDefaultWhenAbsent"
       ]
     },
     {
@@ -193392,9 +193427,9 @@
         "call:internal/codingagent/settings.go#SettingsManager.GetEnableAnalytics"
       ],
       "evidence": [
+        "test:internal/codingagent/settings_defaults_oracle_test.go#TestSettingsDefaultsMatchPiOnAnEmptySettingsManager",
         "test:internal/codingagent/settings_structured_getters_oracle_test.go#TestSettingsManagerStructuredGettersMatchPi",
-        "test:internal/codingagent/first_time_setup_test.go#TestShowFirstTimeSetupSavesTheChoiceBeforeTheTUI",
-        "test:internal/codingagent/settings_getters_alloc_test.go#TestSettingsScalarGettersDoNotCopySettings"
+        "test:internal/codingagent/first_time_setup_test.go#TestShowFirstTimeSetupSavesTheChoiceBeforeTheTUI"
       ]
     },
     {
@@ -193414,9 +193449,9 @@
         "call:internal/codingagent/settings.go#SettingsManager.GetEnableAnalytics"
       ],
       "evidence": [
+        "test:internal/codingagent/settings_defaults_oracle_test.go#TestSettingsDefaultsMatchPiOnAnEmptySettingsManager",
         "test:internal/codingagent/settings_structured_getters_oracle_test.go#TestSettingsManagerStructuredGettersMatchPi",
-        "test:internal/codingagent/first_time_setup_test.go#TestShowFirstTimeSetupSavesTheChoiceBeforeTheTUI",
-        "test:internal/codingagent/settings_getters_alloc_test.go#TestSettingsScalarGettersDoNotCopySettings"
+        "test:internal/codingagent/first_time_setup_test.go#TestShowFirstTimeSetupSavesTheChoiceBeforeTheTUI"
       ]
     },
     {
@@ -193516,9 +193551,9 @@
         "call:internal/codingagent/settings.go#SettingsManager.GetEnableSkillCommands"
       ],
       "evidence": [
+        "test:internal/codingagent/settings_defaults_oracle_test.go#TestSettingsDefaultsMatchPiOnAnEmptySettingsManager",
         "test:internal/codingagent/settings_getters_oracle_test.go#TestSettingsManagerGettersMatchPi",
-        "test:internal/codingagent/settings_simple_getters_upstream_test.go#TestSettingsManagerSimpleGettersMatchUpstreamDefaultsAndStoredValues",
-        "test:internal/codingagent/settings_accessors_roundtrip_test.go#TestSettingsManagerGettersReadTheirKeysAndDefaultWhenAbsent"
+        "test:internal/codingagent/settings_simple_getters_upstream_test.go#TestSettingsManagerSimpleGettersMatchUpstreamDefaultsAndStoredValues"
       ]
     },
     {
@@ -193538,9 +193573,9 @@
         "call:internal/codingagent/settings.go#SettingsManager.GetEnableSkillCommands"
       ],
       "evidence": [
+        "test:internal/codingagent/settings_defaults_oracle_test.go#TestSettingsDefaultsMatchPiOnAnEmptySettingsManager",
         "test:internal/codingagent/settings_getters_oracle_test.go#TestSettingsManagerGettersMatchPi",
-        "test:internal/codingagent/settings_simple_getters_upstream_test.go#TestSettingsManagerSimpleGettersMatchUpstreamDefaultsAndStoredValues",
-        "test:internal/codingagent/settings_accessors_roundtrip_test.go#TestSettingsManagerGettersReadTheirKeysAndDefaultWhenAbsent"
+        "test:internal/codingagent/settings_simple_getters_upstream_test.go#TestSettingsManagerSimpleGettersMatchUpstreamDefaultsAndStoredValues"
       ]
     },
     {
@@ -193646,9 +193681,9 @@
         "call:internal/codingagent/settings.go#SettingsManager.GetFollowUpMode"
       ],
       "evidence": [
+        "test:internal/codingagent/settings_defaults_oracle_test.go#TestSettingsDefaultsMatchPiOnAnEmptySettingsManager",
         "test:internal/codingagent/settings_getters_oracle_test.go#TestSettingsManagerGettersMatchPi",
-        "test:internal/codingagent/settings_simple_getters_upstream_test.go#TestSettingsManagerSimpleGettersMatchUpstreamDefaultsAndStoredValues",
-        "test:internal/codingagent/settings_accessors_roundtrip_test.go#TestSettingsManagerGettersReadTheirKeysAndDefaultWhenAbsent"
+        "test:internal/codingagent/settings_simple_getters_upstream_test.go#TestSettingsManagerSimpleGettersMatchUpstreamDefaultsAndStoredValues"
       ]
     },
     {
@@ -193668,9 +193703,9 @@
         "call:internal/codingagent/settings.go#SettingsManager.GetFollowUpMode"
       ],
       "evidence": [
+        "test:internal/codingagent/settings_defaults_oracle_test.go#TestSettingsDefaultsMatchPiOnAnEmptySettingsManager",
         "test:internal/codingagent/settings_getters_oracle_test.go#TestSettingsManagerGettersMatchPi",
-        "test:internal/codingagent/settings_simple_getters_upstream_test.go#TestSettingsManagerSimpleGettersMatchUpstreamDefaultsAndStoredValues",
-        "test:internal/codingagent/settings_accessors_roundtrip_test.go#TestSettingsManagerGettersReadTheirKeysAndDefaultWhenAbsent"
+        "test:internal/codingagent/settings_simple_getters_upstream_test.go#TestSettingsManagerSimpleGettersMatchUpstreamDefaultsAndStoredValues"
       ]
     },
     {
@@ -194030,9 +194065,9 @@
         "call:internal/codingagent/settings.go#SettingsManager.GetImageWidthCells"
       ],
       "evidence": [
+        "test:internal/codingagent/settings_defaults_oracle_test.go#TestSettingsDefaultsMatchPiOnAnEmptySettingsManager",
         "test:internal/codingagent/settings_structured_getters_oracle_test.go#TestSettingsManagerStructuredGettersMatchPi",
-        "test:internal/codingagent/settings_structured_getters_oracle_test.go#TestSettingsWriteKeepsAnAuthoredNonPositiveImageWidthCells",
-        "test:internal/codingagent/settings_accessors_roundtrip_test.go#TestSettingsManagerGettersReadTheirKeysAndDefaultWhenAbsent"
+        "test:internal/codingagent/settings_structured_getters_oracle_test.go#TestSettingsWriteKeepsAnAuthoredNonPositiveImageWidthCells"
       ]
     },
     {
@@ -194052,9 +194087,9 @@
         "call:internal/codingagent/settings.go#SettingsManager.GetImageWidthCells"
       ],
       "evidence": [
+        "test:internal/codingagent/settings_defaults_oracle_test.go#TestSettingsDefaultsMatchPiOnAnEmptySettingsManager",
         "test:internal/codingagent/settings_structured_getters_oracle_test.go#TestSettingsManagerStructuredGettersMatchPi",
-        "test:internal/codingagent/settings_structured_getters_oracle_test.go#TestSettingsWriteKeepsAnAuthoredNonPositiveImageWidthCells",
-        "test:internal/codingagent/settings_accessors_roundtrip_test.go#TestSettingsManagerGettersReadTheirKeysAndDefaultWhenAbsent"
+        "test:internal/codingagent/settings_structured_getters_oracle_test.go#TestSettingsWriteKeepsAnAuthoredNonPositiveImageWidthCells"
       ]
     },
     {
@@ -194284,9 +194319,9 @@
         "call:internal/codingagent/settings.go#SettingsManager.GetOutputPad"
       ],
       "evidence": [
+        "test:internal/codingagent/settings_defaults_oracle_test.go#TestSettingsDefaultsMatchPiOnAnEmptySettingsManager",
         "test:internal/codingagent/settings_manager_upstream_test.go#TestUpstreamSettingsManager",
-        "test:internal/codingagent/settings_structured_getters_oracle_test.go#TestSettingsManagerStructuredGettersMatchPi",
-        "test:internal/codingagent/settings_upstream_test.go#TestSettingsManagerOriginalValues"
+        "test:internal/codingagent/settings_structured_getters_oracle_test.go#TestSettingsManagerStructuredGettersMatchPi"
       ]
     },
     {
@@ -194306,9 +194341,9 @@
         "call:internal/codingagent/settings.go#SettingsManager.GetOutputPad"
       ],
       "evidence": [
+        "test:internal/codingagent/settings_defaults_oracle_test.go#TestSettingsDefaultsMatchPiOnAnEmptySettingsManager",
         "test:internal/codingagent/settings_manager_upstream_test.go#TestUpstreamSettingsManager",
-        "test:internal/codingagent/settings_structured_getters_oracle_test.go#TestSettingsManagerStructuredGettersMatchPi",
-        "test:internal/codingagent/settings_upstream_test.go#TestSettingsManagerOriginalValues"
+        "test:internal/codingagent/settings_structured_getters_oracle_test.go#TestSettingsManagerStructuredGettersMatchPi"
       ]
     },
     {
@@ -194460,7 +194495,7 @@
       "evidence": [
         "test:internal/codingagent/provider_retry_settings_upstream_test.go#TestProviderRetrySettingsDistinguishUnsetFromExplicitZero",
         "test:internal/codingagent/provider_retry_settings_upstream_test.go#TestProviderRetrySettingsPreservesGlobalSettingsNotOverriddenByProject",
-        "test:internal/codingagent/settings_structured_getters_oracle_test.go#TestSettingsManagerStructuredGettersMatchPi"
+        "test:internal/codingagent/settings_defaults_oracle_test.go#TestSettingsDefaultsMatchPiOnAnEmptySettingsManager"
       ]
     },
     {
@@ -194482,7 +194517,7 @@
       "evidence": [
         "test:internal/codingagent/provider_retry_settings_upstream_test.go#TestProviderRetrySettingsDistinguishUnsetFromExplicitZero",
         "test:internal/codingagent/provider_retry_settings_upstream_test.go#TestProviderRetrySettingsPreservesGlobalSettingsNotOverriddenByProject",
-        "test:internal/codingagent/settings_structured_getters_oracle_test.go#TestSettingsManagerStructuredGettersMatchPi"
+        "test:internal/codingagent/settings_defaults_oracle_test.go#TestSettingsDefaultsMatchPiOnAnEmptySettingsManager"
       ]
     },
     {
@@ -194502,9 +194537,9 @@
         "call:internal/codingagent/settings.go#SettingsManager.GetQuietStartup"
       ],
       "evidence": [
+        "test:internal/codingagent/settings_defaults_oracle_test.go#TestSettingsDefaultsMatchPiOnAnEmptySettingsManager",
         "test:internal/codingagent/settings_structured_getters_oracle_test.go#TestSettingsManagerStructuredGettersMatchPi",
-        "test:internal/codingagent/quiet_startup_setting_test.go#TestQuietStartupSettingReadsAsPi",
-        "test:internal/codingagent/quiet_startup_setting_test.go#TestQuietStartupValueSpelling"
+        "test:internal/codingagent/quiet_startup_setting_test.go#TestQuietStartupSettingReadsAsPi"
       ]
     },
     {
@@ -194524,9 +194559,9 @@
         "call:internal/codingagent/settings.go#SettingsManager.GetQuietStartup"
       ],
       "evidence": [
+        "test:internal/codingagent/settings_defaults_oracle_test.go#TestSettingsDefaultsMatchPiOnAnEmptySettingsManager",
         "test:internal/codingagent/settings_structured_getters_oracle_test.go#TestSettingsManagerStructuredGettersMatchPi",
-        "test:internal/codingagent/quiet_startup_setting_test.go#TestQuietStartupSettingReadsAsPi",
-        "test:internal/codingagent/quiet_startup_setting_test.go#TestQuietStartupValueSpelling"
+        "test:internal/codingagent/quiet_startup_setting_test.go#TestQuietStartupSettingReadsAsPi"
       ]
     },
     {
@@ -194590,9 +194625,9 @@
         "call:internal/codingagent/settings.go#SettingsManager.GetRetrySettings"
       ],
       "evidence": [
+        "test:internal/codingagent/settings_defaults_oracle_test.go#TestSettingsDefaultsMatchPiOnAnEmptySettingsManager",
         "test:internal/codingagent/settings_manager_upstream_test.go#TestUpstreamSettingsManager",
-        "test:internal/codingagent/settings_structured_getters_oracle_test.go#TestSettingsManagerStructuredGettersMatchPi",
-        "test:internal/codingagent/settings_upstream_test.go#TestSettingsManagerOriginalValues"
+        "test:internal/codingagent/settings_structured_getters_oracle_test.go#TestSettingsManagerStructuredGettersMatchPi"
       ]
     },
     {
@@ -194612,9 +194647,9 @@
         "call:internal/codingagent/settings.go#SettingsManager.GetRetrySettings"
       ],
       "evidence": [
+        "test:internal/codingagent/settings_defaults_oracle_test.go#TestSettingsDefaultsMatchPiOnAnEmptySettingsManager",
         "test:internal/codingagent/settings_manager_upstream_test.go#TestUpstreamSettingsManager",
-        "test:internal/codingagent/settings_structured_getters_oracle_test.go#TestSettingsManagerStructuredGettersMatchPi",
-        "test:internal/codingagent/settings_upstream_test.go#TestSettingsManagerOriginalValues"
+        "test:internal/codingagent/settings_structured_getters_oracle_test.go#TestSettingsManagerStructuredGettersMatchPi"
       ]
     },
     {
@@ -194678,9 +194713,9 @@
         "call:internal/codingagent/settings.go#SettingsManager.GetSessionShareDestination"
       ],
       "evidence": [
+        "test:internal/codingagent/settings_defaults_oracle_test.go#TestSettingsDefaultsMatchPiOnAnEmptySettingsManager",
         "test:internal/codingagent/session_share_destination_test.go#TestShareHandlerUploadsToPiGForEveryShareDestination",
-        "test:internal/codingagent/settings_session_share_destination_test.go#TestSettingsManager_GetSessionShareDestination",
-        "test:internal/codingagent/settings_session_share_destination_test.go#TestSettingsManager_SetSessionShareDestinationPersistsGlobally"
+        "test:internal/codingagent/settings_session_share_destination_test.go#TestSettingsManager_GetSessionShareDestination"
       ]
     },
     {
@@ -194700,9 +194735,9 @@
         "call:internal/codingagent/settings.go#SettingsManager.GetSessionShareDestination"
       ],
       "evidence": [
+        "test:internal/codingagent/settings_defaults_oracle_test.go#TestSettingsDefaultsMatchPiOnAnEmptySettingsManager",
         "test:internal/codingagent/session_share_destination_test.go#TestShareHandlerUploadsToPiGForEveryShareDestination",
-        "test:internal/codingagent/settings_session_share_destination_test.go#TestSettingsManager_GetSessionShareDestination",
-        "test:internal/codingagent/settings_session_share_destination_test.go#TestSettingsManager_SetSessionShareDestinationPersistsGlobally"
+        "test:internal/codingagent/settings_session_share_destination_test.go#TestSettingsManager_GetSessionShareDestination"
       ]
     },
     {
@@ -194854,9 +194889,9 @@
         "call:internal/codingagent/settings.go#SettingsManager.GetShowCacheMissNotices"
       ],
       "evidence": [
+        "test:internal/codingagent/settings_defaults_oracle_test.go#TestSettingsDefaultsMatchPiOnAnEmptySettingsManager",
         "test:internal/codingagent/settings_simple_getters_upstream_test.go#TestSettingsManagerSimpleGettersMatchUpstreamDefaultsAndStoredValues",
-        "test:internal/codingagent/settings_structured_getters_oracle_test.go#TestSettingsManagerStructuredGettersMatchPi",
-        "test:internal/codingagent/settings_accessors_roundtrip_test.go#TestSettingsManagerGettersReadTheirKeysAndDefaultWhenAbsent"
+        "test:internal/codingagent/settings_structured_getters_oracle_test.go#TestSettingsManagerStructuredGettersMatchPi"
       ]
     },
     {
@@ -194876,9 +194911,9 @@
         "call:internal/codingagent/settings.go#SettingsManager.GetShowCacheMissNotices"
       ],
       "evidence": [
+        "test:internal/codingagent/settings_defaults_oracle_test.go#TestSettingsDefaultsMatchPiOnAnEmptySettingsManager",
         "test:internal/codingagent/settings_simple_getters_upstream_test.go#TestSettingsManagerSimpleGettersMatchUpstreamDefaultsAndStoredValues",
-        "test:internal/codingagent/settings_structured_getters_oracle_test.go#TestSettingsManagerStructuredGettersMatchPi",
-        "test:internal/codingagent/settings_accessors_roundtrip_test.go#TestSettingsManagerGettersReadTheirKeysAndDefaultWhenAbsent"
+        "test:internal/codingagent/settings_structured_getters_oracle_test.go#TestSettingsManagerStructuredGettersMatchPi"
       ]
     },
     {
@@ -194940,9 +194975,9 @@
         "call:internal/codingagent/settings.go#SettingsManager.GetShowImages"
       ],
       "evidence": [
+        "test:internal/codingagent/settings_defaults_oracle_test.go#TestSettingsDefaultsMatchPiOnAnEmptySettingsManager",
         "test:internal/codingagent/settings_getters_oracle_test.go#TestSettingsManagerGettersMatchPi",
-        "test:internal/codingagent/settings_accessors_roundtrip_test.go#TestSettingsManagerGettersReadTheirKeysAndDefaultWhenAbsent",
-        "test:internal/codingagent/settings_getters_alloc_test.go#TestSettingsScalarGettersDoNotCopySettings"
+        "test:internal/codingagent/settings_accessors_roundtrip_test.go#TestSettingsManagerGettersReadTheirKeysAndDefaultWhenAbsent"
       ]
     },
     {
@@ -194962,9 +194997,9 @@
         "call:internal/codingagent/settings.go#SettingsManager.GetShowImages"
       ],
       "evidence": [
+        "test:internal/codingagent/settings_defaults_oracle_test.go#TestSettingsDefaultsMatchPiOnAnEmptySettingsManager",
         "test:internal/codingagent/settings_getters_oracle_test.go#TestSettingsManagerGettersMatchPi",
-        "test:internal/codingagent/settings_accessors_roundtrip_test.go#TestSettingsManagerGettersReadTheirKeysAndDefaultWhenAbsent",
-        "test:internal/codingagent/settings_getters_alloc_test.go#TestSettingsScalarGettersDoNotCopySettings"
+        "test:internal/codingagent/settings_accessors_roundtrip_test.go#TestSettingsManagerGettersReadTheirKeysAndDefaultWhenAbsent"
       ]
     },
     {
@@ -195070,9 +195105,9 @@
         "call:internal/codingagent/settings.go#SettingsManager.GetSteeringMode"
       ],
       "evidence": [
+        "test:internal/codingagent/settings_defaults_oracle_test.go#TestSettingsDefaultsMatchPiOnAnEmptySettingsManager",
         "test:internal/codingagent/settings_getters_oracle_test.go#TestSettingsManagerGettersMatchPi",
-        "test:internal/codingagent/settings_simple_getters_upstream_test.go#TestSettingsManagerSimpleGettersMatchUpstreamDefaultsAndStoredValues",
-        "test:coding/session_resource_accessors_test.go#TestSessionSettingsManagerIsTheManagerItPersistsThrough"
+        "test:internal/codingagent/settings_simple_getters_upstream_test.go#TestSettingsManagerSimpleGettersMatchUpstreamDefaultsAndStoredValues"
       ]
     },
     {
@@ -195092,9 +195127,9 @@
         "call:internal/codingagent/settings.go#SettingsManager.GetSteeringMode"
       ],
       "evidence": [
+        "test:internal/codingagent/settings_defaults_oracle_test.go#TestSettingsDefaultsMatchPiOnAnEmptySettingsManager",
         "test:internal/codingagent/settings_getters_oracle_test.go#TestSettingsManagerGettersMatchPi",
-        "test:internal/codingagent/settings_simple_getters_upstream_test.go#TestSettingsManagerSimpleGettersMatchUpstreamDefaultsAndStoredValues",
-        "test:coding/session_resource_accessors_test.go#TestSessionSettingsManagerIsTheManagerItPersistsThrough"
+        "test:internal/codingagent/settings_simple_getters_upstream_test.go#TestSettingsManagerSimpleGettersMatchUpstreamDefaultsAndStoredValues"
       ]
     },
     {
@@ -195376,9 +195411,9 @@
         "call:internal/codingagent/settings.go#SettingsManager.GetTransport"
       ],
       "evidence": [
+        "test:internal/codingagent/settings_defaults_oracle_test.go#TestSettingsDefaultsMatchPiOnAnEmptySettingsManager",
         "test:internal/codingagent/settings_getters_oracle_test.go#TestSettingsManagerGettersMatchPi",
-        "test:internal/codingagent/settings_accessors_roundtrip_test.go#TestSettingsManagerGettersReadTheirKeysAndDefaultWhenAbsent",
-        "test:internal/codingagent/settings_getters_alloc_test.go#TestSettingsScalarGettersDoNotCopySettings"
+        "test:internal/codingagent/settings_accessors_roundtrip_test.go#TestSettingsManagerGettersReadTheirKeysAndDefaultWhenAbsent"
       ]
     },
     {
@@ -195398,9 +195433,9 @@
         "call:internal/codingagent/settings.go#SettingsManager.GetTransport"
       ],
       "evidence": [
+        "test:internal/codingagent/settings_defaults_oracle_test.go#TestSettingsDefaultsMatchPiOnAnEmptySettingsManager",
         "test:internal/codingagent/settings_getters_oracle_test.go#TestSettingsManagerGettersMatchPi",
-        "test:internal/codingagent/settings_accessors_roundtrip_test.go#TestSettingsManagerGettersReadTheirKeysAndDefaultWhenAbsent",
-        "test:internal/codingagent/settings_getters_alloc_test.go#TestSettingsScalarGettersDoNotCopySettings"
+        "test:internal/codingagent/settings_accessors_roundtrip_test.go#TestSettingsManagerGettersReadTheirKeysAndDefaultWhenAbsent"
       ]
     },
     {
@@ -195462,9 +195497,9 @@
         "call:internal/codingagent/settings.go#SettingsManager.GetTuiMode"
       ],
       "evidence": [
+        "test:internal/codingagent/settings_defaults_oracle_test.go#TestSettingsDefaultsMatchPiOnAnEmptySettingsManager",
         "test:internal/codingagent/settings_manager_upstream_test.go#TestUpstreamSettingsManager",
-        "test:internal/codingagent/settings_structured_getters_oracle_test.go#TestSettingsManagerStructuredGettersMatchPi",
-        "test:internal/codingagent/settings_tui_mode_oracle_test.go#TestSettingsTuiModeAndFullscreenExitOutputMatchPi"
+        "test:internal/codingagent/settings_structured_getters_oracle_test.go#TestSettingsManagerStructuredGettersMatchPi"
       ]
     },
     {
@@ -195484,9 +195519,9 @@
         "call:internal/codingagent/settings.go#SettingsManager.GetTuiMode"
       ],
       "evidence": [
+        "test:internal/codingagent/settings_defaults_oracle_test.go#TestSettingsDefaultsMatchPiOnAnEmptySettingsManager",
         "test:internal/codingagent/settings_manager_upstream_test.go#TestUpstreamSettingsManager",
-        "test:internal/codingagent/settings_structured_getters_oracle_test.go#TestSettingsManagerStructuredGettersMatchPi",
-        "test:internal/codingagent/settings_tui_mode_oracle_test.go#TestSettingsTuiModeAndFullscreenExitOutputMatchPi"
+        "test:internal/codingagent/settings_structured_getters_oracle_test.go#TestSettingsManagerStructuredGettersMatchPi"
       ]
     },
     {
@@ -208277,9 +208312,9 @@
         "call:durable/codemode/call.go#call.execute"
       ],
       "evidence": [
+        "test:durable/codemode/codemode_pi_oracle_test.go#TestCodemodeDeclarationsMatchPi",
         "test:durable/examples/spec_usage_upstream_test.go#TestSpecUsageHostSequenceRuns",
-        "test:durable/harness/agent_resolve_pi_oracle_test.go#TestResolveAgentMatchesPi",
-        "test:durable/tools/coding_tools_pi_oracle_test.go#TestReadOfImagesMatchesPi"
+        "test:durable/harness/agent_resolve_pi_oracle_test.go#TestResolveAgentMatchesPi"
       ]
     },
     {
@@ -210835,9 +210870,9 @@
         "call:durable/harness/define.go#DefineTool"
       ],
       "evidence": [
+        "test:durable/codemode/call_rows_pi_test.go#TestNestedCallRowsTakeTheirStatusAndErrorTextFromTheResult",
         "test:durable/codemode/codemode_test.go#TestDurableCodeMode",
-        "test:durable/codemode/describe_test.go#TestDescribeRendersTheSectionFromTheConversationsCallableToolsIntoTheSystemPrompt",
-        "test:durable/core/driver/harness_reports_core_test.go#TestReports"
+        "test:durable/codemode/describe_test.go#TestDescribeRendersTheSectionFromTheConversationsCallableToolsIntoTheSystemPrompt"
       ]
     },
     {
@@ -210857,9 +210892,9 @@
         "call:durable/harness/define.go#DefineTool"
       ],
       "evidence": [
+        "test:durable/codemode/call_rows_pi_test.go#TestNestedCallRowsTakeTheirStatusAndErrorTextFromTheResult",
         "test:durable/codemode/codemode_test.go#TestDurableCodeMode",
-        "test:durable/codemode/describe_test.go#TestDescribeRendersTheSectionFromTheConversationsCallableToolsIntoTheSystemPrompt",
-        "test:durable/core/driver/harness_reports_core_test.go#TestReports"
+        "test:durable/codemode/describe_test.go#TestDescribeRendersTheSectionFromTheConversationsCallableToolsIntoTheSystemPrompt"
       ]
     },
     {
@@ -211497,9 +211532,9 @@
         "call:durable/entries.go#DefineEntry"
       ],
       "evidence": [
+        "test:durable/codemode/lone_surrogate_tool_result_test.go#TestAToolResultWithALoneSurrogateKeepsItThroughTheHarnessAndTheEntry",
         "test:durable/core/driver/harness_tasks_port2_core_test.go#TestCoreTaskCommitsResultsWithEntriesKeepsMemosUntilTerminalAndRetiresDocuments",
-        "test:durable/entries_behavior_test.go#TestDefineEntryGuardsByKindAndDecodesTypedData",
-        "test:durable/examples/background_subagents_example_test.go#TestExample22SubagentBackground"
+        "test:durable/entries_behavior_test.go#TestDefineEntryGuardsByKindAndDecodesTypedData"
       ]
     },
     {
@@ -211519,9 +211554,9 @@
         "call:durable/entries.go#Entry.Is"
       ],
       "evidence": [
+        "test:durable/codemode/lone_surrogate_tool_result_test.go#TestAToolResultWithALoneSurrogateKeepsItThroughTheHarnessAndTheEntry",
         "test:durable/core/driver/harness_tasks_port2_core_test.go#TestCoreTaskCommitsResultsWithEntriesKeepsMemosUntilTerminalAndRetiresDocuments",
-        "test:durable/entries_behavior_test.go#TestDefineEntryGuardsByKindAndDecodesTypedData",
-        "test:durable/examples/background_subagents_example_test.go#TestExample22SubagentBackground"
+        "test:durable/entries_behavior_test.go#TestDefineEntryGuardsByKindAndDecodesTypedData"
       ]
     },
     {
@@ -211541,9 +211576,9 @@
         "call:durable/entries.go#Entry.Is"
       ],
       "evidence": [
+        "test:durable/codemode/lone_surrogate_tool_result_test.go#TestAToolResultWithALoneSurrogateKeepsItThroughTheHarnessAndTheEntry",
         "test:durable/core/driver/harness_tasks_port2_core_test.go#TestCoreTaskCommitsResultsWithEntriesKeepsMemosUntilTerminalAndRetiresDocuments",
-        "test:durable/entries_behavior_test.go#TestDefineEntryGuardsByKindAndDecodesTypedData",
-        "test:durable/examples/background_subagents_example_test.go#TestExample22SubagentBackground"
+        "test:durable/entries_behavior_test.go#TestDefineEntryGuardsByKindAndDecodesTypedData"
       ]
     },
     {
@@ -211695,9 +211730,9 @@
         "call:durable/codemode/tool.go#CreateExtension"
       ],
       "evidence": [
+        "test:durable/codemode/codemode_pi_oracle_test.go#TestCodemodeDeclarationsMatchPi",
         "test:durable/examples/spec_usage_upstream_test.go#TestSpecUsageHostSequenceRuns",
-        "test:durable/harness/agent_resolve_pi_oracle_test.go#TestResolveAgentMatchesPi",
-        "test:durable/harness/registry_reader_upstream_test.go#TestRegistryReaderSnapshotsAreImmutableAndSubscribersSeeEachPublication"
+        "test:durable/harness/agent_resolve_pi_oracle_test.go#TestResolveAgentMatchesPi"
       ]
     },
     {
@@ -211761,9 +211796,9 @@
         "call:durable/codemode/tool.go#CreateExtension"
       ],
       "evidence": [
+        "test:durable/codemode/codemode_pi_oracle_test.go#TestCodemodeDeclarationsMatchPi",
         "test:durable/harness/agent_resolve_pi_oracle_test.go#TestResolveAgentMatchesPi",
-        "test:durable/harness/registry_reader_upstream_test.go#TestRegistryReaderSnapshotsAreImmutableAndSubscribersSeeEachPublication",
-        "test:durable/core/driver/core_test.go#TestAgentIsServedByTheCoreFromTheRegistryAndTheStoredState"
+        "test:durable/harness/registry_reader_upstream_test.go#TestRegistryReaderSnapshotsAreImmutableAndSubscribersSeeEachPublication"
       ]
     },
     {
@@ -213969,9 +214004,9 @@
         "call:durable/codemode/call.go#call.callTool"
       ],
       "evidence": [
+        "test:durable/codemode/codemode_helpers_pi_oracle_test.go#TestCodemodeHelpersMatchPi",
         "test:durable/core/driver/harness_nested_core_test.go#TestCoreANestedCallToAnUnavailableToolIsAnErrorResult",
-        "test:durable/core/driver/harness_nested_core_test.go#TestCoreANestedCallsStructuredOutput",
-        "test:durable/core/driver/harness_nested_core_test.go#TestCoreANestedKeyReturnsItsCallAndRecordsUsage"
+        "test:durable/core/driver/harness_nested_core_test.go#TestCoreANestedCallsStructuredOutput"
       ]
     },
     {
@@ -214190,9 +214225,9 @@
         "call:durable/codemode/tool.go#CreateExtension"
       ],
       "evidence": [
+        "test:durable/codemode/codemode_pi_oracle_test.go#TestCodemodeDeclarationsMatchPi",
         "test:durable/harness/agent_resolve_pi_oracle_test.go#TestResolveAgentMatchesPi",
-        "test:durable/core/driver/core_test.go#TestAgentIsServedByTheCoreFromTheRegistryAndTheStoredState",
-        "test:durable/core/driver/harness_reports_core_test.go#TestReports"
+        "test:durable/core/driver/core_test.go#TestAgentIsServedByTheCoreFromTheRegistryAndTheStoredState"
       ]
     },
     {
@@ -214212,9 +214247,9 @@
         "call:durable/codemode/tool.go#CreateExtension"
       ],
       "evidence": [
+        "test:durable/codemode/codemode_pi_oracle_test.go#TestCodemodeDeclarationsMatchPi",
         "test:durable/harness/agent_resolve_pi_oracle_test.go#TestResolveAgentMatchesPi",
-        "test:durable/harness/registry_reader_upstream_test.go#TestRegistryReaderSnapshotsAreImmutableAndSubscribersSeeEachPublication",
-        "test:durable/examples/chat_examples_test.go#TestExample14SystemPrompt"
+        "test:durable/harness/registry_reader_upstream_test.go#TestRegistryReaderSnapshotsAreImmutableAndSubscribersSeeEachPublication"
       ]
     },
     {
@@ -219525,9 +219560,9 @@
         "call:durable/codemode/call.go#call.callGlobal"
       ],
       "evidence": [
-        "test:durable/tools/powershell_upstream_test.go#TestPowerShellPrepareChangesTheScriptAndItsErrorFailsTheCall",
-        "test:durable/core/driver/harness_nested_core_test.go#TestCoreACallerThatReturnsAbortsTheNestedCallsItLeftRunning",
-        "test:durable/core/driver/harness_nested_core_test.go#TestCoreANestedCallToAnUnavailableToolIsAnErrorResult"
+        "test:durable/codemode/codemode_helpers_pi_oracle_test.go#TestNestedCallDetailsCutArgumentsAndErrorsToTheirPreviewLengths",
+        "test:durable/codemode/codemode_helpers_pi_oracle_test.go#TestTheHeaderShowsTheWallTimeFromTheHarnessClock",
+        "test:durable/tools/powershell_upstream_test.go#TestPowerShellPrepareChangesTheScriptAndItsErrorFailsTheCall"
       ],
       "asyncContract": "An awaited Promise is a blocking Go call that returns the value or error; AbortSignal is the context.Context argument; no detached goroutine."
     },
@@ -220696,9 +220731,9 @@
         "call:durable/codemode/call.go#call.complete"
       ],
       "evidence": [
-        "test:durable/harness/tool_pi_oracle_test.go#TestToolResultHelpersMatchPi",
-        "test:durable/tools/coding_tools_pi_oracle_test.go#TestReadOfImagesMatchesPi",
-        "test:durable/tools/coding_tools_run_pi_oracle_test.go#TestCodingToolsRunLikePi"
+        "test:durable/codemode/codemode_helpers_pi_oracle_test.go#TestCodemodeHelpersMatchPi",
+        "test:durable/codemode/codemode_helpers_pi_oracle_test.go#TestNestedCallDetailsCutArgumentsAndErrorsToTheirPreviewLengths",
+        "test:durable/codemode/codemode_helpers_pi_oracle_test.go#TestTheHeaderShowsTheWallTimeFromTheHarnessClock"
       ]
     },
     {
@@ -220850,9 +220885,9 @@
         "call:durable/codemode/call.go#call.execute"
       ],
       "evidence": [
-        "test:durable/harness/agent_resolve_pi_oracle_test.go#TestResolveAgentMatchesPi",
-        "test:durable/tools/coding_tools_run_pi_oracle_test.go#TestCodingToolsRunLikePi",
-        "test:durable/tools/tool_declarations_upstream_test.go#TestWriteEditAndShellToolDeclarationsMatchUpstream"
+        "test:durable/toolsearch/toolsearch_pi_oracle_test.go#TestToolSearchMatchesPiOnSeededDeferredTools",
+        "test:durable/codemode/codemode_pi_oracle_test.go#TestCodemodeDeclarationsMatchPi",
+        "test:durable/codemode/describe_pi_oracle_test.go#TestDescribeMatchesPiOnSeededToolSets"
       ]
     },
     {
@@ -220872,9 +220907,9 @@
         "call:durable/harness/tool.go#AppendToolResult"
       ],
       "evidence": [
+        "test:durable/codemode/lone_surrogate_tool_result_test.go#TestAToolResultWithALoneSurrogateKeepsItThroughTheHarnessAndTheEntry",
         "test:durable/examples/chat_examples_test.go#TestExample16CodingTools",
-        "test:durable/examples/inbox_override_examples_test.go#TestExample29ToolOverride",
-        "test:durable/examples/lifecycle_examples_test.go#TestExample30ReloadAndRestart"
+        "test:durable/examples/inbox_override_examples_test.go#TestExample29ToolOverride"
       ]
     },
     {
@@ -222544,6 +222579,7 @@
         "call:durable/codemode/call.go#call.execute"
       ],
       "evidence": [
+        "test:durable/codemode/codemode_pi_oracle_test.go#TestCodemodeDeclarationsMatchPi",
         "test:durable/codemode/constants_test.go#TestExportedConstantsAndDocumentMatchPi"
       ]
     },
@@ -222564,9 +222600,9 @@
         "call:durable/codemode/tool.go#CreateTool"
       ],
       "evidence": [
+        "test:durable/codemode/codemode_pi_oracle_test.go#TestCodemodeDeclarationsMatchPi",
         "test:durable/codemode/codemode_test.go#TestDurableCodeMode",
-        "test:durable/codemode/constants_test.go#TestExportedConstantsAndDocumentMatchPi",
-        "test:durable/codemode/call_test.go#TestACallLaunchesOnlyOnceItsIssuedCountIsCommitted"
+        "test:durable/codemode/constants_test.go#TestExportedConstantsAndDocumentMatchPi"
       ]
     },
     {
@@ -222588,7 +222624,7 @@
       "evidence": [
         "test:durable/codemode/call_test.go#TestACallLaunchesOnlyOnceItsIssuedCountIsCommitted",
         "test:durable/codemode/codemode_test.go#TestDurableCodeMode",
-        "test:durable/codemode/call_test.go#TestAScriptsTimeoutLimitsItsRun"
+        "test:durable/codemode/codemode_helpers_pi_oracle_test.go#TestNestedCallDetailsCutArgumentsAndErrorsToTheirPreviewLengths"
       ]
     },
     {
@@ -222608,9 +222644,9 @@
         "call:durable/codemode/call.go#call.execute"
       ],
       "evidence": [
-        "test:durable/codemode/describe_test.go#TestDescribeListsCallableToolsAsDeclarationsGroupedByNamespace",
-        "test:durable/codemode/describe_test.go#TestDescribeListsWhatFitsTheBudgetEveryNamespaceBeforeAnyIsCompleteAndSaysWhatIsLeftOut",
-        "test:durable/codemode/describe_test.go#TestDescribeRendersTheSectionFromTheConversationsCallableToolsIntoTheSystemPrompt"
+        "test:durable/codemode/describe_pi_oracle_test.go#TestDescribeMatchesPiOnSeededToolSets",
+        "test:durable/codemode/call_replay_pi_test.go#TestDescribeNamespaceListsEveryToolOfItsNamespaceAndMatchesItByIdentifier",
+        "test:durable/codemode/describe_test.go#TestDescribeListsCallableToolsAsDeclarationsGroupedByNamespace"
       ]
     },
     {
@@ -222630,8 +222666,9 @@
         "call:durable/codemode/call.go#call.details"
       ],
       "evidence": [
-        "test:durable/codemode/codemode_test.go#TestDurableCodeMode",
-        "test:durable/codemode/models_test.go#TestCodeModeModels"
+        "test:durable/codemode/codemode_helpers_pi_oracle_test.go#TestNestedCallDetailsCutArgumentsAndErrorsToTheirPreviewLengths",
+        "test:durable/codemode/call_rows_pi_test.go#TestNestedCallRowsTakeTheirStatusAndErrorTextFromTheResult",
+        "test:durable/codemode/codemode_test.go#TestDurableCodeMode"
       ]
     },
     {
@@ -222651,6 +222688,7 @@
         "call:durable/codemode/call.go#call.execute"
       ],
       "evidence": [
+        "test:durable/codemode/codemode_pi_oracle_test.go#TestCodemodeDeclarationsMatchPi",
         "test:durable/session/codemode_checkpoints_upstream_test.go#TestBuiltInDocumentCheckpointPolicies",
         "test:durable/codemode/constants_test.go#TestExportedConstantsAndDocumentMatchPi"
       ]
@@ -222672,9 +222710,9 @@
         "call:durable/codemode/call.go#call.complete"
       ],
       "evidence": [
-        "test:durable/codemode/codemode_test.go#TestDurableCodeMode",
-        "test:durable/codemode/output_tool_test.go#TestDurableCodeModeOutputAndToolSearch",
-        "test:durable/codemode/models_test.go#TestCodeModeModelCallsRunInTheCallingPhasesTrace"
+        "test:durable/codemode/codemode_helpers_pi_oracle_test.go#TestNestedCallDetailsCutArgumentsAndErrorsToTheirPreviewLengths",
+        "test:durable/codemode/call_rows_pi_test.go#TestNestedCallRowsTakeTheirStatusAndErrorTextFromTheResult",
+        "test:durable/codemode/codemode_test.go#TestDurableCodeMode"
       ]
     },
     {
@@ -222714,9 +222752,9 @@
         "call:durable/codemode/call.go#call.callGlobal"
       ],
       "evidence": [
-        "test:durable/codemode/describe_test.go#TestDescribeRendersTheSectionFromTheConversationsCallableToolsIntoTheSystemPrompt",
-        "test:durable/codemode/output_tool_test.go#TestDiscoveryGlobalsCheckTheirArguments",
-        "test:durable/codemode/output_tool_test.go#TestDurableCodeModeOutputAndToolSearch"
+        "test:durable/codemode/codemode_pi_oracle_test.go#TestCodemodeDeclarationsMatchPi",
+        "test:durable/codemode/call_replay_pi_test.go#TestDescribeNamespaceListsEveryToolOfItsNamespaceAndMatchesItByIdentifier",
+        "test:durable/codemode/describe_test.go#TestDescribeRendersTheSectionFromTheConversationsCallableToolsIntoTheSystemPrompt"
       ]
     },
     {
@@ -222736,9 +222774,9 @@
         "call:durable/codemode/tool.go#CreateExtension"
       ],
       "evidence": [
+        "test:durable/codemode/codemode_pi_oracle_test.go#TestCodemodeDeclarationsMatchPi",
         "test:durable/codemode/describe_test.go#TestDescribeRendersTheSectionFromTheConversationsCallableToolsIntoTheSystemPrompt",
-        "test:durable/codemode/models_test.go#TestCodeModeModelCallsRunInTheCallingPhasesTrace",
-        "test:durable/codemode/models_test.go#TestCodeModeModels"
+        "test:durable/codemode/models_test.go#TestCodeModeModelCallsRunInTheCallingPhasesTrace"
       ]
     },
     {
@@ -222758,9 +222796,9 @@
         "call:durable/codemode/tool.go#CreateExtension"
       ],
       "evidence": [
+        "test:durable/codemode/codemode_pi_oracle_test.go#TestCodemodeDeclarationsMatchPi",
         "test:durable/codemode/describe_test.go#TestDescribeRendersTheSectionFromTheConversationsCallableToolsIntoTheSystemPrompt",
-        "test:durable/codemode/models_test.go#TestCodeModeModelCallsRunInTheCallingPhasesTrace",
-        "test:durable/codemode/models_test.go#TestCodeModeModels"
+        "test:durable/codemode/models_test.go#TestCodeModeModelCallsRunInTheCallingPhasesTrace"
       ]
     },
     {
@@ -222780,9 +222818,9 @@
         "call:durable/codemode/tool.go#CreateTool"
       ],
       "evidence": [
-        "test:durable/codemode/call_test.go#TestACallLaunchesOnlyOnceItsIssuedCountIsCommitted",
-        "test:durable/codemode/call_test.go#TestAScriptsTimeoutLimitsItsRun",
-        "test:durable/codemode/call_test.go#TestTheFirstRunRecordsTheVMsFingerprint"
+        "test:durable/codemode/codemode_helpers_pi_oracle_test.go#TestNestedCallDetailsCutArgumentsAndErrorsToTheirPreviewLengths",
+        "test:durable/codemode/codemode_helpers_pi_oracle_test.go#TestTheHeaderShowsTheWallTimeFromTheHarnessClock",
+        "test:durable/codemode/codemode_pi_oracle_test.go#TestCodemodeDeclarationsMatchPi"
       ]
     },
     {
@@ -222802,9 +222840,9 @@
         "call:durable/codemode/tool.go#CreateTool"
       ],
       "evidence": [
-        "test:durable/codemode/call_test.go#TestACallLaunchesOnlyOnceItsIssuedCountIsCommitted",
-        "test:durable/codemode/call_test.go#TestAScriptsTimeoutLimitsItsRun",
-        "test:durable/codemode/call_test.go#TestTheFirstRunRecordsTheVMsFingerprint"
+        "test:durable/codemode/codemode_helpers_pi_oracle_test.go#TestNestedCallDetailsCutArgumentsAndErrorsToTheirPreviewLengths",
+        "test:durable/codemode/codemode_helpers_pi_oracle_test.go#TestTheHeaderShowsTheWallTimeFromTheHarnessClock",
+        "test:durable/codemode/codemode_pi_oracle_test.go#TestCodemodeDeclarationsMatchPi"
       ]
     },
     {
@@ -222824,6 +222862,7 @@
         "call:durable/codemode/tool.go#CreateExtension"
       ],
       "evidence": [
+        "test:durable/codemode/describe_pi_oracle_test.go#TestDescribeMatchesPiOnSeededToolSets",
         "test:durable/codemode/constants_test.go#TestExportedConstantsAndDocumentMatchPi"
       ]
     },
@@ -225847,6 +225886,7 @@
       ],
       "evidence": [
         "test:durable/env/ledger_errors_test.go#TestNewFileErrorKeepsCodeMessagePathAndCause",
+        "test:durable/env/node/rename_directory_pi_test.go#TestRenameFileReportsTheErrorOfRename2ForADirectoryDestination",
         "test:env/errors_pi_test.go#TestToFileErrorMapsCodesLikePi"
       ]
     },
@@ -229267,8 +229307,8 @@
       ],
       "evidence": [
         "test:durable/images/node/tools_images_test.go#TestCreateNodePhotonImages",
-        "test:durable/images/node/worker_test.go#TestTheWorkerExitsWhenIdleAndTheNextImageStartsAnother",
-        "test:durable/images/node/worker_test.go#TestWorkerFalsePreparesWithThePlainProcessor"
+        "test:durable/images/node/worker_idle_test.go#TestTheWorkerLeavesIdleMsAfterItsLastImage",
+        "test:durable/images/node/worker_test.go#TestTheWorkerExitsWhenIdleAndTheNextImageStartsAnother"
       ]
     },
     {
@@ -236081,9 +236121,9 @@
         "call:durable/toolsearch/toolsearch.go#CreateExtension"
       ],
       "evidence": [
+        "test:durable/toolsearch/toolsearch_pi_oracle_test.go#TestToolSearchMatchesPiOnSeededDeferredTools",
         "test:durable/toolsearch/toolsearch_test.go#TestToolSearchToolDeclarationMatchesPi",
-        "test:durable/toolsearch/toolsearch_test.go#TestAppendsEachLoadedToolInLoadOrderNotRegistryOrder",
-        "test:durable/toolsearch/toolsearch_test.go#TestFindsNothingForAnUnrelatedQueryAndLoadsNothing"
+        "test:durable/toolsearch/toolsearch_test.go#TestAppendsEachLoadedToolInLoadOrderNotRegistryOrder"
       ]
     },
     {
@@ -236103,9 +236143,9 @@
         "call:durable/toolsearch/toolsearch.go#CreateExtension"
       ],
       "evidence": [
+        "test:durable/toolsearch/toolsearch_pi_oracle_test.go#TestToolSearchMatchesPiOnSeededDeferredTools",
         "test:durable/toolsearch/toolsearch_test.go#TestToolSearchToolDeclarationMatchesPi",
-        "test:durable/toolsearch/toolsearch_test.go#TestAppendsEachLoadedToolInLoadOrderNotRegistryOrder",
-        "test:durable/toolsearch/toolsearch_test.go#TestFindsNothingForAnUnrelatedQueryAndLoadsNothing"
+        "test:durable/toolsearch/toolsearch_test.go#TestAppendsEachLoadedToolInLoadOrderNotRegistryOrder"
       ]
     },
     {
@@ -236125,6 +236165,7 @@
         "call:durable/toolsearch/toolsearch.go#CreateTool"
       ],
       "evidence": [
+        "test:durable/toolsearch/toolsearch_pi_oracle_test.go#TestToolSearchMatchesPiOnSeededDeferredTools",
         "test:durable/toolsearch/toolsearch_test.go#TestToolSearchToolDeclarationMatchesPi"
       ]
     },
@@ -236145,6 +236186,7 @@
         "call:durable/toolsearch/toolsearch.go#CreateTool"
       ],
       "evidence": [
+        "test:durable/toolsearch/toolsearch_pi_oracle_test.go#TestToolSearchMatchesPiOnSeededDeferredTools",
         "test:durable/toolsearch/toolsearch_test.go#TestToolSearchToolDeclarationMatchesPi"
       ]
     },
@@ -236165,6 +236207,7 @@
         "call:durable/toolsearch/toolsearch.go#CreateTool"
       ],
       "evidence": [
+        "test:durable/toolsearch/toolsearch_pi_oracle_test.go#TestToolSearchMatchesPiOnSeededDeferredTools",
         "test:durable/toolsearch/toolsearch_test.go#TestToolSearchToolDeclarationMatchesPi"
       ]
     },
@@ -236185,6 +236228,7 @@
         "call:durable/toolsearch/toolsearch.go#CreateTool"
       ],
       "evidence": [
+        "test:durable/toolsearch/toolsearch_pi_oracle_test.go#TestToolSearchMatchesPiOnSeededDeferredTools",
         "test:durable/toolsearch/toolsearch_test.go#TestToolSearchToolDeclarationMatchesPi"
       ]
     },
@@ -236745,9 +236789,9 @@
         "call:durable/tools/read_image.go#imageModelOf"
       ],
       "evidence": [
+        "test:durable/tools/image_processor_pi_oracle_test.go#TestImageProcessorHelpersMatchPi",
         "test:durable/images/images_test.go#TestAFormatProvidersDoNotTakeInlineBecomesPNG",
-        "test:durable/images/images_test.go#TestAJPEGThatMustBeReEncodedStaysAJPEG",
-        "test:durable/images/images_test.go#TestAPNGTooLargeForTheByteLimitBecomesAJPEGAtItsSizeThenShrinks"
+        "test:durable/images/images_test.go#TestAJPEGThatMustBeReEncodedStaysAJPEG"
       ]
     },
     {
@@ -236811,8 +236855,8 @@
         "call:durable/tools/read_image.go#imageModelOf"
       ],
       "evidence": [
-        "test:durable/images/photon_pi_oracle_test.go#TestPhotonImagesMatchPiOnACorpus",
         "test:durable/tools/coding_tools_pi_oracle_test.go#TestReadOfImagesMatchesPi",
+        "test:durable/tools/image_processor_pi_oracle_test.go#TestImageProcessorHelpersMatchPi",
         "test:durable/images/images_test.go#TestAPNGTooLargeForTheByteLimitBecomesAJPEGAtItsSizeThenShrinks"
       ]
     },
@@ -236960,9 +237004,9 @@
         "call:durable/tools/read_image.go#readImage"
       ],
       "evidence": [
-        "test:durable/images/photon_pi_oracle_test.go#TestPhotonImagesMatchPiOnACorpus",
         "test:durable/tools/coding_tools_pi_oracle_test.go#TestReadOfImagesMatchesPi",
-        "test:durable/images/images_test.go#TestAFormatProvidersDoNotTakeInlineBecomesPNG"
+        "test:durable/images/images_test.go#TestAFormatProvidersDoNotTakeInlineBecomesPNG",
+        "test:durable/images/images_test.go#TestAJPEGThatMustBeReEncodedStaysAJPEG"
       ]
     },
     {
@@ -241777,7 +241821,8 @@
       ],
       "evidence": [
         "test:env/connection_request_test.go#TestConnectionRequestSendsPayloadsAndReportsTheAnsweringSession",
-        "test:env/connection_request_test.go#TestReplyCarriesTheFramePayloadOfAPread"
+        "test:env/connection_request_test.go#TestReplyCarriesTheFramePayloadOfAPread",
+        "test:env/frame_limit_test.go#TestRequestOverTheFrameLimitFailsWithoutReachingTheDaemon"
       ]
     },
     {
@@ -247072,8 +247117,8 @@
       ],
       "evidence": [
         "test:coding/mcpext/connection_test.go#TestMCPConnectionsRetriesResourceReadsButNotToolCallsAfterATransientHTTPError",
-        "test:coding/mcpext/command_test.go#TestMcpToolCallPassesTheInputInItsMemberOrderToReachesTools",
-        "test:coding/mcpext/connection_test.go#TestMCPConnectionsAppendsServerLogMessagesToTheLogFile"
+        "test:coding/session_graph_mcp_test.go#TestGraphMcpTransportProxy",
+        "test:coding/mcpext/command_test.go#TestMcpToolCallPassesTheInputInItsMemberOrderToReachesTools"
       ],
       "asyncContract": "An awaited Promise is a blocking Go call that returns the value or error; AbortSignal is the context.Context argument; no detached goroutine."
     },
@@ -247081,7 +247126,7 @@
       "id": "pkg:mcp/.#McpTransport::property:close",
       "disposition": "ported",
       "upstreamShapeHash": "sha256:224a331c8b3e5b8db8f0ed62fadfe68cc6c41e65f8bf7ffb1374a3d41303eed7",
-      "rationale": "Derived by the interface gap detector: McpTransport::property:close is Go mcp/transport.go#Transport.Close (name rule N1), every shape rule holds, and it is exercised by a function reachable from cmd/pig. The row is re-derived on every run of make interface-gaps-update.",
+      "rationale": "Derived by the interface gap detector: McpTransport::property:close is Go mcp/transport.go#Transport.Close (name rule N1), every shape rule holds, and it is exercised by an asserting Go test. The row is re-derived on every run of make interface-gaps-update.",
       "pigTargets": [
         "mcp/transport.go#Transport.Close"
       ],
@@ -247094,7 +247139,7 @@
         "call:mcp/client.go#Client.Close"
       ],
       "evidence": [
-        "reach:mcp/client.go#Client.Close"
+        "test:coding/session_graph_mcp_test.go#TestGraphMcpTransportProxy"
       ],
       "asyncContract": "An awaited Promise is a blocking Go call that returns the value or error; AbortSignal is the context.Context argument; no detached goroutine."
     },
@@ -247102,7 +247147,7 @@
       "id": "pkg:mcp/.#McpTransport::property:close::call:0",
       "disposition": "ported",
       "upstreamShapeHash": "sha256:4016e58fe8d19c1878838481adfefa1484c3b03881840f594c0670e3a6202013",
-      "rationale": "Derived by the interface gap detector: McpTransport::property:close::call:0 is Go mcp/transport.go#Transport.Close (name rule N1), every shape rule holds, and it is exercised by a function reachable from cmd/pig. The row is re-derived on every run of make interface-gaps-update.",
+      "rationale": "Derived by the interface gap detector: McpTransport::property:close::call:0 is Go mcp/transport.go#Transport.Close (name rule N1), every shape rule holds, and it is exercised by an asserting Go test. The row is re-derived on every run of make interface-gaps-update.",
       "pigTargets": [
         "mcp/transport.go#Transport.Close"
       ],
@@ -247115,7 +247160,7 @@
         "call:mcp/client.go#Client.Close"
       ],
       "evidence": [
-        "reach:mcp/client.go#Client.Close"
+        "test:coding/session_graph_mcp_test.go#TestGraphMcpTransportProxy"
       ],
       "asyncContract": "An awaited Promise is a blocking Go call that returns the value or error; AbortSignal is the context.Context argument; no detached goroutine."
     },
@@ -247123,7 +247168,7 @@
       "id": "pkg:mcp/.#McpTransport::property:onClose",
       "disposition": "ported",
       "upstreamShapeHash": "sha256:e02591139127230ad3860dcd7aa2b6ff0dfc09fbe03569344669a2a656cacbbb",
-      "rationale": "Derived by the interface gap detector: McpTransport::property:onClose is Go mcp/transport.go#Transport.OnClose (name rule N1), every shape rule holds, and it is exercised by a function reachable from cmd/pig. The row is re-derived on every run of make interface-gaps-update.",
+      "rationale": "Derived by the interface gap detector: McpTransport::property:onClose is Go mcp/transport.go#Transport.OnClose (name rule N1), every shape rule holds, and it is exercised by an asserting Go test. The row is re-derived on every run of make interface-gaps-update.",
       "pigTargets": [
         "mcp/transport.go#Transport.OnClose"
       ],
@@ -247136,14 +247181,14 @@
         "call:mcp/client.go#Client.Connect"
       ],
       "evidence": [
-        "reach:mcp/client.go#Client.Connect"
+        "test:coding/session_graph_mcp_test.go#TestGraphMcpTransportProxy"
       ]
     },
     {
       "id": "pkg:mcp/.#McpTransport::property:onClose::call:0",
       "disposition": "ported",
       "upstreamShapeHash": "sha256:b364cbef7d8fecac454b434ba272a31ee36f1dd372e9155012218622ae9ed251",
-      "rationale": "Derived by the interface gap detector: McpTransport::property:onClose::call:0 is Go mcp/transport.go#Transport.OnClose (name rule N1), every shape rule holds, and it is exercised by a function reachable from cmd/pig. The row is re-derived on every run of make interface-gaps-update.",
+      "rationale": "Derived by the interface gap detector: McpTransport::property:onClose::call:0 is Go mcp/transport.go#Transport.OnClose (name rule N1), every shape rule holds, and it is exercised by an asserting Go test. The row is re-derived on every run of make interface-gaps-update.",
       "pigTargets": [
         "mcp/transport.go#Transport.OnClose"
       ],
@@ -247156,7 +247201,7 @@
         "call:mcp/client.go#Client.Connect"
       ],
       "evidence": [
-        "reach:mcp/client.go#Client.Connect"
+        "test:coding/session_graph_mcp_test.go#TestGraphMcpTransportProxy"
       ]
     },
     {
@@ -247203,7 +247248,7 @@
       "id": "pkg:mcp/.#McpTransport::property:onMessage",
       "disposition": "ported",
       "upstreamShapeHash": "sha256:79986cedb0777b46cb43ea50e4a1b97875337afa9a714b47e0dffe9f8fd2e84c",
-      "rationale": "Derived by the interface gap detector: McpTransport::property:onMessage is Go mcp/transport.go#Transport.OnMessage (name rule N1), every shape rule holds, and it is exercised by a function reachable from cmd/pig. The row is re-derived on every run of make interface-gaps-update.",
+      "rationale": "Derived by the interface gap detector: McpTransport::property:onMessage is Go mcp/transport.go#Transport.OnMessage (name rule N1), every shape rule holds, and it is exercised by an asserting Go test. The row is re-derived on every run of make interface-gaps-update.",
       "pigTargets": [
         "mcp/transport.go#Transport.OnMessage"
       ],
@@ -247216,14 +247261,14 @@
         "call:mcp/client.go#Client.Connect"
       ],
       "evidence": [
-        "reach:mcp/client.go#Client.Connect"
+        "test:coding/session_graph_mcp_test.go#TestGraphMcpTransportProxy"
       ]
     },
     {
       "id": "pkg:mcp/.#McpTransport::property:onMessage::call:0",
       "disposition": "ported",
       "upstreamShapeHash": "sha256:344fccbfb52c965e729ab7ef61d795d225e8be97501792a8b43266d0b26edf10",
-      "rationale": "Derived by the interface gap detector: McpTransport::property:onMessage::call:0 is Go mcp/transport.go#Transport.OnMessage (name rule N1), every shape rule holds, and it is exercised by a function reachable from cmd/pig. The row is re-derived on every run of make interface-gaps-update.",
+      "rationale": "Derived by the interface gap detector: McpTransport::property:onMessage::call:0 is Go mcp/transport.go#Transport.OnMessage (name rule N1), every shape rule holds, and it is exercised by an asserting Go test. The row is re-derived on every run of make interface-gaps-update.",
       "pigTargets": [
         "mcp/transport.go#Transport.OnMessage"
       ],
@@ -247236,7 +247281,7 @@
         "call:mcp/client.go#Client.Connect"
       ],
       "evidence": [
-        "reach:mcp/client.go#Client.Connect"
+        "test:coding/session_graph_mcp_test.go#TestGraphMcpTransportProxy"
       ]
     },
     {
@@ -247305,7 +247350,7 @@
       "id": "pkg:mcp/.#McpTransport::property:start",
       "disposition": "ported",
       "upstreamShapeHash": "sha256:9d7cf3e7616bf0551abc2b837d09f9ed36d75c42515a4b7eb32995baaabf64f7",
-      "rationale": "Derived by the interface gap detector: McpTransport::property:start is Go mcp/transport.go#Transport.Start (name rule N1), every shape rule holds, and it is exercised by a function reachable from cmd/pig. The row is re-derived on every run of make interface-gaps-update.",
+      "rationale": "Derived by the interface gap detector: McpTransport::property:start is Go mcp/transport.go#Transport.Start (name rule N1), every shape rule holds, and it is exercised by an asserting Go test. The row is re-derived on every run of make interface-gaps-update.",
       "pigTargets": [
         "mcp/transport.go#Transport.Start"
       ],
@@ -247318,7 +247363,7 @@
         "call:mcp/client.go#Client.initialize"
       ],
       "evidence": [
-        "reach:mcp/client.go#Client.initialize"
+        "test:coding/session_graph_mcp_test.go#TestGraphMcpTransportProxy"
       ],
       "asyncContract": "An awaited Promise is a blocking Go call that returns the value or error; AbortSignal is the context.Context argument; no detached goroutine."
     },
@@ -247326,7 +247371,7 @@
       "id": "pkg:mcp/.#McpTransport::property:start::call:0",
       "disposition": "ported",
       "upstreamShapeHash": "sha256:4016e58fe8d19c1878838481adfefa1484c3b03881840f594c0670e3a6202013",
-      "rationale": "Derived by the interface gap detector: McpTransport::property:start::call:0 is Go mcp/transport.go#Transport.Start (name rule N1), every shape rule holds, and it is exercised by a function reachable from cmd/pig. The row is re-derived on every run of make interface-gaps-update.",
+      "rationale": "Derived by the interface gap detector: McpTransport::property:start::call:0 is Go mcp/transport.go#Transport.Start (name rule N1), every shape rule holds, and it is exercised by an asserting Go test. The row is re-derived on every run of make interface-gaps-update.",
       "pigTargets": [
         "mcp/transport.go#Transport.Start"
       ],
@@ -247339,7 +247384,7 @@
         "call:mcp/client.go#Client.initialize"
       ],
       "evidence": [
-        "reach:mcp/client.go#Client.initialize"
+        "test:coding/session_graph_mcp_test.go#TestGraphMcpTransportProxy"
       ],
       "asyncContract": "An awaited Promise is a blocking Go call that returns the value or error; AbortSignal is the context.Context argument; no detached goroutine."
     },
@@ -279392,8 +279437,8 @@
       ],
       "evidence": [
         "test:tui/theme_load_random_oracle_test.go#TestLoadThemeFromPathOnRandomColorsMatchesPi",
-        "test:tui/theme_tokens_oracle_test.go#TestBuiltinThemeTokensMatchPi",
-        "test:internal/codingagent/pi_logo_upstream_test.go#TestBuiltInHeaderColorsTheTextMarkInAppleTerminal256"
+        "test:tui/theme_tokens_metadata_oracle_test.go#TestOmittedOptionalThemeTokensFallBackAsInPi",
+        "test:tui/theme_tokens_oracle_test.go#TestBuiltinThemeTokensMatchPi"
       ]
     },
     {
